@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 
 const Rings = () => {
-    const numRings = 4; // Number of rings
+    const numRings = 3; // Number of rings
   const sphereRefs = useRef([]);
   const eyeballRef = useRef();
   const [eyeTarget, setEyeTarget] = useState({ x: 0, z: 0 });
