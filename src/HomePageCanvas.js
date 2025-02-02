@@ -10,9 +10,9 @@ const HomePageCanvas = () => {
     const degrees = (degrees) => degrees * (Math.PI / 180)
   return (
     <div style={{height: '100%'}}>
-        <Canvas camera={{ position: [0, 0, 15] }} style={{height: '100%'}}>
+        <Canvas shadows={true} camera={{ position: [0, 0, 15] }} style={{height: '100%'}}>
             <ambientLight intensity={0.5} />
-            <directionalLight intensity={10} position={[2, 2, 2]} />
+            <directionalLight intensity={10} position={[1,1,1]} />
             
             <HomePageLogo />
 

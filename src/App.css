@@ -3,6 +3,11 @@
   height: 100vh
 }
 
+.css-p4i41s-MuiButtonBase-root-MuiButton-root{
+  max-width: 122px;
+  font-size: 12px !important;
+}
+
 .App-logo {
   height: 20vmin;
   pointer-events: none;
