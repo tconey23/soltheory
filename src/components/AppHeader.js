@@ -16,7 +16,7 @@ const AppHeader = () => {
 
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const pages = ['SOL Games', 'Personos', 'Emotional Support Creatures', 'About'];
+  const pages = ['SOL Games', 'Thrive', 'Emotional Support Creatures', 'About'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
   const handleOpenNavMenu = (event) => {
