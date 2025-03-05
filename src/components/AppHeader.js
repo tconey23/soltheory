@@ -3,6 +3,7 @@ import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography } f
 import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
+import {useMediaQuery} from "@mui/material";
 
 const AppHeader = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
@@ -10,7 +11,9 @@ const AppHeader = () => {
   const [anchorElGames, setAnchorElGames] = useState(null); // State for "SOL Games" dropdown
   const nav = useNavigate()
 
-  const pages = ["SOL Games", "Thrive", "Emotional Support Creatures", "About"];
+  const isMobile = useMediaQuery("(max-width:430px)");
+
+  const pages = ["SOL Games", "Thrive", "ESC", "About"];
   const solGamesDropdown = ["21 Things", "Pic6"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -48,39 +51,37 @@ const AppHeader = () => {
             <img height={"75px"} src={solTheoryLogo} alt="Sol Theory Logo" />
           </Link>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
             {pages.map((page) =>
               page === "SOL Games" ? (
                 <Box key={page} sx={{ position: "relative" }}>
-                  <Button
+                  {
+                    isMobile
+                    ? <Link style={{marginLeft: 10}} to={'/games'}>{page}</Link>
+                    : <Button
                     onClick={handleOpenGamesMenu}
                     sx={{ my: 2, color: "white", display: "block", margin: 1}}
                     variant="contained"
                   >
                     {page}
-                  </Button>
-                  {/* <Menu
-                    anchorEl={anchorElGames}
-                    open={Boolean(anchorElGames)}
-                    onClose={handleCloseGamesMenu}
-                    sx={{ mt: 1 }}
-                  >
-                    {solGamesDropdown.map((game) => (
-                      <MenuItem key={game} onClick={handleCloseGamesMenu}>
-                        <Link to={`/${game.replace(' ', '')}`}>{game}</Link>
-                      </MenuItem>
-                    ))}
-                  </Menu> */}
+                  </Button>}
                 </Box>
               ) : (
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block", margin: 1}}
-                  variant="contained"
-                >
-                  {page}
-                </Button>
+                <>
+                {isMobile 
+                ? <Link style={{marginLeft: 10}}>
+                    {page}
+                  </Link>
+                :<Button
+                    key={page}
+                    onClick={handleCloseNavMenu}
+                    sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                    variant="contained"
+                    >
+                    {page}
+                  </Button>
+                }
+                </>
               )
             )}
           </Box>

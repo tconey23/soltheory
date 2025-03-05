@@ -5,6 +5,7 @@ import { Routes, Route } from 'react-router-dom';
 import TwentyOneThings from './components/games/TwentyOneThings';
 import Pic6 from './components/games/Pic6';
 import GamePageComp from './components/games/GamePageComp';
+import { useMediaQuery } from '@mui/material';
 
 function App() {
   return (

@@ -7,6 +7,8 @@ import { OrbitControls } from '@react-three/drei'
 import { MeshReflectorMaterial } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
 import { useState, useRef } from 'react'
+import { useMediaQuery } from '@mui/material'
+
 
 const purple = '#c956ff'
 const yellow = '#fff200'
@@ -17,21 +19,21 @@ const Lighting = () => {
   const light1 = useRef();
   const light2 = useRef();
   const light3 = useRef();
-
+  
   // Store intensity direction for each light
   const [lightDirections, setLightDirections] = useState({
     light1: 1, // 1 = increasing, -1 = decreasing
     light2: 1,
     light3: 1,
   });
-
+  
   useFrame(() => {
     if (light1.current && light2.current && light3.current) {
       setLightDirections((prevDirections) => {
         // Function to update intensity for a single light
         const updateLight = (light, key) => {
           if (!light) return prevDirections[key];
-
+          
           if (light.intensity >= 20) {
             return -1; // Switch to decreasing
           } else if (light.intensity <= 0) {
@@ -39,7 +41,7 @@ const Lighting = () => {
           }
           return prevDirections[key];
         };
-
+        
         // Update directions
         return {
           light1: updateLight(light1.current, "light1"),
@@ -47,20 +49,13 @@ const Lighting = () => {
           light3: updateLight(light3.current, "light3"),
         };
       });
-
-      // Apply intensity changes
-      light1.current.intensity += lightDirections.light1 * 0.001; // Adjust speed by changing 0.5
-      light2.current.intensity += lightDirections.light2 * 0.003; // Each light can have a different speed
+      
+      light1.current.intensity += lightDirections.light1 * 0.001;
+      light2.current.intensity += lightDirections.light2 * 0.003;
       light3.current.intensity += lightDirections.light3 * 0.007;
-
-      // console.log({
-      //   light1: light1.current.intensity,
-      //   light2: light2.current.intensity,
-      //   light3: light3.current.intensity,
-      // });
     }
   });
-
+  
   return (
     <>
       <directionalLight ref={light1} intensity={10} color={green} position={[2,0,1]} />
@@ -72,11 +67,12 @@ const Lighting = () => {
 
 
 const HomePageCanvas = () => {
-    const degrees = (degrees) => degrees * (Math.PI / 180)
-
+  const degrees = (degrees) => degrees * (Math.PI / 180)
+  const isMobile = useMediaQuery("(max-width:430px)");
+  
   return (
-    <div style={{height: '100%'}}>
-        <Canvas shadows={true} camera={{ position: [0, 0, 15] }} style={{height: '100%'}}>
+    <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+        <Canvas shadows={true} camera={{ position: [0, 0, 15], fov: isMobile ? 80 : 70 }} style={{height: '100%'}}>
             <ambientLight intensity={0.5} position={[0,0,0]}/>
             <Lighting />
 
