@@ -1,17 +1,22 @@
-import logo from './assets/soltheorylogo.png';
-import HomePageLogo from './HomePageLogo';
 import './App.css';
 import HomePageCanvas from './HomePageCanvas';
 import AppHeader from './components/AppHeader';
+import { Routes, Route } from 'react-router-dom';
+import TwentyOneThings from './components/games/TwentyOneThings';
+import Pic6 from './components/games/Pic6';
+import GamePageComp from './components/games/GamePageComp';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
         <AppHeader />
-      </header>
-      <div style={{height: '100%', backgroundColor: 'black'}}>
-        <HomePageCanvas />
+      <div style={{height: '100%', backgroundColor: 'white'}}>
+        <Routes>
+          <Route path="/" element={<HomePageCanvas />}/>
+          <Route path="/home" element={<HomePageCanvas />}/>
+          <Route path="/21Things" element={<GamePageComp selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>
+          <Route path="/Pic6" element={<GamePageComp selectedGame={{name: 'pic6', displayName: 'Pic6', component: Pic6}}/>}/>
+        </Routes>
       </div>
     </div>
   );

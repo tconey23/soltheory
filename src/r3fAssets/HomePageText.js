@@ -9,7 +9,7 @@ const HomePageText = () => {
     
 
   return (
-    <Center receiveShadow rotation={[degrees(-90),0,0]}>
+    <Center receiveShadow rotation={[degrees(-90),degrees(-25),0]}>
         <Text3D
             position={[5.2,-0.5,0]}
             font={font}
@@ -23,7 +23,7 @@ const HomePageText = () => {
             bevelSegments={8}
             >
         ®
-        <meshStandardMaterial attach="material" color="silver" metalness={3} roughness={10} />
+        <meshStandardMaterial attach="material" color="black" metalness={3} roughness={10} />
         </Text3D>
         <Text3D
             font={font}
@@ -37,7 +37,7 @@ const HomePageText = () => {
             bevelSegments={8}
             >
         SOL
-        <meshStandardMaterial attach="material" color="silver" metalness={3} roughness={10} />
+        <meshStandardMaterial attach="material" color="black" metalness={3} roughness={10} />
         </Text3D>
         <Text3D
             position={[3.8,-0.5,0]}
@@ -52,7 +52,7 @@ const HomePageText = () => {
             bevelSegments={8}
             >
         theory
-        <meshStandardMaterial attach="material" color="silver" metalness={3} roughness={2} />
+        <meshStandardMaterial attach="material" color="black" metalness={3} roughness={2} />
         </Text3D>
       </Center>
   )

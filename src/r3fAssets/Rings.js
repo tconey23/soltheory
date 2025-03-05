@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
+import { MeshReflectorMaterial } from "@react-three/drei";
 
 const Rings = () => {
     const numRings = 3; // Number of rings
@@ -48,7 +49,7 @@ const Rings = () => {
       {Array.from({ length: numRings }).map((_, index) => (
         <mesh rotation={[Math.PI / 2, 0, 0]} key={`ring-${index}`}>
           <torusGeometry args={[index + 4, 0.05, 16, 64]} />
-          <meshStandardMaterial color="silver" metalness={3} roughness={2} />
+          <meshLambertMaterial color="black" metalness={3} roughness={2}/>
         </mesh>
       ))}
 
@@ -56,14 +57,14 @@ const Rings = () => {
       {Array.from({ length: numRings }).map((_, index) => (
         <mesh key={`sphere-${index}`} ref={(el) => (sphereRefs.current[index] = el)}>
           <sphereGeometry args={[0.5, 32, 32]} />
-          <meshStandardMaterial color="silver" metalness={3} roughness={2} />
+          <meshLambertMaterial color="black" metalness={3} roughness={2} />
         </mesh>
       ))}
 
       {/* Eyeball Looking Around Randomly */}
       <mesh ref={eyeballRef} position={[0, 0, 0]}>
         <sphereGeometry args={[0.3, 32, 32]} /> {/* Eyeball size */}
-        <meshStandardMaterial color="silver" metalness={3} roughness={2}/>
+        <meshLambertMaterial color="black" metalness={3} roughness={2}/>
       </mesh>
     </>
   );
