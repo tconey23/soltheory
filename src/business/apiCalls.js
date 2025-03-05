@@ -1,5 +1,14 @@
 import { database21 } from "./firebase21Things";
 import { ref, get, update } from 'firebase/database';
+import {auth, users, app, userApp, currentUser } from './firebaseAuth'
+
+
+const handleAuth = async => {
+
+    
+
+}
+
 
 const get21Things = async (date) => {
 

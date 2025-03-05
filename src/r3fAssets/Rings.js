@@ -49,7 +49,7 @@ const Rings = () => {
       {Array.from({ length: numRings }).map((_, index) => (
         <mesh rotation={[Math.PI / 2, 0, 0]} key={`ring-${index}`}>
           <torusGeometry args={[index + 4, 0.05, 16, 64]} />
-          <meshLambertMaterial color="black" metalness={3} roughness={2}/>
+          <meshStandardMaterial attach="material" color="silver" metalness={1.3} roughness={0.5} />
         </mesh>
       ))}
 
@@ -57,14 +57,14 @@ const Rings = () => {
       {Array.from({ length: numRings }).map((_, index) => (
         <mesh key={`sphere-${index}`} ref={(el) => (sphereRefs.current[index] = el)}>
           <sphereGeometry args={[0.5, 32, 32]} />
-          <meshLambertMaterial color="black" metalness={3} roughness={2} />
+          <meshStandardMaterial attach="material" color="silver" metalness={1.3} roughness={0.5} />
         </mesh>
       ))}
 
       {/* Eyeball Looking Around Randomly */}
       <mesh ref={eyeballRef} position={[0, 0, 0]}>
         <sphereGeometry args={[0.3, 32, 32]} /> {/* Eyeball size */}
-        <meshLambertMaterial color="black" metalness={3} roughness={2}/>
+        <meshStandardMaterial attach="material" color="silver" metalness={1.3} roughness={0.5} />
       </mesh>
     </>
   );

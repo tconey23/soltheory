@@ -14,8 +14,9 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePageCanvas />}/>
           <Route path="/home" element={<HomePageCanvas />}/>
+          <Route path='/games' element={<GamePageComp />}/>
           <Route path="/21Things" element={<GamePageComp selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>
-          <Route path="/Pic6" element={<GamePageComp selectedGame={{name: 'pic6', displayName: 'Pic6', component: Pic6}}/>}/>
+          <Route path="/6pics" element={<GamePageComp selectedGame={{name: 'pic6', displayName: 'Pic6', component: Pic6}}/>}/>
         </Routes>
       </div>
     </div>

@@ -2,11 +2,13 @@ import { useState } from "react";
 import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography } from "@mui/material";
 import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
+import { useNavigate } from "react-router-dom";
 
 const AppHeader = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElGames, setAnchorElGames] = useState(null); // State for "SOL Games" dropdown
+  const nav = useNavigate()
 
   const pages = ["SOL Games", "Thrive", "Emotional Support Creatures", "About"];
   const solGamesDropdown = ["21 Things", "Pic6"];
@@ -30,7 +32,8 @@ const AppHeader = () => {
 
   // Open and close handlers for "SOL Games" dropdown
   const handleOpenGamesMenu = (event) => {
-    setAnchorElGames(event.currentTarget);
+    // setAnchorElGames(event.currentTarget);
+    nav('/games')
   };
 
   const handleCloseGamesMenu = () => {
@@ -51,11 +54,12 @@ const AppHeader = () => {
                 <Box key={page} sx={{ position: "relative" }}>
                   <Button
                     onClick={handleOpenGamesMenu}
-                    sx={{ my: 2, color: "white", display: "block" }}
+                    sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                    variant="contained"
                   >
                     {page}
                   </Button>
-                  <Menu
+                  {/* <Menu
                     anchorEl={anchorElGames}
                     open={Boolean(anchorElGames)}
                     onClose={handleCloseGamesMenu}
@@ -66,13 +70,14 @@ const AppHeader = () => {
                         <Link to={`/${game.replace(' ', '')}`}>{game}</Link>
                       </MenuItem>
                     ))}
-                  </Menu>
+                  </Menu> */}
                 </Box>
               ) : (
                 <Button
                   key={page}
                   onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: "white", display: "block" }}
+                  sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                  variant="contained"
                 >
                   {page}
                 </Button>

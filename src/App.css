@@ -1,4 +1,10 @@
 
+.css-dpjnhs-MuiInputBase-root-MuiOutlinedInput-root{
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+
 body{
   overflow: hidden !important;
 }

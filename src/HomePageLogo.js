@@ -4,7 +4,7 @@ import Rings from './r3fAssets/Rings'
 import { useFrame } from '@react-three/fiber'
 import { useRef } from 'react'
 
-const HomePageLogo = () => {
+const HomePageLogo = ({text}) => {
 
   const logoRef = useRef()
 
@@ -17,7 +17,7 @@ const HomePageLogo = () => {
   const degrees = (degrees) => degrees * (Math.PI / 180)
   return (
     <group ref={logoRef} position={[1,0,0]} rotation={[degrees(90),0,degrees(-25)]}>
-      <HomePageText />
+      <HomePageText text={text}/>
       <Rings />
     </group>
   )

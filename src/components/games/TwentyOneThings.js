@@ -2,52 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 import { Button, Stack, Typography, List, ListItem, Box, TextField } from '@mui/material';
 import {ImageList} from '@mui/material';
 import { get21Things } from '../../business/apiCalls';
+import Hexagon from './Hexagon';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
-const Hexagon = () => {
-
-    const [size] = useState(200)
-    const [strokeColor] = useState("#000")
-    const [strokeSize] = useState(1)
-    const [purple] = useState('#c956ff')
-    const [yellow] = useState('#fff200')
-    const [green] = useState('#45d500')
-
-
-    return (
-          <svg width={size} height={size} viewBox="0 0 186 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M135.435 25.5L93 99L50.5648 25.5L135.435 25.5Z" fill={purple} stroke={strokeColor} strokeWidth={strokeSize} />
-            <path d="M7.56476 99.5L50 26L92.4352 99.5H7.56476Z" fill={purple} stroke={strokeColor} strokeWidth={strokeSize} />
-            <path d="M93.5648 99.5L136 26L178.435 99.5H93.5648Z" fill={purple} stroke={strokeColor} strokeWidth={strokeSize} />
-            <path d="M50.5648 174.5L93 101L135.435 174.5H50.5648Z" fill={green} stroke={strokeColor} strokeWidth={strokeSize} />
-            <path d="M178.435 100.5L136 174L93.5648 100.5L178.435 100.5Z" fill={yellow} stroke={strokeColor} strokeWidth={strokeSize} />
-            <path d="M92.4352 100.5L50 174L7.56476 100.5L92.4352 100.5Z" fill={yellow} stroke={strokeColor} strokeWidth={strokeSize} />
-          </svg>
-        
-      );
-
-}
-
 const Prompt = ({prompt, color}) => {
 
     return (
-        <Stack justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
+        <Stack sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
             <Typography padding={2} fontSize={13}>{prompt}</Typography>
         </Stack>
     )
 }
 
-const Home = ({date, author, setCurrentStage, setSelections, setResetRef}) => {
+const Home = ({date, author, setCurrentStage, setResetRef}) => {
 
     const handlePlayGame = () => {
-        setSelections({
-            a: [],
-            b: [],
-            c: []
-        })
         setCurrentStage(prev => prev + 1)
         setResetRef(prev => prev +1)
     }
@@ -81,12 +53,17 @@ const Home = ({date, author, setCurrentStage, setSelections, setResetRef}) => {
 }
 
 
-const Stage1 = ({ prompts, setPrompts, setSelections, setCurrentStage, selections }) => {
+const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections, setSelections }) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [purpleCount, setPurpleCount] = useState(0);
 
     useEffect(() => {
-        setDispPrompts(prompts);
+        if(selections[currentStage].length > 0){
+            setDispPrompts([...selections[currentStage], ...prompts.filter((p) => p.color === 'white')]);
+            setPurpleCount(selections[currentStage].length)
+        } else {
+            setDispPrompts(prompts)
+        }
     }, [prompts]);
 
     const handleSelect = (prompt, i) => {
@@ -114,13 +91,27 @@ const Stage1 = ({ prompts, setPrompts, setSelections, setCurrentStage, selection
     };
 
     const handleNextStage = () => {
+
+        if(selections[currentStage +1].length > 0) {
+            setSelections(prev => ({
+                ...prev,
+                [currentStage +1]: []
+            }))
+        }
+
+        setSelections(prev => ({
+            ...prev,
+            [currentStage]: dispPrompts.filter((p) => p.color === purple)
+        }))
+        
         setCurrentStage(2)
+        
         setPrompts(dispPrompts)
     }
 
     return (
         <Stack height={'100%'}>
-            <Typography variant="h6">Selected: {purpleCount}/6</Typography>
+            <Typography variant="h6">Select the your top 6 things: {purpleCount}/6</Typography>
             <ImageList sx={{ width: 500, height: '75vh' }} cols={3} rowHeight={1000}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
@@ -137,13 +128,18 @@ const Stage1 = ({ prompts, setPrompts, setSelections, setCurrentStage, selection
     );
 };
 
-const Stage2 = ({ prompts, setCurrentStage, setPrompts}) => {
+const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentStage, selections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [yellowCount, setYellowCount] = useState(0);
 
     useEffect(() => {
-        setDispPrompts(prompts.filter((p) => p.color === purple));
-    }, [prompts, purple]);
+        if(selections[currentStage].length > 0){
+            setDispPrompts([...selections[currentStage], ...prompts.filter((p) => p.color === purple)]);
+            setYellowCount(selections[currentStage].length)
+        } else {
+            setDispPrompts(prompts.filter((p) => p.color === purple))
+        }
+    }, [prompts]);
 
     const handleSelect = (prompt, i) => {
         setDispPrompts(prevPrompts => 
@@ -170,14 +166,24 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts}) => {
     };
 
     const handleNextStage = () => {
+        if(selections[currentStage +1].length > 0) {
+            setSelections(prev => ({
+                ...prev,
+                [currentStage +1]: []
+            }))
+        }
+        setSelections(prev => ({
+            ...prev,
+            [currentStage]: dispPrompts.filter((p) => p.color === yellow)
+        }))
         setCurrentStage(3)
-        setPrompts(dispPrompts)
+        setPrompts([...dispPrompts, ...prompts.filter((p) => p.color === 'white')])
     }
     
 
     return (
         <Stack height={'100%'} alignItems="center">
-            <Typography variant="h6">Selected: {yellowCount}/3</Typography>
+            <Typography variant="h6">Now narrow it down to 3: {yellowCount}/3</Typography>
             <ImageList sx={{ width: 500, height: '75%' }} cols={3} rowHeight={1}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
@@ -193,13 +199,17 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts}) => {
     );
 };
 
-const Stage3 = ({ prompts, setCurrentStage, setPrompts}) => {
+const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections, setSelections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
 
     useEffect(() => {
-        console.log(prompts)
-        setDispPrompts(prompts.filter((p) => p.color === yellow));
+        if(selections[currentStage].length > 0){
+            setDispPrompts([...selections[currentStage], ...prompts.filter((p) => p.color === yellow)]);
+            setGreenCount(selections[currentStage].length)
+        } else {
+            setDispPrompts(prompts.filter((p) => p.color === yellow))
+        }
     }, [prompts]);
 
     const handleSelect = (prompt, i) => {
@@ -227,13 +237,23 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts}) => {
     };
 
     const handleNextStage = () => {
+        if(selections[currentStage +1].length > 0) {
+            setSelections(prev => ({
+                ...prev,
+                [currentStage +1]: []
+            }))
+        }
+        setSelections(prev => ({
+            ...prev,
+            [currentStage]: dispPrompts.filter((p) => p.color === green)
+        }))
         setCurrentStage(4)
-        setPrompts([...dispPrompts, ...prompts.filter((p) => p.color === purple)])
+        setPrompts([...dispPrompts, ...prompts.filter((p) => p.color === purple || p.color === 'white')])
     }
 
     return (
         <Stack height={'100%'} alignItems="center">
-            <Typography variant="h6">Selected: {greenCount}/1</Typography>
+            <Typography variant="h6">Now choose your favorite: {greenCount}/1</Typography>
             <ImageList sx={{ width: 500, height: '75vh' }} cols={3} rowHeight={100}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
@@ -249,26 +269,48 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts}) => {
     );
 };
 
-const Stage4 = ({prompts, setCurrentStage}) => {
+const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
     const [favorite, setFavorite] = useState(null)
+    const [userNote, setUserNote] = useState(null)
+    const [warning, setWarning] = useState(null)
 
     useEffect(() => {
-        console.log(prompts)
+        console.log('stage4',prompts)
         setDispPrompts(prompts.filter((p) => p.color !== 'white'));
         let fav = prompts.filter((p) => p.color === green).prompt
-        console.log(fav)
     }, [prompts]);
 
+    const handleNote = (val) => {
+        console.log(val.length)
+
+        if(val.length < 180){
+            setUserNote(val)
+            setWarning(null)
+        } else {
+            setWarning('You have reached the limit of 180 characters')
+        }
+
+        return
+    }
+
+    const handleSubmit = () => {
+        setCurrentStage(0)
+        setUserNote(null)
+        setSelections({
+            1: [],
+            2: [],
+            3: [],
+            4: []
+        })
+    }
 
     return (
         <Stack height={'100%'} alignItems="center">
-            <Typography variant="h6">Selected: {greenCount}/1</Typography>
             <Stack width={'100%'} justifyContent={'center'}>
-                <ImageList sx={{ width: 500, height: '75%' }} cols={3}>
-                    {dispPrompts
-                    .filter((p) => p.color === purple)
+                <ImageList sx={{ width: 500, height: '100%' }} cols={3}>
+                    {selections['1']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
@@ -277,9 +319,8 @@ const Stage4 = ({prompts, setCurrentStage}) => {
                 </ImageList>
             </Stack>
             <Stack width={'100%'} justifyContent={'center'}>
-                <ImageList sx={{ width: 500, height: '75%' }} cols={2}>
-                    {dispPrompts
-                    .filter((p) => p.color === yellow)
+                <ImageList sx={{ width: 500, height: '75%' }} cols={3}>
+                    {selections['2']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
@@ -289,9 +330,8 @@ const Stage4 = ({prompts, setCurrentStage}) => {
             </Stack>
 
             <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
-                <ImageList sx={{ width: '100%', height: '75%', justifyContent: 'center', alignItems: 'center'}} cols={1}>
-                    {dispPrompts
-                    .filter((p) => p.color === green)
+                <ImageList sx={{ width: 500, height: '75%', justifyContent: 'center', alignItems: 'center'}} cols={1}>
+                    {selections['3']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
@@ -300,14 +340,17 @@ const Stage4 = ({prompts, setCurrentStage}) => {
                 </ImageList>
             </Stack>
 
-            <Stack>
-                <Typography>Right something about why <Typography margin={1} borderRadius={20} boxShadow={'2px 3px 7px 1px #00000070'} padding={2} backgroundColor={green}>{`${prompts.filter((p) => p.color === green)[0].prompt}`}</Typography> boosts your mood the most!</Typography>
-                <TextField width={'100%'} multiline={true}/>
+            <Stack width={'75%'}>
+                Right something about why <Typography margin={1} borderRadius={20} boxShadow={'2px 3px 7px 1px #00000070'} padding={2} backgroundColor={green}>{`${selections['3'][0].prompt}`}</Typography> boosts your mood the most!
+                <Stack height={50}>
+                    <Typography color={'red'}>{warning && warning}</Typography>
+                </Stack>
+                <TextField onChange={(e) => handleNote(e.target.value)} value={userNote} width={'100%'} alignItems={'flex-start'} multiline={true} rows={4} />
             </Stack>
 
             <Stack direction={'row'} spacing={2} mt={2}>
                 <Button onClick={() => setCurrentStage(3)}>Back</Button>
-                <Button>Submit</Button>
+                {userNote && userNote.length > 10 && <Button onClick={() => handleSubmit()}>Submit</Button>}
             </Stack>
         </Stack>
     );
@@ -321,13 +364,14 @@ const TwentyOneThings = () => {
     const [prompts, setPrompts] = useState()
     const [date, setDate] = useState(null)
     const [author, setAuthor] = useState(null)
-    const [today, setToday] = useState('01/25/2025')
+    const [today, setToday] = useState('01/24/2025')
     const [currentStage, setCurrentStage] = useState(0)
     const [isReady, setIsReady] = useState(false)
     const [selections, setSelections] = useState({
-        a: [],
-        b: [],
-        c: [],
+        1: [],
+        2: [],
+        3: [],
+        4: []
     })
 
     const [resetRef, setResetRef] = useState(0)
@@ -349,6 +393,10 @@ const TwentyOneThings = () => {
         }
     }
 
+    useEffect(() => {
+        console.log(selections)
+    }, [selections])
+
     useEffect(() => {   
         setIsReady(false)
     }, [])
@@ -362,23 +410,23 @@ const TwentyOneThings = () => {
     <Stack direction={'column'} sx={{ height: '100%', width: '75%'}} alignItems={'center'}>
         
         {prompts && currentStage === 0 &&
-            <Home date={date} author={author} prompts={prompts} setCurrentStage={setCurrentStage} setSelections={setSelections} setResetRef={setResetRef}/>
+            <Home date={date} author={author} prompts={prompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections}/>
         }
 
         {prompts && currentStage === 1 &&
-            <Stage1 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setSelections={setSelections} setResetRef={setResetRef}/>
+            <Stage1 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections} currentStage={currentStage}/>
         }
 
         {prompts && currentStage === 2 &&
-            <Stage2 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setSelections={setSelections} setResetRef={setResetRef}/>
+            <Stage2 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections} currentStage={currentStage}/>
         }
 
         {prompts && currentStage === 3 &&
-            <Stage3 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setSelections={setSelections} setResetRef={setResetRef}/>
+            <Stage3 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections} currentStage={currentStage}/>
         }
 
         {prompts && currentStage === 4 &&
-            <Stage4 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setSelections={setSelections} setResetRef={setResetRef}/>
+            <Stage4 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} currentStage={currentStage} selections={selections} setSelections={setSelections}/>
         }
 
 
