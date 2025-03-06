@@ -279,13 +279,12 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
     const [readyToSave, setReadyToSave] = useState(false)
 
     useEffect(() => {
-        console.log('stage4',prompts)
+        // console.log('stage4',prompts)
         setDispPrompts(prompts.filter((p) => p.color !== 'white'));
         let fav = prompts.filter((p) => p.color === green).prompt
     }, [prompts]);
 
     const handleNote = (val) => {
-        console.log(val.length)
 
         if(val.length < 180){
             setUserNote(val)
@@ -297,36 +296,35 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
         return
     }
 
-    useEffect(() => {
-
-        if(selections[4].length > 0){
-            console.log(selections)
-            addGameToUser(user, 'TwentyOneThings', selections)
-        }
-
-    }, [selections])
-
     const handleSubmit = () => {
-
-        setSelections(prev => ({
-            ...prev,
-            4: userNote
-        }))
-
-
-        
-
-        setCurrentStage(0)
-
-        setUserNote(null)
-
-        setSelections({
-            1: [],
-            2: [],
-            3: [],
-            4: []
-        })
-    }
+        setSelections(prev => {
+            const newSelections = {
+                ...prev,
+                4: userNote
+            };
+    
+            console.log(newSelections); // Debugging log
+    
+            // Call API before resetting selections
+            addGameToUser(user, 'TwentyOneThings', newSelections);
+    
+            return newSelections;
+        });
+    
+        setCurrentStage(0);
+        setUserNote(null);
+    
+        // Reset selections after API call
+        setTimeout(() => {
+            setSelections({
+                1: [],
+                2: [],
+                3: [],
+                4: []
+            });
+        }, 500);  // Adding a small delay
+    };
+    
 
     return (
         <Stack sx={{overflow: 'scroll'}} height={'80%'} alignItems="center">
@@ -383,7 +381,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
 
 const TwentyOneThings = ({user}) => {
 
-    console.log(user)
+    // console.log(user)
 
     const [prompts, setPrompts] = useState()
     const [date, setDate] = useState(null)
@@ -418,7 +416,7 @@ const TwentyOneThings = ({user}) => {
     }
 
     useEffect(() => {
-        console.log(selections)
+        // console.log(selections)
     }, [selections])
 
     useEffect(() => {   

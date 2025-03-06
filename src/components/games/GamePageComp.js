@@ -125,9 +125,12 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
             {selectedOption === 'My Games' && 
                 <Modal
                     open={selectedOption==='My Games'}
+                    sx={{width: '100%', alignItems: 'center', justifyContent: 'center'}}
                 >
-                <Stack width={'80'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
-                    <MyGames user={user}/>
+                <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+                    <Stack width={'80%'} height={'80%'}>
+                        <MyGames user={user} setSelectedOption={setSelectedOption} />
+                    </Stack>
                 </Stack>
             </Modal>
             }

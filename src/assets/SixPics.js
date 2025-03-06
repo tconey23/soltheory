@@ -1,7 +1,7 @@
 import * as React from "react";
 import { motion } from "framer-motion";
 
-const SixPics = (dims) => (
+const SixPics = ({dims}) => (
   <svg
     id="svg2"
     // width={3162.6667}

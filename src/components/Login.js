@@ -19,7 +19,13 @@ const Login = ({ user, setUser, setSelectedOption }) => {
   // Listen for authentication state changes
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
+
+      try {
+        setUser(currentUser);
+      } catch (error) {
+          console.error(error);
+          
+      }
     });
 
     return () => unsubscribe(); // Cleanup listener on unmount
