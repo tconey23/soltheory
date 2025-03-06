@@ -1,20 +1,25 @@
 import { useEffect, useState } from 'react';
-import { Button, Stack, Typography, List, ListItem, Box, ImageList } from '@mui/material';
+import { Button, Stack, Typography, List, ListItem, Box, ImageList, Modal } from '@mui/material';
 import {Drawer} from '@mui/material';
 import SolGamesLogo from '../../assets/SolGamesLogo';
 import Hexagon from './Hexagon';
 import SixPics from '../../assets/SixPics';
 import { useNavigate } from 'react-router-dom';
+import Login from '../../components/Login'
+import MyGames from './MyGames';
 
 
-const GameMenu = ({toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
+const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
 
-    const menuOptions = ['Play', 'Friends', 'Account', 'Close']
-    
+    const menuOptions = user 
+    ? ['Play', 'Friends', 'My Games', 'Account', 'Close']
+    : ['Play', 'Account', 'Close']
 
 
     const handleOption = (opt) => {
         setSelectedOption(opt)
+
+         console.log(opt)
 
         setTimeout(() => {
             setToggleMenu(false)
@@ -39,7 +44,7 @@ const GameMenu = ({toggleMenu, setToggleMenu, setSelectedOption, selectedOption}
 }
 
 
-const GamePageComp = ({ selectedGame }) => {
+const GamePageComp = ({ selectedGame, user, setUser }) => {
     const [toggleMenu, setToggleMenu] = useState(false);
     const [selectedOption, setSelectedOption] = useState('Play');
     const [toggleLogin, setToggleLogin] = useState(false)
@@ -48,6 +53,10 @@ const GamePageComp = ({ selectedGame }) => {
     const nav = useNavigate()
 
     const Game = selectedGame?.component;
+    
+    useEffect(() => {
+        console.log(selectedOption)
+    }, [selectedOption])
 
     return (
         <Stack direction={'column'} sx={{ height: '99vh', width: '100vw' }}>
@@ -56,6 +65,7 @@ const GamePageComp = ({ selectedGame }) => {
                 setToggleMenu={setToggleMenu} 
                 selectedOption={selectedOption} 
                 setSelectedOption={setSelectedOption} 
+                user={user}
             />
             <Stack direction={'row'} padding={2}>
                 <Stack>
@@ -64,8 +74,8 @@ const GamePageComp = ({ selectedGame }) => {
                     </Box>
                 </Stack>
                 <Stack width={'98%'} justifyContent={'center'} alignItems={'center'}>
-                    {Game 
-                        ? <Game selectedGame={selectedGame} /> 
+                    {Game && selectedOption !== 'Account'
+                        ? <Game selectedGame={selectedGame} user={user} /> 
                         :<>
                             <SolGamesLogo />
                             <List>
@@ -103,9 +113,24 @@ const GamePageComp = ({ selectedGame }) => {
                     }
                 </Stack>
             </Stack>
-            {<Stack>
-
-            </Stack>}
+            {selectedOption === "Account" && 
+                <Modal
+                    open={selectedOption==='Account'}
+                >
+                    <Stack justifyContent={'center'} alignItems={'center'}>
+                        <Login setSelectedOption={setSelectedOption} user={user} setUser={setUser}/>
+                    </Stack>
+                </Modal>
+            }
+            {selectedOption === 'My Games' && 
+                <Modal
+                    open={selectedOption==='My Games'}
+                >
+                <Stack width={'80'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
+                    <MyGames user={user}/>
+                </Stack>
+            </Modal>
+            }
         </Stack>
     );
 };

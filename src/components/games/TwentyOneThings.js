@@ -3,6 +3,7 @@ import { Button, Stack, Typography, List, ListItem, Box, TextField } from '@mui/
 import {ImageList} from '@mui/material';
 import { get21Things } from '../../business/apiCalls';
 import Hexagon from './Hexagon';
+import { addGameToUser } from '../../business/apiCalls';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
@@ -269,12 +270,13 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections
     );
 };
 
-const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelections}) => {
+const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelections, user}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
     const [favorite, setFavorite] = useState(null)
     const [userNote, setUserNote] = useState(null)
     const [warning, setWarning] = useState(null)
+    const [readyToSave, setReadyToSave] = useState(false)
 
     useEffect(() => {
         console.log('stage4',prompts)
@@ -295,9 +297,29 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
         return
     }
 
+    useEffect(() => {
+
+        if(selections[4].length > 0){
+            console.log(selections)
+            addGameToUser(user, 'TwentyOneThings', selections)
+        }
+
+    }, [selections])
+
     const handleSubmit = () => {
+
+        setSelections(prev => ({
+            ...prev,
+            4: userNote
+        }))
+
+
+        
+
         setCurrentStage(0)
+
         setUserNote(null)
+
         setSelections({
             1: [],
             2: [],
@@ -307,7 +329,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
     }
 
     return (
-        <Stack height={'100%'} alignItems="center">
+        <Stack sx={{overflow: 'scroll'}} height={'80%'} alignItems="center">
             <Stack width={'100%'} justifyContent={'center'}>
                 <ImageList sx={{ width: 500, height: '100%' }} cols={3}>
                     {selections['1']
@@ -359,7 +381,9 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
 
 
 
-const TwentyOneThings = () => {
+const TwentyOneThings = ({user}) => {
+
+    console.log(user)
 
     const [prompts, setPrompts] = useState()
     const [date, setDate] = useState(null)
@@ -426,7 +450,7 @@ const TwentyOneThings = () => {
         }
 
         {prompts && currentStage === 4 &&
-            <Stage4 date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} currentStage={currentStage} selections={selections} setSelections={setSelections}/>
+            <Stage4 user={user} date={date} author={author} prompts={prompts} setPrompts={setPrompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} currentStage={currentStage} selections={selections} setSelections={setSelections}/>
         }
 
 

@@ -52,13 +52,14 @@ const AppHeader = () => {
           </Link>
 
           <Box sx={{ flexGrow: 1, display: 'flex' }}>
-            {pages.map((page) =>
+            {pages.map((page, i) =>
               page === "SOL Games" ? (
-                <Box key={page} sx={{ position: "relative" }}>
+                <Box key={`${page}${i}`} sx={{ position: "relative" }}>
                   {
                     isMobile
-                    ? <Link style={{marginLeft: 10}} to={'/games'}>{page}</Link>
+                    ? <Link key={`${page}${i}`} style={{marginLeft: 10}} to={'/games'}>{page}</Link>
                     : <Button
+                    key={`${page}${i}`}
                     onClick={handleOpenGamesMenu}
                     sx={{ my: 2, color: "white", display: "block", margin: 1}}
                     variant="contained"
@@ -69,7 +70,7 @@ const AppHeader = () => {
               ) : (
                 <>
                 {isMobile 
-                ? <Link style={{marginLeft: 10}}>
+                ? <Link key={i} style={{marginLeft: 10}}>
                     {page}
                   </Link>
                 :<Button

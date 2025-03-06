@@ -13,7 +13,7 @@ const SolGamesLogo = () => {
 
   return (
     <Stack direction={'column'} sx={{ height: '10vh', width: '45vw' }}>
-        <Canvas>
+        <Canvas style={{overflowX: 'visible'}}>
             <ambientLight intensity={0.5} />
             <directionalLight color={purple} intensity={50} position={[2,0,1]} />
             <directionalLight color={green} intensity={50} position={[1,2,1]} />
