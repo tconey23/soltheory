@@ -14,7 +14,8 @@ const green = '#45d500'
 const stageColors = {
     1: purple,
     2: yellow,
-    3: green
+    3: green,
+    4: green
 }
 
 const gameObjects = {
@@ -33,66 +34,55 @@ const gameObjects = {
 
 const GameRecord = ({ title, gameData }) => {
     const [font] = useState('Fredoka')
+    console.log(gameData)
 
     return (
-               <>
-                    {gameData.map((gd, i) => {
-                        // console.log(gd)
-                        return (
-                            <Accordion>
-                                <AccordionSummary>
-                                    <Typography>Game {i}</Typography>
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    {
-                                       gd !== 'NA' && gd.map((g, i) => {
+               <Accordion>
+                <AccordionSummary>
+                    <Typography>{gameData.game_date}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <List>
+                        {Object.values(gameData.stages).map((st,i) => {
+                            console.log(st)
+                            return (
+                                <ListItem>
+                                    <Accordion sx={{width: '80%', background: stageColors[i+1]}}>
+                                        <AccordionSummary>
+                                            <Typography>
+                                                {typeof st === 'object' 
+                                                ? 'Stage ' + i
+                                                : 'Note'
+                                            }
+                                            </Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {
+                                                typeof st === 'object'
 
-                                        return(
-                                            <>
-                                            {i && 
-                                            <Accordion>
-                                                <AccordionSummary sx={{background: stageColors[i]}}>
-                                                    <Typography>
-                                                        {
-                                                            i < 4 ? 'Stage ' + i : 'Note'
-                                                        }
-                                                    </Typography>
-                                                </AccordionSummary>
-                                                <AccordionDetails>
-                                                    <List>
+                                                ? <>
                                                     {
-                                                        i < 4 
-                                                        ? g.map((sel) => {
-                                                            console.log(sel)
+                                                        st.map((d) => {
                                                             return (
-                                                                <ListItem>
-                                                                    <Typography>{sel.prompt}</Typography>
-                                                                </ListItem>
+                                                                <Stack marginBottom={1} borderBottom={'1px solid grey'}>
+                                                                    <Typography>{d.prompt}</Typography>
+                                                                </Stack>
                                                             )
                                                         })
-                                                        :
-                                                        <>
-                                                            {
-                                                                <ListItem>
-                                                                    <Typography>{g}</Typography>
-                                                                </ListItem>
-                                                            }
-                                                        </>
                                                     }
-                                                    </List>
-                                                </AccordionDetails>
-                                            </Accordion>
-                                            }
-                                            </>
-                                        )
-
-                                        })
-                                    }
-                                </AccordionDetails>
-                            </Accordion>
-                        )
-                    })}
-               </>
+                                                  </>
+                                                : <>
+                                                    <Typography>{st}</Typography>
+                                                  </>    
+                                        }
+                                        </AccordionDetails>
+                                    </Accordion>
+                                </ListItem>
+                            )
+                        })}
+                    </List>
+                </AccordionDetails>
+               </Accordion>
     );
     
     
@@ -100,10 +90,30 @@ const GameRecord = ({ title, gameData }) => {
 const MyGames = ({user, setSelectedOption}) => {
     const[games, setGames] = useState([]) 
     const fetchMyGames = async () => {
-        const res = await getUserGames(user) 
-        // console.log(Object.entries(res.games)) 
-        setGames(Object.entries(res.games)) 
-    }
+        try {
+            const gamesData = await getUserGames(user);
+
+            console.log(
+                gamesData.map((g) => (
+                    g
+                ))
+            )
+    
+            if (gamesData) {
+                console.log(gamesData);
+                setGames(gamesData);
+            } else {
+                console.warn("No games found for user.");
+                setGames([]); // Set to empty array if no data
+            }
+        } catch (error) {
+            console.error("Error fetching games:", error);
+            setTimeout(() => {
+                fetchMyGames(); // Retry fetching after 2 seconds
+            }, 2000);
+        }
+    };
+    
 
     useEffect(() => {
         console.clear()
@@ -112,26 +122,48 @@ const MyGames = ({user, setSelectedOption}) => {
         }
     }, [])
 
+    useEffect(() =>{
+       if(games){
+        console.log(
+            games.filter((g) => g.game === 'TwentyOneThings')
+        )
+       }
+    }, [games])
+
   return (
     <Stack sx={{overflow: 'auto', paddingTop: 8}} backgroundColor={'white'} height={'100%'} width={'100%'} justifyContent={'flex-start'} alignItems={'center'} justifySelf={'center'}>
         <Stack alignItems={'flex-end'} padding={2} width={'80%'}>
             <Button onClick={() => setSelectedOption(null)} variant='contained'>X</Button>
         </Stack>
-        {games &&
-            games.map(([title, gameData]) => {
-                return (
                     <Accordion sx={{width: '80%'}}>
                         <AccordionSummary>
                             {
-                                gameObjects[title]
+                                gameObjects['TwentyOneThings']
                             }
                         </AccordionSummary>
                         <AccordionDetails>
-                            <GameRecord key={title} title={title} gameData={gameData} />
+                            {
+                                games
+                                .filter((g) => g.game === 'TwentyOneThings')
+                                .map((gm) => {
+                                    
+                                    return (
+                                        <GameRecord title={gm.game} gameData={gm} />
+                                    )
+                                })
+                            }
                         </AccordionDetails>
                     </Accordion>
-            )})
-        }
+                    <Accordion sx={{width: '80%'}}>
+                        <AccordionSummary>
+                            {
+                                gameObjects['sixPics']
+                            }
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            {/* <GameRecord key={i} title={g.game} gameData={g}/> */}
+                        </AccordionDetails>
+                    </Accordion>
     </Stack>
   )
 }

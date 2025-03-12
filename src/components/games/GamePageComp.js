@@ -7,6 +7,8 @@ import SixPics from '../../assets/SixPics';
 import { useNavigate } from 'react-router-dom';
 import Login from '../../components/Login'
 import MyGames from './MyGames';
+import { addFriend } from '../../business/apiCalls';
+import Friends from '../Friends';
 
 
 const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
@@ -49,14 +51,20 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
     const [selectedOption, setSelectedOption] = useState('Play');
     const [toggleLogin, setToggleLogin] = useState(false)
     const [font, setFont] = useState('Fredoka')
+    const [query, setQuery] = useState(null)
 
     const nav = useNavigate()
 
     const Game = selectedGame?.component;
     
     useEffect(() => {
-        console.log(selectedOption)
+        // addFriend(user)
     }, [selectedOption])
+
+    useEffect(() =>{
+        const searchParams = new URLSearchParams(nav.search);
+        console.log(searchParams)
+    }, [])
 
     return (
         <Stack direction={'column'} sx={{ height: '99vh', width: '100vw' }}>
@@ -73,7 +81,7 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
                         <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>
                     </Box>
                 </Stack>
-                <Stack width={'98%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack width={'90%'} justifyContent={'center'} alignItems={'center'}>
                     {Game && selectedOption !== 'Account'
                         ? <Game selectedGame={selectedGame} user={user} /> 
                         :<>
@@ -111,6 +119,9 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
                             </List>
                         </> 
                     }
+                </Stack>
+                <Stack width={'8%'} justifyContent={'center'} alignItems={'center'}>
+                    <Friends />
                 </Stack>
             </Stack>
             {selectedOption === "Account" && 

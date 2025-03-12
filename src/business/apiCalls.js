@@ -1,103 +1,389 @@
-import { database21 } from "./firebase21Things";
-import { ref, get, update, set } from 'firebase/database';
-import {auth, users, app, userApp, currentUser } from './firebaseAuth'
+import { supabase } from "./supabaseClient";
 
 
-const getUserGames = async(user) => { 
-    try {
-        const db = ref(database21, 'users')
-        const data = await get(db)
-
-        if(data.exists()){
-            let findUser = Object.values(data.val()).findIndex((u) => u.email === user.email)
-            if(findUser < 0){
-
-                const newUserRef = ref(database21, `users/${user.uid}`)
-
-                let newUser = {
-                    email: user.email,
-                    name: user.displayName,
-                    created: Date.now(),
-                    games: {
-                        twentyOneThings: ["NA"],
-                        sixPics: ["NA"]
-                    }
-                };
-                
-                const userRef = ref(database21, `users/${user.uid}`);  // Store under UID, NOT displayName
-                await set(userRef, newUser);  
-
-            } 
-            
-            if(findUser > -1){
-                // console.log(Object.values(data.val())[findUser])
-                return Object.values(data.val())[findUser]
-            }
-        }
-
-    } catch (error) {
-        
-    }
+const addFriend = async (user, friend) => {
 }
 
-const addGameToUser = async (user, gameCategory, newGame) => {
+
+const addNewPrompts = async (prompts) => {
     
-    console.log(user, gameCategory, newGame)
+    if(prompts) 
+        {
+            const { data, error } = await supabase
+            .from('21ThingsPrompts')
+            .insert([prompts]); 
+            if (error) {
+                console.error('Error inserting:', error);
+            } else {
+                console.log('Game data saved:', data);
+            }
+        }
+    };
     
-    if (!user) {
-        console.error("User is not authenticated.");
-        return;
+    const get21Things = async (date) =>{
+        
+        let { data, error } = await supabase
+        .from('21ThingsPrompts')
+        .select('*')
+        .eq('date', date)
+        
+        if(data && data[0]){
+            return data[0]
+        }
+
+        return error
+
     }
+    
+    const createUser = async () => {
+        
+    }
+    
+    const getUser = async (email) => {
+        let { data, error } = await supabase
+        .from('Users')
+        .select('*')
+        .eq('email', email.toLowerCase())
+        
+        if(data && data[0]){
+            return data?.[0]
+        }
+        
+        return error
+        
+    }
+    
+    const addGameToUser = async (user, newGameData) => {
+        console.log(user.email, newGameData)
+        // Fetch the existing user
+        const { data: foundUser, error: fetchError } = await supabase
+        .from('Users')
+        .select('game_data')
+        .eq('email', user.email)
+        .single();
+        
+        if (fetchError) {
+            console.error("Error fetching user:", fetchError);
+            return;
+        }
+        
+        console.log("Existing game data:", foundUser.game_data);
+        
+        // Merge new game data with existing game data (if any)
+        const updatedGameData = foundUser.game_data
+        ? [...foundUser.game_data, newGameData]  // Append new game
+        : [newGameData];  // If empty, start fresh array
+        
+        // Update user record with new game data
+        const { error: updateError } = await supabase
+        .from('Users')
+        .update({ game_data: updatedGameData })
+        .eq('email', user.email);
+        
+        if (updateError) {
+            console.error("Error updating user game data:", updateError);
+        } else {
+            console.log("Game data successfully updated!");
+        }
+    };
+    
+    const getUserGames = async (user) => { 
+        const { data, error } = await supabase
+            .from('Users')
+            .select('game_data')
+            .eq('email', user.email)
+            .single();  // Ensures only one record is fetched
+    
+        if (error) {
+            console.error("Error fetching user games:", error);
+            return null; // Return null to indicate failure
+        }
+    
+        console.log("Fetched game data:", data);
+    
+        return data?.game_data || [];  // Ensure we return an array even if empty
+    };
 
-    try {
-        const userGamesRef = ref(database21, `users/${user.uid}/games/${gameCategory}`);
-        const snapshot = await get(userGamesRef);
-        let currentGames = snapshot.exists() ? snapshot.val() : [];
-
-        currentGames.push(newGame);
-
-        await update(ref(database21, `users/${user.uid}/games`), {
-            [gameCategory]: currentGames,
+    const signIn = async (email, password) => {
+        console.log(email, password)
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
         });
 
-        console.log(`Game added to ${gameCategory}:`, newGame);
-    } catch (error) {
-        console.error("Error adding game:", error);
-    }
-};
+        console.log(data)
+    
+        if (error) {
+            console.error("Login error:", error);
+        } else {
+            return data
+        }
+    };
 
+    const signUpUser = async (email, password, username) => {
+        // Step 1: Sign up the user
+        const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+        });
+    
+        if (error) {
+            console.error("Signup error:", error);
+            return;
+        }
+    
+        const user = data.user;
+        
+        if(user){
+            return user
+        }
+    
+        // Step 2: Insert the user into the profiles table
+        const { error: profileError } = await supabase
+            .from('Users')
+            .insert([
+                {
+                    id: user.id,  // Match auth.users.id (UUID)
+                    email: user.email,
+                    username: username,  // Custom field
+                    game_data: []
+                }
+            ]);
+    
+        if (profileError) {
+            console.error("Error creating profile:", profileError);
+        } else {
+            console.log("User profile created!");
+        }
+    };
 
+    const getGifs = async (packName) => {
+        try {  
 
-const get21Things = async (date) => {
+        let { data, error } = await supabase
+        .from('SixPicsPacks')
+        .select("*")
+        .eq('pack_name', packName)
 
-    try {
-        const db = ref(database21, 'categories')
-        const data = await get(db)
-
-        if(data.exists()){
-
-            // Object.values(data.val()).forEach((ct) => {
-            //     console.log(ct.date)
-            // })
-
-            const foundCat = Object.values(data.val()).findIndex((ct) => ct.date === date)
-
-            // console.log(foundCat)
-
-            if(foundCat > -1){
-                return Object.values(data.val())[foundCat]
-            } else {
-                return 'None Found'
-            }
-
+        if(data && data[0]){
+            return data[0]
+        }
+            
+        } catch (error) {
+            console.log(error);
+            
         }
 
-    } catch (error) {
-        console.error(error);
-        
     }
-}
+    
+    const getSixPicsPack = async (cat) => {
+        
+        try {
+            
+        let { data, error } = await supabase
+        .from('SixPicsPacks')
+        .select(cat)
+
+        if(data){
+            return data
+        }
+        
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const addToExistingPack = async (cat, obj) => {
+        try {
+            // Fetch existing gifs
+            let { data, error } = await supabase
+                .from('SixPicsPacks')
+                .select('gifs')
+                .eq('pack_name', cat)
+                .single(); // Ensure we get one row
+    
+            if (error) {
+                console.error("Error fetching existing gifs:", error.message);
+                return;
+            }
+    
+            let existingGifs = data?.gifs || []; // Use existing gifs or empty array
+            let updatedGifs = [...existingGifs, obj]; // Append new obj
+    
+            // Update the row with the new gifs array
+            let { error: updateError } = await supabase
+                .from('SixPicsPacks')
+                .update({ gifs: updatedGifs })
+                .eq('pack_name', cat);
+    
+            if (updateError) {
+                console.error("Error updating gifs:", updateError.message);
+            } else {
+                console.log("Successfully updated gifs!");
+            }
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        }
+    };
+    
+    const checkExistingPack = async (cat, obj) => {
+        try {
+            let { data, error } = await supabase
+                .from('SixPicsPacks')
+                .select('*')
+                .eq('pack_name', cat);
+    
+            if (error) {
+                console.error("Error checking existing pack:", error.message);
+                return;
+            }
+    
+            if (data.length > 0) {
+                console.log("Pack exists, adding to it...");
+                await addToExistingPack(cat, obj);
+                return 'success'
+            } else {
+                console.log("Pack does not exist.");
+            }
+        } catch (error) {
+            console.error("Unexpected error:", error);
+        }
+    };
+    
+    // Example object to add
+    let obj = {
+        "url": "https://tzzljniuogvssdbhxsql.supabase.co/storage/v1/object/public/6pics_videos/1741727317584/titanic.mp4",
+        "name": "titanic.mp4",
+        "answer": "titanic.mp4",
+        "length": 11
+    };
+
+
+ 
+    const uploadVid = async (file) => {
 
 
 
-export {get21Things, getUserGames, addGameToUser}
+        if (!file) {
+            console.error("No file selected");
+            return;
+        }
+    
+        console.log("Uploading file:", file);
+    
+        try {
+            // Define the correct path inside the "vids" folder
+            const filePath = `${Date.now()}/${file.name}`;
+    
+            let { data, error } = await supabase.storage
+                .from("6pics_videos") // Bucket name
+                .upload(filePath, file, {
+                    cacheControl: "3600",
+                    upsert: false,
+                });
+    
+            if (error) {
+                console.error("Upload failed:", error.message);
+                return;
+            }
+    
+            console.log("File uploaded successfully:", data.path);
+            
+            // Get the public URL
+            const { data: publicUrlData } = supabase.storage.from("6pics_videos").getPublicUrl(filePath);
+            console.log("Public URL:", publicUrlData.publicUrl);
+
+            return publicUrlData.publicUrl
+    
+        } catch (error) {
+            console.error("Unexpected error:", error);
+        }
+    };
+
+    const removeGifByName = async (packName, gifName) => {
+        try {
+            // Step 1: Fetch the existing gifs array
+            let { data, error } = await supabase
+                .from("SixPicsPacks")
+                .select("gifs")
+                .eq("pack_name", packName)
+                .single();
+    
+            if (error) {
+                console.error("Error fetching gifs:", error.message);
+                return;
+            }
+    
+            let existingGifs = data?.gifs || [];
+    
+            // Step 2: Remove the object that matches the given name
+            let updatedGifs = existingGifs.filter(gif => gif.name !== gifName);
+    
+            // Step 3: Update the table with the new array
+            let { error: updateError } = await supabase
+                .from("SixPicsPacks")
+                .update({ gifs: updatedGifs })
+                .eq("pack_name", packName);
+    
+            if (updateError) {
+                console.error("Error updating gifs:", updateError.message);
+            } else {
+                return ('success');
+            }
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        }
+    };
+    
+    
+    const addNewCategory = async (cat) => {
+        let newCat = {
+            created_at: new Date().toISOString(), // Proper timestamp format
+            pack_name: cat,
+            gifs: [], // Empty array for new category
+            graphic: "https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg",
+        };
+    
+        console.log("Adding new category:", newCat);
+    
+        try {
+            let { data, error } = await supabase
+                .from("SixPicsPacks")
+                .insert([newCat]) // ✅ Insert expects an array
+                .select('*');
+    
+            if (error) {
+                console.error("Insert failed:", error.message);
+            } else {
+                return 'success'
+            }
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        }
+    };
+
+    const updatePackLogo = async (vid, packName) => {
+
+        const res = await uploadVid(vid)
+        console.log(res)
+
+        try {
+            let { error: updateError } = await supabase
+            .from("SixPicsPacks")
+            .update({ graphic: res })
+            .eq("pack_name", packName);
+
+            if (updateError) {
+                console.error("Error updating gifs:", updateError.message);
+            } else {
+                return ('success');
+            }
+        } catch (error) {
+            console.error(error);
+            
+        }
+    }
+    
+
+
+    export {updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

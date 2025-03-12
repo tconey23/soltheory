@@ -1,3 +1,4 @@
+@import "~@flaticon/flaticon-uicons/css/all/all";
 
 .css-dpjnhs-MuiInputBase-root-MuiOutlinedInput-root{
   overflow-y: auto;
@@ -15,7 +16,11 @@ header{
 
 .App {
   text-align: center;
-  height: 100vh
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .css-p4i41s-MuiButtonBase-root-MuiButton-root{

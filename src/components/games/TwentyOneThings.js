@@ -238,7 +238,7 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections
     };
 
     const handleNextStage = () => {
-        if(selections[currentStage +1].length > 0) {
+        if(selections[currentStage +1]?.length > 0) {
             setSelections(prev => ({
                 ...prev,
                 [currentStage +1]: []
@@ -300,13 +300,13 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
         setSelections(prev => {
             const newSelections = {
                 ...prev,
-                4: userNote
+                note: userNote
             };
     
             console.log(newSelections); // Debugging log
     
             // Call API before resetting selections
-            addGameToUser(user, 'TwentyOneThings', newSelections);
+            addGameToUser(user, newSelections);
     
             return newSelections;
         });
@@ -320,7 +320,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
                 1: [],
                 2: [],
                 3: [],
-                4: []
+                note: ''
             });
         }, 500);  // Adding a small delay
     };
@@ -361,7 +361,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
             </Stack>
 
             <Stack width={'75%'}>
-                Right something about why <Typography margin={1} borderRadius={20} boxShadow={'2px 3px 7px 1px #00000070'} padding={2} backgroundColor={green}>{`${selections['3'][0].prompt}`}</Typography> boosts your mood the most!
+                Write something about why <Typography margin={1} borderRadius={20} boxShadow={'2px 3px 7px 1px #00000070'} padding={2} backgroundColor={green}>{`${selections['3'][0].prompt}`}</Typography> boosts your mood the most!
                 <Stack height={50}>
                     <Typography color={'red'}>{warning && warning}</Typography>
                 </Stack>
@@ -393,13 +393,14 @@ const TwentyOneThings = ({user}) => {
         1: [],
         2: [],
         3: [],
-        4: []
+        note: ''
     })
 
     const [resetRef, setResetRef] = useState(0)
 
     const fetchPrompts = async (date) => {
         const res = await get21Things(date)
+        console.log(res)
         let array = []
         if(res) {
             setDate(res.date)
