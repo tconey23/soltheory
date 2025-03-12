@@ -17,8 +17,11 @@ const AddPics = ({size}) => {
     const [newCat, setNewCat] = useState()
     const [packLogo, setPackLogo] = useState()
     const [videoUrl, setVideoUrl] = useState(null);
+    const [canPlayPause, setCanPlayPause] = useState(true)
+    const [mediaType, setMediaType] = useState()
 
     const videoRef = useRef()
+    const refresh = useRef(2)
 
     useEffect(() => {
 
@@ -30,7 +33,7 @@ const AddPics = ({size}) => {
 
     useEffect(() => {
         if(selectedData){
-            console.log(selectedData)
+            // console.log(selectedData)
         }
     }, [selectedData])
 
@@ -136,15 +139,50 @@ const AddPics = ({size}) => {
        }
       }
 
-      useEffect(() => {
-        if(videoRef.current){
-            videoRef.current.play()
-            console.log(videoRef.current)
+      const handlePlayPause = async (vidRef, type) => {
+        if (!vidRef || !canPlayPause) return; // Ensure vidRef exists
+    
+        // console.group("Play/Pause Attempt:", { canPlayPause, vidRef, type });
+    
+        if (canPlayPause && selectedData) {
+            setCanPlayPause(false);
+    
+            if (type === "play") {
+                try {
+                    // console.log(`Attempting to ${type}...`);
+                    await vidRef.play();
+                    // console.log(refresh.current)
+                    refresh.current += 1;
+                    setCanPlayPause(true);
+                    
+                } catch (error) {
+                    console.error("Playback failed:", error);
+                    setCanPlayPause(true); // Reset state on failure
+                }
+            }
         }
-      }, [videoRef])
+    };
+
+    useEffect(() => {
+    if(!canPlayPause){
+        setTimeout(() => {
+            setCanPlayPause(true)
+        }, 2000);
+    }
+    }, [handlePlayPause])
+
+    useEffect(() => {
+        if(selectedData && selectedData.graphic){
+            setMediaType(selectedData.graphic.split('').splice(-3).join().replaceAll(',',""))
+        }
+        if (videoRef.current) {
+            handlePlayPause(videoRef.current, "play");
+        }
+    }, [selectedData]); // Only depend on selectedData
 
     return (
         <Stack width={size.width} height={size.height * 0.50}>
+            <Typography fontSize={30}>6Pics Controls</Typography>
             <Stack>
                 <Select value={selectedCat} onChange={(e) => setSelectedCat(e.target.value)} sx={{width: '90%'}}>
                     <MenuItem value={'new'}>New</MenuItem>
@@ -159,23 +197,21 @@ const AddPics = ({size}) => {
             {selectedCat === 'new' ? 
             <Stack width={'20%'}>
                 <TextField onChange={(e) => setNewCat(e.target.value)} sx={{padding: 3}} placeholder={'Category name'} value={newCat}></TextField>
-                <Button onClick={() => handleAddNewCat(newCat)}>Add</Button>
+                <Button onClick={() => handleAddNewCat(newCat)}>Add</Button>  
             </Stack>
             : 
             <>
             <Stack sx={{position: 'relative', padding: 3}} onMouseOver={() => setToggleEditPhoto(true)} onMouseOut={() => setToggleEditPhoto(false)} justifyContent={'center'} alignItems={'center'}>
-                {videoUrl ? 
-                <>
-                <video ref={videoRef} style={{height: '100%'}} autoplay loop>
-                    <source src={videoUrl} type="video/mp4"/>
-                </video>
-                <Button onClick={() => handleSavePackLogo()}>Update</Button>
-                </>
-                :
-                <video ref={videoRef} style={{height: '100%'}} autoplay loop>
-                    <source src={selectedData?.graphic} type="video/mp4"/>
+                {selectedData && selectedData.graphic && mediaType === 'mp4' &&
+                <video onClick={() => videoRef.current.play()} key={refresh} ref={videoRef} mute autoplay loop>
+                    <source src={selectedData.graphic} type='video/mp4'/>
                 </video>
                 }
+
+                {selectedData && selectedData.graphic && mediaType === 'svg' &&
+                    <img src={selectedData.graphic}/>
+                }
+
                 {toggleEditPhoto && selectedCat && 
                 <input
                  type='file'
@@ -243,9 +279,22 @@ const AddPics = ({size}) => {
 }
 
 const Admin = ({size}) => {
+    const [selection, setSelection] = useState()
   return (
     <Stack direction={'column'} sx={{ height: '98%', width: '100%', overflow: 'scroll'}}>
-      <AddPics size={size}/>
+        <Typography>Admin Controls</Typography>
+        <Stack width={'50%'}>
+            <Select value={selection} onChange={(e) => setSelection(e.target.value)}>
+                <MenuItem value={'6Pics'}>6Pics</MenuItem>
+                <MenuItem value={'21Things'}>21Things</MenuItem>
+            </Select>
+        </Stack>
+        {selection === '6Pics' ?
+            <AddPics size={size}/>
+            :
+            <>
+            </>
+        }
     </Stack>
   );
 };

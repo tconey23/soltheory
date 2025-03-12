@@ -13,6 +13,10 @@ const Login = ({ user, setUser, setSelectedOption }) => {
   const [isSignUp, setIsSignUp] = useState(false); 
   const [size, setSize] = useState({ width: 1000, height: 800 })
 
+  useEffect(() =>{
+    console.log(user)
+  }, [user])
+
   const handleLogin = async () => {
     
     if(isSignUp){
@@ -27,7 +31,7 @@ const Login = ({ user, setUser, setSelectedOption }) => {
       const res = await signIn(email, password)
       
       if(res && res.session.access_token) {
-        setUser(res.user)
+        setUser(res)
       }
     }
 

@@ -14,7 +14,7 @@ import Friends from '../Friends';
 const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
 
     const menuOptions = user 
-    ? ['Play', 'Friends', 'My Games', 'Account', 'Close']
+    ? ['Play', 'Friends', 'My Games', 'Account', 'Quit', 'Close']
     : ['Play', 'Account', 'Close']
 
 
@@ -46,7 +46,7 @@ const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedO
 }
 
 
-const GamePageComp = ({ selectedGame, user, setUser }) => {
+const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     const [toggleMenu, setToggleMenu] = useState(false);
     const [selectedOption, setSelectedOption] = useState('Play');
     const [toggleLogin, setToggleLogin] = useState(false)
@@ -55,19 +55,21 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
 
     const nav = useNavigate()
 
-    const Game = selectedGame?.component;
+    let Game = selectedGame?.component;
     
     useEffect(() => {
-        // addFriend(user)
+       if(selectedOption === 'Quit'){
+        nav('/games')
+        setToggleQuit(true)
+       }
+       if(selectedOption === 'Play'){
+        nav('/games')
+        setToggleQuit(false)
+       }
     }, [selectedOption])
 
-    useEffect(() =>{
-        const searchParams = new URLSearchParams(nav.search);
-        console.log(searchParams)
-    }, [])
-
     return (
-        <Stack direction={'column'} sx={{ height: '99vh', width: '100vw' }}>
+        <Stack direction={'column'} sx={{ height: '75vh', width: '100vw' }}>
             <GameMenu 
                 toggleMenu={toggleMenu} 
                 setToggleMenu={setToggleMenu} 
@@ -81,7 +83,7 @@ const GamePageComp = ({ selectedGame, user, setUser }) => {
                         <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>
                     </Box>
                 </Stack>
-                <Stack width={'90%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack width={'90%'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
                     {Game && selectedOption !== 'Account'
                         ? <Game selectedGame={selectedGame} user={user} /> 
                         :<>

@@ -34,8 +34,8 @@ const Countdown = ({setStart}) => {
   }, [videoRef, ref])
 
   return (
-    <Stack height={'58vh'} width={'100%'}>
-      <Typography fontSize={100}>Get ready!</Typography>
+    <Stack height={'50vh'} width={'100%'}>
+      <Typography fontSize={80}>Get ready!</Typography>
       <video style={{height: '100%', width: '100%'}} ref={videoRef} mute autoplay
       preload="metadata"
       onLoadedMetadata={() => {
@@ -111,7 +111,6 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
     setAllowPlayPause(false)
     if(type === 'play' && vidref.paused){
       await vidref.play()
-      console.log('done playing')
       setAllowPlayPause(true)
       return
     } 
@@ -317,13 +316,13 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
         </>
       </Stack>
 
-      <Stack backgroundColor={"white"}>
+      <Stack backgroundColor={"white"} height={'45%'}>
         {playbackSpeed && start && (
           <>
             <video
               ref={videoRef}
               width="640"
-              height="360"
+              height="75%"
               autoPlay
               mute
               preload="metadata"
@@ -341,7 +340,7 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
 
       {!isWin ? (
         <>
-          <Stack height={50} width={"100%"} justifyContent="flex-start" alignItems="center">
+          <Stack height={'100%'} width={"100%"} justifyContent="flex-start" alignItems="center">
             {!start &&
               <Countdown setStart={setStart}/>
              }

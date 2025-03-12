@@ -349,7 +349,7 @@ const addNewPrompts = async (prompts) => {
         try {
             let { data, error } = await supabase
                 .from("SixPicsPacks")
-                .insert([newCat]) // ✅ Insert expects an array
+                .insert([newCat])
                 .select('*');
     
             if (error) {

@@ -6,9 +6,25 @@ import {Button} from '@mui/material';
 import Admin from './Admin';
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
+import { getUser } from '../business/apiCalls';
 
 
 const AccountPage = ({user, handleLogout, size}) => {
+
+    const [isAdmin, setisAdmin] = useState(false)
+
+    const checkAdminAccess = async (email) => {
+        const res = await getUser(email)
+        if(res.is_admin){
+            setisAdmin(true)
+        }
+    }
+
+useEffect(() => {
+    if(user && user.email){
+        checkAdminAccess(user.email)
+    }
+}, [user])
 
   return (
         <Stack direction={'column'} sx={{ height: '100%', width: '100%'}} justifyContent={'flex-start'} alignItems={'flex-start'}>
@@ -23,7 +39,7 @@ const AccountPage = ({user, handleLogout, size}) => {
                     <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
                         {/* <Button variant='contained'>My Games</Button>
                         <Button variant='contained'>My Friends</Button> */}
-                        <Admin size={size}/>
+                        {isAdmin && <Admin size={size}/>}
                     </Stack>
                 </Stack>
         </Stack>
