@@ -1,4 +1,10 @@
+import { dispose } from "@react-three/fiber";
 import { supabase } from "./supabaseClient";
+
+async function checkAndAddUsers(user) {
+
+
+}
 
 
 const addFriend = async (user, friend) => {
@@ -81,9 +87,15 @@ const addNewPrompts = async (prompts) => {
         .eq('email', user.email);
         
         if (updateError) {
-            console.error("Error updating user game data:", updateError);
+            return {
+                disposition: 'error',
+                message: 'There was an error adding the game to your profile'
+            };
         } else {
-            console.log("Game data successfully updated!");
+            return {
+                disposition: 'success',
+                message: 'Game data added to your profile'
+            };
         }
     };
     
@@ -111,51 +123,67 @@ const addNewPrompts = async (prompts) => {
             password,
         });
 
-        console.log(data)
-    
         if (error) {
             console.error("Login error:", error);
         } else {
-            return data
+            return {
+                disposition: 'success',
+                message: `Welcome ${data.user.email}`,
+                session: data?.session,
+                user: data?.user
+            }
         }
     };
 
     const signUpUser = async (email, password, username) => {
-        // Step 1: Sign up the user
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-        });
+
+        const { data, error } = await supabase.auth.signUp({ email, password });
     
         if (error) {
-            console.error("Signup error:", error);
-            return;
+            return {
+                message: 'Error creating profile',
+                disposition: 'error',
+                error: error
+            };
         }
     
         const user = data.user;
-        
-        if(user){
-            return user
-        }
     
-        // Step 2: Insert the user into the profiles table
+        if (!user) {
+            console.error("User signup failed, no user returned.");
+            return {
+                message: 'User signup failed',
+                disposition: 'error'
+            };
+        }
+        
         const { error: profileError } = await supabase
-            .from('Users')
+            .from('Users') 
             .insert([
                 {
-                    id: user.id,  // Match auth.users.id (UUID)
+                    id: user.id,
                     email: user.email,
-                    username: username,  // Custom field
+                    username: username,
                     game_data: []
                 }
             ]);
     
         if (profileError) {
             console.error("Error creating profile:", profileError);
-        } else {
-            console.log("User profile created!");
+            return {
+                message: 'Database error saving new user',
+                disposition: 'error',
+                error: profileError
+            };
         }
+    
+        console.log("User profile created!");
+        return {
+            message: 'Profile created successfully',
+            disposition: 'success',
+        };
     };
+    
 
     const getGifs = async (packName) => {
         try {  
@@ -386,4 +414,4 @@ const addNewPrompts = async (prompts) => {
     
 
 
-    export {updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}
+    export {checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

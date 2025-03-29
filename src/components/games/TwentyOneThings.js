@@ -4,12 +4,15 @@ import {ImageList} from '@mui/material';
 import { get21Things } from '../../business/apiCalls';
 import Hexagon from './Hexagon';
 import { addGameToUser } from '../../business/apiCalls';
+import { useGlobalContext } from '../../business/GlobalContext';
+import { ServerRouter } from 'react-router-dom';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
 const Prompt = ({prompt, color}) => {
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     return (
         <Stack sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
@@ -19,6 +22,7 @@ const Prompt = ({prompt, color}) => {
 }
 
 const Home = ({date, author, setCurrentStage, setResetRef}) => {
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     const handlePlayGame = () => {
         setCurrentStage(prev => prev + 1)
@@ -57,6 +61,7 @@ const Home = ({date, author, setCurrentStage, setResetRef}) => {
 const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections, setSelections }) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [purpleCount, setPurpleCount] = useState(0);
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -132,6 +137,7 @@ const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections
 const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentStage, selections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [yellowCount, setYellowCount] = useState(0);
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -203,6 +209,7 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentSt
 const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections, setSelections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -270,13 +277,14 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections
     );
 };
 
-const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelections, user}) => {
+const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelections, user, date}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
     const [favorite, setFavorite] = useState(null)
     const [userNote, setUserNote] = useState(null)
     const [warning, setWarning] = useState(null)
     const [readyToSave, setReadyToSave] = useState(false)
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     useEffect(() => {
         // console.log('stage4',prompts)
@@ -296,19 +304,39 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
         return
     }
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+
+        const addGame = async (u, n) => {
+            const res = await addGameToUser(u, n)
+            if(res && res.disposition){
+                setAlertProps({
+                    text: res.message,
+                    severity: res.disposition,
+                    display: true
+                })
+            }
+        }
+
         setSelections(prev => {
             const newSelections = {
                 ...prev,
-                note: userNote
+                
             };
     
-            console.log(newSelections); // Debugging log
+            
+            const gameDataObject = {
+                game: 'TwentyOneThings',
+                stages: [
+                    newSelections[1], newSelections[2], newSelections[3]
+                ],
+                game_date: date,
+                note: userNote
+            }
+            
+            console.log(gameDataObject);
+            addGame(user, gameDataObject);
     
-            // Call API before resetting selections
-            addGameToUser(user, newSelections);
-    
-            return newSelections;
+            return gameDataObject;
         });
     
         setCurrentStage(0);
@@ -382,6 +410,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
 const TwentyOneThings = ({user}) => {
 
     // console.log(user)
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     const [prompts, setPrompts] = useState()
     const [date, setDate] = useState(null)

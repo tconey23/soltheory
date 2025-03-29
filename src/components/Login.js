@@ -5,8 +5,11 @@ import AccountPage from './AccountPage';
 import { signIn, signUpUser } from '../business/apiCalls';
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
+import { useGlobalContext } from '../business/GlobalContext';
+import { checkAndAddUsers } from '../business/apiCalls';
 
 const Login = ({ user, setUser, setSelectedOption }) => {
+  const {alertProps, setAlertProps} = useGlobalContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState(''); 
@@ -15,6 +18,9 @@ const Login = ({ user, setUser, setSelectedOption }) => {
 
   useEffect(() =>{
     console.log(user)
+    if(user){
+      checkAndAddUsers(user.session)
+    }
   }, [user])
 
   const handleLogin = async () => {
@@ -29,16 +35,31 @@ const Login = ({ user, setUser, setSelectedOption }) => {
     } else {
 
       const res = await signIn(email, password)
-      
-      if(res && res.session.access_token) {
+      console.log(res)
+      if(res && res.session?.access_token) {
         setUser(res)
       }
+
+      if(res && res.disposition){
+        setAlertProps({
+          text: res.message,
+          severity: res.disposition,
+          display: true
+        })
+      }
+
+      
     }
 
   }
 
   const handleLogout = async () => {
     setUser(null)
+    setAlertProps({
+      text: 'You have been logged out',
+      severity: 'success',
+      display: true
+    })
   }
   
 
@@ -66,7 +87,7 @@ const Login = ({ user, setUser, setSelectedOption }) => {
       </Stack>
       {user ? (
         <>
-            <AccountPage user={user} handleLogout={handleLogout} size={size}/>
+            <AccountPage user={user.user} handleLogout={handleLogout} size={size}/>
         </>
       ) : (
         <>

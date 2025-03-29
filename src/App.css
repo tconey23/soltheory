@@ -5,6 +5,32 @@
   max-height: 200px;
 }
 
+.css-9dmjx7-MuiPaper-root-MuiAlert-root{
+  animation: alertFloat 5s ease-in-out both
+}
+
+@keyframes alertFloat {
+  0% {
+    transform: translateY(-48px);
+    opacity: 0;
+  }
+  25% {
+    transform: translateY(0px);
+    opacity: 1
+  }
+  50% {
+    transform: translateY(0px);
+    opacity: 1
+  }
+  75% {
+    transform: translateY(0px);
+    opacity: 1
+  }
+  100%{
+    transform: translateY(-48px);
+    opacity: 0
+  }
+};
 
 body{
   overflow: hidden !important;

@@ -1,12 +1,45 @@
 import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button, Slider } from "@mui/material";
 import lambGif from "../../assets/silence_of_the_lambs.gif";
-import { getGifs } from "../../business/apiCalls";
-import { useLocation } from "react-router-dom";
+import { addGameToUser, getGifs } from "../../business/apiCalls";
+import { useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";
+import { useGlobalContext } from "../../business/GlobalContext";
+
+const ResultsPage = ({score, gamePack, user}) => {
+  const {alertProps, setAlertProps} = useGlobalContext()
+  const nav = useNavigate()
+
+  const handleSaveGame = async () => {
+
+    const gameDataObject = {
+      game: 'SixPics',
+      pack: gamePack,
+      score: score,
+      date_played: Date.now()
+    }
+    
+    const res = addGameToUser(user,gameDataObject)
+    console.log(res)
+    
+    nav('/games')
+  }
+
+  return (
+    <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+      <Stack width={'100%'} height={'100%'}>
+        <Typography fontSize={50}>Your Score</Typography>
+        <Typography fontSize={35}>{score}</Typography>
+      </Stack>
+      <Stack width={'10%'}>
+        <Button onClick={() => handleSaveGame()} variant="contained">Save</Button>
+      </Stack>
+    </Stack>
+  )
+}
 
 const Countdown = ({setStart}) => {
-
+  const {alertProps, setAlertProps} = useGlobalContext()
   const [ref, setRef] = useState(0)
   const videoRef=useRef()
 
@@ -52,6 +85,7 @@ const Countdown = ({setStart}) => {
 }
 
 const interpolateColor = (startHex, endHex, progress) => {
+
   const start = parseInt(startHex.slice(1), 16);
   const end = parseInt(endHex.slice(1), 16);
 
@@ -83,7 +117,8 @@ const getVideoDuration = (videoUrl) => {
   });
 };
 
-const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
+const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex, gamePack, user}) => {
+  const {alertProps, setAlertProps} = useGlobalContext()
   const [score, setScore] = useState(100);
   const [seconds, setSeconds] = useState(10);
   const [currTime, setCurrTime] = useState(10);
@@ -102,6 +137,7 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
   const [ref, setRef] = useState(1)
   const [playTimes, setPlayTimes] = useState(0)
   const [allowPlayPause, setAllowPlayPause] = useState(true)
+  const [gameOver, setGameOver] = useState(false)
 
   const inputRefs = useRef([]);
   const videoRef = useRef(null);
@@ -281,21 +317,25 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
 
 
   const checkAnswer = () => {
-
     let ans = answer.replaceAll(' ','').toLowerCase()
     let check = inputLetters
     check === ans ? setIsWin(true) : setIsWin(false)
   }
 
   const handleNextLevel = () => {
-    console.log(gifIndex, levels)
     if(gifIndex < levels -1 ){
       setGifIndex(prev => prev +1)
+    }
+    if(gifIndex == levels -1){
+      setGameOver(true)  
     }
   }
 
   return (
     <>
+    {gameOver 
+    ? <ResultsPage user={user} score={score} gamePack={gamePack}/>
+    : <>
       <Stack width={"80%"}>
         <Slider
           sx={{
@@ -392,19 +432,21 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex}) => {
           </Stack>
         </>
       )}
+      </>
+    }
     </>
   );
 };
 
 
-const Pic6 = () => {
+const Pic6 = ({user}) => {
+  const {alertProps, setAlertProps} = useGlobalContext()
   const [gamePack, setGamePack] = useState(null)
   const [gifIndex, setGifIndex] = useState(0)
   const [gifs, setGifs] = useState([])
   const [totalPoints, setTotalPoints] = useState(0)
   const [possPoints, setPossPoints] = useState(300)
   const [levels, setLevels] = useState(0)
-  
   
 
   const fetchGifs = async (name) => {
@@ -445,7 +487,7 @@ const Pic6 = () => {
 
     {
       gifs && gifs.gifs && gifIndex > -1 &&
-      <Stage stage={gifs.gifs[gifIndex]} setGifIndex={setGifIndex} setTotalPoints={setTotalPoints} levels={levels} gifIndex={gifIndex}/>
+      <Stage stage={gifs.gifs[gifIndex]} setGifIndex={setGifIndex} setTotalPoints={setTotalPoints} levels={levels} gifIndex={gifIndex} gamePack={gamePack} user={user}/>
     }
 
    {gifs && !gifs.gifs &&

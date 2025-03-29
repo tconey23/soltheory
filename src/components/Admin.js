@@ -1,9 +1,10 @@
 import { useEffect, useState, useRef } from 'react';
 import { Button, List, ListItem, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { checkExistingPack, getGifs, getSixPicsPack, uploadVid, removeGifByName, addNewCategory, updatePackLogo } from '../business/apiCalls';
-
+import { useGlobalContext } from '../business/GlobalContext';
 
 const AddPics = ({size}) => {
+    const {alertProps, setAlertProps} = useGlobalContext()
     const [selectedFile, setSelectedFile] = useState(null)
     const [answer, setAnswer] = useState(null)
     const [category, setCategory] = useState(null)
@@ -279,6 +280,7 @@ const AddPics = ({size}) => {
 }
 
 const Admin = ({size}) => {
+    const {alertProps, setAlertProps} = useGlobalContext()
     const [selection, setSelection] = useState()
   return (
     <Stack direction={'column'} sx={{ height: '98%', width: '100%', overflow: 'scroll'}}>

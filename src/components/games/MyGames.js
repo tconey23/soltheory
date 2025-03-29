@@ -1,11 +1,12 @@
 import React from 'react'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Stack } from '@mui/system'
 import { Accordion, AccordionDetails, AccordionSummary, Button, Typography } from '@mui/material'
 import {List, ListItem} from '@mui/material'
 import { getUserGames, addGameToUser } from '../../business/apiCalls'
 import Hexagon from './Hexagon'
 import SixPics from '../../assets/SixPics';
+import { useGlobalContext } from '../../business/GlobalContext'
 
 const purple = '#c956ff'
 const yellow = '#fff200'
@@ -17,6 +18,8 @@ const stageColors = {
     3: green,
     4: green
 }
+
+
 
 const gameObjects = {
     'TwentyOneThings': 
@@ -34,17 +37,54 @@ const gameObjects = {
 
 const GameRecord = ({ title, gameData }) => {
     const [font] = useState('Fredoka')
-    console.log(gameData)
+    const {alertProps, setAlertProps} = useGlobalContext()
+    // console.log(gameData)
+    const videoRef = useRef()
+
+    const formattedDate = (date) => {
+
+        const options = { 
+            year: 'numeric', 
+            month: 'numeric', 
+            day: 'numeric', 
+            // hour: '2-digit', 
+            // minute: '2-digit', 
+            // second: '2-digit' 
+        }
+
+        return new Intl.DateTimeFormat('en-US', options).format(date)
+
+    }
+
+    useEffect(() =>{
+        if(videoRef.current){
+            console.log(videoRef.current)
+            videoRef.current.play()
+        }
+    }, [videoRef])
+
+    const capitalizeWords = (str) => {
+        return str.split(' ')
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')
+    }
+
+    const mediaType = (media) => {
+        return(media?.split('').splice(-3).join().replaceAll(',', ''))
+    }
+
+
 
     return (
                <Accordion>
                 <AccordionSummary>
-                    <Typography>{gameData.game_date}</Typography>
+                    <Typography>{gameData.game_date || formattedDate(gameData.date_played)}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
                     <List>
-                        {Object.values(gameData.stages).map((st,i) => {
-                            console.log(st)
+                        {gameData.stages
+                        ? Object.values(gameData.stages).map((st,i) => {
+                            // console.log(st)
                             return (
                                 <ListItem>
                                     <Accordion sx={{width: '80%', background: stageColors[i+1]}}>
@@ -79,7 +119,32 @@ const GameRecord = ({ title, gameData }) => {
                                     </Accordion>
                                 </ListItem>
                             )
-                        })}
+                        })
+                        :
+                            <ListItem sx={{flexDirection: 'column', alignItems: 'flex-start'}}>
+                                <Stack>
+                                    {mediaType(gameData.graphic) === 'mp4' ?
+                                    <>
+                                        <video height={'110px'} ref={videoRef} mute autoplay loop>
+                                            <source src={gameData.graphic} type='video/mp4'/>
+                                        </video>
+                                    </>
+                                    :
+                                    <>
+                                        <img src={gameData.graphic} />
+                                    </>
+                                    }
+                                </Stack>
+                                <Stack direction={'row'}>
+                                    <Typography>Pack: </Typography>
+                                    <Typography>{capitalizeWords(gameData.pack)}</Typography>
+                                </Stack>
+                                <Stack direction={'row'}>
+                                    <Typography>Score: </Typography>
+                                    <Typography>{gameData.score}</Typography>
+                                </Stack>
+                            </ListItem>
+                        }
                     </List>
                 </AccordionDetails>
                </Accordion>
@@ -89,17 +154,19 @@ const GameRecord = ({ title, gameData }) => {
 };
 const MyGames = ({user, setSelectedOption}) => {
     const[games, setGames] = useState([]) 
+    const {alertProps, setAlertProps} = useGlobalContext()
+    
     const fetchMyGames = async () => {
         try {
             const gamesData = await getUserGames(user);
 
-            console.log(
-                gamesData.map((g) => (
-                    g
-                ))
-            )
-    
+            
             if (gamesData) {
+                console.log(
+                    gamesData.map((g) => (
+                        g
+                    ))
+                )
                 console.log(gamesData);
                 setGames(gamesData);
             } else {
@@ -108,25 +175,23 @@ const MyGames = ({user, setSelectedOption}) => {
             }
         } catch (error) {
             console.error("Error fetching games:", error);
-            setTimeout(() => {
-                fetchMyGames(); // Retry fetching after 2 seconds
-            }, 2000);
+
         }
     };
     
 
     useEffect(() => {
-        console.clear()
+        // console.clear()
         if(user){
-            fetchMyGames()
+            fetchMyGames() 
         }
     }, [])
 
     useEffect(() =>{
        if(games){
-        console.log(
-            games.filter((g) => g.game === 'TwentyOneThings')
-        )
+        // console.log(
+        //     games.filter((g) => g.game === 'TwentyOneThings')
+        // )
        }
     }, [games])
 
@@ -161,7 +226,16 @@ const MyGames = ({user, setSelectedOption}) => {
                             }
                         </AccordionSummary>
                         <AccordionDetails>
-                            {/* <GameRecord key={i} title={g.game} gameData={g}/> */}
+                            {
+                                games
+                                .filter((g) => g.game === 'SixPics')
+                                .map((gm) => {
+                                    
+                                    return (
+                                        <GameRecord title={gm.game} gameData={gm} />
+                                    )
+                                })
+                            }
                         </AccordionDetails>
                     </Accordion>
     </Stack>

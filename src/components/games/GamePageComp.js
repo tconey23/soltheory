@@ -9,9 +9,12 @@ import Login from '../../components/Login'
 import MyGames from './MyGames';
 import { addFriend } from '../../business/apiCalls';
 import Friends from '../Friends';
+import { useGlobalContext } from '../../business/GlobalContext'
 
 
 const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
+
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     const menuOptions = user 
     ? ['Play', 'Friends', 'My Games', 'Account', 'Quit', 'Close']
@@ -54,6 +57,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     const [query, setQuery] = useState(null)
 
     const nav = useNavigate()
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     let Game = selectedGame?.component;
     
@@ -130,7 +134,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                 <Modal
                     open={selectedOption==='Account'}
                 >
-                    <Stack justifyContent={'center'} alignItems={'center'}>
+                    <Stack justifyContent={'center'} alignItems={'center'} height={'100%'}>
                         <Login setSelectedOption={setSelectedOption} user={user} setUser={setUser}/>
                     </Stack>
                 </Modal>

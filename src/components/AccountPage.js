@@ -7,9 +7,10 @@ import Admin from './Admin';
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
 import { getUser } from '../business/apiCalls';
-
+import { useGlobalContext } from '../business/GlobalContext'
 
 const AccountPage = ({user, handleLogout, size}) => {
+    const {alertProps, setAlertProps} = useGlobalContext()
 
     const [isAdmin, setisAdmin] = useState(false)
 
@@ -24,6 +25,7 @@ useEffect(() => {
     if(user && user.email){
         checkAdminAccess(user.email)
     }
+    console.log(user)
 }, [user])
 
   return (
@@ -31,7 +33,7 @@ useEffect(() => {
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
                     <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} />
-                        <Typography variant="h7">Welcome, {user.email || "User"}!</Typography>
+                        <Typography variant="h7">Welcome, {user?.email || "User"}!</Typography>
                         <Button variant="contained" color="error" onClick={handleLogout} sx={{ mt: 2 }}>
                             Logout
                         </Button>

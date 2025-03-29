@@ -4,8 +4,10 @@ import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
 import {useMediaQuery} from "@mui/material";
+import { useGlobalContext } from "../business/GlobalContext";
 
 const AppHeader = () => {
+  const {alertProps, setAlertProps} = useGlobalContext()
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElGames, setAnchorElGames] = useState(null); // State for "SOL Games" dropdown
