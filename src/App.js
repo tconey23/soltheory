@@ -48,6 +48,7 @@ function App() {
         <Stack width={'100vw'} justifyContent={'center'} alignItems={'center'} position={'fixed'} zIndex={1301}>
           {alertProps.display && <Alert severity={alertProps.severity} sx={{width: '50%'}}>{alertProps.text}</Alert>}
         </Stack>
+        <Stack height={'100%'}>
           <Routes>
             <Route path="/" element={<HomePageCanvas user={user} setUser={setUser} />}/>
             <Route path="/home" element={<HomePageCanvas user={user} setUser={setUser} />}/>
@@ -59,8 +60,8 @@ function App() {
           </>
             }
           </Routes>
+          </Stack>
         </div>
-        <UserAlert />
       </div>
   );
 }

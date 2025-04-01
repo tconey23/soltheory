@@ -1,10 +1,13 @@
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, Slider } from "@mui/material";
+import { Stack, Typography, TextField, Button} from "@mui/material";
 import lambGif from "../../assets/silence_of_the_lambs.gif";
 import { addGameToUser, getGifs } from "../../business/apiCalls";
 import { useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";
 import { useGlobalContext } from "../../business/GlobalContext";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 const ResultsPage = ({score, gamePack, user}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
@@ -28,7 +31,8 @@ const ResultsPage = ({score, gamePack, user}) => {
   return (
     <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
       <Stack width={'100%'} height={'100%'}>
-        <Typography fontSize={50}>Your Score</Typography>
+        <Typography fontSize={50}>{gamePack}</Typography>
+        <Typography fontSize={40}>Your Score</Typography>
         <Typography fontSize={35}>{score}</Typography>
       </Stack>
       <Stack width={'10%'}>
@@ -84,21 +88,6 @@ const Countdown = ({setStart}) => {
   )
 }
 
-const interpolateColor = (startHex, endHex, progress) => {
-
-  const start = parseInt(startHex.slice(1), 16);
-  const end = parseInt(endHex.slice(1), 16);
-
-  const r1 = (start >> 16) & 0xff, g1 = (start >> 8) & 0xff, b1 = start & 0xff;
-  const r2 = (end >> 16) & 0xff, g2 = (end >> 8) & 0xff, b2 = end & 0xff;
-
-  const r = Math.round(r1 + (r2 - r1) * progress);
-  const g = Math.round(g1 + (g2 - g1) * progress);
-  const b = Math.round(b1 + (b2 - b1) * progress);
-
-  return `rgb(${r}, ${g}, ${b})`;
-};
-
 const getVideoDuration = (videoUrl) => {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
@@ -117,74 +106,140 @@ const getVideoDuration = (videoUrl) => {
   });
 };
 
-const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex, gamePack, user}) => {
+const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [score, setScore] = useState(100);
-  const [seconds, setSeconds] = useState(10);
   const [currTime, setCurrTime] = useState(10);
   const [vidDur, setVidDur] = useState(null)
-  const [playbackSpeed, setPlayBackSpeed] = useState(null);
-  const [sliderColor, setSliderColor] = useState("#00FF00");
-  const [timerOpac, setTimerOpac] = useState(1);
-  const [toggleTryAgain, setToggleTryAgain] = useState(false);
   const [start, setStart] = useState(false);
   const [inputLetters, setInputLetters] = useState();
-  const [answer, setAnswer] = useState("Silence of the lambs");
-  const [paused, setPaused] = useState(false);
+  const [answer, setAnswer] = useState("cat on a hot tin roof");
   const [isWin, setIsWin] = useState(false);
   const [letterCount, setLetterCount] = useState(0);
-  const [toggleAnswer, setToggleAnswer] = useState(false);
-  const [ref, setRef] = useState(1)
-  const [playTimes, setPlayTimes] = useState(0)
-  const [allowPlayPause, setAllowPlayPause] = useState(true)
-  const [gameOver, setGameOver] = useState(false)
-
+  const [checkTime, setCheckTime] = useState(1)
+  const [drawNum, setDrawNum] = useState(1)
+  const [pauseTime, setPauseTime] = useState()
+  const [giveUp, setGiveUp] = useState(false)
+  const [toggleGiveUp, setToggleGiveUp] = useState(false)
+  const [disableNext, setDisableNext] = useState(false)
+  const [animTextNum, setAnimTextNum] = useState(0)
+  const [levelScore, setLevelScore] = useState(100)
+  
   const inputRefs = useRef([]);
   const videoRef = useRef(null);
 
-  const playPause = async (vidref, type) => {
-  if(allowPlayPause){
-    setAllowPlayPause(false)
-    if(type === 'play' && vidref.paused){
-      await vidref.play()
-      setAllowPlayPause(true)
-      return
+  useEffect(() => {
+    if(currTime == pauseTime && videoRef.current) {
+      videoRef.current.pause()
     } 
-    
-    if(type === 'pause' && !vidref.paused){
-      await vidref.pause()
-      setAllowPlayPause(true)
-      console.log('done pausing')
-      return
+  }, [currTime, pauseTime, videoRef])
+
+  useEffect(() => {
+    if(videoRef.current && start && vidDur) {
+      let curr = videoRef.current.currentTime
+      let pauseAt 
+
+      let paused = videoRef.current.paused
+      let ended = videoRef.current.ended
+      let atEnd = curr.toFixed(0) == vidDur
+
+      const isPlaying = 
+        !paused &&
+        !ended &&
+        !atEnd
+        ;
+
+        setDisableNext(isPlaying)
+
+      if(drawNum < 3){
+        pauseAt = vidDur / 3 * drawNum
+      } else {
+        pauseAt = vidDur
+      }
+      
+      if(curr < vidDur) {
+        setCheckTime(prev => prev +1)
+        setCurrTime(curr.toFixed(1))
+        setPauseTime(pauseAt.toFixed(1))
+      }
+      
+      if(curr.toFixed(0) == vidDur) {
+        setDisableNext(true)
+        setTimeout(() => {
+          setToggleGiveUp(true)
+        }, 2000);
+      }
+
+    }
+  }, [videoRef, start, vidDur, currTime, checkTime])
+
+  const handleNext = () => {
+    if(videoRef && videoRef.current){
+      setDrawNum(prev => prev +1)
+      setStart(true)
+      videoRef.current.play()
     }
   }
 
-  }
+  useEffect(() => {
+    console.log(drawNum)
+    if (!giveUp && level.level != null) {
+      let target = levelScore;
+  
+      switch (drawNum) {
+        case 1:
+          target = 100;
+          break;
+        case 2:
+          target = levelScore - 34;
+          break;
+        case 3:
+          target = levelScore - 33;
+          break;
+        default:
+          return;
+      }
+  
+      const interval = setInterval(() => {
+        setLevelScore(prev => {
+          if (prev > target) {
+            return prev - 1;
+          } else {
+            clearInterval(interval);
+            return prev; // return current value to avoid undefined
+          }
+        });
+      }, 50);
+  
+      return () => clearInterval(interval);
+    }
 
-  useEffect(()=>{
-    if(videoRef.current && isWin){
-      playPause(videoRef.current, 'pause')
-      videoRef.current.currentTime = vidDur
+    if(giveUp){
+      let target = 0
+      const interval = setInterval(() => {
+        setLevelScore(prev => {
+          if (prev > target) {
+            return prev - 1;
+          } else {
+            clearInterval(interval);
+            return prev; // return current value to avoid undefined
+          }
+        });
+      }, 50);
+  
+      return () => clearInterval(interval);
     }
-    if(isWin){
-      setTotalPoints(prev => prev + parseFloat(score))
-    }
-  }, [isWin, videoRef])
+
+
+  }, [drawNum, giveUp]);
+   
 
   useEffect(() => {
-    if(ref && videoRef.current && playbackSpeed && start && !isWin){
-      let currTime = videoRef.current.currentTime / playbackSpeed
-      let remTime = 10 - currTime
-      setCurrTime(remTime)
-      setRef(prev => prev +1)
+    if (level) {
+      setAnswer(level.answer);
+      // console.log(level)
     }
-  }, [ref, videoRef, playbackSpeed, start, isWin])
-
-  useEffect(() => {
-    if (stage) {
-      setAnswer(stage.answer);
-    }
-  }, [stage]);
+  }, [level]);
 
   useEffect(() => {
     if (answer) {
@@ -201,92 +256,45 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex, gamePack,
   useEffect(() => {
     let inputLength;
     if (inputLetters && videoRef.current) {
-      inputLength = inputLetters.length - 1;
 
-      if (inputLetters[inputLength] === answer.replaceAll(" ", "").split("")[inputLength]) {
-          playPause(videoRef.current, 'pause')
-          setPaused(true)
-      } else {
-        videoRef.current.play()
-      }
     }
   }, [inputLetters]);
 
-  useEffect(()=>{
-    if(paused){
-      const interval = setInterval(() => {
-        try {
-          playPause(videoRef.current, 'play')
-          setPaused(false)
-          console.log('restarting')
-            
-        } catch (error) {
-            console.error(error);
-        }
-      }, 2000)
-      return () => (
-        clearInterval(interval)
-      )
-    }
-    if(videoRef.current && inputLetters?.length == letterCount){
-      playPause(videoRef.current, 'pause')
-    }
-  }, [videoRef, start, isWin, inputLetters, letterCount, paused])
-
-  useEffect(() => {
-    if (currTime > 0) {
-        let scr = currTime * 1 / 0.1;
-
-        if(scr > 50){
-          setScore(scr.toFixed(2));
-        } else {
-          setScore(50)
-        }
-    }
-  }, [currTime]);
-
-  useEffect(()=>{
-
-    if (videoRef.current && start) {
-      try {
-        playPause(videoRef.current, 'play')
-        setPlayTimes(prev => prev +1)
-      } catch (error) {
-          console.error(error);
-          
-      }
-    }
-
-  }, [start])
-
-  useEffect(() => {
-    const progress = 1 - currTime / seconds;
-    setSliderColor(interpolateColor("#00FF00", "#FF0000", progress));
-    if (currTime < 0) {
-      setToggleTryAgain(true);
-    }
-  }, [currTime, seconds]);
 
   const getDuration = async () => {
-    const res = await getVideoDuration(stage.url)
+    const res = await getVideoDuration(level.url)
     setVidDur(res)
-    setPlayBackSpeed(res / seconds)
   }
+
+  useEffect(() => {
+    if(videoRef.current){
+      // console.log(videoRef.current.autoplay)
+    }
+
+    if(videoRef.current && start){
+      videoRef.current.play()
+    }
+  }, [start, videoRef])
+
+  useEffect(() => {
+    if (animTextNum < letterCount) {
+      const timeout = setTimeout(() => {
+        setAnimTextNum(prev => prev + 1);
+      }, 200);
+  
+      return () => clearTimeout(timeout);
+    }
+  }, [animTextNum, letterCount]);
 
   useEffect(() => {
     getDuration()
   }, []);
 
   useEffect(() => {
-    if (videoRef.current && playbackSpeed !== null) {
-      videoRef.current.playbackRate = playbackSpeed;
+    if(inputRefs.current){
+        // console.log(inputRefs)
     }
-  }, [playbackSpeed]);
-
-  const handleStartOver = () => {
-    setScore(prev => prev /2)
-    setToggleTryAgain(false)
-  }
+  }, [inputRefs, inputLetters])
 
   const handleInputChange = (event, wordIndex, letterIndex) => {
     const { value } = event.target;
@@ -320,119 +328,101 @@ const Stage = ({ stage, setGifIndex, setTotalPoints, levels, gifIndex, gamePack,
     let ans = answer.replaceAll(' ','').toLowerCase()
     let check = inputLetters
     check === ans ? setIsWin(true) : setIsWin(false)
+    console.log(check === ans)
   }
 
-  const handleNextLevel = () => {
-    if(gifIndex < levels -1 ){
-      setGifIndex(prev => prev +1)
-    }
-    if(gifIndex == levels -1){
-      setGameOver(true)  
+  const handleNextLevel = async (dir, score) => {
+    let levelCount = levels.length-1
+    
+    if(level.level < levelCount){
+      handleGoToSlide(dir, score)
+    } else {
+      console.log('end')
+      handleGoToSlide('end', score)
     }
   }
 
   return (
     <>
-    {gameOver 
-    ? <ResultsPage user={user} score={score} gamePack={gamePack}/>
-    : <>
-      <Stack width={"80%"}>
-        <Slider
-          sx={{
-            "& .MuiSlider-thumb": { backgroundColor: sliderColor },
-            "& .MuiSlider-track": { backgroundColor: sliderColor },
-          }}
-          value={currTime}
-          max={seconds}
-          aria-label={currTime.toFixed(0)}
-        />
-        <>
-          {currTime > 0 && (
-            <>
-              <Typography sx={{ opacity: timerOpac }}>{`Remaing time: ${currTime.toFixed(0)} sec`}</Typography>
-            </>
-          )}
-          {currTime > -1 && <Typography>{`Remaining points: ${score}`}</Typography>}
-        </>
-      </Stack>
-
-      <Stack backgroundColor={"white"} height={'45%'}>
-        {playbackSpeed && start && (
-          <>
-            <video
-              ref={videoRef}
-              width="640"
-              height="75%"
-              autoPlay
-              mute
-              preload="metadata"
-              onLoadedMetadata={() => {
-                if(videoRef.current){
-                  videoRef.current.playbackRate = playbackSpeed
-                }
-              }}
-            >
-              <source src={stage.url} type="video/mp4"/>
-            </video>
-          </>
-        )}
-      </Stack>
-
-      {!isWin ? (
-        <>
-          <Stack height={'100%'} width={"100%"} justifyContent="flex-start" alignItems="center">
-            {!start &&
-              <Countdown setStart={setStart}/>
-             }
-              {toggleTryAgain && 
-                <Stack>
-                  <Button onClick={() => handleStartOver()}>Try again</Button>
-                </Stack>
-            }
-          </Stack>
-          <Stack direction={"row"} width={"100%"} justifyContent={"center"} flexWrap={'wrap'}>
-        {answer.split(" ").map((word, wordIndex) => {
-          inputRefs.current[wordIndex] = [];
-          
-          return (
-            <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={10} marginBottom={5}>
-              {start && word.split("").map((letter, letterIndex) => (
-                <Stack key={letterIndex} marginLeft={1} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
-                  {toggleAnswer ? (
-                    <Typography fontSize={50}>{letter}</Typography>
-                  ) : (
-                    <TextField
-                    autoComplete="off"
-                    inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
-                    onChange={(event) =>
-                      handleInputChange(event, wordIndex, letterIndex)
-                    }
-                    inputProps={{
-                      maxLength: 1,
-                      style: { textAlign: "center", fontSize: 30, width: 40 }
-                    }}
-                    />
-                  )}
-                </Stack>
-              ))}
+        <Stack backgroundColor={"white"} justifyContent={'center'} alignItems={'center'}>
+          <Typography>{`Points ${levelScore}/100`}</Typography>
+            <Stack width={'20%'} height={'20%'} justifyContent={'center'} alignItems={'center'}>
+              <video
+                style={{boxShadow: '4px 2px 10px 1px #00000038', padding: 1}}
+                ref={videoRef}
+                width="100%"
+                height="70%"
+                preload="metadata"
+                mute
+              >
+                <source src={level.url} type="video/mp4"/>
+              </video>
             </Stack>
-          );
-        })}
-      </Stack>
-      <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
-        {inputLetters?.length === letterCount && <Button onClick={() => checkAnswer()} variant='contained'>Check Answer</Button>}
-      </Stack>
-      </> 
-      ) : (
+          {start && !toggleGiveUp && <Button disabled={disableNext} onClick={handleNext}>Next</Button>}
+          {toggleGiveUp && !giveUp && <Button onClick={() => setGiveUp(true)}>Give Up</Button>}
+          {!start && <Button onClick={() => setStart(true)}>Start</Button>}
+        </Stack>
+
+    
         <>
-          <Stack>
-            <Typography fontSize={60}>{answer.toUpperCase()}</Typography>
-            <Typography fontSize={60}>Correct!</Typography>
-            <Button onClick={() => handleNextLevel()} variant="contained">Next</Button>
+          <Stack direction={"row"} width={"100%"} justifyContent={"center"} flexWrap={'wrap'}>
+            {answer.split(" ").map((word, wordIndex) => {
+              inputRefs.current[wordIndex] = [];
+              
+              return (
+                <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={10} marginBottom={5} padding={1}>
+                  {word.split("").map((letter, letterIndex) => {
+
+                    return (
+                    <Stack key={letterIndex} marginLeft={1} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
+                        {!giveUp 
+                        ? <TextField
+                          disabled={giveUp}
+                          sx={{opacity: animTextNum > letterIndex ? 1 : 0, transition: 'all 1s ease-in'}}
+                          autoComplete="off"
+                          inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
+                          onChange={(event) =>
+                            handleInputChange(event, wordIndex, letterIndex)
+                          }
+                          inputProps={{
+                            maxLength: 1,
+                            style: { textAlign: "center", fontSize: 30, width: 40 }
+                          }}
+                        /> 
+                        : <TextField
+                        value={letter}
+                        disabled={giveUp}
+                        sx={{opacity: animTextNum > letterIndex ? 1 : 0, transition: 'all 1s ease-in'}}
+                        autoComplete="off"
+                        inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
+                        onChange={(event) =>
+                          handleInputChange(event, wordIndex, letterIndex)
+                        }
+                        inputProps={{
+                          maxLength: 1,
+                          style: { textAlign: "center", fontSize: 30, width: 40 }
+                        }}
+                      />
+                        }
+                    </Stack>
+                  )})}
+                </Stack>
+              );
+            })}
           </Stack>
-        </>
-      )}
-      </>
+
+          <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
+            {inputLetters?.length === letterCount && !isWin && <Button onClick={() => checkAnswer()} variant='contained'>Check Answer</Button>}
+          </Stack>
+        </> 
+      
+        {isWin && 
+          <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
+            <Stack width={'25%'}>
+              <Typography fontSize={60}>Correct!</Typography>
+              <Button onClick={() => handleNextLevel('next', levelScore)} variant="contained">Next</Button>
+            </Stack>
+          </Stack>
     }
     </>
   );
@@ -443,58 +433,127 @@ const Pic6 = ({user}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [gamePack, setGamePack] = useState(null)
   const [gifIndex, setGifIndex] = useState(0)
-  const [gifs, setGifs] = useState([])
-  const [totalPoints, setTotalPoints] = useState(0)
-  const [possPoints, setPossPoints] = useState(300)
-  const [levels, setLevels] = useState(0)
-  
+  const [levels, setLevels] = useState([])
+  const [refKey, setRefKey] = useState(0)
+  const [totalScore, setTotalScore] = useState(0)
+  const [gameOver, setGameOver] = useState(false)
+  const sliderRef = useRef(null)
+
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    beforeChange: (current, next) => setGifIndex(next),
+    slickGoTo: gifIndex
+  };
 
   const fetchGifs = async (name) => {
     const res = await getGifs(name)
-    if(res){
-      setLevels(res.gifs.length)
-      setGifs(res)
+    if(res && res.gifs){
+      res.gifs.forEach((l, i) => {
+        setLevels(prev => [
+          ...prev,
+          {
+            level: i,
+            score: 100,
+            url: l.url,
+            answer: l.answer
+          }
+        ])
+      })
     }
   }
+
+  const handleGoToSlide = (dir, score) => {
+
+    if(gifIndex < levels.length-1) {
+      if(dir === 'next') {
+        let nextIndex = gifIndex +1
+        setGifIndex(prev => prev +1);
+        sliderRef.current?.slickGoTo(nextIndex);
+        setTotalScore(prev => prev + score)
+      }
+
+      if(dir === 'prev') {
+        let nextIndex = gifIndex -1
+        setGifIndex(prev => prev -1);
+        sliderRef.current?.slickGoTo(nextIndex);
+      }
+
+      
+    } 
+    
+    if(dir === 'end'){
+      setTotalScore(prev => prev + score)
+      setGifIndex(0)
+      sliderRef.current?.slickGoTo(0)
+      setGameOver(true)
+    }
+
+  };
+
+  const resetGame = () => {
+    setGifIndex(0)
+    setLevels([])
+    fetchGifs(gamePack)
+  }
+
+
+  useEffect(() => {
+    resetGame()
+  }, [refKey])
 
   useEffect(() => {
     if(gamePack)
       {
-        console.log(gamePack)
         fetchGifs(gamePack)
       }
   }, [gamePack])
 
   useEffect(() => {
-    console.log(gifs)
-    if(gifs && gifs.gifs){
-      console.log(gifs.gifs.length)
-      setPossPoints(gifs.gifs.length *100)
+    if(gameOver, sliderRef.current){
+      sliderRef.current?.slickGoTo(levels.length)
     }
-  }, [gifs])
+  }, [gameOver, sliderRef])
+
 
   return (
     <Stack
       direction={"column"}
-      // border={"1px solid black"}
-      key={gifIndex}
-      sx={{ height: "80%", width: "75%" }}
+      key={refKey}
+      sx={{ height: "90%", width: "75%" }}
       alignItems={"center"}
       justifyContent={"flex-start"}
     >
 
-     {gifs && gifs.gifs && gifs.gifs.length > 0 && <Typography>{`${totalPoints.toFixed(0)} / ${possPoints}`}</Typography>}
+      <Stack direction={'row'} height={'6%'} width={'100%'} marginBottom={3} alignItems={'center'} justifyContent={'space-around'}>
+        <Typography>{`Level ${gifIndex +1}`}</Typography>
+        <Button onClick={() => setRefKey(prev => prev +1)}>Start over</Button>
+        <Typography sx={{width: 100}}>{`Total Score: ${totalScore}`}</Typography>
+      </Stack>
 
-    {
-      gifs && gifs.gifs && gifIndex > -1 &&
-      <Stage stage={gifs.gifs[gifIndex]} setGifIndex={setGifIndex} setTotalPoints={setTotalPoints} levels={levels} gifIndex={gifIndex} gamePack={gamePack} user={user}/>
-    }
-
-   {gifs && !gifs.gifs &&
-    <>
-      <SixPicsPacks setGamePack={setGamePack} gamePack={gamePack}/>
-     </>  
-    } 
+      {
+        levels.length > 0 
+          ? <Stack height={'75%'} width={'100%'} sx={{scale: 0.9}} alignItems={'center'} justifyContent={'space-around'}>
+            <Slider ref={sliderRef} {...settings} style={{width: '100%', height: '100%'}}>
+              {levels.map((l) => (
+              <Stack>
+                <Stage 
+                  handleGoToSlide={handleGoToSlide} 
+                  level={l}
+                  levels={levels}
+                  setLevels={setLevels}
+                  setGameOver={setGameOver}
+                />
+              </Stack>
+              ))}
+              {gameOver && <ResultsPage score={totalScore} user={user} gamePack={gamePack}/>}
+            </Slider>
+          </Stack>
+        :<SixPicsPacks setGamePack={setGamePack} gamePack={gamePack}/>
+      }
     </Stack>
   );
 };

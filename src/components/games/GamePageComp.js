@@ -73,7 +73,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     }, [selectedOption])
 
     return (
-        <Stack direction={'column'} sx={{ height: '75vh', width: '100vw' }}>
+        <Stack direction={'column'} sx={{ height: '89%', width: '100vw' }}>
             <GameMenu 
                 toggleMenu={toggleMenu} 
                 setToggleMenu={setToggleMenu} 
@@ -81,7 +81,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                 setSelectedOption={setSelectedOption} 
                 user={user}
             />
-            <Stack direction={'row'} padding={2}>
+            <Stack direction={'row'} padding={2} height={'80%'}>
                 <Stack>
                     <Box>
                         <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>

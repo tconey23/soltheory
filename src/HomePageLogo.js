@@ -16,7 +16,7 @@ const HomePageLogo = ({text}) => {
 
   const degrees = (degrees) => degrees * (Math.PI / 180)
   return (
-    <group ref={logoRef} position={[1,0,0]} rotation={[degrees(90),0,degrees(-25)]}>
+    <group ref={logoRef} position={[1,0,0]} rotation={[degrees(90),0,degrees(0)]}>
       <HomePageText text={text}/>
       <Rings />
     </group>

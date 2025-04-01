@@ -8,6 +8,7 @@ import { MeshReflectorMaterial } from "@react-three/drei";
 import { useFrame } from '@react-three/fiber'
 import { useState, useRef } from 'react'
 import { useMediaQuery } from '@mui/material'
+import HeadModel from './components/HeadModel'
 
 
 const purple = '#c956ff'
@@ -59,7 +60,7 @@ const Lighting = () => {
   return (
     <>
       <directionalLight ref={light1} intensity={10} color={green} position={[2,0,1]} />
-      <directionalLight ref={light2} intensity={20} color={yellow} position={[1,2,1]} />
+      <directionalLight ref={light2} intensity={20} color={'red'} position={[1,2,1]} />
       <directionalLight ref={light3} intensity={15} color={purple} position={[1,3,1]} />
     </>
   );
@@ -72,12 +73,14 @@ const HomePageCanvas = () => {
   
   return (
     <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
-        <Canvas shadows={true} camera={{ position: [0, 0, 15], fov: isMobile ? 80 : 70 }} style={{height: '100%'}}>
+        <Canvas shadows={true} camera={{ position: [0, 0, 15], fov: isMobile ? 80 : 70 }} style={{height: '100%', background: 'black'}}>
             <ambientLight intensity={0.5} position={[0,0,0]}/>
             <Lighting />
 
-            {/* <directionalLight intensity={40} position={[1,0,1]} /> */}
-              <mesh position={[0,-7,0]} rotation={[degrees(-50),degrees(0),degrees(0)]}>
+            {/* <directionalLight intensity={40} position={[1,0,1]} />
+            <directionalLight intensity={40} position={[-1,0,-1]} /> */}
+
+              {/* <mesh position={[0,-7,0]} rotation={[degrees(-50),degrees(0),degrees(0)]}>
                 <planeGeometry args={[1000,1000,500]} />
                   <MeshReflectorMaterial
                     color='black'
@@ -93,11 +96,11 @@ const HomePageCanvas = () => {
                     depthToBlurRatioBias={0.25} 
                     reflectorOffset={0}
                   />
-              </mesh>
+              </mesh> */}
             
             <HomePageLogo />
-
-            {/* <OrbitControls enableZoom={true} enablePan={true}/> */}
+            {/* <HeadModel scale={0.04} position={[0,0,-5]}/> */}
+            <OrbitControls enableZoom={true} enablePan={true}/>
         </Canvas>
     </div>
   )
