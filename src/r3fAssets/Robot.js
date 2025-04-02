@@ -22,12 +22,14 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
     const lightMin = 0.1
     const fadeSpeed = 0.01
 
-    const speed = 0.1
+    const speed = 0.3
     const maxTilt = 10 // degrees
     const liftRef = useRef(0) // 0 = grounded
     const groupRef = useRef()
+    const robotLightRef = useRef()
     const leftLegLightRef = useRef()
     const rightLegLightRef = useRef()
+    const robotHead = useRef()
     const rightLegRef = useRef()
     const leftLegRef = useRef()
       
@@ -37,6 +39,14 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
           ArrowLeft: false,
           ArrowRight: false,
         })
+
+        const meshMaterialProps = {
+            metalness: 10,
+            roughness: 5,
+            color: 'silver',
+            receiveShadow: true,
+            castShadow: true
+          }
       
         useEffect(() => {
           const down = (e) => (keys.current[e.code] = true)
@@ -48,15 +58,9 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
             window.removeEventListener('keyup', up)
           }
         }, [])
-
-        useEffect(() => {
-            if(rightLegRef.current){
-                console.log(rightLegRef.current)
-            }
-        }, [rightLegRef])
       
         useFrame(() => {
-            if (!bodyRef.current || !leftLegLightRef.current || ! rightLegRef.current || !leftLegRef.current || !rightLegLightRef.current) return
+            if (!bodyRef.current || !leftLegLightRef.current || ! rightLegRef.current || !leftLegRef.current || !rightLegLightRef.current || !robotHead.current || !robotLightRef.current) return
 
             const fadeLight = (lightRef, dirRef) => {
                 if (!lightRef.current) return
@@ -75,13 +79,16 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
                 }
               }
             
-
-
-
-          
             const rot = bodyRef.current.rotation()
+
+            const robotHeadWorldPos = new THREE.Vector3()
             const leftLegWorldPos = new THREE.Vector3()
             const rightLegWorldPos = new THREE.Vector3()
+
+            robotHead.current.getWorldPosition(robotHeadWorldPos)
+            const robotLightOffset = new THREE.Vector3(robotHeadWorldPos.x, robotHeadWorldPos.y+5, robotHeadWorldPos.z)
+            robotLightRef.current.position.copy(robotLightOffset)
+            
 
             leftLegRef.current.getWorldPosition(leftLegWorldPos)
             leftLegLightRef.current.position.copy(leftLegWorldPos)
@@ -104,13 +111,18 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
             rightLegLightRef.current.rotation.x = rot.x
             rightLegLightRef.current.rotation.z = rot.z
             
-
+            const robotLightTarget = robotHeadWorldPos.clone().add(new THREE.Vector3(0, -1, 0))
             const leftLegTargetPos = leftLegWorldPos.clone().add(new THREE.Vector3(0, -1, 0))
             const rightLegTargetPos = rightLegWorldPos.clone().add(new THREE.Vector3(0, -1, 0))
+
+            robotLightRef.current.target.position.copy(robotLightTarget)
             leftLegLightRef.current.target.position.copy(leftLegTargetPos)
             rightLegLightRef.current.target.position.copy(rightLegTargetPos)
           
-            // Add the target to the scene if not already
+            if (!robotLightRef.current.target.parent) {
+                scene.add(robotLightRef.current.target)
+              }
+            
             if (!leftLegLightRef.current.target.parent) {
               scene.add(leftLegLightRef.current.target)
             }
@@ -188,40 +200,39 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
             angularDamping={1}
             >
 
-        <mesh name="robot-head" position={[0, 1.6, 0]}>
+        <mesh ref={robotHead} name="robot-head" position={[0, 1.6, 0]}>
           <cylinderGeometry args={[0.3, 0.3, 0.5, 16]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial {...meshMaterialProps}/>
         </mesh>
         <CuboidCollider args={[0.3, 0.3, 0.3]} position={[0, 1.6, 0]} />
   
         <mesh name="robot-torso"  position={[0, 0.5, 0]}>
           <boxGeometry args={[1, 1.5, 0.5]} />
           <cylinderGeometry args={[0.25, 0.5, 2, 16]} />
-          <meshStandardMaterial color={color} />
+          <meshStandardMaterial {...meshMaterialProps}/>
+          <pointLight castShadow intensity={0.1}/>
         </mesh>
         <CuboidCollider args={[0.5, 0.75, 0.25]} position={[0, 0.5, 0]} />
   
         <mesh name="robot-leg-left" ref={leftLegRef} position={[-0.3, -0.8, 0]}>
         <cylinderGeometry args={[0.09, 0.3, 1.2, 16]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial {...meshMaterialProps}/>
         </mesh>
         <CuboidCollider
         name="robot-leg-left"
         args={[0.3 / 2, 1.2 / 2, 0.3 / 2]} // x: half-width, y: half-height, z: depth
-        position={[-0.3, -0.7, 0]}
+        position={[-0.3, -0.8, 0]}
         />
 
-        
         <mesh name="robot-leg-right" ref={rightLegRef} position={[0.3, -0.8, 0]}>
         <cylinderGeometry args={[0.09, 0.3, 1.2, 16]} />
-        <meshStandardMaterial color={color} />
+        <meshStandardMaterial {...meshMaterialProps}/>
         </mesh>
         <CuboidCollider
         name="robot-leg-right"
         args={[0.3 / 2, 1.2 / 2, 0.3 / 2]}
-        position={[0.3, -0.7, 0]}
+        position={[0.3, -0.8, 0]}
         />
-
         </RigidBody>
       </group>
             <spotLight
@@ -239,7 +250,16 @@ const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
                 penumbra={0.5}
                 distance={5}
                 color="skyBlue"
-            />       
+            />
+            <spotLight
+                name="robot-spotlight"
+                ref={robotLightRef}
+                intensity={4}
+                angle={degrees(45)}
+                penumbra={2}
+                distance={10}
+                color="white"
+            />        
           </>
     )
   }

@@ -10,7 +10,7 @@ import { useState, useRef } from 'react'
 import { useMediaQuery } from '@mui/material'
 import HeadModel from './components/HeadModel'
 import BallLandscape from './r3fAssets/BallLandscape'
-import { Physics, RigidBody } from '@react-three/rapier'
+import { Physics } from '@react-three/rapier'
 
 
 const purple = '#c956ff'
@@ -78,7 +78,7 @@ const HomePageCanvas = () => {
         <Canvas shadows style={{height: '100%', background: 'black'}}>
             <OrbitControls enableZoom={true} enablePan={true}/>
             <Physics gravity={[0, -9.81, 0]}>
-              <BallLandscape />
+                <BallLandscape />
             </Physics>
 
         </Canvas>

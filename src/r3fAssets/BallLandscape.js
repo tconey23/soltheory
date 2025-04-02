@@ -96,7 +96,7 @@ const Ball = ({ bodyRef }) => {
     return (
       <>
         <group scale={2} position={[-1.5, 0, -5]}>
-            <directionalLight castShadow intensity={0.05} position={[0,20,0]} />
+            <directionalLight color={'grey'} castShadow intensity={0.08} position={[0,10,-10]} />
         <SpotLight
             ref={spotlightRef}
             position={[2,0.5,0]}
@@ -123,7 +123,7 @@ const Ball = ({ bodyRef }) => {
           </mesh>
         </RigidBody>
 
-        <Platform position={[10, -0.6, 1]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.1, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'}/>
+        <Platform position={[10, -0.53, 1]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'}/>
 
       </>
     )
