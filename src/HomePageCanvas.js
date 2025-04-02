@@ -9,6 +9,8 @@ import { useFrame } from '@react-three/fiber'
 import { useState, useRef } from 'react'
 import { useMediaQuery } from '@mui/material'
 import HeadModel from './components/HeadModel'
+import BallLandscape from './r3fAssets/BallLandscape'
+import { Physics, RigidBody } from '@react-three/rapier'
 
 
 const purple = '#c956ff'
@@ -73,34 +75,12 @@ const HomePageCanvas = () => {
   
   return (
     <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
-        <Canvas shadows={true} camera={{ position: [0, 0, 15], fov: isMobile ? 80 : 70 }} style={{height: '100%', background: 'black'}}>
-            <ambientLight intensity={0.5} position={[0,0,0]}/>
-            <Lighting />
-
-            {/* <directionalLight intensity={40} position={[1,0,1]} />
-            <directionalLight intensity={40} position={[-1,0,-1]} /> */}
-
-              {/* <mesh position={[0,-7,0]} rotation={[degrees(-50),degrees(0),degrees(0)]}>
-                <planeGeometry args={[1000,1000,500]} />
-                  <MeshReflectorMaterial
-                    color='black'
-                    blur={[0, 0]} 
-                    mixBlur={0} 
-                    mixStrength={2} 
-                    mixContrast={2} 
-                    resolution={1080} 
-                    mirror={1} 
-                    depthScale={0.5}
-                    minDepthThreshold={0.9}
-                    maxDepthThreshold={1} 
-                    depthToBlurRatioBias={0.25} 
-                    reflectorOffset={0}
-                  />
-              </mesh> */}
-            
-            <HomePageLogo />
-            {/* <HeadModel scale={0.04} position={[0,0,-5]}/> */}
+        <Canvas shadows style={{height: '100%', background: 'black'}}>
             <OrbitControls enableZoom={true} enablePan={true}/>
+            <Physics gravity={[0, -9.81, 0]}>
+              <BallLandscape />
+            </Physics>
+
         </Canvas>
     </div>
   )

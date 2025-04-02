@@ -3,11 +3,13 @@ import { Stack } from '@mui/material';
 import { useGLTF } from '@react-three/drei'
 import { MeshStandardMaterial, MeshDepthMaterial, MeshLambertMaterial, MeshPhongMaterial, MeshPhysicalMaterial, DirectionalLight } from 'three'
 import { useFrame } from '@react-three/fiber';
+import { RigidBody } from '@react-three/rapier';
+
+const degrees = (degrees) => degrees * (Math.PI / 180)
 
 
 const HeadModel = (props) => {
     const { scene, nodes } = useGLTF('/brain.glb')
-    const degrees = (degrees) => degrees * (Math.PI / 180)
 
     const modelRef = useRef(null)
     const lightRef = useRef(null)
@@ -18,25 +20,23 @@ const HeadModel = (props) => {
     const pulseSpeed = 10;
 
     useFrame(() => {
-        if (modelRef.current) {
+        if (modelRef.current && props.autoRotate) {
           modelRef.current.rotation.y += 0.002;
-        //   modelRef.current.rotation.z += 0.002;
-        // modelRef.current.rotation.x += 0.002
         }
-        const intensity = lightRef.current.intensity;
+        // const intensity = lightRef.current.intensity;
 
     // Flip direction if out of bounds
-    if (intensity >= lightMax) pulseDirection.current = -1;
-    if (intensity <= lightMin) pulseDirection.current = 1;
+    // if (intensity >= lightMax) pulseDirection.current = -1;
+    // if (intensity <= lightMin) pulseDirection.current = 1;
 
     // Update intensity
-    lightRef.current.intensity += pulseSpeed * pulseDirection.current;
+    // lightRef.current.intensity += pulseSpeed * pulseDirection.current;
       });
     
     const myMaterial = new MeshStandardMaterial({
         color: 'darkBlue',
         transparent: true,
-        opacity: 0.8,
+        opacity: props.opac,
         metalness: 1,
         roughness: 0.15
     });
@@ -49,15 +49,19 @@ const HeadModel = (props) => {
   childMesh.children.forEach((c) => {
     c.material = myMaterial
   })
-
-  console.log(scene, childMesh.children)
-
+  
   return (
+        <RigidBody type='fixed' colliders={'cuboid'} restitution={0} friction={1} mass={0}>
+    <mesh rotation={[degrees(0),degrees(0),degrees(0)]}>
+    {props.prelit &&  
     <>
-        <pointLight ref={lightRef} intensity={0} color={'darkBlue'} position={[0,1,3]} />
-        <pointLight ref={lightRef} intensity={0} color={'brightPink'} position={[0,0,3]} />
-        <primitive ref={modelRef} rotation={[degrees(45),degrees(0),degrees(0)]} object={scene} {...props} />
-    </>
+        {/* <pointLight ref={lightRef} intensity={0.5} color={'darkBlue'} position={[0,1,3]} />
+        <pointLight ref={lightRef} intensity={0.5} color={'brightPink'} position={[0,0,0]} /> */}
+    </>   
+    }
+    <primitive ref={modelRef} rotation={[degrees(45),degrees(0),degrees(0)]} object={scene} {...props} />
+    </mesh>
+        </RigidBody>
     );
 };
 
