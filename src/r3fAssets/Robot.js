@@ -1,21 +1,13 @@
 import { RigidBody, useRapier } from '@react-three/rapier'
 import { useEffect, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
-import HomePageText from './HomePageText'
-import CameraFollow from './CameraController'
 import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
-import HeadModel from '../components/HeadModel'
-import Platform from './Platform'
-import { SpotLight } from '@react-three/drei'
-import { SpotLightHelper } from 'three'
-import { useHelper } from '@react-three/drei'
 import { CuboidCollider } from '@react-three/rapier'
-import { Scene } from 'three'
 
 const degrees = (d) => d * (Math.PI / 180)
 
-const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => {
+const Robot = ({ position = [0, 1, 0], color = 'silver', bodyRef}) => { 
     const { scene } = useThree()
     const fadeDir = useRef(0)
     const lightMax = 2

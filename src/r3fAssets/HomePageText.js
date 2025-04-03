@@ -7,7 +7,7 @@ import { useHelper } from '@react-three/drei'
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
-const Character = ({ch, x, thickness}) => {
+const Character = ({ch, x, thickness, col}) => {
   const [fontSize, setFontSize] = useState(2)
   const [font, setFont] = useState("/fonts/Fredoka_Regular.json")
 
@@ -16,7 +16,7 @@ const Character = ({ch, x, thickness}) => {
         colliders="cuboid" 
         restitution={0.2}
         friction={1}
-        mass={0.5}
+        mass={-10}
         angularDamping={0.1}
         linearDamping={0.1}
         >
@@ -35,14 +35,14 @@ const Character = ({ch, x, thickness}) => {
         castShadow
         >
     {ch}
-  <meshStandardMaterial attach="material" color="black" metalness={10} roughness={0.5} transparent={true} opacity={0.9} castShadow/>
+  <meshStandardMaterial attach="material" color={col} metalness={10} roughness={0.5} transparent={true} opacity={0.9} castShadow/>
   </Text3D>
   </mesh>
   </RigidBody>
   )
 }
 
-const HomePageText = ({text, thickness, type, pos, rot, col, prelit}) => {
+const HomePageText = ({text, thickness, type, pos, rot, col, prelit, charOffset}) => {
 
   const spotlightRef = useRef()
   const targetRef = useRef()
@@ -58,9 +58,15 @@ const HomePageText = ({text, thickness, type, pos, rot, col, prelit}) => {
       let t = text.replaceAll(" ", "").split('')
       setRenderedObjects(
         t.map((c, i) => {
-          console.log(typeof c)
+          let offset = 0
+          if(charOffset && !isNaN(i+charOffset)){
+            console.log(i*charOffset)
+            offset = i*charOffset
+          } else {
+            offset = i
+          }
         return (
-          <Character ch={c} x={i} thickness={thickness}/>
+          <Character ch={c} x={offset} thickness={thickness} charOffset={charOffset} col={col}/>
         )})
       )
     }, [])    

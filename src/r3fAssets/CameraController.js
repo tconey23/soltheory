@@ -1,29 +1,36 @@
+import { CameraControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
+import { useRef, useEffect } from 'react'
 import * as THREE from 'three'
 
-const CameraFollow = ({ targetRef, offset = new THREE.Vector3(0, 5, -10) }) => {
-  const { camera } = useThree()
-  const camTarget = new THREE.Vector3()
-  const desiredPosition = new THREE.Vector3()
+let controls
+
+const CameraFollow = ({ targetRef }) => {
+  const { camera, gl } = useThree()
+  const controlsRef = useRef()
+
+  useEffect(() => {
+    controls = controlsRef.current
+    controls.setLookAt(0, 5, 10, 0, 1, 0)
+  }, [])
 
   useFrame(() => {
-    if (!targetRef.current) return
-
+    if (!targetRef.current || !controls) return
+  
     const pos = targetRef.current.translation()
-    const ballPosition = new THREE.Vector3(pos.x, pos.y, pos.z)
-
-    // Fixed offset relative to world space
-    desiredPosition.copy(ballPosition).add(offset)
-
-    // Smoothly move camera
-    camera.position.lerp(desiredPosition, 0.1)
-
-    // Always look at the ball
-    camTarget.set(pos.x, pos.y + 1, pos.z)
-    camera.lookAt(camTarget)
+    const vel = targetRef.current.linvel()
+  
+    const dynamicOffset = new THREE.Vector3().copy(vel).multiplyScalar(0.2).negate()
+    const staticOffset = new THREE.Vector3(-1, 5, 5)
+    const offset = dynamicOffset.add(staticOffset)
+  
+    const camPos = new THREE.Vector3(pos.x, pos.y, pos.z).add(offset)
+    const lookAt = new THREE.Vector3(pos.x, pos.y, pos.z)
+  
+    controls.setLookAt(camPos.x, camPos.y, camPos.z, lookAt.x, lookAt.y, lookAt.z, true)
   })
 
-  return null
+  return <CameraControls ref={controlsRef} />
 }
 
 export default CameraFollow

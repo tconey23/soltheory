@@ -11,6 +11,7 @@ import { useMediaQuery } from '@mui/material'
 import HeadModel from './components/HeadModel'
 import BallLandscape from './r3fAssets/BallLandscape'
 import { Physics } from '@react-three/rapier'
+import Joystick from './r3fAssets/Joystick'
 
 
 const purple = '#c956ff'
@@ -72,13 +73,19 @@ const Lighting = () => {
 const HomePageCanvas = () => {
   const degrees = (degrees) => degrees * (Math.PI / 180)
   const isMobile = useMediaQuery("(max-width:430px)");
+  const [joystickData, setJoystickData] = useState(null)
   
   return (
     <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
+        <Joystick
+            onMove={(data) => setJoystickData(data)}
+            onEnd={() => setJoystickData(null)}
+        />
         <Canvas shadows style={{height: '100%', background: 'black'}}>
             <OrbitControls enableZoom={true} enablePan={true}/>
+            <directionalLight intensity={0.05}/>
             <Physics gravity={[0, -9.81, 0]}>
-                <BallLandscape />
+                <BallLandscape joystickData={joystickData}/>
             </Physics>
 
         </Canvas>

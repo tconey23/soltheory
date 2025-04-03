@@ -4,12 +4,14 @@ import { useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import HomePageText from './HomePageText'
-import { Center, Text3D } from '@react-three/drei'
+import { Center, Html, Text3D } from '@react-three/drei'
 import { useCursor } from '@react-three/drei'
+import { Billboard } from '@react-three/drei'
+import { Button } from '@mui/material'
 
 const degrees = (d) => d * (Math.PI / 180)
 
-const Platform = ({ endpoint, position, dims, text }) => {
+const Platform = ({ endpoint, position, dims, text, clickText, triggerObject}) => {
   const platformLight = useRef()
   const platform = useRef()
   const navigate = useNavigate()
@@ -22,7 +24,7 @@ const Platform = ({ endpoint, position, dims, text }) => {
   const lightMax = 0.5
   const lightMin = 0
   const fieldOpMax = 0.3
-  const fieldOpMin = 0
+  const fieldOpMin = 1
 
   useFrame(() => {
     if (
@@ -51,26 +53,27 @@ const Platform = ({ endpoint, position, dims, text }) => {
   return (
     <>
     <RigidBody
+    userData='platform'
   type="fixed"
   friction={0}
   colliders={false}
-  onCollisionEnter={() => {
-      if (!hasTriggeredRef.current) {
+  onCollisionEnter={({ target, other }) => {
+      if (!hasTriggeredRef.current && other.rigidBody.userData === triggerObject) {
           hasTriggeredRef.current = true
           fadeDir.current = 1
-          setShowButton(true) // 👉 show the button
+          setShowButton(true)
         }
     }}
     onCollisionExit={() => {
         fadeDir.current = -1
         hasTriggeredRef.current = false
-        setShowButton(false) // 👉 hide the button
+        setShowButton(false)
     }}
 >
   {/* Collider acts as trigger */}
   <CuboidCollider
-    args={[dims[0] / 2, dims[1] / 2, dims[2] / 2]}
-    position={[position[0], position[1]+1, position[2]]}
+    args={[dims[0] / 2, 0.01, dims[2] / 2]}
+    position={[position[0], position[1]+0.05, position[2]]}
     />
 
   {/* Visuals */}
@@ -96,22 +99,11 @@ const Platform = ({ endpoint, position, dims, text }) => {
       color="white"
       />
 {showButton && (
-    <group>
-  <mesh
-    position={[0, 5, 0]}
-    rotation={[degrees(-45), degrees(-20), degrees(-10)]}
-    onPointerOver={() => setHovered(true)}
-      onPointerOut={() => setHovered(false)}
-    onClick={() => navigate(endpoint)}
-    >
-    <Center>
-    <Text3D font="/fonts/Fredoka_Regular.json" size={0.3} height={0.1} position={[-0.9, -0.1, 0.55]}>
-        See games
-    <meshStandardMaterial color="white" metalness={10} roughness={1} />
-    </Text3D>
-    </Center>
-  </mesh>
-</group>    
+        <Billboard position={[0,-5,0]} >
+            <Html rotation={[degrees(0), degrees(90), degrees(90)]}>
+                <Button onClick={() => navigate(endpoint)} variant='contained'>{clickText}</Button>
+            </Html>
+        </Billboard>   
 )}
   </group>
 </RigidBody>
