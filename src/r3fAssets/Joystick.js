@@ -8,7 +8,7 @@ const Joystick = ({ onMove, onEnd }) => {
   useEffect(() => {
     const manager = nipplejs.create({
       zone: joystickZone.current,
-      mode: 'static',
+      mode: 'semi',
       position: { left: '75px', bottom: '75px' },
       color: 'skyblue',
       size: 130
