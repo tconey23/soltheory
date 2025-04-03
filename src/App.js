@@ -16,6 +16,7 @@ function App() {
   const [user, setUser] = useState({email: 'tomconey@tomconey.dev'});
   const [toggleQuit, setToggleQuit] = useState(false)
   const {alertProps, setAlertProps} = useGlobalContext()
+  const [toggleHeader, setToggleHeader] = useState(false)
 
   useEffect(() => {
     console.log(user)
@@ -42,9 +43,9 @@ function App() {
   }, [alertProps])
 
   return (
-      <div className="App">
-          <AppHeader />
-        <div style={{height: '100%', backgroundColor: 'white', alignItems: 'center', width: '100%'}}>
+      <div className="App" style={{justifyContent: 'center'}}>
+         {toggleHeader && <AppHeader />}
+        <div style={{height: '98%', backgroundColor: 'white', alignItems: 'center', width: '100%'}}>
         <Stack width={'100vw'} justifyContent={'center'} alignItems={'center'} position={'fixed'} zIndex={1301}>
           {alertProps.display && <Alert severity={alertProps.severity} sx={{width: '50%'}}>{alertProps.text}</Alert>}
         </Stack>

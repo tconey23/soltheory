@@ -60,7 +60,6 @@ const HomePageText = ({text, thickness, type, pos, rot, col, prelit, charOffset}
         t.map((c, i) => {
           let offset = 0
           if(charOffset && !isNaN(i+charOffset)){
-            console.log(i*charOffset)
             offset = i*charOffset
           } else {
             offset = i

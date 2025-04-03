@@ -18,6 +18,7 @@ const RobotModel = ({ bodyRef, joystick }) => {
   const spotlightRef = useRef()
   const liftRef = useRef(0)
   const { scene: r3fScene } = useThree()
+  const headLamp = useRef()
 
   const keys = useRef({
     ArrowUp: false,
@@ -45,19 +46,32 @@ const RobotModel = ({ bodyRef, joystick }) => {
   }, [])
 
   useEffect(() => {
+    let emmIndex = [4,6]
     if (scene) {
       const clones = scene.children.map((child, index) => {
         const object = child.clone()
   
         object.traverse((node) => {
-          if (node.isMesh) {
+            console.log(index)
+          if (node.isMesh && emmIndex.includes(index)) {
             node.material = new THREE.MeshStandardMaterial({
               color: 'white',
               metalness: 3,
-              roughness: 1,
+              roughness: 0.5,
+              emissive:"grey",
+              emissiveIntensity: 0.2,
+              toneMapped: true
             })
             node.castShadow = true
             node.receiveShadow = true
+          } else if (node.isMesh && !emmIndex.includes(index)){
+            node.material = new THREE.MeshStandardMaterial({
+                color: 'white',
+                metalness: 3,
+                roughness: 1,
+              })
+              node.castShadow = true
+              node.receiveShadow = true
           }
         })
   
@@ -81,11 +95,17 @@ const RobotModel = ({ bodyRef, joystick }) => {
     const right = keys.current['ArrowRight']
     const hover = keys.current['Space']
 
+    if(joystick && joystick.force) {
+        console.log(joystick.force)
+    }
+
     // If joystick is active, use its input instead of keys
     if (joystick && joystick.force > 0) {
-      impulse.x += Math.sin(joystick.angle) * joystick.force * speed
-      impulse.z += Math.cos(joystick.angle) * joystick.force * speed
-    } else {
+        impulse.x += Math.cos(joystick.angle) * joystick.force * speed
+        impulse.z += -Math.sin(joystick.angle) * joystick.force * speed
+      }
+      
+
       if (up) {
         impulse.z -= speed
         tiltX = -maxTilt
@@ -102,7 +122,6 @@ const RobotModel = ({ bodyRef, joystick }) => {
         impulse.x += speed
         tiltZ = -maxTilt
       }
-    }
 
     if (hover) impulse.y += speed
 
@@ -143,7 +162,8 @@ if (impulse.lengthSq() > 0) {
   return (
     <>
       <group ref={groupRef} >
-        <SpotLight castShadow angle={0.2} ref={spotlightRef} distance={7} penumbra={2}/>
+        <SpotLight color="skyblue" castShadow angle={0} ref={spotlightRef} distance={0} penumbra={0}/>
+        <pointLight color='skyBlue' intensity={0.01}/>
         <RigidBody
           ccd 
           userData='robot-mesh'
@@ -169,14 +189,6 @@ if (impulse.lengthSq() > 0) {
           <CuboidCollider userData='robot-collider' args={[0.5, 1, 0.5]} position={[0, 1, 0]} />
         </RigidBody>
       </group>
-      <spotLight
-        ref={spotlightRef}
-        intensity={1.5}
-        angle={Math.PI / 6}
-        distance={6}
-        color="skyblue"
-        penumbra={0.8}
-      />
     </>
   )
 }
