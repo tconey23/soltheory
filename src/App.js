@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import TwentyOneThings from './components/games/TwentyOneThings';
 import Pic6 from './components/games/Pic6';
 import GamePageComp from './components/games/GamePageComp';
+import EscLanding from './r3fAssets/EscLanding';
 import { Alert } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useGlobalContext } from './business/GlobalContext';
 import UserAlert from './components/UserAlert';
 import { checkAndAddUsers } from './business/apiCalls';
+import ErrorPage from './components/ErrorPage';
 
 function App() {
   const [user, setUser] = useState({email: 'tomconey@tomconey.dev'});
@@ -54,6 +56,8 @@ function App() {
             <Route path="/" element={<HomePageCanvas user={user} setUser={setUser} />}/>
             <Route path="/home" element={<HomePageCanvas user={user} setUser={setUser} />}/>
             <Route path='/games' element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser}/>}/>
+            <Route path='/esc' element={<EscLanding />}/>
+            <Route path='/error' element={<ErrorPage />}/>
           {!toggleQuit && 
           <>
             <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

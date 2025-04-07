@@ -11,9 +11,11 @@ export const GlobalProvider = ({ children }) => {
     severity: 'success',
     display: false
   })
+  const [returnUrl, setReturnUrl] = useState()
+  const [font, setFont] = useState("/fonts/Fredoka_Regular.json")
 
   return (
-    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps }}>
+    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font}}>
       {children}
     </GlobalContext.Provider>
   );

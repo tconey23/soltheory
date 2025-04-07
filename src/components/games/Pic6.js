@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button} from "@mui/material";
-import lambGif from "../../assets/silence_of_the_lambs.gif";
 import { addGameToUser, getGifs } from "../../business/apiCalls";
 import { useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";

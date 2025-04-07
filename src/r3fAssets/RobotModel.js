@@ -7,7 +7,7 @@ import { CuboidCollider } from '@react-three/rapier'
 
 const degrees = (d) => d * (Math.PI / 180)
 
-const RobotModel = ({ bodyRef, joystick }) => {
+const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
  let debugSpeed = 0.5
 
@@ -31,7 +31,7 @@ const RobotModel = ({ bodyRef, joystick }) => {
   const maxTilt = 10
 
   useEffect(() => {
-    console.log(speed)
+    // console.log(speed)
   }, [speed])
 
   useEffect(() => {
@@ -52,12 +52,11 @@ const RobotModel = ({ bodyRef, joystick }) => {
         const object = child.clone()
   
         object.traverse((node) => {
-            console.log(index)
           if (node.isMesh && emmIndex.includes(index)) {
             node.material = new THREE.MeshStandardMaterial({
               color: 'white',
-              metalness: 3,
-              roughness: 0.5,
+              metalness: 1,
+              roughness: 0.4,
               emissive:"grey",
               emissiveIntensity: 0.2,
               toneMapped: true
@@ -83,7 +82,9 @@ const RobotModel = ({ bodyRef, joystick }) => {
   }, [scene])
 
   useFrame(() => {
-    if (!bodyRef.current || !groupRef.current || !spotlightRef.current) return;
+    if (!bodyRef || !bodyRef.current || !groupRef.current || !spotlightRef.current) return;
+
+    console.log(bodyRef.current)
 
     const impulse = new THREE.Vector3()
     let tiltX = 0
@@ -125,7 +126,7 @@ const RobotModel = ({ bodyRef, joystick }) => {
 
     if (hover) impulse.y += speed
 
-    if (impulse.lengthSq() > 0) bodyRef.current.applyImpulse(impulse, true)
+    if (impulse.lengthSq() > 0) bodyRef?.current?.applyImpulse(impulse, true)
 
 
     // Hover lift effect
@@ -141,19 +142,19 @@ if (impulse.lengthSq() > 0) {
       new THREE.Euler(degrees(tiltX), angle, degrees(tiltZ))
     )
   
-    const currentQuat = new THREE.Quaternion().copy(bodyRef.current.rotation())
+    const currentQuat = new THREE.Quaternion().copy(bodyRef?.current.rotation())
     currentQuat.slerp(targetRotation, 0.1) // Smooth interpolation
-    bodyRef.current.setRotation(currentQuat, true)
+    bodyRef?.current.setRotation(currentQuat, true)
   } else {
     // Maintain upright tilt when idle
     const uprightQuat = new THREE.Quaternion().setFromEuler(
       new THREE.Euler(degrees(0), bodyRef.current.rotation().y, degrees(0))
     )
-    bodyRef.current.setRotation(uprightQuat, true)
+    bodyRef?.current.setRotation(uprightQuat, true)
   }
 
     // Move spotlight with robot
-    const pos = bodyRef.current.translation()
+    const pos = bodyRef?.current.translation()
     spotlightRef.current.position.set(pos.x, pos.y + 5, pos.z)
     spotlightRef.current.target.position.set(pos.x, pos.y, pos.z)
     if (!spotlightRef.current.target.parent) r3fScene.add(spotlightRef.current.target)
@@ -164,6 +165,9 @@ if (impulse.lengthSq() > 0) {
       <group ref={groupRef} >
         <SpotLight color="skyblue" castShadow angle={0} ref={spotlightRef} distance={0} penumbra={0}/>
         <pointLight color='skyBlue' intensity={0.01}/>
+        {bodyRef 
+        ? 
+        
         <RigidBody
           ccd 
           userData='robot-mesh'
@@ -188,6 +192,11 @@ if (impulse.lengthSq() > 0) {
           {robot}
           <CuboidCollider userData='robot-collider' args={[0.5, 1, 0.5]} position={[0, 1, 0]} />
         </RigidBody>
+        : 
+        <group position={pos} rotation={[degrees(0), rot > 0 ? rot : degrees(180), degrees(0)]} >
+          {robot}
+        </group>  
+      }
       </group>
     </>
   )

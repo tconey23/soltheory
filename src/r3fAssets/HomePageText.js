@@ -35,7 +35,7 @@ const Character = ({ch, x, thickness, col}) => {
         castShadow
         >
     {ch}
-  <meshStandardMaterial attach="material" color={col} metalness={10} roughness={0.5} transparent={true} opacity={0.9} castShadow/>
+  <meshStandardMaterial castShadow attach="material" color={col} metalness={10} roughness={0.5} transparent={true} opacity={0.9}/>
   </Text3D>
   </mesh>
   </RigidBody>

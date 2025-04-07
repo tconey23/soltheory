@@ -1,18 +1,16 @@
 import { RigidBody, useRapier } from '@react-three/rapier'
 import { useEffect, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
-import HomePageText from './HomePageText'
-import CameraFollow from './CameraController'
-import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
-import HeadModel from '../components/HeadModel'
-import Platform from './Platform'
 import { Billboard, Html, SpotLight } from '@react-three/drei'
 import { SpotLightHelper } from 'three'
 import { useHelper } from '@react-three/drei'
-import Robot from './Robot'
 import RobotModel from './RobotModel'
-import Joystick from './Joystick'
+import * as THREE from 'three'
+import HomePageText from './HomePageText'
+import CameraFollow from './CameraController'
+import Platform from './Platform'
+import HangingText from './HangingText'
 
 
 
@@ -83,33 +81,68 @@ const Ball = ({ bodyRef }) => {
     const spotLightRef = useRef()
     const targetRef = useRef()
     const { scene } = useThree()
+    const [showRobot, setShowRobot] = useState(true)
     
 
-    const spotlightRef = useRef()
+    const spotlightRef1 = useRef()
+    const spotlightRef2 = useRef()
   
     // useHelper(spotlightRef, SpotLightHelper, 'teal')
 
     useEffect(() => {
-        if (spotlightRef.current && targetRef.current) {
-          spotlightRef.current.target = targetRef.current
+        if (spotlightRef1.current && targetRef.current) {
+            console.log(spotlightRef1.current, targetRef.current, spotlightRef2.current)
+            spotlightRef1.current.target = targetRef.current
+            spotlightRef2.current.target = targetRef.current
           scene.add(targetRef.current)
         }
       }, [scene])
   
     return (
       <>
-        <group scale={2} position={[-1.5, 0, -5]}>
-            <directionalLight color={'grey'} castShadow intensity={0.08} position={[0,10,-10]} />
         <SpotLight
-            ref={spotlightRef}
-            position={[2,0.5,0]}
-            angle={degrees(180)}
-            penumbra={0.8}
+            ref={spotlightRef1}
+            position={[40,200,0]}
+            angle={degrees(280)}
+            penumbra={0.75}
             intensity={50}
-            distance={6}
+            distance={220}
             castShadow
+            color={'skyBlue'}
             target={targetRef.current}
         />
+        <SpotLight
+            ref={spotlightRef2}
+            position={[-40,200,0]}
+            angle={degrees(280)}
+            penumbra={0.75}
+            intensity={50}
+            distance={220}
+            castShadow
+            color={'purple'}
+            target={targetRef.current}
+        />
+
+<SpotLight
+            ref={spotlightRef2}
+            position={[0,200,40]}
+            angle={degrees(280)}
+            penumbra={0.75}
+            intensity={50}
+            distance={220}
+            castShadow
+            color={'white'}
+            target={targetRef.current}
+        />
+
+        <object3D ref={targetRef} position={[0,2,0]}>
+        </object3D>
+
+        {/* <HangingText char={'S'} pos={[0,-0.5,0]}/>
+        <HangingText char={'O'} pos={[1,-0.5,0]}/>
+        <HangingText char={'L'} pos={[2,-0.5,0]}/> */}
+
+        <group scale={2} position={[-1.5, 0, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'}/>
         </group>
 
@@ -121,8 +154,12 @@ const Ball = ({ bodyRef }) => {
           <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'}/>
         </group>
   
-        <RobotModel bodyRef={ballRef} joystick={joystickData}/>
-        <CameraFollow targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} />
+        {showRobot && 
+        <>
+            <RobotModel bodyRef={ballRef} joystick={joystickData}/>
+            <CameraFollow targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} /> 
+        </>
+        }
   
         <RigidBody userData='floor-plane' type="fixed">
           <mesh receiveShadow position={[0, -1, 0]}>
