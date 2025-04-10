@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { RigidBody, useRopeJoint } from '@react-three/rapier'
+import { RigidBody, useImpulseJoint } from '@react-three/rapier'
 import { Center, Text3D } from '@react-three/drei'
 import { BoxGeometry } from 'three'
 
@@ -7,7 +7,7 @@ const HangingText = ({char, pos}) => {
   const anchor = useRef()
   const letter = useRef()
 
-  useRopeJoint(anchor, letter, [
+  useImpulseJoint(anchor, letter, [
     [0, -0.025, 0],   // Anchor on anchor
     [0, 1, 0],     // Anchor on letter
     0.5                 // Max length

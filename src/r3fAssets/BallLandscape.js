@@ -10,7 +10,9 @@ import * as THREE from 'three'
 import HomePageText from './HomePageText'
 import CameraFollow from './CameraController'
 import Platform from './Platform'
-import HangingText from './HangingText'
+import AcronymScene from './AcronymScene'
+import { interactionGroups } from '@react-three/rapier'
+
 
 
 
@@ -91,7 +93,6 @@ const Ball = ({ bodyRef }) => {
 
     useEffect(() => {
         if (spotlightRef1.current && targetRef.current) {
-            console.log(spotlightRef1.current, targetRef.current, spotlightRef2.current)
             spotlightRef1.current.target = targetRef.current
             spotlightRef2.current.target = targetRef.current
           scene.add(targetRef.current)
@@ -123,7 +124,7 @@ const Ball = ({ bodyRef }) => {
             target={targetRef.current}
         />
 
-<SpotLight
+        <SpotLight
             ref={spotlightRef2}
             position={[0,200,40]}
             angle={degrees(280)}
@@ -138,20 +139,16 @@ const Ball = ({ bodyRef }) => {
         <object3D ref={targetRef} position={[0,2,0]}>
         </object3D>
 
-        {/* <HangingText char={'S'} pos={[0,-0.5,0]}/>
-        <HangingText char={'O'} pos={[1,-0.5,0]}/>
-        <HangingText char={'L'} pos={[2,-0.5,0]}/> */}
-
-        <group scale={2} position={[-1.5, 0, -5]}>
-          <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'}/>
+        <group scale={2} position={[-1.5, 1, -5]}>
+          <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]}/>
         </group>
 
-        <group scale={1} position={[-1.8, 0, -3]}>
-          <HomePageText text={'Theory®'} thickness={0.4} type={'dynamic'}/>
+        <group scale={1} position={[-1.8, 1, -3]}>
+          <HomePageText text={'Theory®'} thickness={0.4} type={'dynamic'} pos={[-1.8, 1, -3]}/>
         </group>
 
         <group scale={2} position={[-7, 1, -25]}>
-          <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'}/>
+          <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'} pos={[-7, 1, -25]}/>
         </group>
   
         {showRobot && 
@@ -160,8 +157,10 @@ const Ball = ({ bodyRef }) => {
             <CameraFollow targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} /> 
         </>
         }
+
+        <AcronymScene />
   
-        <RigidBody userData='floor-plane' type="fixed">
+        <RigidBody userData='floor-plane' type="fixed" colliders='cuboid' collisionGroups={interactionGroups([3], [0,1,2])}>
           <mesh receiveShadow position={[0, -1, 0]}>
             <boxGeometry args={[1000, 1, 1000]} />
             <meshStandardMaterial color="grey" />

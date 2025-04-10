@@ -84,7 +84,8 @@ const CamControl = ({setCamReady}) => {
     useEffect(() => {
         if(camera){
             setCamReady(true)
-            camera.lookAt(0, 2, 0)
+            camera.position.set(0,4,10)
+            camera.lookAt(0, 2, -10)
         }
     }, [camera])
   

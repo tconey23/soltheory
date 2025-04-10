@@ -107,8 +107,6 @@ const StuffedBear = ({nav, gltf}) => {
       useEffect(() => {
         const spotlight = spotlightRef.current
         const target = spotlight?.target?.current
-
-        console.log(rigidRef.current.bodyType())
       
         if (spotlight && target && !r3fScene.children.includes(target)) {
           r3fScene.add(target)
