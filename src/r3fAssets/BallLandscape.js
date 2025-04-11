@@ -13,75 +13,13 @@ import Platform from './Platform'
 import AcronymScene from './AcronymScene'
 import { interactionGroups } from '@react-three/rapier'
 
-
-
-
 const degrees = (degrees) => degrees * (Math.PI / 180)
-
-const Ball = ({ bodyRef }) => {
-    const speed = 0.1
-  
-    const keys = useRef({
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false,
-    })
-  
-    useEffect(() => {
-      const down = (e) => (keys.current[e.code] = true)
-      const up = (e) => (keys.current[e.code] = false)
-      window.addEventListener('keydown', down)
-      window.addEventListener('keyup', up)
-      return () => {
-        window.removeEventListener('keydown', down)
-        window.removeEventListener('keyup', up)
-      }
-    }, [])
-  
-    useFrame(() => {
-      if (!bodyRef.current) return
-  
-      const impulse = new THREE.Vector3()
-  
-      if (keys.current['ArrowUp']) impulse.z -= speed
-      if (keys.current['ArrowDown']) impulse.z += speed
-      if (keys.current['ArrowLeft']) impulse.x -= speed
-      if (keys.current['ArrowRight']) impulse.x += speed
-  
-      if (impulse.lengthSq() > 0) {
-        bodyRef.current.applyImpulse(impulse, true)
-      }
-    })
-  
-    return (
-        <>
-      <RigidBody
-        ref={bodyRef}
-        colliders="ball"
-        type="dynamic"
-        restitution={0.5}
-        friction={0.1}
-        linearDamping={1.5} 
-        angularDamping={1.5}
-        mass={100000000}
-        enabledRotations={[false, false, false]} 
-      >
-        <mesh position={[0, 1, 0]} castShadow receiveShadow>
-          <pointLight castShadow intensity={3} distance={10} color={'blue'}/>
-          <ambientLight intensity={0.02}/>
-          <sphereGeometry args={[0.5, 32, 32]} />
-          <meshStandardMaterial color="deepskyblue" transparent={false} opacity={0.8} metalness={1} roughness={0.1}/>
-        </mesh>
-      </RigidBody>
-        </>
-    )
-  }
 
   const BallLandscape = ({joystickData}) => {
     const ballRef = useRef()
     const spotLightRef = useRef()
     const targetRef = useRef()
+    const letters = useRef()
     const { scene } = useThree()
     const [showRobot, setShowRobot] = useState(true)
     
@@ -98,10 +36,20 @@ const Ball = ({ bodyRef }) => {
           scene.add(targetRef.current)
         }
       }, [scene])
+
+      useEffect(() =>{
+        if(letters.current){
+          const intervalId = setInterval(() => {
+            // setShowRobot(true)
+          }, 2000)
+        
+          return () => clearInterval(intervalId)
+        }
+      }, [letters])
   
     return (
       <>
-        <SpotLight
+        {/* <SpotLight
             ref={spotlightRef1}
             position={[40,200,0]}
             angle={degrees(280)}
@@ -134,11 +82,12 @@ const Ball = ({ bodyRef }) => {
             castShadow
             color={'white'}
             target={targetRef.current}
-        />
+        /> */}
 
-        <object3D ref={targetRef} position={[0,2,0]}>
-        </object3D>
+        {/* <object3D ref={targetRef} position={[0,2,0]}>
+        </object3D> */}
 
+      {/* <group ref={letters}>
         <group scale={2} position={[-1.5, 1, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]}/>
         </group>
@@ -150,6 +99,7 @@ const Ball = ({ bodyRef }) => {
         <group scale={2} position={[-7, 1, -25]}>
           <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'} pos={[-7, 1, -25]}/>
         </group>
+      </group> */}
   
         {showRobot && 
         <>
@@ -158,7 +108,7 @@ const Ball = ({ bodyRef }) => {
         </>
         }
 
-        <AcronymScene />
+        {/* <AcronymScene /> */}
   
         <RigidBody userData='floor-plane' type="fixed" colliders='cuboid' collisionGroups={interactionGroups([3], [0,1,2])}>
           <mesh receiveShadow position={[0, -1, 0]}>
@@ -168,10 +118,10 @@ const Ball = ({ bodyRef }) => {
         </RigidBody>
 
 
-        <Platform position={[0, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'}/>
+        {/* <Platform position={[0, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'}/> */}
         
         
-        <Platform position={[20, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'}/>
+        {/* <Platform position={[20, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'}/> */}
       </>
     )
   }

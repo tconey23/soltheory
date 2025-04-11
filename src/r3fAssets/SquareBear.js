@@ -107,6 +107,7 @@ const SquareBear = ({nav, gltf}) => {
         }
       }, [])
 
+
       const handleNav = () => {
         nav('/error')
         setReturnUrl('/esc')

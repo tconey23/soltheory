@@ -6,8 +6,29 @@ import * as THREE from 'three'
 import { CuboidCollider } from '@react-three/rapier'
 import { interactionGroups } from '@react-three/rapier'
 import { useAnimations } from '@react-three/drei'
+import { Billboard, Html } from '@react-three/drei'
+import { Stack } from '@mui/system'
+import { Select } from '@mui/material'
+import { MenuItem } from '@mui/material'
+import { useCursor } from '@react-three/drei'
 
-const degrees = (d) => d * (Math.PI / 180)
+const degrees = (degrees) => degrees * (Math.PI / 180)
+
+const RobotOptions = () => {
+  const [menuOptions, setMenuOptions] = useState([
+    'Flashlight Color',
+    'Face Color'
+  ])
+
+  return (
+
+      <Stack width={200} height={100} sx={{background: '#ffffff29', scale: 0.5}} padding={2}>
+        
+      </Stack>
+
+  )
+}
+
 
 const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
@@ -17,16 +38,23 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
  const groupRef = useRef()
  const { scene, animations } = useGLTF('/AnimatedRobot.glb')
+//  console.log(animations)
  const { actions, mixer } = useAnimations(animations, groupRef)
   const [robot, setRobot] = useState([])
   const [speed, setSpeed] = useState(debugSpeed)
-  const spotlightRef = useRef()
-  const { scene: r3fScene } = useThree()
+  const internalSpotlightRef = useRef(<THREE.SpotLight/>)
   const [sprinting, setSprinting] = useState(false)
   const [sprintMult, setSprintMult] = useState(2)
   const [addBip, setAddBip] = useState(false)
   const [bored, setBored] = useState(false)
+  const spotTarget = useRef()
+  const [toggleOptions, setToggleOptions] = useState(false)
+  const [toggleHover, setToggleHover] = useState(false)
+  useCursor(toggleHover, /*'pointer', 'auto', document.body*/)
+  const { scene: r3fScene } = useThree()
 
+  const menuLight = useRef()
+  const menuLightTarget = useRef()
   const lastRotationRef = useRef(new THREE.Quaternion())
   const animName = 'Bip_Walking'
   const animWaving = 'Bip_Waving'
@@ -48,7 +76,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
   mixer._actions.forEach((action) => {
     if (action.isRunning()) {
-      console.log(`→ ${action._clip.name}`)
+      // console.log(`→ ${action._clip.name}`)
     }
   })
 
@@ -80,38 +108,88 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
     if (!scene) return
     scene.visible = true
 
-    console.log(animations)
-  
-    scene.traverse((node) => {
+     scene.traverse((node) => {
       if (node.isMesh && node.material?.color?.isColor) {
-
-        node.material.metalness = 0.5
-        node.material.roughness = 0.5
-        node.material.wireframe = false
         node.castShadow = true
         node.receiveShadow = true
 
         const { r, g, b } = node.material.color
-        if(r > 0){
-          node.material = new THREE.MeshPhysicalMaterial({
-            color: 0xaaaaaa,
-            emissive: new THREE.Color('deepSkyBlue'),
-            emissiveIntensity: 1.2,
-            roughness: 0.3,
-            metalness: 0.7,
-            clearcoat: 1,
-            clearcoatRoughness: 0.1,
-          })
+        if(node.name === "pCylinder1"){ 
+
+          const target = new THREE.Object3D()
+
+          const targetDebug = new THREE.Mesh(
+            new THREE.SphereGeometry(2, 16, 16),
+            new THREE.MeshBasicMaterial({ color: 'red' })
+          )
+          
+          target.position.copy(node.position).add(new THREE.Vector3(0, 10, 70)) 
+          spotTarget.current = target
+
+          node.add(target)
+
+          const spotlight = new THREE.SpotLight('deepSkyBlue', 2, 30, degrees(45), 0.8);
+          const pointLight = new THREE.PointLight('deepSkyBlue', 10, 30, 70)
+          targetDebug.position.copy(scene.position).add(new THREE.Vector3(0, 20, 0))
+          pointLight.position.copy(scene.position).add(new THREE.Vector3(0, 20, 8))
+          // console.log(pointLight.position)
+          
+          spotlight.position.copy(node.position).add(new THREE.Vector3(0, 0, 0)); // Offset above the node
+          spotlight.target = target; // Make the spotlight point at the mesh
+          spotlight.castShadow = true;
+          pointLight.castShadow = true;
+          scene.castShadow = false
+
+          spotlight.userData = 'SpotLight'
+          pointLight.userData = 'PointLight'
+          targetDebug.userData = 'DebugMesh'
+          
+          const existingDebug = scene.getObjectByProperty('userData', 'DebugMesh')
+          const existingPoint = scene.getObjectByProperty('userData', 'PointLight')
+          const existingSpot = node.getObjectByProperty('userData', 'SpotLight')
+
+          node.material.transparent = true
+          node.material.opacity = 0.1
+          node.material.ior = 1.6
+          node.material.side = THREE.DoubleSide
+          node.material.transmission = 1
+          node.material.thickness = 0.1
+          node.material.roughness = 0
+          node.material.envMapIntensity = 1.5
+          node.material.metalness = 0
+
+          console.log(node.material)
+          
+          // Replace or add debug mesh
+          if (existingDebug) scene.remove(existingDebug)
+          scene.add(targetDebug)
+          
+          // Replace or add point light
+          if (existingPoint) scene.remove(existingPoint)
+          scene.add(pointLight)
+          
+          // Replace or add spotlight
+          if (existingSpot) node.remove(existingSpot)
+          node.add(spotlight)
+          node.add(spotlight.target)
+          
+          // console.log(scene.children)
         }
       }
     })
   
     setRobot(
-      <group scale={[0.1, 0.1, 0.1]}>
-        <primitive object={scene} />
+      <group
+       scale={[0.1, 0.1, 0.1]}
+      >
+        <primitive
+         object={scene} 
+         />
       </group>
   )
   }, [scene])
+
+
 
   useEffect(() => {
     if(robot && groupRef.current) {
@@ -150,6 +228,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
   useEffect(() => {
     if(bored){
         actions['Bip_Dance'].reset().fadeIn(0.3).play()
+
         const intervalId = setInterval(() => {
           actions['Bip_Dance'].fadeOut(0.3)
         }, 5000)
@@ -159,8 +238,22 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
   }, [bored])
   
 
+  const spotlight = spotTarget.current
+
   useFrame(() => {
-    if (!bodyRef?.current || !groupRef.current || !spotlightRef.current) return;
+    if (!bodyRef?.current || !groupRef.current || !spotlight) return;
+
+    const targetWorldPos = new THREE.Vector3()
+    spotlight.getWorldPosition(targetWorldPos) 
+
+    const clampedY = THREE.MathUtils.clamp(targetWorldPos.y, 0, 2)
+
+    if (targetWorldPos.y !== clampedY) {
+      // console.log(targetWorldPos.y !== clampedY)
+      // spotlight.position.y += clampedY - targetWorldPos.y
+    }
+
+    // console.log(targetWorldPos.y)
   
     const impulse = new THREE.Vector3()
     let tiltX = 0
@@ -264,23 +357,35 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
         playAnimation("Bip_Idle")
       }
     }
-  
-    // Spotlight follow
+
     const pos = bodyRef.current.translation()
-    spotlightRef.current.position.set(pos.x, pos.y + 5, pos.z)
-    spotlightRef.current.target.position.set(pos.x, pos.y, pos.z)
-    if (!spotlightRef.current.target.parent) r3fScene.add(spotlightRef.current.target)
+
+    if (menuLight.current && !r3fScene.children.includes(menuLight.current.target)) {
+      r3fScene.add(menuLight.current.target)
+    }
+
+    const spotTargetPos = new THREE.Vector3()
+    if(menuLightTarget.current){
+      menuLightTarget.current.getWorldPosition(spotTargetPos)
+      menuLight.current.target.position.set(spotTargetPos.x, spotTargetPos.y, spotTargetPos.z)
+
+    }
+
+
   })
+
+  
+  useEffect(() => {
+    console.log(toggleOptions)
+  }, [toggleOptions])
   
 
   return (
     <>
-      <group ref={groupRef} >
-        <SpotLight color="skyblue" castShadow angle={0} ref={spotlightRef} distance={0} penumbra={0}/>
-        <pointLight color='skyBlue' intensity={0.01}/>
+      <group ref={groupRef}>
+
         {bodyRef 
         ? 
-        
         <RigidBody
           ccd 
           userData='robot-mesh'
@@ -295,17 +400,52 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
           enabledRotations={[false, true, false]}
           position={[0, 2, 0]}
           collisionGroups={interactionGroups([1], [0, 3])}
-          onCollisionEnter={(target, other) => {
-            
-            if(target.rigidBody.userData !== 'floor-plane' && target.rigidBody.userData !== 'platform'){
-                // console.log('collision', target.rigidBody.userData)
-                setSpeed(prev => prev * 1.25)
-            }
-        }}
-          onCollisionExit={() => setSpeed(debugSpeed)}
         >
+
+
+        {toggleOptions && 
+        <>
+          <group position={[0,1.2,3]}>
+            <spotLight color={'deepSkyBlue'} castShadow ref={menuLight} intensity={0.6}/>
+          </group>
+          <group position={[0,4,0]}>
+            <object3D ref={menuLightTarget} position={[0,5,0]}>
+            </object3D>
+              <mesh>
+                <Html
+                  transform
+                  position={[0, 1.5, 0]} // Relative to mesh center
+                  center
+                  >
+                  <RobotOptions />
+                  </Html>
+                <boxGeometry args={[3,3,0.01]}/>
+                <meshStandardMaterial color={'white'} transparent opacity={0.3} roughness={2} side={THREE.DoubleSide}/>
+              </mesh>
+          </group>
+        </>
+        }
+
+        <mesh
+          position={[0, 1, 0]}
+          onPointerOver={() => setToggleHover(true)}
+          onPointerOut={() => setToggleHover(false)}
+          onClick={() => setToggleOptions(prev => !prev)}
+        >
+          <boxGeometry args={[1, 3, 1]} />
+          <meshBasicMaterial
+            transparent
+            opacity={0} // Fully invisible
+            depthWrite={false} // Prevents z-buffer issues
+          />
+        </mesh>
           {addBip && robot}
-          <CuboidCollider userData='robot-collider' args={[0.5, 1, 0.5]} position={[0, 1, 0]} collisionGroups={interactionGroups([1], [0, 3])} />
+          <CuboidCollider
+            userData='robot-collider' 
+            args={[0.5, 1, 0.5]} 
+            position={[0, 1, 0]} 
+            collisionGroups={interactionGroups([1], [0, 3])} 
+           />
         </RigidBody>
         : 
         <group position={pos} rotation={[degrees(0), rot > 0 ? rot : degrees(180), degrees(0)]} >

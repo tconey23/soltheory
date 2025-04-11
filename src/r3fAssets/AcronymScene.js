@@ -129,7 +129,7 @@ const AcronymScene = () => {
             castShadow
         /> 
 
-        <group  position={[0,0,-25.5]}>  
+        {/* <group  position={[0,0,-25.5]}>  
         <RigidBody type="fixed" colliders={false}>
           <CuboidCollider
             ref={forceField}
@@ -141,9 +141,9 @@ const AcronymScene = () => {
             <meshStandardMaterial color="white" transparent opacity={0} />
           </mesh>
         </RigidBody>
-        </group>
+        </group> */}
 
-        <group position={[-25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
+        {/* <group position={[-25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
           <RigidBody
             position={[0,0,0]}
             type="fixed"
@@ -159,9 +159,9 @@ const AcronymScene = () => {
               <meshStandardMaterial color={'white'} transparent opacity={0}/>
             </mesh>
           </RigidBody>
-        </group>
+        </group> */}
 
-        <group position={[25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
+        {/* <group position={[25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
           <RigidBody
             position={[0,0,0]}
             type="fixed"
@@ -177,10 +177,10 @@ const AcronymScene = () => {
               <meshStandardMaterial color={'white'} transparent opacity={0}/>
             </mesh>
           </RigidBody>
-        </group>
+        </group> */}
 
 
-          <RigidBody
+          {/* <RigidBody
             type="fixed"
             colliders={false}
           >
@@ -188,7 +188,7 @@ const AcronymScene = () => {
                 <boxGeometry args={[50,50,50]} />
                 <forceFieldMaterial ref={matRef} transparent side={THREE.DoubleSide} />
             </mesh>
-        </RigidBody>
+        </RigidBody> */}
         <group>
             {letterStacks && letterStacks}
         </group>
