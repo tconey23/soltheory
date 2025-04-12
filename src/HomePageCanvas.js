@@ -54,11 +54,11 @@ const HomePageCanvas = () => {
   <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
       <Canvas shadows style={{height: '100%', background: 'black'}}>
           <OrbitControls enableZoom={true} enablePan={true}/>
-          {/* <directionalLight castShadow intensity={0.05}/> */}
+          {/* <directionalLight castShadow intensity={0.05}/>ws */}
           {/* <PerspectiveCamera key={'perspectiveCamera'} makeDefault position={[-100,2.7,6]}/>
           <CamControl key={'camControl'}/> */}
           <Physics gravity={[0, -9.81, 0]}>
-            <Debug/>
+            {/* <Debug/> */}
             <BallLandscape joystickData={joystickData}/> 
           </Physics>  
           </Canvas>

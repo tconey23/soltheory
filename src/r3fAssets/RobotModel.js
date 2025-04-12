@@ -134,7 +134,7 @@ useHelper(robotLight, SpotLightHelper, 'teal')
 
           node.add(target)
 
-          const spotlight = new THREE.SpotLight('deepSkyBlue', 2, 30, degrees(45), 0.8);
+          const spotlight = new THREE.SpotLight('deepSkyBlue', 2, 10000, degrees(45), 0.8);
           const pointLight = new THREE.PointLight('deepSkyBlue', 0.1, 30, 70)
           targetDebug.position.copy(scene.position).add(new THREE.Vector3(0, 20, 0))
           pointLight.position.copy(scene.position).add(new THREE.Vector3(0, 20, 8))
