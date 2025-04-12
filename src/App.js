@@ -13,6 +13,7 @@ import { useGlobalContext } from './business/GlobalContext';
 import UserAlert from './components/UserAlert';
 import { checkAndAddUsers } from './business/apiCalls';
 import ErrorPage from './components/ErrorPage';
+import ThreeDTwentyOne from './r3fAssets/ThreeDTwentyOne';
 
 function App() {
   const [user, setUser] = useState({email: 'tomconey@tomconey.dev'});
@@ -21,7 +22,7 @@ function App() {
   const [toggleHeader, setToggleHeader] = useState(false)
 
   useEffect(() => {
-    console.log(user)
+    // console.log(user)
   }, [user])
 
   useEffect(()=>{
@@ -30,7 +31,7 @@ function App() {
         setToggleQuit(false)
       }, 100);
     }
-    console.log(toggleQuit)
+    // console.log(toggleQuit)
   },[toggleQuit])
 
   useEffect(() => {
@@ -58,6 +59,7 @@ function App() {
             <Route path='/games' element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser}/>}/>
             <Route path='/esc' element={<EscLanding />}/>
             <Route path='/error' element={<ErrorPage />}/>
+            <Route path='/21Things' element={<ThreeDTwentyOne />}/>
           {!toggleQuit && 
           <>
             <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

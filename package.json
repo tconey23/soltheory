@@ -5,13 +5,12 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@ffmpeg/ffmpeg": "^0.12.15",
-    "@ffmpeg/util": "^0.12.2",
     "@flaticon/flaticon-uicons": "^3.3.1",
     "@mui/material": "^5.15.0",
     "@mui/system": "^5.15.0",
-    "@react-three/drei": "9.56.14",
-    "@react-three/fiber": "8.13.5",
+    "@react-three/drei": "^9.94.1",
+    "@react-three/fiber": "^8.15.10",
+    "@react-three/postprocessing": "^2.19.1",
     "@react-three/rapier": "0.12.1",
     "@supabase/supabase-js": "^2.49.1",
     "ajv": "^8.17.1",
@@ -19,9 +18,8 @@
     "dotenv": "^16.4.7",
     "firebase": "^11.4.0",
     "framer-motion": "^12.4.10",
-    "nipplejs": "^0.10.2",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-joystick-component": "^6.2.1",
     "react-resizable": "^3.0.5",
     "react-router-dom": "^6.17.0",
@@ -30,7 +28,7 @@
     "react-svg": "^16.3.0",
     "slick-carousel": "^1.8.1",
     "supabase": "^2.19.6",
-    "three": "^0.150.1"
+    "three": "^0.175.0"
   },
   "scripts": {
     "start": "react-scripts start",

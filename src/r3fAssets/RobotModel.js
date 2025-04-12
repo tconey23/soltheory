@@ -11,6 +11,9 @@ import { Stack } from '@mui/system'
 import { Select } from '@mui/material'
 import { MenuItem } from '@mui/material'
 import { useCursor } from '@react-three/drei'
+import { useHelper } from '@react-three/drei'
+import { SpotLightHelper } from 'three'
+
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
@@ -30,7 +33,7 @@ const RobotOptions = () => {
 }
 
 
-const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
+const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) => {
 
   useGLTF.preload('/AnimatedRobot.glb')
 
@@ -42,7 +45,6 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
  const { actions, mixer } = useAnimations(animations, groupRef)
   const [robot, setRobot] = useState([])
   const [speed, setSpeed] = useState(debugSpeed)
-  const internalSpotlightRef = useRef(<THREE.SpotLight/>)
   const [sprinting, setSprinting] = useState(false)
   const [sprintMult, setSprintMult] = useState(2)
   const [addBip, setAddBip] = useState(false)
@@ -52,6 +54,8 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
   const [toggleHover, setToggleHover] = useState(false)
   useCursor(toggleHover, /*'pointer', 'auto', document.body*/)
   const { scene: r3fScene } = useThree()
+  const robotLight = useRef()
+  const robotLightGroup = useRef()
 
   const menuLight = useRef()
   const menuLightTarget = useRef()
@@ -61,6 +65,8 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
   const animJump = 'Bip_Jump'
 
   const [currentAnim, setCurrentAnim] = useState(null)
+
+useHelper(robotLight, SpotLightHelper, 'teal')
 
   const keys = useRef({
     ArrowUp: false,
@@ -129,7 +135,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
           node.add(target)
 
           const spotlight = new THREE.SpotLight('deepSkyBlue', 2, 30, degrees(45), 0.8);
-          const pointLight = new THREE.PointLight('deepSkyBlue', 10, 30, 70)
+          const pointLight = new THREE.PointLight('deepSkyBlue', 0.1, 30, 70)
           targetDebug.position.copy(scene.position).add(new THREE.Vector3(0, 20, 0))
           pointLight.position.copy(scene.position).add(new THREE.Vector3(0, 20, 8))
           // console.log(pointLight.position)
@@ -240,139 +246,125 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
   const spotlight = spotTarget.current
 
-  useFrame(() => {
-    if (!bodyRef?.current || !groupRef.current || !spotlight) return;
+  const timeoutRef = useRef(null)
 
-    const targetWorldPos = new THREE.Vector3()
-    spotlight.getWorldPosition(targetWorldPos) 
+useFrame(() => {
+  if (!bodyRef?.current || !groupRef.current || !robotLight.current) return;
 
-    const clampedY = THREE.MathUtils.clamp(targetWorldPos.y, 0, 2)
+  const impulse = new THREE.Vector3()
+  let tiltX = 0
+  let tiltZ = 0
 
-    if (targetWorldPos.y !== clampedY) {
-      // console.log(targetWorldPos.y !== clampedY)
-      // spotlight.position.y += clampedY - targetWorldPos.y
+  const up = keys.current['ArrowUp'] || keys.current['KeyW']
+  const down = keys.current['ArrowDown'] || keys.current['KeyS']
+  const left = keys.current['ArrowLeft'] || keys.current['KeyA']
+  const right = keys.current['ArrowRight'] || keys.current['KeyD']
+  const jump = keys.current['Space']
+  const sprint = keys.current['ShiftLeft']
+
+  // Update sprinting state
+  setSprinting(sprint)
+
+  if (joystick?.force > 0) {
+    impulse.x += Math.cos(joystick.angle) * joystick.force * speed
+    impulse.z += -Math.sin(joystick.angle) * joystick.force * speed
+  }
+
+  const mult = sprint ? sprintMult : 1
+
+  if (up) {
+    impulse.z -= speed * mult
+    tiltX = -maxTilt
+  }
+  if (down) {
+    impulse.z += speed * mult
+    tiltX = maxTilt
+  }
+  if (left) {
+    impulse.x -= speed * mult
+    tiltZ = maxTilt
+  }
+  if (right) {
+    impulse.x += speed * mult
+    tiltZ = -maxTilt
+  }
+  if (jump) {
+    impulse.y += speed * mult
+    playAnimation(animJump, THREE.LoopOnce, true)
+    setCurrentAnim(animJump)
+  }
+
+  const isMoving = impulse.lengthSq() > 0
+
+  const pos = bodyRef.current.translation()
+
+  // --- TURN AROUND AFTER IDLE ---
+  if (!isMoving) {
+    if (!turnAround && !timeoutRef.current) {
+      timeoutRef.current = setTimeout(() => {
+        setTurnAround(true)
+        timeoutRef.current = null
+      }, 5000)
     }
-
-    // console.log(targetWorldPos.y)
-  
-    const impulse = new THREE.Vector3()
-    let tiltX = 0
-    let tiltZ = 0
-  
-    const up = keys.current['ArrowUp', 'KeyW']
-    const down = keys.current['ArrowDown', 'KeyS']
-    const left = keys.current['ArrowLeft', 'KeyA']
-    const right = keys.current['ArrowRight', 'KeyD']
-    const jump = keys.current['Space']
-    const sprint = keys.current['ShiftLeft']
-    
-    if(sprint) {
-      setSprinting(true)
-    } else {
-      setSprinting(false)
+  } else {
+    if (turnAround) setTurnAround(false)
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
     }
+  }
 
-    if(jump){
-      actions[animJump]
-          .reset()
-          .fadeIn(0.3)
-          .setLoop(THREE.LoopOnce)
+  // --- ROTATION & IMPULSE ---
+  if (isMoving) {
+    const angle = Math.atan2(impulse.x, impulse.z)
+    const newQuat = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(degrees(tiltX), angle, degrees(tiltZ))
+    )
+    lastRotationRef.current.copy(newQuat)
+    bodyRef.current.setRotation(newQuat, true)
+    bodyRef.current.applyImpulse(impulse, true)
+  } else if (turnAround) {
+    const faceForward = new THREE.Quaternion().setFromEuler(
+      new THREE.Euler(0, degrees(180), 0)
+    )
+    bodyRef.current.setRotation(faceForward, true)
+  } else {
+    bodyRef.current.setRotation(lastRotationRef.current, true)
+  }
 
-          actions[animJump].play()
-        setCurrentAnim(animJump)
+  // --- ANIMATIONS ---
+  if (isMoving) {
+    if (currentAnim !== animName && actions[animName]) {
+      playAnimation(animName)
     }
-    
-    if (joystick?.force > 0) {
-      impulse.x += Math.cos(joystick.angle) * joystick.force * speed
-      impulse.z += -Math.sin(joystick.angle) * joystick.force * speed
+    const joystickForce = THREE.MathUtils.clamp(joystick?.force ?? 0, 0.1, 1)
+    const speedMultiplier = 1 + joystickForce * (sprint ? sprintMult : 1)
+    actions[animName].timeScale = speedMultiplier
+  } else {
+    if (currentAnim === animName) {
+      playAnimation("Bip_Idle")
     }
+  }
 
-    const mult = sprinting ? sprintMult : 1
-  
-    if (up) {
-      impulse.z -= speed * mult
-      tiltX = -maxTilt
-    }
-    if (down) {
-      impulse.z += speed * mult
-      tiltX = maxTilt
-    }
-    if (left) {
-      impulse.x -= speed * mult
-      tiltZ = maxTilt
-    }
+  // --- SPOTLIGHT POSITIONING ---
+  // Ensure targets are in the scene
+  if (menuLight.current && !r3fScene.children.includes(menuLight.current.target)) {
+    r3fScene.add(menuLight.current.target)
+  }
+  if (menuLightTarget.current) {
+    const targetPos = new THREE.Vector3()
+    menuLightTarget.current.getWorldPosition(targetPos)
+    menuLight.current.target.position.copy(targetPos)
+  }
 
-    if (right) {
-      impulse.x += speed * mult
-      tiltZ = -maxTilt
-    }
+  if (robotLight.current && robotLight.current.target && !r3fScene.children.includes(robotLight.current.target)) {
+    r3fScene.add(robotLight.current.target)
+  }
 
-    if (jump) {
-      impulse.y += speed * mult
-    }
-  
-    const isMoving = impulse.lengthSq() > 0
-  
-    if (isMoving) {
-      bodyRef.current.applyImpulse(impulse, true)
-  
-      const angle = Math.atan2(impulse.x, impulse.z)
-      const newQuat = new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(degrees(tiltX), angle, degrees(tiltZ))
-      )
-  
-      // Save the new rotation as the last known direction
-      lastRotationRef.current.copy(newQuat)
-  
-      // Apply it
-      bodyRef.current.setRotation(newQuat, true)
-    } else {
-      // Maintain the last known rotation
-      bodyRef.current.setRotation(lastRotationRef.current, true)
-    }
-  
-    // 🔁 Animation handling
-    if (isMoving) {
-      bodyRef.current.applyImpulse(impulse, true)
-    
-      const angle = Math.atan2(impulse.x, impulse.z)
-      const newQuat = new THREE.Quaternion().setFromEuler(
-        new THREE.Euler(degrees(tiltX), angle, degrees(tiltZ))
-      )
-      lastRotationRef.current.copy(newQuat)
-      bodyRef.current.setRotation(newQuat, true)
-    
-      if (currentAnim !== animName && actions[animName]) {
-        playAnimation(animName)
-      }
-    
-      const joystickForce = THREE.MathUtils.clamp(joystick?.force ?? 0, 0.1, 1)
-      const speedMultiplier = 1 + joystickForce * (sprinting ? sprintMult : 1)
-      actions[animName].timeScale = speedMultiplier
-    
-    } else {
-      bodyRef.current.setRotation(lastRotationRef.current, true)
-    
-      if (currentAnim === animName) {
-        playAnimation("Bip_Idle")
-      }
-    }
-
-    const pos = bodyRef.current.translation()
-
-    if (menuLight.current && !r3fScene.children.includes(menuLight.current.target)) {
-      r3fScene.add(menuLight.current.target)
-    }
-
-    const spotTargetPos = new THREE.Vector3()
-    if(menuLightTarget.current){
-      menuLightTarget.current.getWorldPosition(spotTargetPos)
-      menuLight.current.target.position.set(spotTargetPos.x, spotTargetPos.y, spotTargetPos.z)
-
-    }
-
-
-  })
+  // Position robot spotlight above robot and update target
+  robotLightGroup.current.position.set(pos.x, pos.y + 30, pos.z)
+  robotLight.current.target.position.set(pos.x, pos.y + 1.5, pos.z)
+})
 
   
   useEffect(() => {
@@ -382,31 +374,41 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
 
   return (
     <>
+        <group ref={robotLightGroup}>
+        <spotLight
+          ref={robotLight}
+          intensity={10}
+          distance={50}
+          angle={degrees(180)}
+          penumbra={0.5}
+          castShadow
+          color={'white'}
+        />
+        </group>
       <group ref={groupRef}>
-
         {bodyRef 
         ? 
         <RigidBody
-          ccd 
-          userData='robot-mesh'
-          ref={bodyRef}
-          type="dynamic"
-          colliders={false}
-          friction={0}
-          restitution={0.5}
-          mass={1000}
-          linearDamping={5}
-          angularDamping={0.1}
-          enabledRotations={[false, true, false]}
-          position={[0, 2, 0]}
-          collisionGroups={interactionGroups([1], [0, 3])}
+        ccd 
+        userData='robot-mesh'
+        ref={bodyRef}
+        type="dynamic"
+        colliders={false}
+        friction={0}
+        restitution={0.5}
+        mass={1000}
+        linearDamping={5}
+        angularDamping={0.1}
+        enabledRotations={[false, true, false]}
+        position={[0, 2, 0]}
+        collisionGroups={interactionGroups([1], [0, 3])}
         >
 
 
         {toggleOptions && 
         <>
           <group position={[0,1.2,3]}>
-            <spotLight color={'deepSkyBlue'} castShadow ref={menuLight} intensity={0.6}/>
+            <spotLight color={'deepSkyBlue'} castShadow ref={menuLight} intensity={0.2}/>
           </group>
           <group position={[0,4,0]}>
             <object3D ref={menuLightTarget} position={[0,5,0]}>
@@ -440,6 +442,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot}) => {
           />
         </mesh>
           {addBip && robot}
+          <ambientLight color={'deepSkyBlue'} intensity={0.01}/>
           <CuboidCollider
             userData='robot-collider' 
             args={[0.5, 1, 0.5]} 

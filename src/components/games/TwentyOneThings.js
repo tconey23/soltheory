@@ -5,7 +5,6 @@ import { get21Things } from '../../business/apiCalls';
 import Hexagon from './Hexagon';
 import { addGameToUser } from '../../business/apiCalls';
 import { useGlobalContext } from '../../business/GlobalContext';
-import { ServerRouter } from 'react-router-dom';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
