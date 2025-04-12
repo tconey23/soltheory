@@ -18,6 +18,10 @@
   animation: alertFloat 5s ease-in-out both
 }
 
+.css-r3ge8i-MuiStack-root{
+  height: 120% !important
+}
+
 @keyframes alertFloat {
   0% {
     transform: translateY(-48px);

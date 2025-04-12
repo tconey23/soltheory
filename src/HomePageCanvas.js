@@ -14,6 +14,8 @@ import { PerspectiveCamera } from '@react-three/drei'
 import { useDetectGPU } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 
+const degrees = (degrees) => degrees * (Math.PI / 180)
+
 const CamControl = () => {
   const { camera } = useThree()
 
@@ -54,12 +56,11 @@ const HomePageCanvas = () => {
   <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
       <Canvas shadows style={{height: '100%', background: 'black'}}>
           <OrbitControls enableZoom={true} enablePan={true}/>
-          {/* <directionalLight castShadow intensity={0.05}/>ws */}
-          {/* <PerspectiveCamera key={'perspectiveCamera'} makeDefault position={[-100,2.7,6]}/>
-          <CamControl key={'camControl'}/> */}
           <Physics gravity={[0, -9.81, 0]}>
             {/* <Debug/> */}
-            <BallLandscape joystickData={joystickData}/> 
+            <group rotation={[degrees(0), degrees(180), degrees(0)]} >
+              <BallLandscape joystickData={joystickData}/> 
+            </group>
           </Physics>  
           </Canvas>
           <JoystickWrapper

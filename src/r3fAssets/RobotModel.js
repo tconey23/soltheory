@@ -25,7 +25,7 @@ const RobotOptions = () => {
 
   return (
 
-      <Stack width={200} height={100} sx={{background: '#ffffff29', scale: 0.5}} padding={2}>
+      <Stack width={200} height={200} sx={{background: '#ffffff29', scale: 0.5}} padding={2}>
         
       </Stack>
 
@@ -66,7 +66,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
 
   const [currentAnim, setCurrentAnim] = useState(null)
 
-useHelper(robotLight, SpotLightHelper, 'teal')
+// useHelper(robotLight, SpotLightHelper, 'teal')
 
   const keys = useRef({
     ArrowUp: false,
@@ -273,19 +273,19 @@ useFrame(() => {
   const mult = sprint ? sprintMult : 1
 
   if (up) {
-    impulse.z -= speed * mult
+    impulse.z += speed * mult
     tiltX = -maxTilt
   }
   if (down) {
-    impulse.z += speed * mult
+    impulse.z -= speed * mult
     tiltX = maxTilt
   }
   if (left) {
-    impulse.x -= speed * mult
+    impulse.x += speed * mult
     tiltZ = maxTilt
   }
   if (right) {
-    impulse.x += speed * mult
+    impulse.x -= speed * mult
     tiltZ = -maxTilt
   }
   if (jump) {
@@ -410,13 +410,13 @@ useFrame(() => {
           <group position={[0,1.2,3]}>
             <spotLight color={'deepSkyBlue'} castShadow ref={menuLight} intensity={0.2}/>
           </group>
-          <group position={[0,4,0]}>
+          <group position={[0,5,0]}>
             <object3D ref={menuLightTarget} position={[0,5,0]}>
             </object3D>
               <mesh>
                 <Html
                   transform
-                  position={[0, 1.5, 0]} // Relative to mesh center
+                  position={[0, 0, 0]} // Relative to mesh center
                   center
                   >
                   <RobotOptions />

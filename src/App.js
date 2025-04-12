@@ -19,7 +19,7 @@ function App() {
   const [user, setUser] = useState({email: 'tomconey@tomconey.dev'});
   const [toggleQuit, setToggleQuit] = useState(false)
   const {alertProps, setAlertProps} = useGlobalContext()
-  const [toggleHeader, setToggleHeader] = useState(false)
+  const [toggleHeader, setToggleHeader] = useState(true)
 
   useEffect(() => {
     // console.log(user)

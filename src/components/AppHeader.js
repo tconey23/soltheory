@@ -10,12 +10,12 @@ const AppHeader = () => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElGames, setAnchorElGames] = useState(null); // State for "SOL Games" dropdown
+  const [anchorElGames, setAnchorElGames] = useState(null);
   const nav = useNavigate()
 
   const isMobile = useMediaQuery("(max-width:430px)");
 
-  const pages = ["SOL Games", "Thrive", "ESC", "About"];
+  const pages = ["SOL Games", "Thrive", "ESC", "Personos", "About"];
   const solGamesDropdown = ["21 Things", "Pic6"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
