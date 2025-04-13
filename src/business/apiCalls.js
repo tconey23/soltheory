@@ -11,19 +11,21 @@ const addFriend = async (user, friend) => {
 }
 
 
-const addNewPrompts = async (prompts) => {
-    
-    if(prompts) 
-        {
-            const { data, error } = await supabase
-            .from('21ThingsPrompts')
-            .insert([prompts]); 
-            if (error) {
-                console.error('Error inserting:', error);
-            } else {
-                console.log('Game data saved:', data);
+    const addNewPrompts = async (prompts) => {
+        if(prompts) 
+            {
+                const { data, error } = await supabase
+                .from('21ThingsPrompts')
+                .insert([
+                    prompts
+                ])
+                .select()
+                if (error) {
+                    console.error('Error inserting:', error);
+                } else {
+                    return 'success'
+                }
             }
-        }
     };
     
     const get21Things = async (date) =>{
@@ -31,10 +33,11 @@ const addNewPrompts = async (prompts) => {
         let { data, error } = await supabase
         .from('21ThingsPrompts')
         .select('*')
-        .eq('date', date)
+        // .eq('date', date)
         
         if(data && data[0]){
-            return data[0]
+            // console.log(data)
+            return data
         }
 
         return error

@@ -8,7 +8,8 @@ import "react-resizable/css/styles.css";
 import { useGlobalContext } from '../business/GlobalContext';
 import { checkAndAddUsers } from '../business/apiCalls';
 
-const Login = ({ user, setUser, setSelectedOption }) => {
+
+const Login = ({ setSelectedOption }) => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -16,8 +17,10 @@ const Login = ({ user, setUser, setSelectedOption }) => {
   const [isSignUp, setIsSignUp] = useState(false); 
   const [size, setSize] = useState({ width: 1000, height: 800 })
 
+  const {user, setUser} = useGlobalContext()
+
   useEffect(() =>{
-    console.log(user)
+    console.log(user) 
     if(user){
       checkAndAddUsers(user.session)
     }
