@@ -351,15 +351,16 @@ useFrame(() => {
   if (menuLight.current && !r3fScene.children.includes(menuLight.current.target)) {
     r3fScene.add(menuLight.current.target)
   }
-  if (menuLightTarget.current) {
-    const targetPos = new THREE.Vector3()
-    menuLightTarget.current.getWorldPosition(targetPos)
-    menuLight.current.target.position.copy(targetPos)
-  }
 
-  if (robotLight.current && robotLight.current.target && !r3fScene.children.includes(robotLight.current.target)) {
-    r3fScene.add(robotLight.current.target)
-  }
+  // if (menuLightTarget.current) {
+  //   const targetPos = new THREE.Vector3()
+  //   menuLightTarget.current.getWorldPosition(targetPos)
+  //   menuLight.current.target.position.copy(targetPos)
+  // }
+
+  // if (robotLight.current && robotLight.current.target && !r3fScene.children.includes(robotLight.current.target)) {
+  //   r3fScene.add(robotLight.current.target)
+  // }
 
   // Position robot spotlight above robot and update target
   robotLightGroup.current.position.set(pos.x, pos.y + 30, pos.z)
@@ -367,9 +368,9 @@ useFrame(() => {
 })
 
   
-  useEffect(() => {
-    console.log(toggleOptions)
-  }, [toggleOptions])
+  // useEffect(() => {
+  //   console.log(toggleOptions)
+  // }, [toggleOptions])
   
 
   return (

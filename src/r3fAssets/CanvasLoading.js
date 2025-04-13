@@ -24,7 +24,7 @@ const CanvasLoading = ({progress}) => {
     const robot = useRef()
 
     useEffect(() => {
-        console.log(progress)
+        // console.log(progress)
     }, [progress])
 
     useEffect(() => {
@@ -47,9 +47,9 @@ const CanvasLoading = ({progress}) => {
     }, [currentRotation])
 
 
-    useFrame(() =>{
-        setCurrentRotation(prev => prev +0.9)
-    })
+    // useFrame(() =>{
+    //     setCurrentRotation(prev => prev +0.9)
+    // })
 
   return (
     <group position={[0,-1,-3]}>
@@ -60,6 +60,7 @@ const CanvasLoading = ({progress}) => {
         </group>
         <group position={[0,-3.5,0]}>
         <Html center transform distanceFactor={10}>
+                    {progress && 
             <Stack width={300} justifyContent={'center'}>
                     <LinearProgress variant="buffer" value={progress} valueBuffer={buffer} />
                 <Stack marginTop={2} width={300} alignItems={'center'}>
@@ -68,6 +69,7 @@ const CanvasLoading = ({progress}) => {
                     </Box>
                 </Stack>
             </Stack>
+                    }
         </Html>
         </group>
         <group position={[0,-2,0]}>
