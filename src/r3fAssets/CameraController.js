@@ -5,7 +5,7 @@ import * as THREE from 'three'
 
 let controls
 
-const CameraFollow = ({ targetRef }) => {
+const CameraFollow = ({ targetRef, turnAround, setTurnAround }) => {
   const { camera, gl } = useThree()
   const controlsRef = useRef()
 
@@ -15,20 +15,26 @@ const CameraFollow = ({ targetRef }) => {
   }, [])
 
   useFrame(() => {
-    if (!targetRef.current || !controls) return
+    if (!targetRef.current || !controls) return;
   
-    const pos = targetRef.current.translation()
-    const vel = targetRef.current.linvel()
+    const pos = targetRef.current.translation();
+    const rot = targetRef.current.rotation(); // This gives a quaternion
+    const quaternion = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w);
   
-    const dynamicOffset = new THREE.Vector3().copy(vel).multiplyScalar(0.2).negate()
-    const staticOffset = new THREE.Vector3(-1, 3.5, 5)
-    const offset = dynamicOffset.add(staticOffset)
+    // Define the camera offset (behind and above)
+    const offset = new THREE.Vector3(0, 3.5, turnAround ? 6 : -8); // behind = -Z
   
-    const camPos = new THREE.Vector3(pos.x, pos.y, pos.z+2).add(offset)
-    const lookAt = new THREE.Vector3(pos.x, pos.y + 2, pos.z)
+    // Rotate offset relative to the robot's orientation
+    offset.applyQuaternion(quaternion);
   
-    controls.setLookAt(camPos.x, camPos.y, camPos.z, lookAt.x, lookAt.y, lookAt.z, true)
-  })
+    // Calculate camera position by applying offset to robot position
+    const camPos = new THREE.Vector3(pos.x, pos.y, pos.z).add(offset);
+  
+    // Look slightly above robot
+    const lookAt = new THREE.Vector3(pos.x, pos.y + 1.5, pos.z);
+  
+    controls.setLookAt(camPos.x, camPos.y, camPos.z, lookAt.x, lookAt.y, lookAt.z, true, 0.1);
+  });
 
   return <CameraControls ref={controlsRef} />
 }

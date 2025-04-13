@@ -5,7 +5,7 @@ import { get21Things } from '../../business/apiCalls';
 import Hexagon from './Hexagon';
 import { addGameToUser } from '../../business/apiCalls';
 import { useGlobalContext } from '../../business/GlobalContext';
-import { ServerRouter } from 'react-router-dom';
+import { USDZExporter } from 'three/examples/jsm/Addons.js';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
@@ -15,13 +15,13 @@ const Prompt = ({prompt, color}) => {
     const {alertProps, setAlertProps} = useGlobalContext()
 
     return (
-        <Stack sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
+        <Stack userData='21things prompt' sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
             <Typography padding={2} fontSize={13}>{prompt}</Typography>
         </Stack>
     )
 }
 
-const Home = ({date, author, setCurrentStage, setResetRef}) => {
+const Home = ({handleDateChange, date, author, setCurrentStage, setResetRef, setToday, allData}) => {
     const {alertProps, setAlertProps} = useGlobalContext()
 
     const handlePlayGame = () => {
@@ -31,26 +31,36 @@ const Home = ({date, author, setCurrentStage, setResetRef}) => {
 
 
     return (
-        <Stack alignItems={'center'} height={'100%'} width={'100%'}>
-            <Stack>
+        <Stack userData='21things home wrapper' alignItems={'center'} height={'100%'} width={'100%'}>
+            <Stack userData='21things hex wrapper' >
                 <Hexagon />
             </Stack>
 
-            <Stack>
+            <Stack userData='21things info wrapper'>
                 <Box sx={{marginBottom: 2}}>
                     <Typography fontSize={40}>21 Things</Typography>
                 </Box>
-                <Box sx={{marginBottom: 2}}>
+
+                <Stack width={'100%'}>
                     <Typography fontSize={20}>Date: </Typography>
-                    <Typography>{date}</Typography>
-                </Box>
-                <Box sx={{marginBottom: 2}}>
+                    <Stack direction={'row'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
+                        <Button onClick={() => handleDateChange('back')}>
+                            <i style={{marginRight: 10, fontSize: 20}} className="fi fi-sr-angle-circle-left"></i>
+                        </Button>
+                        <Typography>{date}</Typography>
+                        <Button onClick={() => handleDateChange('forward')}>
+                            <i style={{marginLeft: 10, fontSize: 20}} className="fi fi-sr-angle-circle-right"></i>
+                        </Button>
+                    </Stack>
+                </Stack>
+
+                <Stack sx={{marginBottom: 2, marginTop: 2}} width={'100%'} justifyContent={'center'} alignItems={'center'}>
                     <Typography fontSize={20}>Author: </Typography>
                     <Typography>{author}</Typography>
-                </Box>
-                <Box sx={{marginBottom: 2}}>
+                </Stack>
+                <Stack sx={{marginBottom: 2}}>
                     <Button variant='contained' onClick={() => handlePlayGame()}>PLAY!</Button>
-                </Box>
+                </Stack>
             </Stack>
 
         </Stack>
@@ -116,9 +126,9 @@ const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections
     }
 
     return (
-        <Stack height={'100%'}>
+        <Stack userData='21things stage1 prompt list' height={'100%'}>
             <Typography variant="h6">Select the your top 6 things: {purpleCount}/6</Typography>
-            <ImageList sx={{ width: 500, height: '75vh' }} cols={3} rowHeight={1000}>
+            <ImageList sx={{ width: 500, height: '75vh', overflow: 'scroll'}} cols={3} rowHeight={1000}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
                         <Prompt prompt={p.prompt} color={p.color} />
@@ -189,16 +199,16 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentSt
     
 
     return (
-        <Stack height={'100%'} alignItems="center">
+        <Stack userData='21things stage2 prompt list'  height={'100%'} alignItems="center">
             <Typography variant="h6">Now narrow it down to 3: {yellowCount}/3</Typography>
-            <ImageList sx={{ width: 500, height: '75%' }} cols={3} rowHeight={1}>
+            <ImageList sx={{ width: 500, height: '75%', justifyItems:'center', alignContent: 'center' }} cols={3} rowHeight={1}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
                         <Prompt prompt={p.prompt} color={p.color} />
                     </Stack>
                 ))}
             </ImageList>
-            <Stack direction={'row'} spacing={2} mt={2}>
+            <Stack  userData='21things button wrapper'  direction={'row'} spacing={2} mt={2}>
                 <Button onClick={() => setCurrentStage(1)}>Back</Button>
                 {yellowCount === 3 && <Button onClick={() => handleNextStage()}>Next</Button>}
             </Stack>
@@ -355,9 +365,9 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
     
 
     return (
-        <Stack sx={{overflow: 'scroll'}} height={'80%'} alignItems="center">
-            <Stack width={'100%'} justifyContent={'center'}>
-                <ImageList sx={{ width: 500, height: '100%' }} cols={3}>
+        <Stack userData='21things stage4 wrapper' sx={{overflow: 'scroll'}} height={'80%'} alignItems="center">
+            <Stack userData='21things stage4 inner' width={'100%'} justifyContent={'center'}>
+                <ImageList userData='21things stage4 prompt list' sx={{ width: 500, height: '100%', overFlowY: 'hidden'}} cols={3}>
                     {selections['1']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
@@ -366,8 +376,8 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
                     ))}
                 </ImageList>
             </Stack>
-            <Stack width={'100%'} justifyContent={'center'}>
-                <ImageList sx={{ width: 500, height: '75%' }} cols={3}>
+            <Stack userData='21things stage4 prompt list' width={'100%'} justifyContent={'center'}>
+                <ImageList sx={{ width: 500, height: '75%', overFlowY: 'hidden' }} cols={3}>
                     {selections['2']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
@@ -378,7 +388,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
             </Stack>
 
             <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
-                <ImageList sx={{ width: 500, height: '75%', justifyContent: 'center', alignItems: 'center'}} cols={1}>
+                <ImageList sx={{ width: 500, height: '75%', justifyContent: 'center', alignItems: 'center', overFlowY: 'hidden'}} cols={1}>
                     {selections['3']
                     .map((p, i) => (
                         <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
@@ -424,19 +434,31 @@ const TwentyOneThings = ({user}) => {
         3: [],
         note: ''
     })
+    const [allData, setAllData] = useState()
 
     const [resetRef, setResetRef] = useState(0)
 
+    useEffect(() => {
+        console.log(allData)
+    }, [allData])
+
     const fetchPrompts = async (date) => {
         const res = await get21Things(date)
-        console.log(res)
+
+        const sorted = [...res].sort((a, b) => new Date(a.date) - new Date(b.date));
+        setAllData(sorted)
+        // console.log(sorted)
+
+        let latest = sorted[sorted.length-1]
+
         let array = []
         if(res) {
-            setDate(res.date)
-            setAuthor(res.author)
-            res.prompts.forEach((p) => {
+            setDate(latest.date)
+            setAuthor(latest.author)
+
+            latest.prompts.forEach((p) => {
                 array.push({
-                    prompt: p,
+                    prompt: p.prompt,
                     color: 'white'
                 })
             })
@@ -446,23 +468,38 @@ const TwentyOneThings = ({user}) => {
     }
 
     useEffect(() => {
-        // console.log(selections)
-    }, [selections])
+        console.log(today)
+    }, [today])
 
     useEffect(() => {   
         setIsReady(false)
     }, [])
     
-    useEffect(() =>{
+    useEffect(() => {
         setPrompts([])
         fetchPrompts(today)
-    }, [setResetRef])
+    }, [resetRef])
+
+    const handleDateChange = (dir) => {
+        console.log(dir)
+        if (!allData || !date) return;
+    
+        const currentIndex = allData.findIndex(d => d.date === date);
+        if (currentIndex === -1) return;
+    
+        const newIndex = dir === 'back' ? currentIndex - 1 : currentIndex + 1;
+        if (newIndex < 0 || newIndex >= allData.length) return;
+    
+        const newDate = allData[newIndex].date;
+        console.log(newDate)
+        setToday(newDate);
+    };
 
   return (
-    <Stack direction={'column'} sx={{ height: '100%', width: '75%'}} alignItems={'center'}>
+    <Stack userData='21things main wrapper' direction={'column'} sx={{ height: '100%', width: '75%'}} alignItems={'center'}>
         
-        {prompts && currentStage === 0 &&
-            <Home date={date} author={author} prompts={prompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections}/>
+        {prompts && currentStage === 0 && allData && 
+            <Home handleDateChange={handleDateChange} date={date} author={author} prompts={prompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections}/>
         }
 
         {prompts && currentStage === 1 &&

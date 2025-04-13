@@ -13,15 +13,16 @@ import { useGlobalContext } from './business/GlobalContext';
 import UserAlert from './components/UserAlert';
 import { checkAndAddUsers } from './business/apiCalls';
 import ErrorPage from './components/ErrorPage';
+import ThreeDTwentyOne from './r3fAssets/ThreeDTwentyOne';
 
 function App() {
-  const [user, setUser] = useState({email: 'tomconey@tomconey.dev'});
+  const [user, setUser] = useState({email: ''});
   const [toggleQuit, setToggleQuit] = useState(false)
   const {alertProps, setAlertProps} = useGlobalContext()
-  const [toggleHeader, setToggleHeader] = useState(false)
+  const [toggleHeader, setToggleHeader] = useState(true)
 
   useEffect(() => {
-    console.log(user)
+    // console.log(user)
   }, [user])
 
   useEffect(()=>{
@@ -30,7 +31,7 @@ function App() {
         setToggleQuit(false)
       }, 100);
     }
-    console.log(toggleQuit)
+    // console.log(toggleQuit)
   },[toggleQuit])
 
   useEffect(() => {
@@ -45,19 +46,20 @@ function App() {
   }, [alertProps])
 
   return (
-      <div className="App" style={{justifyContent: 'center'}}>
+      <div userData='app wrapper' className="App" style={{justifyContent: 'center'}}>
          {toggleHeader && <AppHeader />}
         <div style={{height: '98%', backgroundColor: 'white', alignItems: 'center', width: '100%'}}>
-        <Stack width={'100vw'} justifyContent={'center'} alignItems={'center'} position={'fixed'} zIndex={1301}>
+        <Stack userData='app alerts wrapper' width={'100vw'} height={'10vh'} justifyContent={'center'} alignItems={'center'} position={'fixed'}>
           {alertProps.display && <Alert severity={alertProps.severity} sx={{width: '50%'}}>{alertProps.text}</Alert>}
         </Stack>
-        <Stack height={'100%'}>
+        <Stack userData='app 2' height={'100%'}>
           <Routes>
             <Route path="/" element={<HomePageCanvas user={user} setUser={setUser} />}/>
             <Route path="/home" element={<HomePageCanvas user={user} setUser={setUser} />}/>
             <Route path='/games' element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser}/>}/>
             <Route path='/esc' element={<EscLanding />}/>
             <Route path='/error' element={<ErrorPage />}/>
+            {/* <Route path='/21Things' element={<ThreeDTwentyOne />}/> */}
           {!toggleQuit && 
           <>
             <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

@@ -106,6 +106,8 @@ const ESCLandscape = ({sunMesh, models}) => {
                 </mesh>
         <RobotModel bodyRef={null} joystick={null} pos={[0,0,3.9]}/>
 
+        <ambientLight intensity={0.6}/>
+
         {groundReady && 
           <>
             <SquareBear nav={nav} gltf={models.SquareBear}/>

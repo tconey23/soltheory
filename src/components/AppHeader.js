@@ -5,17 +5,18 @@ import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
 import {useMediaQuery} from "@mui/material";
 import { useGlobalContext } from "../business/GlobalContext";
+import { Stack } from "@mui/material";
 
 const AppHeader = () => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElGames, setAnchorElGames] = useState(null); // State for "SOL Games" dropdown
+  const [anchorElGames, setAnchorElGames] = useState(null);
   const nav = useNavigate()
 
   const isMobile = useMediaQuery("(max-width:430px)");
 
-  const pages = ["SOL Games", "Thrive", "ESC", "About"];
+  const pages = ["SOL Games", "Thrive", "ESC", "Personos", "About"];
   const solGamesDropdown = ["21 Things", "Pic6"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
@@ -46,9 +47,10 @@ const AppHeader = () => {
   };
 
   return (
-    <AppBar position="static" sx={{justifyContent: 'center', height: '80px'}}>
-      <Container maxWidth="xl">
-        <Toolbar disableGutters>
+    <Stack height={'10vh'} width={'100vw'}>
+    <AppBar position="static" sx={{display: 'flex', justifyContent: 'center', height: '100%'}}>
+      <Container maxWidth="xl sx={{height: '100%'}}">
+        <Toolbar disableGutters sx={{height: '100%'}}>
           <Link to="/home">
             <img height={"75px"} src={solTheoryLogo} alt="Sol Theory Logo" />
           </Link>
@@ -65,7 +67,7 @@ const AppHeader = () => {
                     onClick={handleOpenGamesMenu}
                     sx={{ my: 2, color: "white", display: "block", margin: 1}}
                     variant="contained"
-                  >
+                    >
                     {page}
                   </Button>}
                 </Box>
@@ -76,11 +78,11 @@ const AppHeader = () => {
                     {page}
                   </Link>
                 :<Button
-                    key={page}
-                    onClick={handleCloseNavMenu}
-                    sx={{ my: 2, color: "white", display: "block", margin: 1}}
-                    variant="contained"
-                    >
+                key={page}
+                onClick={handleCloseNavMenu}
+                sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                variant="contained"
+                >
                     {page}
                   </Button>
                 }
@@ -105,7 +107,7 @@ const AppHeader = () => {
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
-            >
+              >
               {settings.map((setting) => (
                 <MenuItem key={setting} onClick={handleCloseUserMenu} sx={{ maxWidth: 122 }}>
                   <Typography sx={{ textAlign: "center", maxWidth: 122, fontSize: 1 }}>
@@ -118,6 +120,7 @@ const AppHeader = () => {
         </Toolbar>
       </Container>
     </AppBar>
+    </Stack>
   );
 };
 

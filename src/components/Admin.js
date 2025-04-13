@@ -1,7 +1,223 @@
 import { useEffect, useState, useRef } from 'react';
-import { Button, List, ListItem, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
+import { Button, InputLabel, List, ListItem, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { checkExistingPack, getGifs, getSixPicsPack, uploadVid, removeGifByName, addNewCategory, updatePackLogo } from '../business/apiCalls';
 import { useGlobalContext } from '../business/GlobalContext';
+import Papa from 'papaparse';
+import { addNewPrompts } from '../business/apiCalls';
+
+const AddPrompts = ({}) => {
+    const [date, setDate] = useState()
+    const [author, setAuthor] = useState()
+    const [prompts, setPrompts] = useState([])
+    const [newPrompt, setNewPrompt] = useState()
+    const [toggleMulti, setToggleMulti] = useState(false)
+    const [refreshList, setRefreshList] = useState(1)
+    const [toggleEdit, settoggleEdit] = useState(false)
+    const [readyToSubmit, setReadyToSubmit] = useState(false)
+
+    const {user} = useGlobalContext()
+    const [data, setData] = useState([]);
+
+    
+    useEffect(() => { 
+        if(user){
+            console.log(user.user.email) 
+            setAuthor(user.name)
+        }
+    }, [user])
+
+    useEffect(() => {
+
+        if(data){
+            if(date && author && prompts.length == 21){
+                setReadyToSubmit(true)
+            } else {
+                setReadyToSubmit(false)
+            }
+
+            if(date && author && data.length == 21){
+                setReadyToSubmit(true)
+            } else {
+                setReadyToSubmit(false)
+            }
+            // console.log(date, author, prompts.length)
+        }
+    }, [data, prompts, date, author])
+
+    const handlePost = async () => {
+
+        let promptList
+
+        const formatted = new Date(date).toLocaleDateString("en-US")
+
+        if(prompts.length > 0){
+            promptList = prompts
+        }
+
+        if(data.length > 0) {
+            promptList = data
+        }
+
+        const payload = {
+            date: formatted,
+            author: author,
+            prompts: promptList
+        }
+
+        const res = await addNewPrompts(payload)
+        
+        if(res === 'success'){
+            setDate('')
+            setData([])
+            setPrompts([])
+            setAuthor('')
+        }
+
+    }
+
+    const handleFileUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+    
+        Papa.parse(file, {
+          header: false,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const promptArray = results.data.map(row => ({ prompt: row[0]?.trim() })).filter(p => p.prompt);
+            setData(promptArray);
+          }
+        });
+      };
+
+      const handleDelete = (index, type) => {
+        console.log(index, type)
+        if(type === 'data'){
+            setData((prev) => prev.filter((_, i) => i !== index));
+        }
+        if(type === 'prompts'){
+            setPrompts((prev) => prev.filter((_, i) => i !== index));
+        }
+        setRefreshList(prev => prev +1)
+      };
+
+      const handleEdit = (i) => {
+
+      }
+
+      const handleAddPrompt = () => {
+        if(newPrompt){
+            setPrompts(prev => ([
+                ...prev,
+                newPrompt 
+            ]))
+            setNewPrompt('')
+        }
+      }
+
+      const handleKeyDown = (key) => {
+        if(key === "Enter" && prompts.length < 21 && newPrompt){
+            handleAddPrompt()
+        }
+      }
+
+    return (
+        <Stack userData='prompts form' justifyContent={'flex-start'} alignItems={'center'} direction={'column'} >
+                <Typography>Add Prompts Below</Typography>
+
+                {readyToSubmit && <Button onClick={() => handlePost()}>Upload</Button>}
+
+            <Stack userData='form wrapper' width={'90%'}>
+                <Stack userData='date' direction={'column'} justifyContent={'center'} alignItems={'flex-start'} width={'100%'}>
+                    <Stack direction={'column'} alignItems={'center'}>
+                        <InputLabel sx={{padding: 2}}>Date: </InputLabel>
+                        <TextField
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />  
+                    </Stack>
+
+                    <Stack userData='author' direction={'column'} alignItems={'flex-start'} width={'100%'}>
+                        <InputLabel sx={{padding: 2}}>Author: </InputLabel>
+                        <TextField
+                            value={author}
+                            onChange={(e) => setAuthor(e.target.value)}
+                        />
+                    </Stack>
+
+                    <Button onClick={() => setToggleMulti(prev => !prev)}>{toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Button>
+                {
+                    toggleMulti 
+                    ?
+                            <Stack direction={'column'} justifyContent={'flex-start'} alignItems={'center'}>
+                                <input type="file" accept=".csv" onChange={handleFileUpload} />
+                            </Stack>
+
+                    :
+                        <Stack direction={'column'} justifyContent={'flex-start'} alignItems={'center'}>
+                            <TextField disabled={readyToSubmit} value={newPrompt} onKeyDown={(e) => handleKeyDown(e.key)} onChange={(e) => setNewPrompt(e.target.value)} type='text'/>
+                            <Button disabled={readyToSubmit || !newPrompt} onClick={() => handleAddPrompt()}>Add</Button>
+                        </Stack> 
+                }
+
+                    <List sx={{width: '100%'}}>
+                        {!toggleMulti && prompts.map((p,i)=> (
+                            <Stack sx={{padding: 0.5, margin: 2,border: '1px solid black', borderRadius: '10px'}} direction={'row'} justifyContent={'center'} alignItems={'center'}>
+                            <Button sx={{marginLeft: 1}} variant='contained' onClick={() => handleDelete(i, 'prompts')}>
+                                <i className="fi fi-bs-cross-circle" style={{padding: 5}}></i>
+                            </Button>
+                            <Button sx={{marginLeft: 1}} variant='contained' onClick={() => settoggleEdit(i, 'prompts')}>
+                                <i className="fi fi-br-pencil" style={{padding: 5}}></i>
+                            </Button>
+                            <ListItem key={refreshList}> 
+                                {
+                                    toggleEdit == i 
+                                    ?
+                                    <Stack direction={'row'} width={'100%'}>
+                                        <TextField sx={{width: '100%', marginRight: 2}} value={p}></TextField>
+                                        <Button onClick={() => handleEdit()} variant='contained'>Save</Button>
+                                    </Stack>
+                                    :
+                                    <Typography>{p}</Typography>
+                                }
+                            </ListItem>
+                        </Stack>
+                        ))}
+                        {toggleMulti && data.length > 0 &&
+                            data.map((d, i) => (
+                                <Stack sx={{padding: 0.5, margin: 2,border: '1px solid black', borderRadius: '10px'}} direction={'row'} justifyContent={'center'} alignItems={'center'}>
+                                    <Button sx={{marginLeft: 1}} variant='contained' onClick={() => handleDelete(i, 'data')}>
+                                        <i className="fi fi-bs-cross-circle" style={{padding: 5}}></i>
+                                    </Button>
+                                    <Button sx={{marginLeft: 1}} variant='contained' onClick={() => settoggleEdit(i, 'data')}>
+                                        <i className="fi fi-br-pencil" style={{padding: 5}}></i>
+                                    </Button>
+                                    <ListItem key={refreshList}>
+                                        {
+                                            toggleEdit == i 
+                                            ?
+                                            <Stack direction={'row'} width={'100%'}>
+                                                <TextField sx={{width: '100%', marginRight: 2}} value={d.prompt}></TextField>
+                                                <Button onClick={() => handleEdit()} variant='contained'>Save</Button>
+                                            </Stack>
+                                            :
+                                            <Typography>{d.prompt}</Typography>
+                                        }
+                                    </ListItem>
+                                </Stack>
+                            ))
+                        }
+                    </List>
+                    
+                </Stack>
+            </Stack>
+
+
+        </Stack>
+    )
+    
+}
+
 
 const AddPics = ({size}) => {
     const {alertProps, setAlertProps} = useGlobalContext()
@@ -182,7 +398,7 @@ const AddPics = ({size}) => {
     }, [selectedData]); // Only depend on selectedData
 
     return (
-        <Stack width={size.width} height={size.height * 0.50}>
+        <Stack userData='admin panel' width={size.width} height={'60%'}>
             <Typography fontSize={30}>6Pics Controls</Typography>
             <Stack>
                 <Select value={selectedCat} onChange={(e) => setSelectedCat(e.target.value)} sx={{width: '90%'}}>
@@ -291,11 +507,11 @@ const Admin = ({size}) => {
                 <MenuItem value={'21Things'}>21Things</MenuItem>
             </Select>
         </Stack>
-        {selection === '6Pics' ?
+        {selection === '6Pics' &&
             <AddPics size={size}/>
-            :
-            <>
-            </>
+        }
+        {selection === '21Things' &&
+            <AddPrompts /> 
         }
     </Stack>
   );

@@ -21,34 +21,34 @@ const Platform = ({ endpoint, position, dims, text, clickText, triggerObject}) =
   const [hovered, setHovered] = useState(false)
   useCursor(hovered)
 
-  const lightMax = 0.5
-  const lightMin = 0
-  const fieldOpMax = 0.3
-  const fieldOpMin = 1
+  // const lightMax = 0.5
+  // const lightMin = 0
+  // const fieldOpMax = 0.3
+  // const fieldOpMin = 1
 
-  useFrame(() => {
-    if (
-      fadeDir.current === 1 &&
-      platformLight.current &&
-      platform.current &&
-      platformLight.current.intensity < lightMax
-    ) {
-      platformLight.current.intensity = Math.min(platformLight.current.intensity + 0.01, lightMax)
-      platform.current.material.opacity = Math.min(platform.current.material.opacity + 0.01, fieldOpMax)
-      if (platformLight.current.intensity >= lightMax) fadeDir.current = 0
-    }
+  // useFrame(() => {
+  //   if (
+  //     fadeDir.current === 1 &&
+  //     platformLight.current &&
+  //     platform.current &&
+  //     platformLight.current.intensity < lightMax
+  //   ) {
+  //     platformLight.current.intensity = Math.min(platformLight.current.intensity + 0.01, lightMax)
+  //     platform.current.material.opacity = Math.min(platform.current.material.opacity + 0.01, fieldOpMax)
+  //     if (platformLight.current.intensity >= lightMax) fadeDir.current = 0
+  //   }
 
-    if (
-      fadeDir.current === -1 &&
-      platformLight.current &&
-      platform.current &&
-      platformLight.current.intensity > lightMin
-    ) {
-      platformLight.current.intensity = Math.max(platformLight.current.intensity - 0.01, lightMin)
-      platform.current.material.opacity = Math.max(platform.current.material.opacity - 0.01, fieldOpMin)
-      if (platformLight.current.intensity <= lightMin) fadeDir.current = 0
-    }
-  })
+  //   if (
+  //     fadeDir.current === -1 &&
+  //     platformLight.current &&
+  //     platform.current &&
+  //     platformLight.current.intensity > lightMin
+  //   ) {
+  //     platformLight.current.intensity = Math.max(platformLight.current.intensity - 0.01, lightMin)
+  //     platform.current.material.opacity = Math.max(platform.current.material.opacity - 0.01, fieldOpMin)
+  //     if (platformLight.current.intensity <= lightMin) fadeDir.current = 0
+  //   }
+  // })
 
   return (
     <>
@@ -61,6 +61,7 @@ const Platform = ({ endpoint, position, dims, text, clickText, triggerObject}) =
       if (!hasTriggeredRef.current && other.rigidBody.userData === triggerObject) {
           hasTriggeredRef.current = true
           fadeDir.current = 1
+          console.log('collision')
           setShowButton(true)
         }
     }}
@@ -73,7 +74,7 @@ const Platform = ({ endpoint, position, dims, text, clickText, triggerObject}) =
   {/* Collider acts as trigger */}
   <CuboidCollider
     args={[dims[0] / 2, 0.01, dims[2] / 2]}
-    position={[position[0], position[1]+0.05, position[2]]}
+    position={[position[0], position[1]+0.1, position[2]]}
     />
 
   {/* Visuals */}
@@ -92,12 +93,6 @@ const Platform = ({ endpoint, position, dims, text, clickText, triggerObject}) =
       prelit
       />
 
-    <pointLight
-      position={[0, 1, 0]}
-      ref={platformLight}
-      intensity={0}
-      color="white"
-      />
 {showButton && (
         <Billboard position={[0,-5,0]} >
             <Html rotation={[degrees(0), degrees(90), degrees(90)]}>

@@ -1,178 +1,123 @@
-import { RigidBody, useRapier } from '@react-three/rapier'
+import { CuboidCollider, RigidBody, useRapier } from '@react-three/rapier'
 import { useEffect, useRef, useState } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useThree } from '@react-three/fiber'
-import { Billboard, Html, SpotLight } from '@react-three/drei'
 import { SpotLightHelper } from 'three'
 import { useHelper } from '@react-three/drei'
 import RobotModel from './RobotModel'
 import * as THREE from 'three'
 import HomePageText from './HomePageText'
-import CameraFollow from './CameraController'
+import CameraFollow from './CameraController' 
 import Platform from './Platform'
 import AcronymScene from './AcronymScene'
 import { interactionGroups } from '@react-three/rapier'
-
-
-
+import { useTexture } from '@react-three/drei'
+import { Environment } from '@react-three/drei'
+import { Lightformer } from '@react-three/drei'
+import HoloLink from './HoloLink'
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
-const Ball = ({ bodyRef }) => {
-    const speed = 0.1
-  
-    const keys = useRef({
-      ArrowUp: false,
-      ArrowDown: false,
-      ArrowLeft: false,
-      ArrowRight: false,
-    })
-  
-    useEffect(() => {
-      const down = (e) => (keys.current[e.code] = true)
-      const up = (e) => (keys.current[e.code] = false)
-      window.addEventListener('keydown', down)
-      window.addEventListener('keyup', up)
-      return () => {
-        window.removeEventListener('keydown', down)
-        window.removeEventListener('keyup', up)
-      }
-    }, [])
-  
-    useFrame(() => {
-      if (!bodyRef.current) return
-  
-      const impulse = new THREE.Vector3()
-  
-      if (keys.current['ArrowUp']) impulse.z -= speed
-      if (keys.current['ArrowDown']) impulse.z += speed
-      if (keys.current['ArrowLeft']) impulse.x -= speed
-      if (keys.current['ArrowRight']) impulse.x += speed
-  
-      if (impulse.lengthSq() > 0) {
-        bodyRef.current.applyImpulse(impulse, true)
-      }
-    })
-  
-    return (
-        <>
-      <RigidBody
-        ref={bodyRef}
-        colliders="ball"
-        type="dynamic"
-        restitution={0.5}
-        friction={0.1}
-        linearDamping={1.5} 
-        angularDamping={1.5}
-        mass={100000000}
-        enabledRotations={[false, false, false]} 
-      >
-        <mesh position={[0, 1, 0]} castShadow receiveShadow>
-          <pointLight castShadow intensity={3} distance={10} color={'blue'}/>
-          <ambientLight intensity={0.02}/>
-          <sphereGeometry args={[0.5, 32, 32]} />
-          <meshStandardMaterial color="deepskyblue" transparent={false} opacity={0.8} metalness={1} roughness={0.1}/>
-        </mesh>
-      </RigidBody>
-        </>
-    )
-  }
 
   const BallLandscape = ({joystickData}) => {
     const ballRef = useRef()
-    const spotLightRef = useRef()
-    const targetRef = useRef()
+    const letters = useRef()
     const { scene } = useThree()
     const [showRobot, setShowRobot] = useState(true)
-    
-
-    const spotlightRef1 = useRef()
-    const spotlightRef2 = useRef()
+    const [turnAround, setTurnAround] = useState(true)
+  
   
     // useHelper(spotlightRef, SpotLightHelper, 'teal')
 
-    useEffect(() => {
-        if (spotlightRef1.current && targetRef.current) {
-            spotlightRef1.current.target = targetRef.current
-            spotlightRef2.current.target = targetRef.current
-          scene.add(targetRef.current)
+    const textures = useTexture({
+      map: '/ground_texture/BaseColor.jpg',
+      aoMap: '/ground_texture/AmbientOcclusion.jpg',
+      displacementMap: '/ground_texture/Displacement.png',
+      metalnessMap: '/ground_texture/Metallic.png',
+      normalMap: '/ground_texture/Normal.png',
+      roughnessMap: '/ground_texture/Roughness.png',
+    })
+
+    if (textures.map && textures.normalMap && textures.roughnessMap){   
+        Object.values(textures).forEach((tex) => {
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping
+            tex.repeat.set(300,300)
+            tex.anisotropy =16
+        })
+    }
+
+      useEffect(() =>{
+        if(letters.current){
+          const intervalId = setInterval(() => {
+            // setShowRobot(true)
+          }, 2000)
+        
+          return () => clearInterval(intervalId)
         }
-      }, [scene])
+      }, [letters])
   
     return (
       <>
-        <SpotLight
-            ref={spotlightRef1}
-            position={[40,200,0]}
-            angle={degrees(280)}
-            penumbra={0.75}
-            intensity={50}
-            distance={220}
-            castShadow
-            color={'skyBlue'}
-            target={targetRef.current}
-        />
-        <SpotLight
-            ref={spotlightRef2}
-            position={[-40,200,0]}
-            angle={degrees(280)}
-            penumbra={0.75}
-            intensity={50}
-            distance={220}
-            castShadow
-            color={'purple'}
-            target={targetRef.current}
-        />
 
-        <SpotLight
-            ref={spotlightRef2}
-            position={[0,200,40]}
-            angle={degrees(280)}
-            penumbra={0.75}
-            intensity={50}
-            distance={220}
-            castShadow
-            color={'white'}
-            target={targetRef.current}
-        />
-
-        <object3D ref={targetRef} position={[0,2,0]}>
-        </object3D>
-
+      <group ref={letters}>
         <group scale={2} position={[-1.5, 1, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]}/>
         </group>
-
+        
         <group scale={1} position={[-1.8, 1, -3]}>
-          <HomePageText text={'Theory®'} thickness={0.4} type={'dynamic'} pos={[-1.8, 1, -3]}/>
+          <HomePageText text={'Theory'} thickness={0.4} type={'dynamic'} pos={[-1.8, 1, -3]}/>
         </group>
-
+        
         <group scale={2} position={[-7, 1, -25]}>
           <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'} pos={[-7, 1, -25]}/>
         </group>
+      </group>
+
+      <group position={[-8,0,0]}>
+        <HoloLink />
+      </group>
   
         {showRobot && 
         <>
-            <RobotModel bodyRef={ballRef} joystick={joystickData}/>
-            <CameraFollow targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} /> 
+            <RobotModel bodyRef={ballRef} joystick={joystickData} setTurnAround={setTurnAround} turnAround={turnAround} />
+            {/* <CameraFollow turnAround={turnAround} setTurnAround={setTurnAround} targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} />  */}
         </>
         }
 
-        <AcronymScene />
+        {/* <AcronymScene /> */}
   
+
         <RigidBody userData='floor-plane' type="fixed" colliders='cuboid' collisionGroups={interactionGroups([3], [0,1,2])}>
           <mesh receiveShadow position={[0, -1, 0]}>
-            <boxGeometry args={[1000, 1, 1000]} />
-            <meshStandardMaterial color="grey" />
+            <boxGeometry args={[500, 1, 500]} />
+            <meshStandardMaterial {...textures} metalness={1.5} roughness={1.1}/>
           </mesh>
+          <CuboidCollider args={[500, 1, 500]} position={[0, -1, 0]}/>
         </RigidBody>
 
 
-        <Platform position={[0, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'}/>
+        <Platform position={[0, -0.12, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'}/>
         
-        
-        <Platform position={[20, -0.53, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'}/>
-      </>
+        <Platform position={[20, -0.1, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'}/>
+
+        <Environment 
+          resolution={720} 
+          preset={null}
+          background={true}
+          backgroundBlurriness={0}
+          backgroundIntensity={0.1}
+          backgroundRotation={[degrees(0), degrees(-180), degrees(0)]}
+          environmentIntensity={0.2}
+          environmentRotation={[0, degrees(0), 0]}
+          files={'/puresky.hdr'}
+          >
+        <Lightformer  form="ring" color="rebeccapurple"  intensity={900} rotation-x={Math.PI / 2} position={[0, 10, 0]} scale={[10, 1, 1]} />
+        <Lightformer  form="ring" color="limeGreen"  intensity={100} rotation-z={degrees(45)} position={[0, 10, 0]} scale={[9, 1, 1]} />
+        <Lightformer form="ring" color="deepSkyBlue" intensity={80} rotation-z={degrees(-90)} position={[5, 10, 0]} scale={[10, 1, 1]} />
+        <Lightformer form="ring" color="hotPink" intensity={300} rotation-y={-Math.PI / 2} position={[0, 30, 30]} scale={[100, 2, 1]} />
+        <Lightformer form="ring" color="red" intensity={10} scale={5} position={[0, 8, 0]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+      </Environment>
+      </> 
     )
   }
 

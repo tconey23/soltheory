@@ -32,13 +32,15 @@ const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedO
     }
 
     const menuList = (
-        <List>
-            {menuOptions.map((opt, i) => (
-                <ListItem key={i}>
-                    <Button variant={selectedOption === opt ? 'contained' : ''} onClick={() => handleOption(opt)}>{opt}</Button>
-                </ListItem>
-            ))}
-        </List>
+        <Stack>
+            <List>
+                {menuOptions.map((opt, i) => (
+                    <ListItem key={i}>
+                        <Button variant={selectedOption === opt ? 'contained' : ''} onClick={() => handleOption(opt)}>{opt}</Button>
+                    </ListItem>
+                ))}
+            </List>
+        </Stack>
     )
 
     return (
@@ -73,7 +75,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     }, [selectedOption])
 
     return (
-        <Stack direction={'column'} sx={{ height: '89%', width: '100vw' }}>
+        <Stack userData='gamePage 1' direction={'column'} sx={{ height: '80vh', width: '90vw' }}>
             <GameMenu 
                 toggleMenu={toggleMenu} 
                 setToggleMenu={setToggleMenu} 
@@ -81,18 +83,20 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                 setSelectedOption={setSelectedOption} 
                 user={user}
             />
-            <Stack direction={'row'} padding={2} height={'80%'}>
-                <Stack>
+
+            <Stack userData='gamePage 2' direction={'row'} padding={2} height={'100%'}>
+                <Stack userData='gamePage 3' >
                     <Box>
                         <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>
                     </Box>
                 </Stack>
-                <Stack width={'90%'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack userData='gamePage 4' width={'90%'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
                     {Game && selectedOption !== 'Account'
                         ? <Game selectedGame={selectedGame} user={user} /> 
                         :<>
-                            <SolGamesLogo />
-                            <List>
+                            {/* <SolGamesLogo /> */}
+                            <Stack userData='gamePage 5' height={'80%'} justifyContent={'center'} alignItems={'center'}>
+                            <List userData='gamePage list 1'>
                                 <ListItem
                                 sx={{
                                     transition: 'all 0.25s ease-in-out',
@@ -102,8 +106,8 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                                         borderRadius: 20,
                                         scale: 1.05
                                     }
-                                    }}>
-                                    <Stack onClick={() => nav('/21things')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
+                                }}>
+                                    <Stack userData='gamePage 6' onClick={() => nav('/21things')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
                                         <Hexagon dims={100}/>
                                         <Typography fontSize={50} fontFamily={font}>21Things</Typography>
                                     </Stack>
@@ -116,20 +120,22 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                                         borderRadius: 20,
                                         scale: 1.05
                                     }
-                                    }}>
-                                    <Stack onClick={() => nav('/6pics')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
+                                }}>
+                                    <Stack userData='gamePage 7' onClick={() => nav('/6pics')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
                                         <SixPics dims={100}/>
                                         <Typography fontSize={50} fontFamily={font}>6Pics</Typography>
                                     </Stack>
                                 </ListItem>
                             </List>
+                            </Stack>
                         </> 
                     }
                 </Stack>
-                <Stack width={'8%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack userData='gamePage 8' width={'8%'} justifyContent={'center'} alignItems={'center'}>
                     <Friends />
                 </Stack>
             </Stack>
+
             {selectedOption === "Account" && 
                 <Modal
                     open={selectedOption==='Account'}

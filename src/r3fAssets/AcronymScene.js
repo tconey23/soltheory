@@ -129,66 +129,7 @@ const AcronymScene = () => {
             castShadow
         /> 
 
-        <group  position={[0,0,-25.5]}>  
-        <RigidBody type="fixed" colliders={false}>
-          <CuboidCollider
-            ref={forceField}
-            args={[25, 5, 0.5]}
-            collisionGroups={interactionGroups([2], [0])}
-          />
-          <mesh>
-            <boxGeometry args={[50, 10, 1]} />
-            <meshStandardMaterial color="white" transparent opacity={0} />
-          </mesh>
-        </RigidBody>
-        </group>
-
-        <group position={[-25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
-          <RigidBody
-            position={[0,0,0]}
-            type="fixed"
-            colliders='cuboid'
-            collisionGroups={interactionGroups([2], [0])}
-            restitution={5}
-            onCollisionEnter={({ target, other }) => {
-              setCollDet(true)
-            }}
-            >
-            <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[50,10,1]} />
-              <meshStandardMaterial color={'white'} transparent opacity={0}/>
-            </mesh>
-          </RigidBody>
-        </group>
-
-        <group position={[25.5,0,0]} rotation={[degrees(0), degrees(90), degrees(0)]}>
-          <RigidBody
-            position={[0,0,0]}
-            type="fixed"
-            colliders='cuboid'
-            collisionGroups={interactionGroups([2], [0])}
-            restitution={5}
-            onCollisionEnter={({ target, other }) => {
-              setCollDet(true)
-            }}
-            >
-            <mesh position={[0, 0, 0]}>
-              <boxGeometry args={[50,10,1]} />
-              <meshStandardMaterial color={'white'} transparent opacity={0}/>
-            </mesh>
-          </RigidBody>
-        </group>
-
-
-          <RigidBody
-            type="fixed"
-            colliders={false}
-          >
-            <mesh ref={model} position={[0, 0, 0]}>
-                <boxGeometry args={[50,50,50]} />
-                <forceFieldMaterial ref={matRef} transparent side={THREE.DoubleSide} />
-            </mesh>
-        </RigidBody>
+  
         <group>
             {letterStacks && letterStacks}
         </group>
