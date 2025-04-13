@@ -1,7 +1,7 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { Physics } from '@react-three/rapier'
 import React from 'react'
 import HomePageText from './r3fAssets/HomePageText'
@@ -13,6 +13,7 @@ import { Debug } from '@react-three/rapier'
 import { PerspectiveCamera } from '@react-three/drei'
 import { useDetectGPU } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
+import CanvasLoading from './r3fAssets/CanvasLoading'
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
@@ -55,6 +56,7 @@ const HomePageCanvas = () => {
   return (
   <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
       <Canvas shadows style={{height: '100%', background: 'black'}}>
+          
           <OrbitControls enableZoom={true} enablePan={true}/>
           <Physics gravity={[0, -9.81, 0]}>
             {/* <Debug/> */}
@@ -69,7 +71,7 @@ const HomePageCanvas = () => {
             stickColor="skyblue"
             move={handleJoystickMove}
             stop={handleJoystickEnd}
-          />
+            />
   </div>
   )
 }
