@@ -80,22 +80,19 @@ const BallLandscape = memo(({ joystickData }) => {
 
       <RigidBody type="fixed" colliders="cuboid" collisionGroups={interactionGroups([3], [0, 1, 2])}>
         <mesh receiveShadow position={[0, -1, 0]}>
-          <boxGeometry args={[500, 1, 500]} />
+          <boxGeometry args={[30, 1, 30]} />
           <meshStandardMaterial {...textures} metalness={1.5} roughness={1.1} />
         </mesh>
-        <CuboidCollider args={[500, 1, 500]} position={[0, -1, 0]} />
+        <CuboidCollider args={[30, 1, 30]} position={[0, -1, 0]} />
       </RigidBody>
 
       {/* Text groups */}
       <group>
-        <group scale={2} position={[-1.5, 1, -5]}>
+        <group scale={6} position={[-8, 2, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]} />
         </group>
-        <group scale={1} position={[-1.8, 1, -3]}>
+        <group scale={3} position={[-8, 3, -2]}>
           <HomePageText text={'Theory'} thickness={0.4} type={'dynamic'} pos={[-1.8, 1, -3]} />
-        </group>
-        <group scale={2} position={[-7, 1, -25]}>
-          <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'} pos={[-7, 1, -25]} />
         </group>
       </group>
 
@@ -107,13 +104,12 @@ const BallLandscape = memo(({ joystickData }) => {
         </>
       )}
 
-      {/* Platforms */}
-      {showPlatforms && (
+      {/* {showPlatforms && (
         <group>
           <Platform position={[0, -0.12, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'} />
           <Platform position={[20, -0.1, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'} />
         </group>
-      )}
+      )} */}
 
       {/* Environment */}
       {showEnvironment && (

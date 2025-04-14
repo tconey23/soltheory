@@ -1,4 +1,4 @@
-import { SpotLight, useGLTF } from '@react-three/drei'
+import { useGLTF } from '@react-three/drei'
 import { useEffect, useRef, useState } from 'react'
 import { RigidBody } from '@react-three/rapier'
 import { useFrame, useThree } from '@react-three/fiber'
@@ -8,29 +8,10 @@ import { interactionGroups } from '@react-three/rapier'
 import { useAnimations } from '@react-three/drei'
 import { Billboard, Html } from '@react-three/drei'
 import { Stack } from '@mui/system'
-import { Select } from '@mui/material'
-import { MenuItem } from '@mui/material'
 import { useCursor } from '@react-three/drei'
-import { useHelper } from '@react-three/drei'
-import { SpotLightHelper } from 'three'
-
+import SpeechBubble from './SpeechBubble'
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
-
-const RobotOptions = () => {
-  const [menuOptions, setMenuOptions] = useState([
-    'Flashlight Color',
-    'Face Color'
-  ])
-
-  return (
-
-      <Stack width={200} height={200} sx={{background: '#ffffff29', scale: 0.5}} padding={2}>
-        
-      </Stack>
-
-  )
-}
 
 
 const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) => {
@@ -66,8 +47,6 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
 
   const [currentAnim, setCurrentAnim] = useState(null)
 
-// useHelper(robotLight, SpotLightHelper, 'teal')
-
   const keys = useRef({
     ArrowUp: false,
     ArrowDown: false,
@@ -79,12 +58,6 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
 
   const maxHeight = 5
   const maxTilt = 10
-
-  mixer._actions.forEach((action) => {
-    if (action.isRunning()) {
-      // console.log(`→ ${action._clip.name}`)
-    }
-  })
 
   const playAnimation = (name, loop = THREE.LoopRepeat, clamp = false) => {
     Object.values(actions).forEach((action) => {
@@ -242,6 +215,12 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
         return () => clearInterval(intervalId)
     }
   }, [bored])
+
+  useEffect(() => {
+    setTimeout(() => {
+      setToggleOptions(true)
+    }, 2000);
+  }, [])
   
 
   const spotlight = spotTarget.current
@@ -346,33 +325,14 @@ useFrame(() => {
     }
   }
 
-  // --- SPOTLIGHT POSITIONING ---
-  // Ensure targets are in the scene
   if (menuLight.current && !r3fScene.children.includes(menuLight.current.target)) {
     r3fScene.add(menuLight.current.target)
   }
 
-  // if (menuLightTarget.current) {
-  //   const targetPos = new THREE.Vector3()
-  //   menuLightTarget.current.getWorldPosition(targetPos)
-  //   menuLight.current.target.position.copy(targetPos)
-  // }
-
-  // if (robotLight.current && robotLight.current.target && !r3fScene.children.includes(robotLight.current.target)) {
-  //   r3fScene.add(robotLight.current.target)
-  // }
-
-  // Position robot spotlight above robot and update target
   robotLightGroup.current.position.set(pos.x, pos.y + 30, pos.z)
   robotLight.current.target.position.set(pos.x, pos.y + 1.5, pos.z)
 })
-
   
-  // useEffect(() => {
-  //   console.log(toggleOptions)
-  // }, [toggleOptions])
-  
-
   return (
     <>
         <group ref={robotLightGroup}>
@@ -415,13 +375,16 @@ useFrame(() => {
             <object3D ref={menuLightTarget} position={[0,5,0]}>
             </object3D>
               <mesh>
-                <Html
-                  transform
-                  position={[0, 0, 0]} // Relative to mesh center
-                  center
+                <Billboard>
+                  <Html
+                    scale={0.75}
+                    transform
+                    position={[-1, 1, 0]} // Relative to mesh center
+                    center
                   >
-                  <RobotOptions />
+                   <SpeechBubble setToggleOptions={setToggleOptions}/> 
                   </Html>
+                </Billboard>
                 <boxGeometry args={[3,3,0.01]}/>
                 <meshStandardMaterial color={'white'} transparent opacity={0.3} roughness={2} side={THREE.DoubleSide}/>
               </mesh>
