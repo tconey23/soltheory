@@ -9,19 +9,51 @@ const degrees = (degrees) => degrees * (Math.PI / 180)
 const Character = ({ ch, x, thickness, col }) => {
   const [font] = useState("/fonts/Fredoka_Regular.json");
   const letter = useRef();
+  const [rest, setRest] = useState(true)
+  const { world } = useRapier()
+  const [colliders, setColliders] = useState([])
 
+  const [refresh, setRefresh] = useState(0)
+
+
+  useEffect(() => {
+    if (!rest || !letter.current) return
+  
+    const bodyHandle = letter.current.handle
+  
+    world.forEachCollider((collider) => {
+      const parent = collider.parent()
+      const foundCollider = colliders.findIndex((c) => c.handle == parent.handle)
+      if(foundCollider < 0){
+        setColliders(prev => ([
+          ...prev, 
+          parent
+        ]))
+      }
+      if (parent === bodyHandle) {
+        collider.setRestitution(1.0)
+        console.log(`✔ Restitution set for Letter-${ch} on collider with parent:`, parent)
+      }
+    })
+  }, [colliders, rest, refresh])
+
+  useEffect(() => {
+    console.log(colliders)
+  }, [colliders])
 
 
   return (
     <RigidBody
       ref={letter}
-      userData={`Letter ${ch}`}
+      userData={{ tag: `Letter-${ch}` }}
       colliders="cuboid"
       restitution={0.3}
       friction={1}
       mass={1}
       angularDamping={0.1}
-      linearDamping={0.1}
+      linearDamping={0.5}
+      enabledRotations={[false, false, false]}
+      onCollisionEnter={() => setRest(true)}
     >
       <mesh castShadow receiveShadow>
         <Text3D

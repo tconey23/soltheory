@@ -18,7 +18,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
 
   useGLTF.preload('/AnimatedRobot.glb')
 
- let debugSpeed = 300
+ let debugSpeed = 500
 
  const groupRef = useRef()
  const { scene, animations } = useGLTF('/AnimatedRobot.glb')
@@ -27,7 +27,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
   const [robot, setRobot] = useState([])
   const [speed, setSpeed] = useState(debugSpeed)
   const [sprinting, setSprinting] = useState(false)
-  const [sprintMult, setSprintMult] = useState(2)
+  const [sprintMult, setSprintMult] = useState(3)
   const [addBip, setAddBip] = useState(false)
   const [bored, setBored] = useState(false)
   const spotTarget = useRef()
@@ -107,7 +107,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
 
           node.add(target)
 
-          const spotlight = new THREE.SpotLight('deepSkyBlue', 2, 10000, degrees(45), 0.8);
+          const spotlight = new THREE.SpotLight('deepSkyBlue', 50, 100, degrees(45), 2);
           const pointLight = new THREE.PointLight('deepSkyBlue', 0.1, 30, 70)
           targetDebug.position.copy(scene.position).add(new THREE.Vector3(0, 20, 0))
           pointLight.position.copy(scene.position).add(new THREE.Vector3(0, 20, 8))
@@ -117,7 +117,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
           spotlight.target = target; // Make the spotlight point at the mesh
           spotlight.castShadow = true;
           pointLight.castShadow = true;
-          scene.castShadow = false
+          scene.castShadow = true
 
           spotlight.userData = 'SpotLight'
           pointLight.userData = 'PointLight'
@@ -136,12 +136,10 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
           node.material.roughness = 0
           node.material.envMapIntensity = 1.5
           node.material.metalness = 0
-
-          console.log(node.material)
           
           // Replace or add debug mesh
           if (existingDebug) scene.remove(existingDebug)
-          scene.add(targetDebug)
+          // scene.add(targetDebug)
           
           // Replace or add point light
           if (existingPoint) scene.remove(existingPoint)
@@ -179,7 +177,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
   }, [robot, groupRef])
 
   useEffect(() =>{
-    if(addBip){
+    if(addBip && actions){
       setTimeout(() => {
         actions[animWaving]
           .reset()
@@ -219,7 +217,7 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
   useEffect(() => {
     setTimeout(() => {
       setToggleOptions(true)
-    }, 2000);
+    }, 3000);
   }, [])
   
 
