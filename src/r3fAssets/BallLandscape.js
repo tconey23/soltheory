@@ -1,23 +1,28 @@
 // File: src/scenes/BallLandscapeOptimized.js
-import { memo, Suspense, useEffect, useRef } from 'react'
+import { memo, Suspense, useEffect, useRef, useMemo, useState } from 'react'
 import { useThree } from '@react-three/fiber'
 import { useTexture, Environment, Lightformer, useProgress } from '@react-three/drei'
 import { RigidBody, CuboidCollider, interactionGroups } from '@react-three/rapier'
 import * as THREE from 'three'
 import RobotModel from './RobotModel'
 import CameraFollow from './CameraController'
-import Platform from './Platform'
 import HomePageText from './HomePageText'
 import { create } from 'zustand'
 import CanvasLoading from './CanvasLoading'
+import HoloLink from './HoloLink'
+import { useGlobalContext } from '../business/GlobalContext'
+import GroundPlane from './GroundPlane'
+import { PointerLockControls } from '@react-three/drei'
 
 const useUIStore = create((set) => ({
   isLoading: true,
   showRobot: false,
-  turnAround: true,
+  turnAround: false,
   showEnvironment: false,
   showPlatforms: false,
+  showGround: false,
 
+  setShowGround: (val) => set({ showGround: val }),
   setIsLoading: (val) => set({ isLoading: val }),
   setShowRobot: (val) => set({ showRobot: val }),
   setTurnAround: (val) => set({ turnAround: val }),
@@ -28,14 +33,29 @@ const useUIStore = create((set) => ({
 const degrees = (d) => d * (Math.PI / 180)
 
 const BallLandscape = memo(({ joystickData }) => {
+  const {isMobile} = useGlobalContext()
   const { scene } = useThree()
   const ballRef = useRef()
+  const teleport = useRef()
+  const controlsRef = useRef()
+
+  const [showTeleport, setShowTeleport] = useState(false)
+  const [teleportHeight, setTeleportHeight] = useState(-6)
+  const [toggleMouseLook, setToggleMouseLook] = useState(false)
+
+  useEffect(() => {
+    if(teleport.current){
+
+    }
+  }, [teleport])
 
   // Zustand state
   const {
     isLoading,
     setIsLoading,
     showRobot,
+    showGround, 
+    setShowGround,
     setShowRobot,
     turnAround,
     setTurnAround,
@@ -46,25 +66,11 @@ const BallLandscape = memo(({ joystickData }) => {
   } = useUIStore()
 
   // Load textures
-  const textures = useTexture({
-    map: '/ground_texture/BaseColor.jpg',
-    aoMap: '/ground_texture/AmbientOcclusion.jpg',
-    displacementMap: '/ground_texture/Displacement.png',
-    metalnessMap: '/ground_texture/Metallic.png',
-    normalMap: '/ground_texture/Normal.png',
-    roughnessMap: '/ground_texture/Roughness.png',
-  })
 
-  useEffect(() => {
-    Object.values(textures).forEach((tex) => {
-      tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-      tex.repeat.set(300, 300)
-      tex.anisotropy = 16
-    })
-  }, [textures])
 
   // Trigger scene ready state
   useEffect(() => {
+    setShowGround(true)
     const timeout = setTimeout(() => {
       setIsLoading(false)
       setShowRobot(true)
@@ -75,65 +81,93 @@ const BallLandscape = memo(({ joystickData }) => {
     return () => clearTimeout(timeout)
   }, [])
 
+
+
   return (
     <Suspense fallback={<CanvasLoading />}>
+      {!isMobile && <PointerLockControls />}
 
-      <RigidBody type="fixed" colliders="cuboid" collisionGroups={interactionGroups([3], [0, 1, 2])}>
-        <mesh receiveShadow position={[0, -1, 0]}>
-          <boxGeometry args={[500, 1, 500]} />
-          <meshStandardMaterial {...textures} metalness={1.5} roughness={1.1} />
-        </mesh>
-        <CuboidCollider args={[500, 1, 500]} position={[0, -1, 0]} />
-      </RigidBody>
-
-      {/* Text groups */}
-      <group>
-        <group scale={2} position={[-1.5, 1, -5]}>
+      <group position={[0,0,-7.5]} >
+        <group scale={6} position={[-8, 2, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]} />
         </group>
-        <group scale={1} position={[-1.8, 1, -3]}>
+        <group scale={3} position={[-8, 3, -2]}>
           <HomePageText text={'Theory'} thickness={0.4} type={'dynamic'} pos={[-1.8, 1, -3]} />
-        </group>
-        <group scale={2} position={[-7, 1, -25]}>
-          <HomePageText text={'Find UR Better'} thickness={0.5} type={'dynamic'} charOffset={0.82} col={'white'} pos={[-7, 1, -25]} />
         </group>
       </group>
 
-      {/* Conditional Robot & Camera */}
+      {showGround && (
+        <GroundPlane />
+      )
+      
+      }
+
       {showRobot && (
         <>
-          <RobotModel bodyRef={ballRef} joystick={joystickData} setTurnAround={setTurnAround} turnAround={turnAround} />
-          <CameraFollow turnAround={turnAround} setTurnAround={setTurnAround} targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} />
+          <RobotModel
+            bodyRef={ballRef}
+            joystick={joystickData}
+            setTurnAround={setTurnAround}
+            turnAround={turnAround}
+            controlsRef={controlsRef}
+          />
+
+          <CameraFollow
+            turnAround={turnAround}
+            setTurnAround={setTurnAround}
+            targetRef={ballRef}
+            setControlsRef={(ref) => {
+              controlsRef.current = ref.current
+            }}
+          />
         </>
       )}
 
-      {/* Platforms */}
-      {showPlatforms && (
-        <group>
-          <Platform position={[0, -0.12, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'Games'} endpoint={'/games'} clickText={'See Games'} triggerObject={'robot-mesh'} />
-          <Platform position={[20, -0.1, -30]} fieldDims={[4.8, 5, 4.8]} dims={[5, 0.08, 5]} bevelRadius={0.1} bevelSmoothness={8} text={'ESC'} endpoint={'/esc'} clickText={'See ESCs'} triggerObject={'robot-mesh'} />
-        </group>
-      )}
 
-      {/* Environment */}
+      
+        <group ref={teleport} position={[5,6,0]} >
+          <HoloLink teleport={teleport} setShowTeleport={setShowTeleport} showTeleport={showTeleport} teleportHeight={teleportHeight} setTeleportHeight={setTeleportHeight} />
+        </group>
+
+      <group  rotation={[degrees(4.5), degrees(0), degrees(0)]} >
+        <RigidBody
+             type='fixed' 
+             colliders={false}
+             position={[-16,0,-28]}
+             >
+                <CuboidCollider
+                 args={[4,1,4]} 
+                 position={[16,0,0]}
+                 onIntersectionEnter={() => setShowTeleport(true)}
+                //  onIntersectionExit={() => setShowTeleport(false)}
+                 sensor
+                />
+            </RigidBody>
+      </group>
+
       {showEnvironment && (
+        <>
         <Environment
+        shadows
+        castShadow
+        receiveShadow
         resolution={720}
         preset={null}
         background
         backgroundBlurriness={0}
         backgroundIntensity={0.1}
-        backgroundRotation={[degrees(0), degrees(-180), degrees(0)]}
-        environmentIntensity={0.2}
+        backgroundRotation={[degrees(0), degrees(-250), degrees(0)]}
+        environmentIntensity={0.08}
         environmentRotation={[0, degrees(0), 0]}
         files={'/puresky.hdr'}
         >
-          <Lightformer form="ring" color="rebeccapurple" intensity={900} rotation-x={Math.PI / 2} position={[0, 10, 0]} scale={[10, 1, 1]} />
+          <Lightformer form="ring" color="rebeccapurple" intensity={100} rotation-x={Math.PI / 2} position={[0, 10, 0]} scale={[10, 1, 1]} />
           <Lightformer form="ring" color="limeGreen" intensity={100} rotation-z={degrees(45)} position={[0, 10, 0]} scale={[9, 1, 1]} />
           <Lightformer form="ring" color="deepSkyBlue" intensity={80} rotation-z={degrees(-90)} position={[5, 10, 0]} scale={[10, 1, 1]} />
-          <Lightformer form="ring" color="hotPink" intensity={300} rotation-y={-Math.PI / 2} position={[0, 30, 30]} scale={[100, 2, 1]} />
-          <Lightformer form="ring" color="red" intensity={10} scale={5} position={[0, 8, 0]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
+          <Lightformer form="ring" color="hotPink" intensity={75} rotation-y={-Math.PI / 2} position={[0, 30, 30]} scale={[100, 2, 1]} />
+          <Lightformer form="ring" color="red" intensity={5} scale={5} position={[0, 8, 0]} onUpdate={(self) => self.lookAt(0, 0, 0)} />
         </Environment>
+          </>
       )}
       </Suspense>
   )

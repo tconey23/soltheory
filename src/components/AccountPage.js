@@ -24,6 +24,8 @@ const AccountPage = ({user, handleLogout, size}) => {
 useEffect(() => {
     if(user && user.email){
         checkAdminAccess(user.email)
+    } else {
+        handleLogout()
     }
     console.log(user)
 }, [user])

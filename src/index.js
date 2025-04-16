@@ -5,6 +5,8 @@ import './index.css';
 import App from './App';
 import { GlobalProvider } from './business/GlobalContext';
 
+import * as serviceWorkerRegistration from './serviceWorkerRegistration';
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <GlobalProvider>
@@ -13,3 +15,6 @@ root.render(
         </BrowserRouter>
     </GlobalProvider>
 );
+
+// Register service worker for PWA
+serviceWorkerRegistration.register();

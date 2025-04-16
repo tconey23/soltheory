@@ -1,43 +1,29 @@
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
-import { useState, useRef, useEffect, Suspense } from 'react'
-import { Physics } from '@react-three/rapier'
+import { useState, useEffect} from 'react'
+import { Physics, TrimeshCollider } from '@react-three/rapier'
 import React from 'react'
-import HomePageText from './r3fAssets/HomePageText'
 import { useMediaQuery } from '@mui/material'
 import BallLandscape from './r3fAssets/BallLandscape'
 import JoystickWrapper from './r3fAssets/Joystick'
-import { Stack } from '@mui/system'
-import { Debug } from '@react-three/rapier'
-import { PerspectiveCamera } from '@react-three/drei'
 import { useDetectGPU } from '@react-three/drei'
-import { useThree } from '@react-three/fiber'
+
+import { useGlobalContext } from './business/GlobalContext'
+import { PerspectiveCamera } from '@react-three/drei'
 import CanvasLoading from './r3fAssets/CanvasLoading'
 
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
-const CamControl = () => {
-  const { camera } = useThree()
-
-  useFrame(() => {
-      if(camera){
-          camera.lookAt(-95, 2, 0)
-      }
-  })
-
-  return null
-}
-
 
 const HomePageCanvas = () => {
   const degrees = (degrees) => degrees * (Math.PI / 180)
-  const isMobile = useMediaQuery("(max-width:430px)");
+  const {isMobile} = useGlobalContext()
   const [joystickData, setJoystickData] = useState(null)
 
   const GPUTier = useDetectGPU()
 
   // console.log(GPUTier)
+  console.log(isMobile)
 
   const handleJoystickMove = (data) => {
     setJoystickData({
@@ -55,10 +41,9 @@ const HomePageCanvas = () => {
   
   return (
   <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
-      <Canvas shadows style={{height: '100%', background: 'black'}}>
-          
-          <OrbitControls enableZoom={true} enablePan={true}/>
-          <Physics gravity={[0, -9.81, 0]}>
+      <Canvas gl={{ physicallyCorrectLights: true }} shadows style={{height: '100%', background: 'black'}}>
+          <OrbitControls enableZoom={false} enablePan={false}/>
+          <Physics gravity={[0, -20, 0]}>
             {/* <Debug/> */}
             <group rotation={[degrees(0), degrees(180), degrees(0)]} >
               <BallLandscape joystickData={joystickData}/> 
@@ -71,7 +56,7 @@ const HomePageCanvas = () => {
             stickColor="skyblue"
             move={handleJoystickMove}
             stop={handleJoystickEnd}
-            />
+          />
   </div>
   )
 }

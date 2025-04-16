@@ -13,7 +13,7 @@ import { Html } from '@react-three/drei';
 const degrees = (degrees) => degrees * (Math.PI / 180)
 
 const CanvasLoading = ({progress}) => {
-    const {font} = useGlobalContext()
+    const {font, setShowJoystick} = useGlobalContext()
 
     const [currentRotation, setCurrentRotation] = useState(0)
     const [text, setText] = useState('Loading Scene')
@@ -25,7 +25,8 @@ const CanvasLoading = ({progress}) => {
 
     useEffect(() => {
         // console.log(progress)
-    }, [progress])
+        setShowJoystick(false)
+    }, [])
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -43,6 +44,8 @@ const CanvasLoading = ({progress}) => {
         // console.log(currentRotation)
         if(currentRotation >= 360){
             setCurrentRotation(0)
+        } else {
+            setCurrentRotation(180)
         }
     }, [currentRotation])
 
@@ -55,9 +58,9 @@ const CanvasLoading = ({progress}) => {
     <group position={[0,-1,-3]}>
         <directionalLight color={'deepskyblue'} castShadow intensity={30} position={[5,4,0]}/>
         <directionalLight color={'violet'} castShadow intensity={30} position={[-5,4,0]}/>
-        <group ref={robot}>
-            <RobotModel bodyRef={null} joystick={null} pos={[0,0,3.9]} rot={degrees(currentRotation)}/>
-        </group>
+        {/* <group ref={robot}>
+            <RobotModel bodyRef={null} joystick={null} pos={[0,0,3.9]} rot={[0,degrees(180),0]}/>
+        </group> */}
         <group position={[0,-3.5,0]}>
         <Html center transform distanceFactor={10}>
                     {progress && 
