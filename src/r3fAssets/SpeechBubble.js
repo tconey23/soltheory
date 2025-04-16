@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from "react"
 import { Stack, typography } from "@mui/system"
 import { Typography } from "@mui/material"
+import { Html, Billboard } from "@react-three/drei"
 
 const SpeechBubble = ({setToggleOptions}) => {
 
@@ -51,19 +52,29 @@ const SpeechBubble = ({setToggleOptions}) => {
 
 
     return (
-        <Stack position={'absolute'} top={index > -1 ? dynamicPos[index].height2 : 0}>
+        <mesh>
+        <Billboard>
+            <Html
+                scale={0.75}
+                transform
+                position={[-1, 1, 0]} // Relative to mesh center
+                center
+                style={{background: '#ffffff'}}
+                >
+        <Stack position={'absolute'} top={index > -1 ? dynamicPos[index].height2 : 0} sx={{background: '#ffffff00'}}>
             <Stack
+             sx={{background: '#ffffff00'}}
              top={index > 0 ? dynamicPos[index].height : 65} 
              left={15} 
              position={'relative'} 
              width={170} 
-            //  backgroundColor={'green'}
-            >
+             //  backgroundColor={'green'}
+             >
                 <Typography>{currentMessage}</Typography>
             </Stack>
             <svg
             width="200"
-        
+            
             height="150"
             viewBox="0 0 200 150"
             xmlns="http://www.w3.org/2000/svg"
@@ -88,6 +99,9 @@ const SpeechBubble = ({setToggleOptions}) => {
                     />
             </svg>
         </Stack>
+    </Html>
+    </Billboard>
+    </mesh>
     )
 }
 

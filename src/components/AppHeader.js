@@ -1,50 +1,88 @@
-import { useState } from "react";
-import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography } from "@mui/material";
+import { useState, useEffect } from "react";
+import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography, MenuList, ListItem } from "@mui/material";
 import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
 import {useMediaQuery} from "@mui/material";
 import { useGlobalContext } from "../business/GlobalContext";
 import { Stack } from "@mui/material";
+import {Modal} from "@mui/material";
 
 const AppHeader = () => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [anchorElNav, setAnchorElNav] = useState(null);
   const [anchorElUser, setAnchorElUser] = useState(null);
   const [anchorElGames, setAnchorElGames] = useState(null);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(false);
+  const [mobileMenu, setMobileMenu] = useState(false)
   const nav = useNavigate()
 
-  const isMobile = useMediaQuery("(max-width:430px)");
+  const {isMobile} = useGlobalContext()
 
+  
+  useEffect(() => {
+    const checkInstalled = () => {
+      const isStandalone =
+        window.matchMedia('(display-mode: standalone)').matches ||
+        window.navigator.standalone === true;
+
+        console.log(isStandalone)
+
+      setIsInstalled(isStandalone);
+    };
+
+    checkInstalled();
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setIsReady(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handler);
+
+    return () => window.removeEventListener('beforeinstallprompt', handler);
+  }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+
+    if (outcome === 'accepted') {
+      console.log('✅ User accepted the install prompt');
+    } else {
+      console.log('🚫 User dismissed the install prompt');
+    }
+
+    setDeferredPrompt(null);
+    setIsReady(false);
+  };
   const pages = ["SOL Games", "Thrive", "ESC", "Personos", "About"];
-  const solGamesDropdown = ["21 Things", "Pic6"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
   const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
+   isMobile ? setMobileMenu(false) : setMobileMenu(false)
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
 
   // Open and close handlers for "SOL Games" dropdown
   const handleOpenGamesMenu = (event) => {
     // setAnchorElGames(event.currentTarget);
+    handleCloseNavMenu()
     nav('/games')
   };
 
-  const handleCloseGamesMenu = () => {
-    setAnchorElGames(null);
-  };
+  const handleCloseModal = (target) => {
+    if(target.type !== 'button'){
+      setMobileMenu(false)
+    }
+  }
 
   return (
     <Stack height={'10vh'} width={'100vw'}>
@@ -55,29 +93,25 @@ const AppHeader = () => {
             <img height={"75px"} src={solTheoryLogo} alt="Sol Theory Logo" />
           </Link>
 
-          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+          {
+            !isMobile && 
+            <Box sx={{ flexGrow: 1, display: 'flex' }}>
+
             {pages.map((page, i) =>
               page === "SOL Games" ? (
                 <Box key={`${page}${i}`} sx={{ position: "relative" }}>
-                  {
-                    isMobile
-                    ? <Link key={`${page}${i}`} style={{marginLeft: 10}} to={'/games'}>{page}</Link>
-                    : <Button
+                  <Button
                     key={`${page}${i}`}
                     onClick={handleOpenGamesMenu}
                     sx={{ my: 2, color: "white", display: "block", margin: 1}}
                     variant="contained"
                     >
                     {page}
-                  </Button>}
+                  </Button>
                 </Box>
               ) : (
                 <>
-                {isMobile 
-                ? <Link key={i} style={{marginLeft: 10}}>
-                    {page}
-                  </Link>
-                :<Button
+                <Button
                 key={page}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block", margin: 1}}
@@ -85,41 +119,70 @@ const AppHeader = () => {
                 >
                     {page}
                   </Button>
-                }
                 </>
               )
             )}
-          </Box>
 
-          <Box sx={{ flexGrow: 0 }}>
-            <Menu
-              sx={{ mt: "45px" }}
-              id="menu-appbar"
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "right",
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
-              >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu} sx={{ maxWidth: 122 }}>
-                  <Typography sx={{ textAlign: "center", maxWidth: 122, fontSize: 1 }}>
-                    {setting}
-                  </Typography>
-                </MenuItem>
-              ))}
-            </Menu>
+            {!isInstalled && 
+            <Button
+             sx={{ my: 2, color: "white", display: "block", margin: 1}}
+             variant="contained"
+             onClick={handleInstallClick} className="install-button">
+                Install App
+            </Button>}
           </Box>
+          }
+
+          {
+          isMobile && 
+          <>
+            <Stack direction={'row'} width={'100%'} justifyContent={'flex-end'}>  
+              <Button onClick={() => setMobileMenu(prev => !prev)} variant="contained">=</Button>
+            </Stack>
+          </>
+          }
         </Toolbar>
       </Container>
     </AppBar>
+    
+    
+    <Modal
+      open={mobileMenu}
+      onClick={(e) => handleCloseModal(e.target)}
+      userData='MenuModal'
+    >
+              <Stack height={'100%'} width={'100%'} userData='MenuWrapper'>
+                <Stack marginTop={10}>
+                  <MenuList>
+                    {pages.map((page, i) =>
+                      page === "SOL Games" ? (
+                        <ListItem userData='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
+                          <Button
+                            key={`${page}${i}`}
+                            onClick={handleOpenGamesMenu}
+                            sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                            variant="contained"
+                          >
+                            {page}
+                          </Button>
+                        </ListItem>
+                      ) : (
+                        <ListItem userData='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
+                          <Button
+                            key={page}
+                            onClick={handleCloseNavMenu}
+                            sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                            variant="contained"
+                          >
+                            {page}
+                          </Button>
+                      </ListItem>
+                      )
+                    )}
+                  </MenuList>
+                </Stack>
+              </Stack>
+    </Modal>
     </Stack>
   );
 };

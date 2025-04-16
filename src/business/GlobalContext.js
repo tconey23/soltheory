@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useMediaQuery } from '@mui/material'
 
 // Create Context
 const GlobalContext = createContext();
@@ -14,9 +15,17 @@ export const GlobalProvider = ({ children }) => {
   const [returnUrl, setReturnUrl] = useState()
   const [font, setFont] = useState("/fonts/Fredoka_Regular.json")
   const [speed, setSpeed] = useState(4)
+  const isMobile = useMediaQuery("(max-width:430px)")
+  const [showJoystick, setShowJoystick] = useState(true)
+
+  const degrees = (degrees) => degrees * (Math.PI / 180)
+
+  useEffect(() => {
+    // console.log(isMobile)
+  }, [isMobile])
 
   return (
-    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed}}>
+    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees}}>
       {children}
     </GlobalContext.Provider>
   );

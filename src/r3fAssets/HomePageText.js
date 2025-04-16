@@ -38,7 +38,7 @@ const Character = ({ ch, x, thickness, col }) => {
   }, [colliders, rest, refresh])
 
   useEffect(() => {
-    console.log(colliders)
+    // console.log(colliders)
   }, [colliders])
 
 

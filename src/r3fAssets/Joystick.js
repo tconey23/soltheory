@@ -1,20 +1,26 @@
-import React from 'react'
+import React, {useState} from 'react'
 import { Joystick } from 'react-joystick-component'
+import { useGlobalContext } from '../business/GlobalContext'
 
 
 const JoystickWrapper = ({ move, stop }) => {
+
+  const {isMobile, showJoystick} = useGlobalContext()
+
+
   return (
     <div
       style={{
         position: 'absolute',
-        bottom: 100,
-        left: 100,
+        bottom: isMobile ? 150 : 100,
+        left: isMobile ? 50 : 100,
         zIndex: 16579833,
         pointerEvents: 'auto',
       }}
     >
+      {showJoystick && 
       <Joystick
-        size={100}
+        size={isMobile ? 80 : 100}
         baseColor="rgba(135,206,235,0.3)"  // skyblue translucent
         stickColor="skyblue"
         throttle={100}
@@ -26,7 +32,7 @@ const JoystickWrapper = ({ move, stop }) => {
           }
         }}
         stop={stop}
-      />
+      />}
     </div>
   )
 }

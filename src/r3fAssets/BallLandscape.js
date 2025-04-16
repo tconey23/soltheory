@@ -6,21 +6,23 @@ import { RigidBody, CuboidCollider, interactionGroups } from '@react-three/rapie
 import * as THREE from 'three'
 import RobotModel from './RobotModel'
 import CameraFollow from './CameraController'
-import Platform from './Platform'
 import HomePageText from './HomePageText'
 import { create } from 'zustand'
 import CanvasLoading from './CanvasLoading'
-import { Fog } from 'three'
 import HoloLink from './HoloLink'
+import { useGlobalContext } from '../business/GlobalContext'
+import GroundPlane from './GroundPlane'
+import { PointerLockControls } from '@react-three/drei'
 
 const useUIStore = create((set) => ({
   isLoading: true,
   showRobot: false,
-  turnAround: true,
+  turnAround: false,
   showEnvironment: false,
   showPlatforms: false,
+  showGround: false,
 
-
+  setShowGround: (val) => set({ showGround: val }),
   setIsLoading: (val) => set({ isLoading: val }),
   setShowRobot: (val) => set({ showRobot: val }),
   setTurnAround: (val) => set({ turnAround: val }),
@@ -31,16 +33,19 @@ const useUIStore = create((set) => ({
 const degrees = (d) => d * (Math.PI / 180)
 
 const BallLandscape = memo(({ joystickData }) => {
+  const {isMobile} = useGlobalContext()
   const { scene } = useThree()
   const ballRef = useRef()
   const teleport = useRef()
+  const controlsRef = useRef()
 
   const [showTeleport, setShowTeleport] = useState(false)
   const [teleportHeight, setTeleportHeight] = useState(-6)
+  const [toggleMouseLook, setToggleMouseLook] = useState(false)
 
   useEffect(() => {
     if(teleport.current){
-      console.log(teleport.current)
+
     }
   }, [teleport])
 
@@ -49,6 +54,8 @@ const BallLandscape = memo(({ joystickData }) => {
     isLoading,
     setIsLoading,
     showRobot,
+    showGround, 
+    setShowGround,
     setShowRobot,
     turnAround,
     setTurnAround,
@@ -63,6 +70,7 @@ const BallLandscape = memo(({ joystickData }) => {
 
   // Trigger scene ready state
   useEffect(() => {
+    setShowGround(true)
     const timeout = setTimeout(() => {
       setIsLoading(false)
       setShowRobot(true)
@@ -77,8 +85,9 @@ const BallLandscape = memo(({ joystickData }) => {
 
   return (
     <Suspense fallback={<CanvasLoading />}>
-      
-      <group position={[0,0,-5]} >
+      {!isMobile && <PointerLockControls />}
+
+      <group position={[0,0,-7.5]} >
         <group scale={6} position={[-8, 2, -5]}>
           <HomePageText text={'SOL'} thickness={0.4} type={'dynamic'} pos={[-1.5, 1, -5]} />
         </group>
@@ -87,10 +96,30 @@ const BallLandscape = memo(({ joystickData }) => {
         </group>
       </group>
 
+      {showGround && (
+        <GroundPlane />
+      )
+      
+      }
+
       {showRobot && (
         <>
-          <RobotModel bodyRef={ballRef} joystick={joystickData} setTurnAround={setTurnAround} turnAround={turnAround} />
-          <CameraFollow turnAround={turnAround} setTurnAround={setTurnAround} targetRef={ballRef} offset={new THREE.Vector3(-2, 5, 5)} />
+          <RobotModel
+            bodyRef={ballRef}
+            joystick={joystickData}
+            setTurnAround={setTurnAround}
+            turnAround={turnAround}
+            controlsRef={controlsRef}
+          />
+
+          <CameraFollow
+            turnAround={turnAround}
+            setTurnAround={setTurnAround}
+            targetRef={ballRef}
+            setControlsRef={(ref) => {
+              controlsRef.current = ref.current
+            }}
+          />
         </>
       )}
 

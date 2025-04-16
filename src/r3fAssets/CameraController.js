@@ -2,39 +2,53 @@ import { CameraControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef, useEffect } from 'react'
 import * as THREE from 'three'
+import { useGlobalContext } from '../business/GlobalContext'
 
-let controls
-
-const CameraFollow = ({ targetRef, turnAround, setTurnAround }) => {
-  const { camera, gl } = useThree()
+const CameraFollow = ({ targetRef, turnAround, setControlsRef }) => {
+  const { isMobile } = useGlobalContext()
+  const { camera } = useThree()
   const controlsRef = useRef()
+  const currentZOffset = useRef(-8)
+  const currentPos = useRef(new THREE.Vector3())
+  const currentLook = useRef(new THREE.Vector3())
 
   useEffect(() => {
-    controls = controlsRef.current
-    controls.setLookAt(0, 5, 10, 0, 1, 0)
-  }, [])
+    setControlsRef(controlsRef)
+  }, [setControlsRef])
 
-  useFrame(() => {
-    if (!targetRef.current || !controls) return;
+  useFrame((_, delta) => {
+    if (!targetRef.current || !controlsRef.current) return
   
-    const pos = targetRef.current.translation();
-    const rot = targetRef.current.rotation(); // This gives a quaternion
-    const quaternion = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w);
+    const controls = controlsRef.current
+    const pos = targetRef.current.translation()
+    const rot = targetRef.current.rotation()
+    const quat = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w)
   
-    // Define the camera offset (behind and above)
-    const offset = new THREE.Vector3(0, 3.5, turnAround ? 6 : -8); // behind = -Z
+    // Smoothly interpolate Z offset
+    const targetZ = turnAround ? 8 : -8
+    currentZOffset.current = THREE.MathUtils.lerp(currentZOffset.current, targetZ, 0.05)
   
-    // Rotate offset relative to the robot's orientation
-    offset.applyQuaternion(quaternion);
+    const offset = new THREE.Vector3(0, 3.5, currentZOffset.current).applyQuaternion(quat)
   
-    // Calculate camera position by applying offset to robot position
-    const camPos = new THREE.Vector3(pos.x, pos.y, pos.z).add(offset);
+    const desiredPos = new THREE.Vector3(pos.x, pos.y, pos.z).add(offset)
+    const desiredLook = new THREE.Vector3(pos.x, pos.y + 2.5, pos.z)
   
-    // Look slightly above robot
-    const lookAt = new THREE.Vector3(pos.x, pos.y + 1.5, pos.z);
+    currentPos.current.lerp(desiredPos, 0.1)
+    currentLook.current.lerp(desiredLook, 0.1)
   
-    controls.setLookAt(camPos.x, camPos.y, camPos.z, lookAt.x, lookAt.y, lookAt.z, true, 0.1);
-  });
+    controls.setLookAt(
+      currentPos.current.x,
+      currentPos.current.y,
+      currentPos.current.z,
+      currentLook.current.x,
+      currentLook.current.y,
+      currentLook.current.z,
+      false
+    )
+  
+    controls.enabled = false
+    controls.update(delta)
+  })
 
   return <CameraControls ref={controlsRef} />
 }

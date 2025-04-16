@@ -30,14 +30,13 @@ const HoloLink = ({showTeleport, setShowTeleport, teleportHeight, setTeleportHei
     const maxMult = 50
 
     useEffect(() => {
-        console.log(teleport.current)
+
       }, [r3fScene, spotlight, spotlightTarget, teleport])
 
       useFrame(() => {
         if (showTeleport && teleport.current) {
           const pos = teleport.current.position.clone()
           if (pos.y < 6) {
-            console.log(pos)
             teleport.current.position.set(pos.x, pos.y + 0.05, pos.z)
           }
         }
