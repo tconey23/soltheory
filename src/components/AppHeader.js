@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography, MenuList, ListItem } from "@mui/material";
+import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography, MenuList, ListItem, List } from "@mui/material";
 import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
@@ -48,8 +48,20 @@ const AppHeader = () => {
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
+  const handleCloseNavMenu = () => {
+   isMobile ? setMobileMenu(false) : setMobileMenu(false)
+  };
+
+  const handleCloseModal = (target) => {
+    if(target.type !== 'button'){
+      setMobileMenu(false)
+    }
+  }
+
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
+
+    handleCloseModal({type: 'button'})
 
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
@@ -66,9 +78,6 @@ const AppHeader = () => {
   const pages = ["SOL Games", "Thrive", "ESC", "Personos", "About"];
   const settings = ["Profile", "Account", "Dashboard", "Logout"];
 
-  const handleCloseNavMenu = () => {
-   isMobile ? setMobileMenu(false) : setMobileMenu(false)
-  };
 
 
   // Open and close handlers for "SOL Games" dropdown
@@ -78,11 +87,6 @@ const AppHeader = () => {
     nav('/games')
   };
 
-  const handleCloseModal = (target) => {
-    if(target.type !== 'button'){
-      setMobileMenu(false)
-    }
-  }
 
   return (
     <Stack height={'10vh'} width={'100vw'}>
@@ -179,6 +183,15 @@ const AppHeader = () => {
                       </ListItem>
                       )
                     )}
+                    <ListItem>
+                    {!isInstalled && 
+                      <Button
+                      sx={{ my: 2, color: "white", display: "block", margin: 1}}
+                      variant="contained"
+                      onClick={handleInstallClick} className="install-button">
+                          Install App
+                      </Button>}
+                    </ListItem>
                   </MenuList>
                 </Stack>
               </Stack>
