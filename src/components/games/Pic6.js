@@ -8,8 +8,8 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-const ResultsPage = ({score, gamePack, user}) => {
-  const {alertProps, setAlertProps} = useGlobalContext()
+const ResultsPage = ({score, gamePack}) => {
+  const {alertProps, setAlertProps, user} = useGlobalContext()
   const nav = useNavigate()
 
   const handleSaveGame = async () => {
@@ -21,7 +21,7 @@ const ResultsPage = ({score, gamePack, user}) => {
       date_played: Date.now()
     }
     
-    const res = addGameToUser(user,gameDataObject)
+    const res = addGameToUser(user.user,gameDataObject)
     console.log(res)
     
     nav('/games')
@@ -35,7 +35,7 @@ const ResultsPage = ({score, gamePack, user}) => {
         <Typography fontSize={35}>{score}</Typography>
       </Stack>
       <Stack width={'10%'}>
-        <Button onClick={() => handleSaveGame()} variant="contained">Save</Button>
+        <Button disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>
       </Stack>
     </Stack>
   )

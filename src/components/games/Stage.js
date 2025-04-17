@@ -74,7 +74,7 @@ const Stage = ({
             {selectCount === maxSelect && <Button variant="contained" onClick={handleNext}>Next</Button>}
         </Stack>
       </Stack>
-      <ImageList userData='prompt_list' sx={{ width: '100%', height: '100%', justifyItems: 'center', alignContent: 'space-between'}} cols={3} rowHeight={100} gap={'0px'}>
+      <ImageList userData='prompt_list' sx={{ width: '100%', height: '100%', justifyItems: 'center', alignContent: 'space-evenly'}} cols={3} rowHeight={100} gap={'0px'}>
         {displayPrompts.map((p, i) => (
           <Stack justifyContent={'center'} key={i} onClick={() => handleSelect(p, i)}>
             <Prompt prompt={p.prompt} color={p.color} />
