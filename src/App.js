@@ -13,11 +13,12 @@ import UserAlert from './components/UserAlert';
 import { checkAndAddUsers } from './business/apiCalls';
 import ErrorPage from './components/ErrorPage';
 import DevCanvas from './r3fAssets/DevCanvas';
+import Login from './components/Login';
+import AccountPage from './components/AccountPage';
 
 function App() {
-  const [user, setUser] = useState({email: ''});
   const [toggleQuit, setToggleQuit] = useState(false)
-  const {alertProps, setAlertProps} = useGlobalContext()
+  const {alertProps, setAlertProps, user, setUser} = useGlobalContext()
   const [toggleHeader, setToggleHeader] = useState(true)
 
   useEffect(() => {
@@ -63,6 +64,8 @@ function App() {
               <Route path='/esc' element={null}/>
               <Route path='/error' element={<ErrorPage />}/>
               <Route path='/dev_canvas' element={<DevCanvas />}/>
+              <Route path='/login' element={<Login />}/>
+              <Route path='/account' element={<AccountPage />}/>
             {!toggleQuit && 
               <>
                 <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

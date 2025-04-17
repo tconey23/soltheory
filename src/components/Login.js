@@ -1,28 +1,29 @@
 import { useEffect, useState } from 'react';
 import { Button, Stack, Typography, Avatar, TextField } from '@mui/material';
 import { Box } from '@mui/system';
-import AccountPage from './AccountPage';
 import { signIn, signUpUser } from '../business/apiCalls';
-import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
 import { useGlobalContext } from '../business/GlobalContext';
 import { checkAndAddUsers } from '../business/apiCalls';
+import { useNavigate } from 'react-router-dom';
 
 
 const Login = ({ setSelectedOption }) => {
-  const {alertProps, setAlertProps} = useGlobalContext()
+  const {alertProps, setAlertProps, user, setUser, isMobile} = useGlobalContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState(''); 
   const [isSignUp, setIsSignUp] = useState(false); 
   const [size, setSize] = useState({ width: 400, height: 800 })
 
-  const {user, setUser} = useGlobalContext()
+  const nav = useNavigate()
 
   useEffect(() =>{
-    console.log(user) 
-    if(user){
+    if(user?.session){
       checkAndAddUsers(user.session)
+    }
+    if(user?.disposition === 'success'){
+      nav('/account')
     }
   }, [user])
 
@@ -56,79 +57,63 @@ const Login = ({ setSelectedOption }) => {
 
   }
 
-  const handleLogout = async () => {
-    setUser(null)
-    setAlertProps({
-      text: 'You have been logged out',
-      severity: 'success',
-      display: true
-    })
-  }
-  
-
   return (
-    <ResizableBox
-        width={size.width}
-        height={size.height}
-        axis="both" // Resize in both directions
-        minConstraints={[300, 600]} // Min width & height
-        maxConstraints={[1200, 1200]} // Max width & height
-        onResizeStop={(e, data) => setSize({ width: data.size.width, height: data.size.height })}
-        style={{justifyContent: 'flex-start'}}
+    <Stack
+      alignItems="center"
+      justifyContent="flex-start"
+      userData="login_wrapper"
+      sx={styles.wrapper}
     >
-      <Stack
-        backgroundColor={'white'}
-        direction={'column'}
-        alignItems="center"
-        justifyContent="center"
-        sx={{ height: '100%', width: '100%' }}
-      >
-      <Stack width={'80%'} height={'1%'} padding={3} alignItems={'flex-end'}>
-        <Stack width={'5%'} height={'10%'} >
-          <Button variant='contained' onClick={() => setSelectedOption('Play')}>X</Button>
-        </Stack>
-      </Stack>
-      {user ? (
-        <>
-            <AccountPage user={user.user} handleLogout={handleLogout} size={size}/>
-        </>
-      ) : (
-        <>
-          <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
+        <Stack
+          userData="inputs_wrapper"
+          backgroundColor={'white'}
+          direction={'column'}
+          alignItems="center"
+          justifyContent="center"
+          sx={isMobile ? styles.mobileInputWrapper : styles.inputWrapper}
+        >
+          <Stack userData="login_styling" padding={'30px'} width={'100%'}>
+            <Stack userData="input_fields" width={'100%'} alignItems={'center'}>
+              <Box>
+                <Typography>Email:</Typography>
+                <TextField sx={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
+              </Box>
 
-            <Stack width={'25%'}>
-              {isSignUp && (
-                <Box>
-                  <Typography>Display Name:</Typography>
-                  <TextField value={name} onChange={(e) => setName(e.target.value)} fullWidth />
-                </Box>
-              )}
+              <Box>
+                <Typography>Password:</Typography>
+                <TextField sx={styles.input} type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
+              </Box>
 
-                <Box>
-                  <Typography>Email:</Typography>
-                  <TextField value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
-                </Box>
+              <Stack direction={'column'} margin={2} width={'50%'} justifyContent={'center'} alignItems={'center'}>
+                <Button variant='contained' onClick={handleLogin}>{isSignUp ? 'Create' : 'Login'}</Button>
+                <Button variant='contained' onClick={() => setIsSignUp(!isSignUp)} sx={{ mt: 2 }}>
+                  {isSignUp ? "Back To Login" : "Sign Up"}
+                </Button>
+              </Stack>
 
-                <Box>
-                  <Typography>Password:</Typography>
-                  <TextField type="password" value={password} onChange={(e) => setPassword(e.target.value)} fullWidth />
-                </Box>
-
-                <Stack direction={'column'} margin={2}>
-
-                  <Button variant='contained' onClick={handleLogin}>{isSignUp ? 'Create' : 'Login'}</Button>
-                  <Button variant='contained' onClick={() => setIsSignUp(!isSignUp)} sx={{ mt: 2 }}>
-                    {isSignUp ? "Already have an account? Login" : "New user? Sign Up"}
-                  </Button>
-
-                </Stack>
             </Stack>
           </Stack>
-        </>
-      )}
+
+        </Stack>
       </Stack>
-    </ResizableBox>
   );
 };
 
 export default Login;
+
+const styles = {
+  input: {
+    borderRadius: 20,
+  },
+  wrapper: { 
+    height: '100%', 
+    width: '100%' 
+  },
+  inputWrapper: { 
+    height: '100%', 
+    width: '50%' 
+  },
+  mobileInputWrapper: {
+    width: '50%'
+  }
+}

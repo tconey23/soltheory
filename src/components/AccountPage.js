@@ -1,49 +1,134 @@
 import { useEffect, useState } from 'react';
-import { Stack } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, FormLabel, ImageList, MenuItem, Select, Stack, TextField } from '@mui/material';
 import {Avatar} from '@mui/material';
 import {Typography} from '@mui/material';
 import {Button} from '@mui/material';
 import Admin from './Admin';
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import { getUser } from '../business/apiCalls';
+import { getUser, signOut } from '../business/apiCalls';
 import { useGlobalContext } from '../business/GlobalContext'
+import { useNavigate } from 'react-router-dom';
+import { findAvatars } from '../business/apiCalls';
 
-const AccountPage = ({user, handleLogout, size}) => {
-    const {alertProps, setAlertProps} = useGlobalContext()
+const AvatarSelect = ({search, setResults, results, submit, setSubmit}) => {
 
-    const [isAdmin, setisAdmin] = useState(false)
+    const [images, setImages] = useState([])
 
-    const checkAdminAccess = async (email) => {
-        const res = await getUser(email)
-        if(res.is_admin){
-            setisAdmin(true)
+    const searchAvatars = async () => {
+        const res = await findAvatars(search)
+        setResults(res)
+        setSubmit(false)
+    }
+
+    useEffect(() =>{
+        if(results?.results?.length > 0){
+            setImages(results.results.map((r) => {
+                console.log(r.urls.small)
+                return (
+                    <MenuItem>
+                        <img style={{width: '50px', height: '50px'}} src={r?.urls?.small}/>
+                    </MenuItem>
+                )
+            }))
         }
+    }, [results])
+
+    useEffect(()=>{
+        console.log(search)
+        if(search && submit){
+            searchAvatars(search)
+        }        
+    }, [search, submit])
+
+    return (
+        <Stack width={'50%'}>
+            <Select>
+                {images}
+            </Select>
+        </Stack>
+    )
+}
+
+const AccountPage = ({size}) => {
+    const {alertProps, setAlertProps , user, setUser, isAdmin, setisAdmin, displayName, setDisplayName, avatar, setAvatar} = useGlobalContext()
+    const nav = useNavigate()
+    const [results, setResults] = useState([])
+    const [submit, setSubmit] = useState(false)
+    const [searchTerm, setSearchTerm] = useState()
+    const [imageType, setImageType] = useState('abstract')
+    const [avatarSearch, setAvatarSearch] = useState()
+    const [avatarTerms, setAvatarTerms] = useState([
+        'abstract', 'illustration', 'minimal', 'cartoon'
+    ])
+
+    useEffect(() => {
+        if(imageType && avatarSearch){
+            setSearchTerm(`${imageType} + ${avatarSearch}`)
+        }
+    }, [imageType, avatarSearch])
+
+    const handleLogout = async () => {
+    const res = await signOut()
+        if(res.disposition === 'success'){
+            setUser(null)
+        }
+        setAlertProps({
+            text: 'You have been logged out',
+            severity: 'success',
+            display: true
+        })
     }
 
-useEffect(() => {
-    if(user && user.email){
-        checkAdminAccess(user.email)
-    } else {
-        handleLogout()
-    }
-    console.log(user)
-}, [user])
+    useEffect(() =>{
+        if(!user){
+            nav('/login')
+        }
+    }, [user])
+
 
   return (
-        <Stack direction={'column'} sx={{ height: '100%', width: '100%'}} justifyContent={'flex-start'} alignItems={'flex-start'}>
+        <Stack direction={'column'} sx={{ height: '100%', width: '100%', overflow: 'auto'}} justifyContent={'flex-start'} alignItems={'flex-start'}>
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
                     <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
-                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} />
-                        <Typography variant="h7">Welcome, {user?.email || "User"}!</Typography>
+                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
+                        <Typography variant="h7">Welcome, {displayName}!</Typography>
                         <Button variant="contained" color="error" onClick={handleLogout} sx={{ mt: 2 }}>
                             Logout
                         </Button>
                     </Stack>
-                    <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
-                        {/* <Button variant='contained'>My Games</Button>
-                        <Button variant='contained'>My Friends</Button> */}
-                        {isAdmin && <Admin size={size}/>}
+                    <Stack width={'85%'} overflow={'auto'} userData='accrodion_wrapper' height={'60%'}>
+                    <Accordion>
+                        <AccordionSummary>
+                            <Typography>Account Details</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                                <Stack justifyContent={'center'} alignItems={'center'}>
+                                    <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
+                                    <Select value={imageType} onChange={(e) => setImageType(e.target.value)}>
+                                        {avatarTerms.map((t) => (
+                                            <MenuItem value={t}>
+                                                <Typography>{t}</Typography>
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    <FormLabel>Image Search Term</FormLabel>
+                                    <TextField value={avatarSearch} onChange={(e) => setAvatarSearch(e.target.value)}/>
+                                    <Button onClick={() => setSubmit(true)} >Search</Button>
+                                    <AvatarSelect results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit}/>
+                                </Stack>
+                            </AccordionDetails>
+                        </Accordion>
+                        <Accordion>
+                            <AccordionSummary>
+                                <Typography>Admin Controls</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
+                                    {isAdmin && <Admin size={size}/>}
+                                </Stack>
+                            </AccordionDetails>
+                        </Accordion>
                     </Stack>
                 </Stack>
         </Stack>

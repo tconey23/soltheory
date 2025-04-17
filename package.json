@@ -29,6 +29,7 @@
     "react-slick": "^0.30.3",
     "react-svg": "^16.3.0",
     "slick-carousel": "^1.8.1",
+    "styled-components": "^6.1.17",
     "supabase": "^2.19.6",
     "three": "^0.175.0",
     "workbox-webpack-plugin": "^7.3.0",

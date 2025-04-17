@@ -120,23 +120,59 @@ const addFriend = async (user, friend) => {
     };
 
     const signIn = async (email, password) => {
-        console.log(email, password)
+        console.log(email, password);
+      
         const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+          email,
+          password,
         });
-
+      
         if (error) {
-            console.error("Login error:", error);
-        } else {
-            return {
-                disposition: 'success',
-                message: `Welcome ${data.user.email}`,
-                session: data?.session,
-                user: data?.user
-            }
+          console.error("Login error:", error);
+          // Optional: clear storage on failed login
+          localStorage.removeItem('user');
+          localStorage.setItem('isAuthenticated', 'false');
+          return {
+            disposition: 'error',
+            message: error.message,
+          };
         }
-    };
+      
+        // Save user info to localStorage
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('isAuthenticated', 'true');
+      
+        return {
+          disposition: 'success',
+          message: `Welcome ${data.user.email}`,
+          session: data?.session,
+          user: data?.user,
+        };
+      };
+      ;
+
+      const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+      
+        // Clear user info from localStorage either way
+        localStorage.removeItem('user');
+        localStorage.setItem('isAuthenticated', 'false');
+      
+        if (error) {
+          console.error('Sign out error:', error);
+          return {
+            disposition: 'error',
+            message: 'There was a problem signing out.',
+            error,
+          };
+        }
+      
+        return {
+          disposition: 'success',
+          message: 'You have been signed out successfully.',
+        };
+      };
+      
 
     const signUpUser = async (email, password, username) => {
 
@@ -414,7 +450,17 @@ const addFriend = async (user, friend) => {
             
         }
     }
-    
+
+    const findAvatars = async (query) => {
+        const res = await fetch(`https://api.unsplash.com/search/photos?query=${query ? query : 'abstract'}&per_page=10&client_id=9IrboRmW-r0KlptyqhiWGlB4Bt_QWPOR4Y11SS5wxAs`)
+        const data = await res.json()
+
+        if(data.total > 0 && data.results.length > 0) {
+            return data
+        } else {
+            return 'Search returned 0 results'
+        }
+    }    
 
 
-    export {checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}
+    export {findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

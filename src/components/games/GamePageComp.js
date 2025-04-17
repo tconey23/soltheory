@@ -14,7 +14,7 @@ import { useGlobalContext } from '../../business/GlobalContext'
 
 const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedOption}) => {
 
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     const menuOptions = user 
     ? ['Play', 'Friends', 'My Games', 'Account', 'Quit', 'Close']
@@ -23,8 +23,6 @@ const GameMenu = ({user, toggleMenu, setToggleMenu, setSelectedOption, selectedO
 
     const handleOption = (opt) => {
         setSelectedOption(opt)
-
-         console.log(opt)
 
         setTimeout(() => {
             setToggleMenu(false)
@@ -85,15 +83,10 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
             />
 
             <Stack userData='gamePage 2' direction={'column'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
-                <Stack userData='gamePage 3' direction={'row'} width={'100%'} >
-                    <Box>
-                        <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>
-                    </Box>
-                </Stack>
                 <Stack direction={'row'} width={'100%'}>
-                    {/* <Stack height={'100%'} width={'20%'} userData='left_spacer'></Stack> */}
+                    {!isMobile && <Stack height={'100%'} width={'30%'} userData='left_spacer'></Stack>}
 
-                    <Stack userData='gamePage 4' width={isMobile ? '100%' : '80%'} height={'86%'} justifyContent={'center'} alignItems={'center'}>
+                    <Stack userData='gamePage 4' width={isMobile ? '100%' : '40%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
                         {Game && selectedOption !== 'Account'
                             ? <Game selectedGame={selectedGame} user={user} /> 
                             :<>
@@ -143,8 +136,8 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                     </Stack>
 
                     {!isMobile && 
-                    <Stack height={'100%'} width={'20%'} userData='friends_section'>
-                        <Stack userData='gamePage 8' width={'90%'} height={'85%'} justifyContent={'center'} alignItems={'center'} sx={{boxShadow: 'inset #00000021 0px 0px 6px 6px', borderRadius: 2}}>
+                    <Stack height={'100%'} width={'30%'} userData='friends_section' alignItems={'center'}>
+                        <Stack userData='gamePage 8' width={'60%'} height={'85%'} justifyContent={'center'} alignItems={'center'} sx={{boxShadow: 'inset #00000021 0px 0px 6px 6px', borderRadius: 2}}>
                             <Friends />
                         </Stack>
                     </Stack>}
