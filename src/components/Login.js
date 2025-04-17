@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 
 const Login = ({ setSelectedOption }) => {
-  const {alertProps, setAlertProps, user, setUser, isMobile} = useGlobalContext()
+  const {alertProps, setAlertProps, user, setUser, isMobile, setRecheckUser} = useGlobalContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState(''); 
@@ -22,10 +22,14 @@ const Login = ({ setSelectedOption }) => {
     if(user?.session){
       checkAndAddUsers(user.session)
     }
-    if(user?.disposition === 'success'){ 
+    if(user?.aud === 'authenticated' || user?.disposition === 'success'){ 
       nav('/account')
     }
   }, [user])
+
+  useEffect(() =>{
+    setRecheckUser(prev => prev +1)
+  }, [])
 
   const handleLogin = async () => {
     
@@ -39,7 +43,6 @@ const Login = ({ setSelectedOption }) => {
     } else {
 
       const res = await signIn(email, password)
-      console.log(res)
       if(res && res.session?.access_token) {
         setUser(res)
       }

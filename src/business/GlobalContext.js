@@ -22,32 +22,38 @@ export const GlobalProvider = ({ children }) => {
   const [displayName, setDisplayName] = useState()
   const [isAdmin, setisAdmin] = useState(false)
   const [avatar, setAvatar] = useState(null)
+  const [recheckUser, setRecheckUser] = useState(0)
 
   const degrees = (degrees) => degrees * (Math.PI / 180)
 
+  useEffect(() => {
+    // console.log(recheckUser)
+  }, [recheckUser])
+
   const checkAdminAccess = async (email) => {
     const res = await getUser(email)
-    console.log(res.avatar)
-    if(res.avatar) {
-      setAvatar(res.avatar)
-    }
-    
-    if(res.user_name){
-        setDisplayName(res.user_name)
-    } else {
-      setDisplayName(email)
-    }
-    if(res.is_admin){
-        setisAdmin(true)
-    }
+
+    setUser(prev => ({
+      ...prev,
+      metadata: res
+    }))
 }
 
 useEffect(() =>{
-
-  if(user && user.email){
-    checkAdminAccess(user.email)
+  if(user && user?.user?.email && !user?.metadata){
+    checkAdminAccess(user?.user?.email)
   }
 
+  if(user?.metadata){
+    setAvatar(user.metadata.avatar)
+    setDisplayName(user.metadata.user_name)
+    setisAdmin(user.metadata.is_admin)
+  } else {
+    setAvatar(null)
+    setDisplayName(null)
+    setisAdmin(null)
+  }
+ 
 }, [user])
 
   useEffect(() => {
@@ -56,14 +62,13 @@ useEffect(() =>{
       const isAuth = localStorage.getItem('isAuthenticated') === 'true';
       
       if (isAuth && storedUser) {
-        console.log(JSON.parse(storedUser)) 
         setUser(JSON.parse(storedUser));
       }
     }
-  }, [user]);
+  }, [user, recheckUser]);
 
   return (
-    <GlobalContext.Provider value={{ avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName}}>
+    <GlobalContext.Provider value={{ setRecheckUser, avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName}}>
       {children}
     </GlobalContext.Provider>
   );

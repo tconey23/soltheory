@@ -120,8 +120,6 @@ const addFriend = async (user, friend) => {
     };
 
     const signIn = async (email, password) => {
-        console.log(email, password);
-      
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password,
@@ -137,19 +135,20 @@ const addFriend = async (user, friend) => {
             message: error.message,
           };
         }
-      
-        // Save user info to localStorage
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('isAuthenticated', 'true');
-      
-        return {
+
+        const responseData = {
           disposition: 'success',
           message: `Welcome ${data.user.email}`,
           session: data?.session,
           user: data?.user,
-        };
+        }
+      
+        // Save user info to localStorage
+        localStorage.setItem('user', JSON.stringify(responseData));
+        localStorage.setItem('isAuthenticated', 'true');
+      
+        return responseData
       };
-      ;
 
       const signOut = async () => {
         const { error } = await supabase.auth.signOut();
@@ -462,5 +461,20 @@ const addFriend = async (user, friend) => {
         }
     }    
 
+    const updateUserAvatar = async (userId, avatarUrl) => {
+        const { data, error } = await supabase
+          .from('users') // your table name
+          .update({ avatar: avatarUrl })
+          .eq('id', userId) // match user by ID
+          .select(); // optional: returns updated row
+      
+        if (error) {
+          console.error('Failed to update avatar:', error);
+          return { success: false, error };
+        }
+      
+        return { success: true, data };
+      };
 
-    export {findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}
+
+    export {updateUserAvatar, findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

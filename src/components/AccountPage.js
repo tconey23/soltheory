@@ -6,49 +6,73 @@ import {Button} from '@mui/material';
 import Admin from './Admin';
 import { ResizableBox } from "react-resizable";
 import "react-resizable/css/styles.css";
-import { getUser, signOut } from '../business/apiCalls';
+import { getUser, signOut, updateUserAvatar } from '../business/apiCalls';
 import { useGlobalContext } from '../business/GlobalContext'
 import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
 
-const AvatarSelect = ({search, setResults, results, submit, setSubmit}) => {
-
-    const [images, setImages] = useState([])
-
+const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
+    const {
+      user,
+      avatar,
+      setAvatar,
+      isMobile
+    } = useGlobalContext();
+  
+    const [newAvatar, setNewAvatar] = useState('');
+    const [images, setImages] = useState([]);
+  
     const searchAvatars = async () => {
-        const res = await findAvatars(search)
-        setResults(res)
-        setSubmit(false)
-    }
-
-    useEffect(() =>{
-        if(results?.results?.length > 0){
-            setImages(results.results.map((r) => {
-                console.log(r.urls.small)
-                return (
-                    <MenuItem>
-                        <img style={{width: '50px', height: '50px'}} src={r?.urls?.small}/>
-                    </MenuItem>
-                )
-            }))
-        }
-    }, [results])
-
-    useEffect(()=>{
-        console.log(search)
-        if(search && submit){
-            searchAvatars(search)
-        }        
-    }, [search, submit])
-
+      const res = await findAvatars(search);
+      setResults(res);
+      setSubmit(false);
+    };
+  
+    const handleAvatarChange = async (selectedUrl) => {
+      setNewAvatar(selectedUrl);
+      setAvatar(selectedUrl);
+      const res = await updateUserAvatar(user?.user?.id, selectedUrl);
+      if (res?.success) {
+        console.log('Avatar updated in Supabase');
+      } else {
+        console.error('Avatar update failed');
+      }
+    };
+  
+    useEffect(() => {
+      if (results?.results?.length > 0) {
+        setImages(results.results.map((r, i) => (
+          <MenuItem key={i} value={r.urls.small}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Avatar src={r.urls.small} sx={{ width: 32, height: 32 }} />
+              <span>{`Avatar ${i + 1}`}</span>
+            </Stack>
+          </MenuItem>
+        )));
+      }
+    }, [results]);
+  
+    useEffect(() => {
+      if (search && submit) {
+        searchAvatars();
+      }
+    }, [search, submit]);
+  
     return (
-        <Stack width={'50%'}>
-            <Select>
-                {images}
-            </Select>
-        </Stack>
-    )
-}
+      <Stack width={'100%'} maxWidth={isMobile ? '100%' : '300px'} overflow={'scroll'}>
+        <Select
+          fullWidth
+          value={newAvatar || avatar || ''}
+          onChange={(e) => handleAvatarChange(e.target.value)}
+          renderValue={(selected) => (
+            <Avatar src={selected} sx={{ width: 32, height: 32 }} />
+          )}
+        >
+          {images}
+        </Select>
+      </Stack>
+    );
+  };
 
 const AccountPage = ({size}) => {
     const {alertProps, setAlertProps , user, setUser, isAdmin, setisAdmin, displayName, setDisplayName, avatar, setAvatar} = useGlobalContext()
@@ -84,6 +108,7 @@ const AccountPage = ({size}) => {
         if(!user){
             nav('/login')
         }
+        console.log(user)
     }, [user])
 
 

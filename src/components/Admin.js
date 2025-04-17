@@ -231,7 +231,7 @@ const AddPrompts = () => {
     };
   
     return (
-      <Stack width={'100%'} spacing={3} padding={isMobile ? 2 : 4}>
+      <Stack width={'90%'} spacing={3} padding={isMobile ? 2 : 4}>
         <Typography variant="h6">6Pics Controls</Typography>
   
         <Select value={selectedCat} onChange={(e) => setSelectedCat(e.target.value)} fullWidth>

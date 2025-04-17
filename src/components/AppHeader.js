@@ -22,9 +22,6 @@ const AppHeader = () => {
       const isStandalone =
         window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true;
-
-        console.log(isStandalone)
-
       setIsInstalled(isStandalone);
     };
 
@@ -80,14 +77,17 @@ const AppHeader = () => {
   }
 
   const handleAccount = () =>{
-    
-    if(user.name && user.email){
+    if(user?.user?.name && user?.user?.email){
       nav('/account')
     } else {
       nav('/login')
     }
 
   }
+
+  useEffect(() => {
+    console.log(avatar)
+  }, [user])
 
   return (
     <Stack height={'10vh'} width={'100vw'}>
@@ -147,7 +147,7 @@ const AppHeader = () => {
               </>
           }
           <Button onClick={() => handleAccount()}>
-            <Avatar src={avatar}/>
+            <Avatar key={user} src={avatar ? avatar : null}/>
           </Button>
         </Toolbar>
       </Container>

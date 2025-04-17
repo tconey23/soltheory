@@ -41,52 +41,6 @@ const ResultsPage = ({score, gamePack, user}) => {
   )
 }
 
-const Countdown = ({setStart}) => {
-  const {alertProps, setAlertProps} = useGlobalContext()
-  const [ref, setRef] = useState(0)
-  const videoRef=useRef()
-
-  useEffect(() => {
-
-    
-    if(videoRef.current && !videoRef.current.ended){
-
-      try {
-        videoRef.current.play()
-        videoRef.current.playbackSpeed = 0.25
-      } catch (error) {
-          console.error(error);
-          
-      }
-    }
-    
-    if(videoRef.current && !videoRef.current.paused){
-      setRef(prev => prev +1)
-    }
-
-    if(videoRef.current && videoRef.current.ended){
-      setStart(true)
-    }
-  }, [videoRef, ref])
-
-  return (
-    <Stack height={'50vh'} width={'100%'}>
-      <Typography fontSize={80}>Get ready!</Typography>
-      <video style={{height: '100%', width: '100%'}} ref={videoRef} mute autoplay
-      preload="metadata"
-      onLoadedMetadata={() => {
-        if(videoRef.current){
-          videoRef.current.playbackRate = 0.75
-        }
-      }}
-      >
-        <source src={'https://tzzljniuogvssdbhxsql.supabase.co/storage/v1/object/public/6pics_videos//countdown.mp4'} type='video/mp4'/>
-      </video>
-      <Typography fontSize={10}><a href="https://www.flaticon.com/free-animated-icons/countdown" title="countdown animated icons">Countdown animated icons created by Freepik - Flaticon</a></Typography>
-    </Stack>
-  )
-}
-
 const getVideoDuration = (videoUrl) => {
   return new Promise((resolve, reject) => {
     const video = document.createElement("video");
@@ -106,7 +60,7 @@ const getVideoDuration = (videoUrl) => {
 };
 
 const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
-  const {alertProps, setAlertProps} = useGlobalContext()
+  const {alertProps, setAlertProps, isMobile} = useGlobalContext()
   const [score, setScore] = useState(100);
   const [currTime, setCurrTime] = useState(10);
   const [vidDur, setVidDur] = useState(null)
@@ -345,12 +299,12 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
     <>
         <Stack backgroundColor={"white"} justifyContent={'center'} alignItems={'center'}>
           <Typography>{`Points ${levelScore}/100`}</Typography>
-            <Stack width={'20%'} height={'20%'} justifyContent={'center'} alignItems={'center'}>
+            <Stack width={'45%'} height={'45%'} justifyContent={'center'} alignItems={'center'}>
               <video
                 style={{boxShadow: '4px 2px 10px 1px #00000038', padding: 1}}
                 ref={videoRef}
                 width="100%"
-                height="70%"
+                height="100%"
                 preload="metadata"
                 mute
               >
@@ -369,13 +323,14 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
               inputRefs.current[wordIndex] = [];
               
               return (
-                <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={10} marginBottom={5} padding={1}>
+                <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={0} marginBottom={1} padding={1}>
                   {word.split("").map((letter, letterIndex) => {
 
                     return (
-                    <Stack key={letterIndex} marginLeft={1} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
+                    <Stack id='textbox-wrapper' key={letterIndex} marginLeft={0} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
                         {!giveUp 
                         ? <TextField
+                          id='textbox'
                           disabled={giveUp}
                           sx={{opacity: animTextNum > letterIndex ? 1 : 0, transition: 'all 1s ease-in'}}
                           autoComplete="off"
@@ -522,23 +477,24 @@ const Pic6 = ({user}) => {
     <Stack
       direction={"column"}
       key={refKey}
-      sx={{ height: "90%", width: "75%" }}
+      sx={{ height: "100%", width: "100%" }}
       alignItems={"center"}
       justifyContent={"flex-start"}
     >
 
+      {gamePack && 
       <Stack direction={'row'} height={'6%'} width={'100%'} marginBottom={3} alignItems={'center'} justifyContent={'space-around'}>
         <Typography>{`Level ${gifIndex +1}`}</Typography>
         <Button onClick={() => setRefKey(prev => prev +1)}>Start over</Button>
         <Typography sx={{width: 100}}>{`Total Score: ${totalScore}`}</Typography>
-      </Stack>
+      </Stack>}
 
       {
         levels.length > 0 
           ? <Stack height={'75%'} width={'100%'} sx={{scale: 0.9}} alignItems={'center'} justifyContent={'space-around'}>
             <Slider ref={sliderRef} {...settings} style={{width: '100%', height: '100%'}}>
               {levels.map((l) => (
-              <Stack>
+              <Stack justifyContent={'center'} alignItems={'center'}>
                 <Stage 
                   handleGoToSlide={handleGoToSlide} 
                   level={l}
@@ -551,7 +507,10 @@ const Pic6 = ({user}) => {
               {gameOver && <ResultsPage score={totalScore} user={user} gamePack={gamePack}/>}
             </Slider>
           </Stack>
-        :<SixPicsPacks setGamePack={setGamePack} gamePack={gamePack}/>
+        :  
+        <Stack justifyContent={'flex-start'}>
+          <SixPicsPacks setGamePack={setGamePack} gamePack={gamePack}/>
+        </Stack>
       }
     </Stack>
   );
