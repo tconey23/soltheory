@@ -56,7 +56,7 @@ useEffect(() =>{
       const isAuth = localStorage.getItem('isAuthenticated') === 'true';
       
       if (isAuth && storedUser) {
-        console.log(JSON.parse(storedUser))
+        console.log(JSON.parse(storedUser)) 
         setUser(JSON.parse(storedUser));
       }
     }

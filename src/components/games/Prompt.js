@@ -3,7 +3,7 @@ import { Stack } from "@mui/system"
 import { Typography } from "@mui/material"
 
 const Prompt = ({prompt, color}) => {
-    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext() 
 
     return (
         <Stack

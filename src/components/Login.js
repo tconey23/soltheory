@@ -22,7 +22,7 @@ const Login = ({ setSelectedOption }) => {
     if(user?.session){
       checkAndAddUsers(user.session)
     }
-    if(user?.disposition === 'success'){
+    if(user?.disposition === 'success'){ 
       nav('/account')
     }
   }, [user])

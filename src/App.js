@@ -1,5 +1,5 @@
 import './App.css';
-import HomePageCanvas from './r3fAssets/HomePageCanvas';
+import HomePageCanvas from './r3fAssets/HomePageCanvas'; 
 import AppHeader from './components/AppHeader';
 import { Routes, Route } from 'react-router-dom';
 import { useEffect, useState } from 'react';

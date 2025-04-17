@@ -105,7 +105,7 @@ const AccountPage = ({size}) => {
                         <AccordionDetails>
                                 <Stack justifyContent={'center'} alignItems={'center'}>
                                     <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
-                                    <Select value={imageType} onChange={(e) => setImageType(e.target.value)}>
+                                    <Select value={imageType} onChange={(e) => setImageType(e.target.value)}> 
                                         {avatarTerms.map((t) => (
                                             <MenuItem value={t}>
                                                 <Typography>{t}</Typography>

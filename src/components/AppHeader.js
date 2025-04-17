@@ -139,7 +139,7 @@ const AppHeader = () => {
           }
 
           {
-            isMobile && 
+            isMobile &&  
               <>
                 <Stack direction={'row'} width={'100%'} justifyContent={'flex-end'}>  
                   <Button onClick={() => setMobileMenu(prev => !prev)} variant="contained">=</Button>

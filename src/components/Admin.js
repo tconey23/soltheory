@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 import { Button, InputLabel, List, ListItem, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
-import { checkExistingPack, getGifs, getSixPicsPack, uploadVid, removeGifByName, addNewCategory, updatePackLogo } from '../business/apiCalls';
+import { checkExistingPack, getGifs, getSixPicsPack, uploadVid, removeGifByName, addNewCategory, updatePackLogo } from '../business/apiCalls'; 
 import { useGlobalContext } from '../business/GlobalContext';
 import Papa from 'papaparse';
 import { addNewPrompts } from '../business/apiCalls';

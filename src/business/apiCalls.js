@@ -441,7 +441,7 @@ const addFriend = async (user, friend) => {
             .eq("pack_name", packName);
 
             if (updateError) {
-                console.error("Error updating gifs:", updateError.message);
+                console.error("Error updating gifs:", updateError.message); 
             } else {
                 return ('success');
             }

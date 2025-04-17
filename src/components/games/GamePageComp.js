@@ -70,7 +70,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
         nav('/games')
         setToggleQuit(false)
        }
-    }, [selectedOption])
+    }, [selectedOption]) 
 
     return (
         <Stack userData='gamePage 1' direction={'column'} height={'100%'} width={'100%'}>

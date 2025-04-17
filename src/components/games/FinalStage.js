@@ -1,5 +1,5 @@
 // FinalStage.js
-import { Stack, Button, Typography, ImageList, TextField } from '@mui/material'
+import { Stack, Button, Typography, ImageList, TextField } from '@mui/material' 
 import { useEffect, useState } from 'react'
 import Prompt from './Prompt'
 import { useGlobalContext } from '../../business/GlobalContext'

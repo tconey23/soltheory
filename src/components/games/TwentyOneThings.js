@@ -166,7 +166,7 @@ const TwentyOneThings = ({user}) => {
         />
         )}
 
-        {prompts && currentStage === 3 && (
+        {prompts && currentStage === 3 && ( 
         <Stage
             stageNum={3}
             prompts={prompts}

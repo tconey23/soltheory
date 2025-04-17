@@ -9,7 +9,7 @@ const EditablePromptItem = ({
     onDelete,
     isMobile
   }) => {
-    const [isEditing, setIsEditing] = useState(false);
+    const [isEditing, setIsEditing] = useState(false); 
     const [editValue, setEditValue] = useState(value);
   
     const handleSave = () => {

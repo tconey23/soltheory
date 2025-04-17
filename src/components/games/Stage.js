@@ -54,7 +54,7 @@ const Stage = ({
     }))
     setPrompts([
       ...displayPrompts,
-      ...prompts.filter((p) => ![prevColor, currentColor].includes(p.color))
+      ...prompts.filter((p) => ![prevColor, currentColor].includes(p.color)) 
     ])
     setCurrentStage(nextStage)
   }
