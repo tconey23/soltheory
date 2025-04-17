@@ -59,7 +59,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     const [query, setQuery] = useState(null)
 
     const nav = useNavigate()
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     let Game = selectedGame?.component;
     
@@ -75,7 +75,7 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
     }, [selectedOption])
 
     return (
-        <Stack userData='gamePage 1' direction={'column'} sx={{ height: '80vh', width: '90vw' }}>
+        <Stack userData='gamePage 1' direction={'column'} height={'100%'} width={'100%'}>
             <GameMenu 
                 toggleMenu={toggleMenu} 
                 setToggleMenu={setToggleMenu} 
@@ -84,56 +84,74 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
                 user={user}
             />
 
-            <Stack userData='gamePage 2' direction={'row'} padding={2} height={'100%'}>
-                <Stack userData='gamePage 3' >
+            <Stack userData='gamePage 2' direction={'column'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
+                <Stack userData='gamePage 3' direction={'row'} width={'100%'} >
                     <Box>
                         <Button onClick={() => setToggleMenu(prev => !prev)} variant='contained'>Menu</Button>
                     </Box>
                 </Stack>
-                <Stack userData='gamePage 4' width={'90%'} height={'80%'} justifyContent={'center'} alignItems={'center'}>
-                    {Game && selectedOption !== 'Account'
-                        ? <Game selectedGame={selectedGame} user={user} /> 
-                        :<>
-                            {/* <SolGamesLogo /> */}
-                            <Stack userData='gamePage 5' height={'80%'} justifyContent={'center'} alignItems={'center'}>
-                            <List userData='gamePage list 1'>
-                                <ListItem
-                                sx={{
-                                    transition: 'all 0.25s ease-in-out',
-                                    "&:hover": {
-                                        cursor: 'pointer',
-                                        boxShadow: '3px 3px 7px 1px #9a1fd94a',
-                                        borderRadius: 20,
-                                        scale: 1.05
-                                    }
-                                }}>
-                                    <Stack userData='gamePage 6' onClick={() => nav('/21things')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
-                                        <Hexagon dims={100}/>
-                                        <Typography fontSize={50} fontFamily={font}>21Things</Typography>
-                                    </Stack>
-                                </ListItem>
-                                <ListItem sx={{
-                                    transition: 'all 0.25s ease-in-out',
-                                    "&:hover": {
-                                        cursor: 'pointer',
-                                        boxShadow: '3px 3px 7px 1px #9a1fd94a',
-                                        borderRadius: 20,
-                                        scale: 1.05
-                                    }
-                                }}>
-                                    <Stack userData='gamePage 7' onClick={() => nav('/6pics')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
-                                        <SixPics dims={100}/>
-                                        <Typography fontSize={50} fontFamily={font}>6Pics</Typography>
-                                    </Stack>
-                                </ListItem>
-                            </List>
-                            </Stack>
-                        </> 
-                    }
+                <Stack direction={'row'} width={'100%'}>
+                    {/* <Stack height={'100%'} width={'20%'} userData='left_spacer'></Stack> */}
+
+                    <Stack userData='gamePage 4' width={isMobile ? '100%' : '80%'} height={'86%'} justifyContent={'center'} alignItems={'center'}>
+                        {Game && selectedOption !== 'Account'
+                            ? <Game selectedGame={selectedGame} user={user} /> 
+                            :<>
+                                <Stack userData='gamePage 5' height={'80%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
+                                    <List userData='gamePage list 1' sx={{width: isMobile ?  '160%' : '100%'}}>
+                                        <ListItem
+                                        sx={{
+                                            justifySelf: 'anchor-center',
+                                            transition: 'all 0.25s ease-in-out',
+                                            marginTop: 10,
+                                            marginBottom: 10,
+                                            width: '50%',
+                                            "&:hover": {
+                                                cursor: 'pointer',
+                                                boxShadow: '3px 3px 7px 1px #9a1fd94a',
+                                                borderRadius: 20,
+                                                scale: 1.05
+                                            }
+                                        }}>
+                                            <Stack userData='gamePage 6' onClick={() => nav('/21things')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
+                                                <Hexagon dims={100}/>
+                                                <Typography fontSize={50} fontFamily={font}>21Things</Typography>
+                                            </Stack>
+                                        </ListItem>
+                                        <ListItem sx={{
+                                            justifySelf: 'anchor-center',
+                                            transition: 'all 0.25s ease-in-out',
+                                            marginTop: 10,
+                                            marginBottom: 10,
+                                            width: '50%',
+                                            "&:hover": {
+                                                cursor: 'pointer',
+                                                boxShadow: '3px 3px 7px 1px #9a1fd94a',
+                                                borderRadius: 20,
+                                                scale: 1.05
+                                            }
+                                        }}>
+                                            <Stack userData='gamePage 7' onClick={() => nav('/6pics')} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>
+                                                <SixPics dims={100}/>
+                                                <Typography fontSize={50} fontFamily={font}>6Pics</Typography>
+                                            </Stack>
+                                        </ListItem>
+                                    </List>
+                                </Stack>
+                            </> 
+                        }
+                    </Stack>
+
+                    {!isMobile && 
+                    <Stack height={'100%'} width={'20%'} userData='friends_section'>
+                        <Stack userData='gamePage 8' width={'90%'} height={'85%'} justifyContent={'center'} alignItems={'center'} sx={{boxShadow: 'inset #00000021 0px 0px 6px 6px', borderRadius: 2}}>
+                            <Friends />
+                        </Stack>
+                    </Stack>}
+
                 </Stack>
-                <Stack userData='gamePage 8' width={'8%'} justifyContent={'center'} alignItems={'center'}>
-                    <Friends />
-                </Stack>
+
+
             </Stack>
 
             {selectedOption === "Account" && 

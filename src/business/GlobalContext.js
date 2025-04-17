@@ -13,7 +13,8 @@ export const GlobalProvider = ({ children }) => {
     display: false
   })
   const [returnUrl, setReturnUrl] = useState()
-  const [font, setFont] = useState("/fonts/Fredoka_Regular.json")
+  const [font] = useState("/fonts/Fredoka_Regular.json")
+  const [fontTTF] = useState("/fonts/Fredoka/static/Fredoka-Bold.ttf")
   const [speed, setSpeed] = useState(4)
   const isMobile = useMediaQuery("(max-width:430px)")
   const [showJoystick, setShowJoystick] = useState(true)
@@ -25,7 +26,7 @@ export const GlobalProvider = ({ children }) => {
   }, [isMobile])
 
   return (
-    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees}}>
+    <GlobalContext.Provider value={{ user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF}}>
       {children}
     </GlobalContext.Provider>
   );

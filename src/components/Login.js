@@ -15,7 +15,7 @@ const Login = ({ setSelectedOption }) => {
   const [password, setPassword] = useState('');
   const [name, setName] = useState(''); 
   const [isSignUp, setIsSignUp] = useState(false); 
-  const [size, setSize] = useState({ width: 1000, height: 800 })
+  const [size, setSize] = useState({ width: 400, height: 800 })
 
   const {user, setUser} = useGlobalContext()
 

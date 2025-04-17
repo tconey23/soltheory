@@ -1,4 +1,24 @@
 @import "~@flaticon/flaticon-uicons/css/all/all";
+@font-face {
+  font-family: 'Fredoka Bold';
+  src: url('/public/fonts/Fredoka/static/Fredoka-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fredoka Regular';
+  src: url('/public/fonts/Fredoka/static/Fredoka-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Fredoka Variable';
+  src: url('/public/fonts/Fredoka/Fredoka-VariableFont_wdth\,wght.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .css-6hp17o-MuiList-root-MuiMenu-list, .css-3dzjca-MuiPaper-root-MuiPopover-paper-MuiMenu-paper{
   z-index: 100000 !important;

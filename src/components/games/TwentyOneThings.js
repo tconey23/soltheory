@@ -12,17 +12,17 @@ const yellow = '#fff200'
 const green = '#45d500'
 
 const Prompt = ({prompt, color}) => {
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     return (
-        <Stack userData='21things prompt' sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={'150px'} height={'85px'} backgroundColor={color}>
-            <Typography padding={2} fontSize={13}>{prompt}</Typography>
+        <Stack userData='21things prompt' padding={isMobile ? '0px' :2} sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}}} alignItems={'center'} justifyContent={'center'} boxShadow={'1px 1px 7px 1px #0000007a'} borderRadius={10} width={isMobile ? '120px' : '150px'} height={'85px'} backgroundColor={color}>
+            <Typography textAlign={'center'} padding={isMobile ? '0px' :2} fontSize={isMobile ? 10 : 13}>{prompt}</Typography>
         </Stack>
     )
 }
 
 const Home = ({handleDateChange, date, author, setCurrentStage, setResetRef, setToday, allData}) => {
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     const handlePlayGame = () => {
         setCurrentStage(prev => prev + 1)
@@ -31,7 +31,7 @@ const Home = ({handleDateChange, date, author, setCurrentStage, setResetRef, set
 
 
     return (
-        <Stack userData='21things home wrapper' alignItems={'center'} height={'100%'} width={'100%'}>
+        <Stack userData='21things home wrapper' alignItems={'center'} height={'100%'} width={'100%'} sx={{scale: isMobile ? 1 : 1}}>
             <Stack userData='21things hex wrapper' >
                 <Hexagon />
             </Stack>
@@ -71,7 +71,7 @@ const Home = ({handleDateChange, date, author, setCurrentStage, setResetRef, set
 const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections, setSelections }) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [purpleCount, setPurpleCount] = useState(0);
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -126,11 +126,11 @@ const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections
     }
 
     return (
-        <Stack userData='21things stage1 prompt list' height={'100%'}>
+        <Stack userData='21things stage1 prompt list' height={'100%'} width={'100%'} sx={{scale: isMobile ? 0.9 : 1}}>
             <Typography variant="h6">Select the your top 6 things: {purpleCount}/6</Typography>
-            <ImageList sx={{ width: 500, height: '75vh', overflow: 'scroll'}} cols={3} rowHeight={1000}>
+            <ImageList sx={{ width: '100%', height: '75vh', overflow: 'scroll'}} cols={3} rowHeight={1000}>
                 {dispPrompts.map((p, i) => (
-                    <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
+                    <Stack key={i} padding={0} onClick={() => handleSelect(p, i)}>
                         <Prompt prompt={p.prompt} color={p.color} />
                     </Stack>
                 ))}
@@ -147,7 +147,7 @@ const Stage1 = ({ prompts, setPrompts, setCurrentStage, currentStage, selections
 const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentStage, selections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [yellowCount, setYellowCount] = useState(0);
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -199,9 +199,9 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentSt
     
 
     return (
-        <Stack userData='21things stage2 prompt list'  height={'100%'} alignItems="center">
+        <Stack userData='21things stage2 prompt list'  height={'100%'} width={'100%'} sx={{scale: isMobile ? 0.9 : 1}} alignItems="center">
             <Typography variant="h6">Now narrow it down to 3: {yellowCount}/3</Typography>
-            <ImageList sx={{ width: 500, height: '75%', justifyItems:'center', alignContent: 'center' }} cols={3} rowHeight={1}>
+            <ImageList sx={{ width: '100%', height: '75%', justifyItems:'center', alignContent: 'center' }} cols={3} rowHeight={1}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
                         <Prompt prompt={p.prompt} color={p.color} />
@@ -219,7 +219,7 @@ const Stage2 = ({ prompts, setCurrentStage, setPrompts, setSelections, currentSt
 const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections, setSelections}) => {
     const [dispPrompts, setDispPrompts] = useState([]);
     const [greenCount, setGreenCount] = useState(0);
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     useEffect(() => {
         if(selections[currentStage].length > 0){
@@ -270,9 +270,9 @@ const Stage3 = ({ prompts, setCurrentStage, setPrompts, currentStage, selections
     }
 
     return (
-        <Stack height={'100%'} alignItems="center">
+        <Stack height={'100%'} width={'100%'} alignItems="center" sx={{scale: isMobile ? 0.9 : 1}}>
             <Typography variant="h6">Now choose your favorite: {greenCount}/1</Typography>
-            <ImageList sx={{ width: 500, height: '75vh' }} cols={3} rowHeight={100}>
+            <ImageList sx={{ width: '100%', height: '75vh' }} cols={3} rowHeight={100}>
                 {dispPrompts.map((p, i) => (
                     <Stack key={i} padding={0.3} onClick={() => handleSelect(p, i)}>
                         <Prompt prompt={p.prompt} color={p.color} />
@@ -294,7 +294,16 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
     const [userNote, setUserNote] = useState(null)
     const [warning, setWarning] = useState(null)
     const [readyToSave, setReadyToSave] = useState(false)
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
+    const [padding, setPadding] = useState()
+
+    useEffect(() => {
+        if(isMobile){
+            setPadding(0)
+        } else {
+            setPadding(0.3)
+        }
+    }, [isMobile])
 
     useEffect(() => {
         // console.log('stage4',prompts)
@@ -365,22 +374,22 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
     
 
     return (
-        <Stack userData='21things stage4 wrapper' sx={{overflow: 'scroll'}} height={'80%'} alignItems="center">
+        <Stack userData='21things stage4 wrapper' sx={{overflow: 'scroll', scale: isMobile ? 0.9 : 1}} height={'80%'} width={'100%'} alignItems="center">
             <Stack userData='21things stage4 inner' width={'100%'} justifyContent={'center'}>
-                <ImageList userData='21things stage4 prompt list' sx={{ width: 500, height: '100%', overFlowY: 'hidden'}} cols={3}>
+                <ImageList userData='21things stage4 prompt list' sx={{ width: '100%', height: '75%', justifyContent: 'center', alignItems: 'center', overFlowY: 'hidden'}} cols={3}>
                     {selections['1']
                     .map((p, i) => (
-                        <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
+                        <Stack key={i} padding={padding} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
                         </Stack>
                     ))}
                 </ImageList>
             </Stack>
             <Stack userData='21things stage4 prompt list' width={'100%'} justifyContent={'center'}>
-                <ImageList sx={{ width: 500, height: '75%', overFlowY: 'hidden' }} cols={3}>
+                <ImageList sx={{ width: '100%', height: '75%', justifyContent: 'center', alignItems: 'center', overFlowY: 'hidden'}} cols={3}>
                     {selections['2']
                     .map((p, i) => (
-                        <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
+                        <Stack key={i} padding={padding} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
                         </Stack>
                     ))}
@@ -388,10 +397,10 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
             </Stack>
 
             <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
-                <ImageList sx={{ width: 500, height: '75%', justifyContent: 'center', alignItems: 'center', overFlowY: 'hidden'}} cols={1}>
+                <ImageList sx={{ width: '100%', height: '75%', justifyContent: 'center', alignItems: 'center', overFlowY: 'hidden'}} cols={1}>
                     {selections['3']
                     .map((p, i) => (
-                        <Stack key={i} padding={0.3} justifyContent={'center'} alignItems={'center'}>
+                        <Stack key={i} padding={padding} justifyContent={'center'} alignItems={'center'}>
                             <Prompt prompt={p.prompt} color={p.color} />
                         </Stack>
                     ))}
@@ -420,7 +429,7 @@ const Stage4 = ({prompts, setCurrentStage, selections, currentStage, setSelectio
 const TwentyOneThings = ({user}) => {
 
     // console.log(user)
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps, isMobile} = useGlobalContext()
 
     const [prompts, setPrompts] = useState()
     const [date, setDate] = useState(null)
@@ -496,7 +505,7 @@ const TwentyOneThings = ({user}) => {
     };
 
   return (
-    <Stack userData='21things main wrapper' direction={'column'} sx={{ height: '100%', width: '75%'}} alignItems={'center'}>
+    <Stack userData='21things main wrapper' direction={'column'} sx={{ height: '100%', width: '100%', scale: isMobile ? 0.9 : 1}} alignItems={'center'} >
         
         {prompts && currentStage === 0 && allData && 
             <Home handleDateChange={handleDateChange} date={date} author={author} prompts={prompts} setCurrentStage={setCurrentStage} setResetRef={setResetRef} setSelections={setSelections} selections={selections}/>
