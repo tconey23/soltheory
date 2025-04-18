@@ -44,12 +44,6 @@ const AppHeader = () => {
    isMobile ? setMobileMenu(false) : setMobileMenu(false)
   };
 
-  const handleCloseModal = (target) => {
-    if(target.type !== 'button'){
-      setMobileMenu(false)
-    }
-  }
-
   const handleInstallClick = async () => {
     if (!deferredPrompt) return;
 
@@ -155,6 +149,16 @@ const AppHeader = () => {
                 </Stack>
               </>
           }
+          <Button>
+            <Avatar sx={{background: 'limeGreen'}}>
+              <i class="fi fi-sr-envelope"></i>
+            </Avatar>
+          </Button>
+          <Button onClick={() => nav('/friends')} >
+            <Avatar>
+              <i class="fi fi-rr-users"></i>
+            </Avatar>
+          </Button>
           <Button onClick={() => handleAccount()}>
             <Avatar key={user} src={avatar ? avatar : null}/>
           </Button>

@@ -137,9 +137,9 @@ const GamePageComp = ({selectedGame, user, setUser, setToggleQuit }) => {
 
                     {!isMobile && 
                     <Stack height={'100%'} width={'30%'} userData='friends_section' alignItems={'center'}>
-                        <Stack userData='gamePage 8' width={'60%'} height={'85%'} justifyContent={'center'} alignItems={'center'} sx={{boxShadow: 'inset #00000021 0px 0px 6px 6px', borderRadius: 2}}>
+                        {/* <Stack userData='gamePage 8' width={'60%'} height={'85%'} justifyContent={'center'} alignItems={'center'} sx={{boxShadow: 'inset #00000021 0px 0px 6px 6px', borderRadius: 2}}>
                             <Friends />
-                        </Stack>
+                        </Stack> */}
                     </Stack>}
 
                 </Stack>

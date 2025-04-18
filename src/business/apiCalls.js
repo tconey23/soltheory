@@ -47,6 +47,17 @@ const addFriend = async (user, friend) => {
     const createUser = async () => {
         
     }
+
+    const getAllUsers = async () => {
+        let { data, error } = await supabase
+        .from('Users')
+        .select('*')
+        
+        if(data){
+            return data
+        }
+
+    }
     
     const getUser = async (email) => {
         let { data, error } = await supabase
@@ -477,4 +488,4 @@ const addFriend = async (user, friend) => {
       };
 
 
-    export {updateUserAvatar, findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}
+    export {getAllUsers, updateUserAvatar, findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

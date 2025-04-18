@@ -15,6 +15,7 @@ import ErrorPage from './components/ErrorPage';
 import DevCanvas from './r3fAssets/DevCanvas';
 import Login from './components/Login';
 import AccountPage from './components/AccountPage';
+import Friends from './components/Friends';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
@@ -66,6 +67,7 @@ function App() {
               <Route path='/dev_canvas' element={<DevCanvas />}/>
               <Route path='/login' element={<Login />}/>
               <Route path='/account' element={<AccountPage />}/>
+              <Route path='/friends' element={<Friends />}/>
             {!toggleQuit && 
               <>
                 <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>
