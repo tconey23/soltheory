@@ -4,13 +4,14 @@ import { RigidBody } from '@react-three/rapier'
 import * as THREE from 'three'
 import { useTexture } from '@react-three/drei'
 import { TrimeshCollider } from '@react-three/rapier'
+import { Environment, Lightformer } from '@react-three/drei';
+import { useGlobalContext } from '../business/GlobalContext';
 
-const GroundPlane = () => {
+
+const GroundPlane = ({showEnvironment}) => {
     const curvedPlane = useMemo(() => {
       const geometry = new THREE.PlaneGeometry(100, 100, 100, 100)
       geometry.rotateX(-Math.PI / 2)
-    
-      // ✅ VERY IMPORTANT: flatten the geometry so Trimesh can use it
       geometry.toNonIndexed()
     
       const pos = geometry.attributes.position
@@ -45,19 +46,21 @@ const GroundPlane = () => {
     }, [textures])
   
     return (
-      <RigidBody userData='ground_plane' type="fixed" colliders={false}>
-        <mesh geometry={curvedPlane} receiveShadow>
-          <meshStandardMaterial {...textures} metalness={1} roughness={1.5} />
-        </mesh>
-        <TrimeshCollider
-  
+      <>
+        <RigidBody userData='ground_plane' type="fixed" colliders={false} friction={1}>
+          <mesh geometry={curvedPlane} receiveShadow>
+            <meshStandardMaterial {...textures} metalness={1} roughness={1.5} />
+          </mesh>
+          <TrimeshCollider
+
         position={[0,0.55,0]}
-          args={[
-            Array.from(curvedPlane.attributes.position.array),
-            Array.from(curvedPlane.index?.array ?? []), // must exist, so fallback to []    
-          ]}
+        args={[
+        Array.from(curvedPlane.attributes.position.array),
+        Array.from(curvedPlane.index?.array ?? []), // must exist, so fallback to []    
+        ]}
         />
-      </RigidBody>
+        </RigidBody>
+    </>
     )
   }
 

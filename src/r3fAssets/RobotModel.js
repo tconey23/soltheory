@@ -6,7 +6,6 @@ import { CuboidCollider } from '@react-three/rapier'
 import { interactionGroups } from '@react-three/rapier'
 import { useRapier } from '@react-three/rapier'
 import { useCursor } from '@react-three/drei'
-import SpeechBubble from './SpeechBubble'
 import { useGlobalContext } from '../business/GlobalContext'
 import RobotGLB from './RobotGLB'
 import * as RAPIER from '@dimforge/rapier3d-compat'
@@ -208,13 +207,13 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
           position={[0, 2, 0]}
           collisionGroups={interactionGroups([1], [0, 3])}
         >
-        {toggleOptions && 
+        {/* {toggleOptions && 
         <>
           <group position={[0,5,0]}>
                    <SpeechBubble setToggleOptions={setToggleOptions}/>   
           </group>
         </>
-        }
+        } */}
 
         <mesh
           position={[0, 1, 0]}

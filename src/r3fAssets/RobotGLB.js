@@ -48,47 +48,29 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isTurning, isJum
 
         setIsIdle(false)
       
-        // First: disable everything softly
         Object.values(actions).forEach((action) => {
           if (action && action.isRunning()) {
             action.fadeOut(0.2)
             action.enabled = false}
         });
       
-      
-        // Prioritize jump animation
         if (isJumping) {
           play(animJump, 1, THREE.LoopOnce, 1);
           return;
         }
       
-        // Walk + turn blend
         if (isMoving && !isSprinting) {
           play(animWalking, 1, THREE.LoopRepeat, 1);
-          if (isTurning === 'left') play(animLeft, 0.4, THREE.LoopRepeat, 0.5);
-          if (isTurning === 'right') play(animRight, 0.4, THREE.LoopRepeat, 0.5);
           return;
         }
       
-        // Sprint
         if (isMoving && isSprinting) {
           play(animRunning, 1, THREE.LoopRepeat, 1);
           return;
         }
-      
-        // Standing turns (when not walking)
-        if (!isMoving && isTurning === 'left') {
-          play(animLeft, 1, THREE.LoopRepeat, 0.5);
-          return;
-        }
-        if (!isMoving && isTurning === 'right') {
-          play(animRight, 1, THREE.LoopRepeat, 0.5);
-          return;
-        }
-
         setIsIdle(true)
       
-      }, [isMoving, isSprinting, sprintMult, isTurning, isJumping, isIdle, actions]);
+      }, [isMoving, isSprinting, sprintMult, isJumping, isIdle, actions]);
       
 
       useEffect(() => {
@@ -99,12 +81,11 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isTurning, isJum
             play(animIdle, 1, THREE.LoopRepeat, 0.5);
           }
       
-          // Prevent stacking timeouts
           clearTimeout(idleTimeoutRef.current)
       
           idleTimeoutRef.current = setTimeout(() => {
             setTurnAround(true);
-          }, 5000);
+          }, 3000000);
         } else {
           setTurnAround(false);
           clearTimeout(idleTimeoutRef.current)

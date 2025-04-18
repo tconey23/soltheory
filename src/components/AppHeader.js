@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { AppBar, Box, Toolbar, Container, Button, Menu, MenuItem, Typography, MenuList, ListItem, List } from "@mui/material";
+import { AppBar, Box, Toolbar, Container, Button, MenuList, ListItem, Avatar } from "@mui/material";
 import { Link } from "react-router-dom";
 import solTheoryLogo from "../assets/soltheorylogo.png";
 import { useNavigate } from "react-router-dom";
@@ -9,17 +9,12 @@ import { Stack } from "@mui/material";
 import {Modal} from "@mui/material";
 
 const AppHeader = () => {
-  const {alertProps, setAlertProps} = useGlobalContext()
-  const [anchorElNav, setAnchorElNav] = useState(null);
-  const [anchorElUser, setAnchorElUser] = useState(null);
-  const [anchorElGames, setAnchorElGames] = useState(null);
+  const {alertProps, setAlertProps, isMobile, user, setUser, avatar} = useGlobalContext()
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isReady, setIsReady] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false)
   const nav = useNavigate()
-
-  const {isMobile} = useGlobalContext()
 
   
   useEffect(() => {
@@ -27,9 +22,6 @@ const AppHeader = () => {
       const isStandalone =
         window.matchMedia('(display-mode: standalone)').matches ||
         window.navigator.standalone === true;
-
-        console.log(isStandalone)
-
       setIsInstalled(isStandalone);
     };
 
@@ -87,6 +79,24 @@ const AppHeader = () => {
     nav('/games')
   };
 
+  const handleCloseModal = (target) => {
+    if(target.type !== 'button'){
+      setMobileMenu(false)
+    }
+  }
+
+  const handleAccount = () =>{
+    if(user?.user?.name && user?.user?.email){
+      nav('/account')
+    } else {
+      nav('/login')
+    }
+
+  }
+
+  useEffect(() => {
+    console.log(avatar)
+  }, [user])
 
   return (
     <Stack height={'10vh'} width={'100vw'}>
@@ -138,13 +148,16 @@ const AppHeader = () => {
           }
 
           {
-          isMobile && 
-          <>
-            <Stack direction={'row'} width={'100%'} justifyContent={'flex-end'}>  
-              <Button onClick={() => setMobileMenu(prev => !prev)} variant="contained">=</Button>
-            </Stack>
-          </>
+            isMobile &&  
+              <>
+                <Stack direction={'row'} width={'100%'} justifyContent={'flex-end'}>  
+                  <Button onClick={() => setMobileMenu(prev => !prev)} variant="contained">=</Button>
+                </Stack>
+              </>
           }
+          <Button onClick={() => handleAccount()}>
+            <Avatar key={user} src={avatar ? avatar : null}/>
+          </Button>
         </Toolbar>
       </Container>
     </AppBar>

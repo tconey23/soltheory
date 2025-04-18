@@ -1,56 +1,29 @@
-import { CameraControls } from '@react-three/drei'
-import { useFrame, useThree } from '@react-three/fiber'
-import { useRef, useEffect } from 'react'
+import { useRef } from "react"
+import { useThree, useFrame } from "@react-three/fiber"
+import { PerspectiveCamera } from "@react-three/drei"
 import * as THREE from 'three'
-import { useGlobalContext } from '../business/GlobalContext'
 
-const CameraFollow = ({ targetRef, turnAround, setControlsRef }) => {
-  const { isMobile } = useGlobalContext()
-  const { camera } = useThree()
-  const controlsRef = useRef()
-  const currentZOffset = useRef(-8)
-  const currentPos = useRef(new THREE.Vector3())
-  const currentLook = useRef(new THREE.Vector3())
+const CameraController = ({ pos, lookAt }) => {
+  const cameraRef = useRef()
+  const targetPos = new THREE.Vector3(...pos)
+  const targetLook = new THREE.Vector3(...lookAt)
 
-  useEffect(() => {
-    setControlsRef(controlsRef)
-  }, [setControlsRef])
-
-  useFrame((_, delta) => {
-    if (!targetRef.current || !controlsRef.current) return
-  
-    const controls = controlsRef.current
-    const pos = targetRef.current.translation()
-    const rot = targetRef.current.rotation()
-    const quat = new THREE.Quaternion(rot.x, rot.y, rot.z, rot.w)
-  
-    // Smoothly interpolate Z offset
-    const targetZ = turnAround ? 8 : -8
-    currentZOffset.current = THREE.MathUtils.lerp(currentZOffset.current, targetZ, 0.05)
-  
-    const offset = new THREE.Vector3(0, 3.5, currentZOffset.current).applyQuaternion(quat)
-  
-    const desiredPos = new THREE.Vector3(pos.x, pos.y, pos.z).add(offset)
-    const desiredLook = new THREE.Vector3(pos.x, pos.y + 2.5, pos.z)
-  
-    currentPos.current.lerp(desiredPos, 0.1)
-    currentLook.current.lerp(desiredLook, 0.1)
-  
-    controls.setLookAt(
-      currentPos.current.x,
-      currentPos.current.y,
-      currentPos.current.z,
-      currentLook.current.x,
-      currentLook.current.y,
-      currentLook.current.z,
-      false
-    )
-  
-    controls.enabled = false
-    controls.update(delta)
+  useFrame(() => {
+    if (cameraRef.current) {
+      cameraRef.current.position.lerp(targetPos, 0.1)
+      cameraRef.current.lookAt(targetLook)
+    }
   })
 
-  return <CameraControls ref={controlsRef} />
+  return (
+    <PerspectiveCamera
+      ref={cameraRef}
+      makeDefault
+      fov={75}
+      near={0.1}
+      far={1000}
+    />
+  )
 }
 
-export default CameraFollow
+export default CameraController

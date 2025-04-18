@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import { Canvas } from '@react-three/fiber'
-import HomePageText from '../r3fAssets/HomePageText';
+
 
 const SolGamesLogo = () => {
 
@@ -18,9 +18,7 @@ const SolGamesLogo = () => {
             <directionalLight color={purple} intensity={50} position={[2,0,1]} />
             <directionalLight color={green} intensity={50} position={[1,2,1]} />
             <directionalLight color={yellow} intensity={50} position={[1,3,1]} />
-            {/* <directionalLight intensity={40} position={[1,0,1]} /> */}
-
-            <HomePageText text={text}/> 
+            {/* <directionalLight intensity={40} position={[1,0,1]} /> */} 
         </Canvas>
     </Stack>
   );
