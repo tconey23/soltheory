@@ -64,23 +64,29 @@ const Login = ({ setSelectedOption }) => {
     <Stack
       alignItems="center"
       justifyContent="flex-start"
-      userData="login_wrapper"
+      userdata="login_wrapper"
       sx={styles.wrapper}
     >
         <Stack
-          userData="inputs_wrapper"
+          userdata="inputs_wrapper"
           backgroundColor={'white'}
           direction={'column'}
           alignItems="center"
           justifyContent="center"
           sx={isMobile ? styles.mobileInputWrapper : styles.inputWrapper}
         >
-          <Stack userData="login_styling" padding={'30px'} width={'100%'}>
-            <Stack userData="input_fields" width={'100%'} alignItems={'center'}>
+          <Stack userdata="login_styling" padding={'30px'} width={'100%'}>
+            <Stack userdata="input_fields" width={'100%'} alignItems={'center'}>
               <Box>
                 <Typography>Email:</Typography>
                 <TextField sx={styles.input} value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
               </Box>
+
+              {isSignUp &&
+              <Box>
+                <Typography>User Name:</Typography>
+                <TextField sx={styles.input} value={name} onChange={(e) => setName(e.target.value)} fullWidth />
+              </Box>}
 
               <Box>
                 <Typography>Password:</Typography>

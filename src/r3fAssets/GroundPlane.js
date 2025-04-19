@@ -47,7 +47,7 @@ const GroundPlane = ({showEnvironment}) => {
   
     return (
       <>
-        <RigidBody userData='ground_plane' type="fixed" colliders={false} friction={1}>
+        <RigidBody userdata='ground_plane' type="fixed" colliders={false} friction={1}>
           <mesh geometry={curvedPlane} receiveShadow>
             <meshStandardMaterial {...textures} metalness={1} roughness={1.5} />
           </mesh>

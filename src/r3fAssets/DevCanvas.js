@@ -287,7 +287,7 @@ const DevCanvas = () => {
 
   return (
     <>
-        <Canvas userData='dev_canvas' gl={{ physicallyCorrectLights: true }} shadows style={{height: '100%', background: 'black'}} onClick={(e) => handleShowOptions(e)}>
+        <Canvas userdata='dev_canvas' gl={{ physicallyCorrectLights: true }} shadows style={{height: '100%', background: 'black'}} onClick={(e) => handleShowOptions(e)}>
           
           <group>
           {allowPan && <OrbitingControl props={props}/>}
@@ -296,7 +296,7 @@ const DevCanvas = () => {
 
           <Billboard position={[props.camProps.pos.posx +50, props.camProps.pos.posy +10, 0]}>
             <Html>
-                <Button userData='dev_canvas_button' onClick={() => setShowOptions(prev => !prev)}>Options</Button>
+                <Button userdata='dev_canvas_button' onClick={() => setShowOptions(prev => !prev)}>Options</Button>
             </Html>
           </Billboard>
 

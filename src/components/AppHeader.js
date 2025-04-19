@@ -89,7 +89,7 @@ const AppHeader = () => {
   }
 
   useEffect(() => {
-    console.log(avatar)
+    // console.log(avatar)
   }, [user])
 
   return (
@@ -151,12 +151,12 @@ const AppHeader = () => {
           }
           <Button>
             <Avatar sx={{background: 'limeGreen'}}>
-              <i class="fi fi-sr-envelope"></i>
+              <i className="fi fi-sr-envelope"></i>
             </Avatar>
           </Button>
           <Button onClick={() => nav('/friends')} >
             <Avatar>
-              <i class="fi fi-rr-users"></i>
+              <i className="fi fi-rr-users"></i>
             </Avatar>
           </Button>
           <Button onClick={() => handleAccount()}>
@@ -170,14 +170,14 @@ const AppHeader = () => {
     <Modal
       open={mobileMenu}
       onClick={(e) => handleCloseModal(e.target)}
-      userData='MenuModal'
+      userdata='MenuModal'
     >
-              <Stack height={'100%'} width={'100%'} userData='MenuWrapper'>
+              <Stack height={'100%'} width={'100%'} userdata='MenuWrapper'>
                 <Stack marginTop={10}>
                   <MenuList>
                     {pages.map((page, i) =>
                       page === "SOL Games" ? (
-                        <ListItem userData='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
+                        <ListItem userdata='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
                           <Button
                             key={`${page}${i}`}
                             onClick={handleOpenGamesMenu}
@@ -188,7 +188,7 @@ const AppHeader = () => {
                           </Button>
                         </ListItem>
                       ) : (
-                        <ListItem userData='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
+                        <ListItem userdata='ListItem' key={`${page}${i}`} sx={{ position: "relative" }}>
                           <Button
                             key={page}
                             onClick={handleCloseNavMenu}

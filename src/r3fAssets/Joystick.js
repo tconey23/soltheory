@@ -26,7 +26,7 @@ const JoystickWrapper = ({ move, stop }) => {
         throttle={100}
         move={(e) => {
           if (e && e.x !== null && e.y !== null) {
-            const angle = Math.atan2(e.y, e.x) // radians
+            const angle = Math.atan2(e.y, e.x) - Math.PI / 2 // 🧭 Adjust so 0 = forward
             const force = Math.sqrt(e.x ** 2 + e.y ** 2)
             move({ angle, force })
           }

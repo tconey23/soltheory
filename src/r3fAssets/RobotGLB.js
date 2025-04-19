@@ -158,13 +158,13 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isTurning, isJum
           pointLight.castShadow = true;
           scene.castShadow = true
 
-          spotlight.userData = 'SpotLight'  
-          pointLight.userData = 'PointLight'
-          targetDebug.userData = 'DebugMesh'
+          spotlight.userdata = 'SpotLight'  
+          pointLight.userdata = 'PointLight'
+          targetDebug.userdata = 'DebugMesh'
           
-          const existingDebug = scene.getObjectByProperty('userData', 'DebugMesh')
-          const existingPoint = scene.getObjectByProperty('userData', 'PointLight')
-          const existingSpot = node.getObjectByProperty('userData', 'SpotLight')
+          const existingDebug = scene.getObjectByProperty('userdata', 'DebugMesh')
+          const existingPoint = scene.getObjectByProperty('userdata', 'PointLight')
+          const existingSpot = node.getObjectByProperty('userdata', 'SpotLight')
 
           node.material.transparent = true
           node.material.opacity = 0.1

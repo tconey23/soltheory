@@ -7,7 +7,7 @@ const Prompt = ({prompt, color}) => {
 
     return (
         <Stack
-            userData='21things prompt' 
+            userdata='21things prompt' 
             padding={isMobile ? 'px' :2} 
             sx={{transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}, marginTop: '5px', marginBottom: '5px', marginLeft: '5px', marginRight: '5px'}} 
             alignItems={'center'} 

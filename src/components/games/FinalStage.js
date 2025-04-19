@@ -5,8 +5,8 @@ import Prompt from './Prompt'
 import { useGlobalContext } from '../../business/GlobalContext'
 import { addGameToUser } from '../../business/apiCalls'
 
-const FinalStage = ({ selections, setSelections, setCurrentStage, user, date }) => {
-  const { isMobile, setAlertProps } = useGlobalContext()
+const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
+  const { isMobile, setAlertProps, user} = useGlobalContext()
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const greenPrompt = selections[3]?.[0] || null
@@ -29,6 +29,7 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, user, date }) 
     }
 
     const result = await addGameToUser(user, gameData)
+    console.log(result)
     if (result?.disposition) {
       setAlertProps({
         text: result.message,
@@ -58,7 +59,7 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, user, date }) 
 
   return (
     <Stack
-      userData="21things final stage"
+      userdata="21things final stage"
       sx={{ scale: isMobile ? 0.89 : 1 }}
       height="100%"
       width="100%"

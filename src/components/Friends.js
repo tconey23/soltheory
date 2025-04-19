@@ -37,9 +37,9 @@ const Friends = () => {
                         <Stack width={'33%'} alignItems={'center'}>
                           <Typography>Users</Typography>
                             <List>
-                              {users.map((u) => {
+                              {users.map((u, i) => {
                               return (
-                                <MenuItem>
+                                <MenuItem key={i}>
                                     <Stack direction={'row'} justifyContent={'space-around'} alignItems={'center'} >
                                       <Avatar src={u.avatar} />
                                       <Typography sx={{marginLeft: 1}}>{u.user_name}</Typography>

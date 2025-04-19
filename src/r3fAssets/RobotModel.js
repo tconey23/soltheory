@@ -12,10 +12,7 @@ import * as RAPIER from '@dimforge/rapier3d-compat'
 
 const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) => {
 
-  const {setShowJoystick, showJoystick, isMobile, degrees} = useGlobalContext()
-
-  const rapier = useRapier();
-  const { world } = rapier
+  const { isMobile, degrees} = useGlobalContext()
   
   const groupRef = useRef()
   const yawRef = useRef(0)
@@ -115,15 +112,30 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
     const right = keys.current['ArrowRight'] || keys.current['KeyD'];
     const jump = keys.current['Space'];
     const sprint = keys.current['ShiftLeft'];
-    const mult = sprint ? sprintMult : 1;
+    const mult = sprint ? sprintMult : 2;
   
     setIsSprinting(sprint);
   
     const moveDirection = new THREE.Vector3();
   
     if (isMobile && joystick?.force > 0) {
-      impulse.x += Math.cos(joystick.angle) * joystick.force * speed;
-      impulse.z += -Math.sin(joystick.angle) * joystick.force * speed;
+      const force = Math.max(joystick.force, 0.1)
+      const angle = joystick.angle
+    
+      const direction = new THREE.Vector3(
+        Math.sin(angle), // X
+        0,
+        Math.cos(angle)  // Z
+      )
+    
+      direction.normalize()
+      impulse.copy(direction.multiplyScalar(speed * mult * force))
+    
+      // ✅ This aligns robot’s Y rotation with movement direction
+      const yawQuat = new THREE.Quaternion().setFromEuler(
+        new THREE.Euler(0, angle, 0)
+      )
+      bodyRef.current.setRotation(yawQuat, true)
     } else {
       if(jump){
         setIsJumping(true)
@@ -194,14 +206,14 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
         ? 
         <RigidBody
           ccd 
-          userData='robot-mesh'
+          userdata='robot-mesh'
           ref={bodyRef}
           type="dynamic"
           colliders={false}
           friction={0}
           restitution={0.5}
           mass={1000}
-          linearDamping={5}
+          linearDamping={4}
           angularDamping={0.1}
           enabledRotations={[false, true, false]}
           position={[0, 2, 0]}
@@ -231,24 +243,24 @@ const RobotModel = ({ bodyRef, joystick, pos, rot, setTurnAround, turnAround}) =
           <RobotGLB turnAround={turnAround} setTurnAround={setTurnAround} groupRef={groupRef} isMoving={isMoving} isSprinting={isSprinting} sprintMult={sprintMult} isTurning={isTurning} isJumping={isJumping} />
           <ambientLight color={'deepSkyBlue'} intensity={0.01}/>
           <CuboidCollider
-            userData='robot-collider' 
+            userdata='robot-collider' 
             args={[0.5, 1, 0.5]} w
             position={[0, 1, 0]} 
             collisionGroups={interactionGroups([1], [0, 3])} 
           />
           <CuboidCollider
-            userData='robot-sensor' 
+            userdata='robot-sensor' 
             sensor 
             args={[0.5, 1, 0.5]} 
             position={[0, 1, 0]} 
             onIntersectionEnter={(other) => {
-              const isGround = other.rigidBody.userData === 'ground_plane'
+              const isGround = other.rigidBody.userdata === 'ground_plane'
               if(isGround && !isGrounded){
                 setIsGrounded(true)
               }
             }}
             onIntersectionExit={(other) => {
-              const isGround = other.rigidBody.userData === 'ground_plane'
+              const isGround = other.rigidBody.userdata === 'ground_plane'
               if(isGround && isGrounded){
                 setIsGrounded(false)
               }

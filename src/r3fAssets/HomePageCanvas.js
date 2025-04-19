@@ -41,7 +41,7 @@ const HomePageCanvas = () => {
   <div style={{height: '100%', width: '100vw', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start'}}>
 
       <Canvas gl={{ physicallyCorrectLights: true }} shadows style={{ height: '100%', width: '100%', background: 'black' }}>
-        <PerformanceMonitor onIncline={console.log('incline')} onDecline={console.log('decline')}/>
+        {/* <PerformanceMonitor onIncline={console.log('incline')} onDecline={console.log('decline')}/> */}
         <Preload all />
         
         <Lighting pos={[0, 40, 0]} xOffset={10} zOffset={-5} intensity={4} color1={'pink'} color2={'deepSkyBlue'} />

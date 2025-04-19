@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useMediaQuery } from '@mui/material'
 import { getUser } from './apiCalls';
+import { supabase } from './supabaseClient';
 
 // Create Context
 const GlobalContext = createContext();
@@ -53,20 +54,37 @@ useEffect(() =>{
     setDisplayName(null)
     setisAdmin(null)
   }
- 
 }, [user])
 
   useEffect(() => {
     if(!user){
       const storedUser = localStorage.getItem('user');
       const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-      
+      console.log(user)
       if (isAuth && storedUser) {
         setUser(JSON.parse(storedUser));
       }
     }
   }, [user, recheckUser]);
 
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[Auth Event]:', event)
+      if (event === 'SIGNED_IN' && session?.user) {
+        await supabase
+          .from('userlist')
+          .upsert([{ primary_id: session.user.id, email: session.user.email }], {
+            onConflict: 'primary_id',
+          })
+      }
+    })
+  
+    return () => {
+      authListener.subscription.unsubscribe()
+    }
+  }, [])
+
+  
   return (
     <GlobalContext.Provider value={{ setRecheckUser, avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName}}>
       {children}

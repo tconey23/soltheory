@@ -10,6 +10,7 @@ import { getUser, signOut, updateUserAvatar } from '../business/apiCalls';
 import { useGlobalContext } from '../business/GlobalContext'
 import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
+import { supabase } from '../business/supabaseClient';
 
 const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
     const {
@@ -85,6 +86,7 @@ const AccountPage = ({size}) => {
     const [avatarTerms, setAvatarTerms] = useState([
         'abstract', 'illustration', 'minimal', 'cartoon'
     ])
+  
 
     useEffect(() => {
         if(imageType && avatarSearch){
@@ -93,22 +95,35 @@ const AccountPage = ({size}) => {
     }, [imageType, avatarSearch])
 
     const handleLogout = async () => {
-    const res = await signOut()
-        if(res.disposition === 'success'){
-            setUser(null)
-        }
-        setAlertProps({
+        localStorage.removeItem('supabase.auth.token');
+        localStorage.removeItem('user');
+        localStorage.setItem('isAuthenticated', 'false');
+
+        const res = await signOut()
+        console.log('[Logout Result]', res)
+      
+        if (res.disposition === 'success') {
+          setUser(null)
+          setAlertProps({
             text: 'You have been logged out',
             severity: 'success',
-            display: true
-        })
-    }
+            display: true,
+          })
+        } else {
+          console.error('[Logout Error]', res.error)
+          setAlertProps({
+            text: res.message,
+            severity: 'error',
+            display: true,
+          })
+        }
+      }
 
     useEffect(() =>{
+      console.log(user)
         if(!user){
             nav('/login')
         }
-        console.log(user)
     }, [user])
 
 
@@ -117,12 +132,12 @@ const AccountPage = ({size}) => {
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
                     <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
-                        <Typography variant="h7">Welcome, {displayName}!</Typography>
+                        <Typography variant="h7">Welcome, {user?.user?.email}!</Typography>
                         <Button variant="contained" color="error" onClick={handleLogout} sx={{ mt: 2 }}>
                             Logout
                         </Button>
                     </Stack>
-                    <Stack width={'85%'} overflow={'auto'} userData='accrodion_wrapper' height={'60%'}>
+                    <Stack width={'85%'} overflow={'auto'} userdata='accrodion_wrapper' height={'60%'}>
                     <Accordion>
                         <AccordionSummary>
                             <Typography>Account Details</Typography>
@@ -131,8 +146,8 @@ const AccountPage = ({size}) => {
                                 <Stack justifyContent={'center'} alignItems={'center'}>
                                     <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
                                     <Select value={imageType} onChange={(e) => setImageType(e.target.value)}> 
-                                        {avatarTerms.map((t) => (
-                                            <MenuItem value={t}>
+                                        {avatarTerms.map((t, i) => (
+                                            <MenuItem key={i} value={t}>
                                                 <Typography>{t}</Typography>
                                             </MenuItem>
                                         ))}

@@ -1,6 +1,7 @@
 import { dispose } from "@react-three/fiber";
 import { supabase } from "./supabaseClient";
 
+
 async function checkAndAddUsers(user) {
 
 
@@ -15,7 +16,7 @@ const addFriend = async (user, friend) => {
         if(prompts) 
             {
                 const { data, error } = await supabase
-                .from('21ThingsPrompts')
+                .from('21thingsprompts_duplicate')
                 .insert([
                     prompts
                 ])
@@ -27,30 +28,27 @@ const addFriend = async (user, friend) => {
                 }
             }
     };
-    
-    const get21Things = async (date) =>{
+
+
+    const get21Things = async (index) =>{
         
-        let { data, error } = await supabase
-        .from('21ThingsPrompts')
-        .select('*')
-        // .eq('date', date)
+        const { data: reqEntry, error } = await supabase
+            .from('21thingsprompts')
+            .select('*')
+            .order('id', { ascending: false })
+            .range(index, index) // Offset by 1, return 1 record
         
-        if(data && data[0]){
-            // console.log(data)
-            return data
+        if(reqEntry){
+            return reqEntry[0]
         }
 
-        return error
+        return error 
 
-    }
-    
-    const createUser = async () => {
-        
     }
 
     const getAllUsers = async () => {
         let { data, error } = await supabase
-        .from('Users')
+        .from('userlist')
         .select('*')
         
         if(data){
@@ -61,7 +59,7 @@ const addFriend = async (user, friend) => {
     
     const getUser = async (email) => {
         let { data, error } = await supabase
-        .from('Users')
+        .from('userlist')
         .select('*')
         .eq('email', email.toLowerCase())
         
@@ -74,48 +72,43 @@ const addFriend = async (user, friend) => {
     }
     
     const addGameToUser = async (user, newGameData) => {
-        console.log(user.email, newGameData)
-        // Fetch the existing user
         const { data: foundUser, error: fetchError } = await supabase
-        .from('Users')
-        .select('game_data')
-        .eq('email', user.email)
-        .single();
-        
+          .from('userlist')
+          .select('*')
+          .eq('user_id', user.user.id)  // use UID from auth
+          .single()
+      
         if (fetchError) {
-            console.error("Error fetching user:", fetchError);
-            return;
+          console.error("Error fetching user:", fetchError)
+          return
         }
-        
-        console.log("Existing game data:", foundUser.game_data);
-        
-        // Merge new game data with existing game data (if any)
+      
         const updatedGameData = foundUser.game_data
-        ? [...foundUser.game_data, newGameData]  // Append new game
-        : [newGameData];  // If empty, start fresh array
-        
-        // Update user record with new game data
+          ? [...foundUser.game_data, newGameData]
+          : [newGameData]
+      
         const { error: updateError } = await supabase
-        .from('Users')
-        .update({ game_data: updatedGameData })
-        .eq('email', user.email);
-        
+          .from('userlist')
+          .update({ game_data: updatedGameData })
+          .eq('user_id', user.user.id) // match on auth.uid()
+      
         if (updateError) {
-            return {
-                disposition: 'error',
-                message: 'There was an error adding the game to your profile'
-            };
+          return {
+            disposition: 'error',
+            message: 'There was an error adding the game to your profile'
+          }
         } else {
-            return {
-                disposition: 'success',
-                message: 'Game data added to your profile'
-            };
+          return {
+            disposition: 'success',
+            message: 'Game data added to your profile'
+          }
         }
-    };
+      }
+      
     
     const getUserGames = async (user) => { 
         const { data, error } = await supabase
-            .from('Users')
+            .from('userlist')
             .select('game_data')
             .eq('email', user.email)
             .single();  // Ensures only one record is fetched
@@ -162,76 +155,87 @@ const addFriend = async (user, friend) => {
       };
 
       const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
+        try {
+          const { error } = await supabase.auth.signOut();
       
-        // Clear user info from localStorage either way
-        localStorage.removeItem('user');
-        localStorage.setItem('isAuthenticated', 'false');
+          localStorage.removeItem('user');
+          localStorage.setItem('isAuthenticated', 'false');
       
-        if (error) {
-          console.error('Sign out error:', error);
+          if (error) {
+            console.error('Sign out error:', error);
+            return {
+              disposition: 'error',
+              message: 'There was a problem signing out.',
+              error,
+            };
+          }
+      
+          return {
+            disposition: 'success',
+            message: 'You have been signed out successfully.',
+          };
+        } catch (err) {
+          console.error('Unexpected signOut failure:', err);
           return {
             disposition: 'error',
-            message: 'There was a problem signing out.',
-            error,
+            message: 'Unexpected error during sign out.',
+            error: err,
+          };
+        }
+      };
+      
+      
+
+      const signUpUser = async (email, password, username) => {
+        console.log(email, password, username);
+      
+        const { data, error } = await supabase.auth.signUp({ email, password });
+      
+        if (error) {
+          return {
+            message: 'Error creating profile',
+            disposition: 'error',
+            error
           };
         }
       
+        const user = data.user;
+      
+        if (!user?.id) {
+          console.error("User signup failed: no ID");
+          return {
+            message: 'User signup failed',
+            disposition: 'error'
+          };
+        }
+      
+        const { updateData, error: updateError } = await supabase
+        .from('users') // ← make sure this matches your table name exactly
+        .update({ user_name: username })
+        .eq('primary_id', user.id)
+        .select(); // ← removes the .single() so it won't throw if no match
+
+        if (updateError) {
+        console.error("Error updating username:", updateError);
         return {
-          disposition: 'success',
-          message: 'You have been signed out successfully.',
+            message: 'Error updating username',
+            disposition: 'error',
+            error: updateError
+        };
+        }
+
+        if (!updateData || updateData.length === 0) {
+        console.warn("No rows returned on username update — possible bad primary_id");
+        }
+      
+        console.log("User profile created!");
+        return {
+          message: 'Profile created successfully',
+          disposition: 'success'
         };
       };
       
-
-    const signUpUser = async (email, password, username) => {
-
-        const { data, error } = await supabase.auth.signUp({ email, password });
-    
-        if (error) {
-            return {
-                message: 'Error creating profile',
-                disposition: 'error',
-                error: error
-            };
-        }
-    
-        const user = data.user;
-    
-        if (!user) {
-            console.error("User signup failed, no user returned.");
-            return {
-                message: 'User signup failed',
-                disposition: 'error'
-            };
-        }
-        
-        const { error: profileError } = await supabase
-            .from('Users') 
-            .insert([
-                {
-                    id: user.id,
-                    email: user.email,
-                    username: username,
-                    game_data: []
-                }
-            ]);
-    
-        if (profileError) {
-            console.error("Error creating profile:", profileError);
-            return {
-                message: 'Database error saving new user',
-                disposition: 'error',
-                error: profileError
-            };
-        }
-    
-        console.log("User profile created!");
-        return {
-            message: 'Profile created successfully',
-            disposition: 'success',
-        };
-    };
+      
     
 
     const getGifs = async (packName) => {
@@ -474,7 +478,7 @@ const addFriend = async (user, friend) => {
 
     const updateUserAvatar = async (userId, avatarUrl) => {
         const { data, error } = await supabase
-          .from('users') // your table name
+          .from('userlist') // your table name
           .update({ avatar: avatarUrl })
           .eq('id', userId) // match user by ID
           .select(); // optional: returns updated row

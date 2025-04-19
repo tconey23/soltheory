@@ -46,18 +46,18 @@ function App() {
     }
   }, [alertProps])
 
+  
+
   return (
-      <Stack userData='app_wrapper' direction={'column'} height={'100vh'} width={'100vw'}>
+      <Stack userdata='app_wrapper' direction={'column'} height={'100vh'} width={'100vw'}>
          
-          <Stack userData='app_header' width={'100%'} height={'10%'}>
+          <Stack userdata='app_header' width={'100%'} height={'10%'}>
             <AppHeader />
           </Stack>
         
-          {/* <Stack userData='app_alerts' width={'100%'} height={'10%'} justifyContent={'center'} alignItems={'center'} position={'fixed'}>
-            {alertProps.display && <Alert severity={alertProps.severity} sx={{width: '50%'}}>{alertProps.text}</Alert>}
-          </Stack> */}
+          <UserAlert />
 
-          <Stack userData='app 2' height={'90%'} justifyContent={'center'} alignItems={'center'}>
+          <Stack userdata='app 2' height={'90%'} justifyContent={'center'} alignItems={'center'}>
             <Routes>
               <Route path="/" element={<HomePageCanvas user={user} setUser={setUser} />}/>
               <Route path="/home" element={<HomePageCanvas user={user} setUser={setUser} />}/>

@@ -12,7 +12,7 @@ const SolGamesLogo = () => {
     const [text, setText] = useState('SolGames')
 
   return (
-    <Stack userData='solGamesContainer' direction={'column'} sx={{ height: '10vh', width: '45vw' }}>
+    <Stack userdata='solGamesContainer' direction={'column'} sx={{ height: '10vh', width: '45vw' }}>
         <Canvas style={{overflowX: 'visible'}}>
             <ambientLight intensity={0.5} />
             <directionalLight color={purple} intensity={50} position={[2,0,1]} />
