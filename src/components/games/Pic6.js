@@ -303,8 +303,8 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
               <video
                 style={{boxShadow: '4px 2px 10px 1px #00000038', padding: 1}}
                 ref={videoRef}
-                width="100%"
-                height="100%"
+                width="80%"
+                height="80%"
                 preload="metadata"
                 mute
               >
@@ -323,7 +323,7 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
               inputRefs.current[wordIndex] = [];
               
               return (
-                <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={0} marginBottom={1} padding={1}>
+                <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={0} marginBottom={0} padding={1}>
                   {word.split("").map((letter, letterIndex) => {
 
                     return (
@@ -405,8 +405,10 @@ const Pic6 = ({user}) => {
 
   const fetchGifs = async (name) => {
     const res = await getGifs(name)
+    console.log(res)
     if(res && res.gifs){
-      res.gifs.forEach((l, i) => {
+      const gifs = JSON.parse(res.gifs)
+      gifs.forEach((l, i) => {
         setLevels(prev => [
           ...prev,
           {
@@ -483,7 +485,7 @@ const Pic6 = ({user}) => {
     >
 
       {gamePack && 
-      <Stack direction={'row'} height={'6%'} width={'100%'} marginBottom={3} alignItems={'center'} justifyContent={'space-around'}>
+      <Stack direction={'row'} height={'6%'} width={'100%'} marginBottom={0} alignItems={'center'} justifyContent={'space-around'}>
         <Typography>{`Level ${gifIndex +1}`}</Typography>
         <Button onClick={() => setRefKey(prev => prev +1)}>Start over</Button>
         <Typography sx={{width: 100}}>{`Total Score: ${totalScore}`}</Typography>

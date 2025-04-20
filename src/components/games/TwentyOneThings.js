@@ -110,8 +110,9 @@ const Home = ({ onPlay, setGameIndex, payload, gameIndex }) => {
     useEffect(() => {
       const fetchPrompts = async () => {
         const res = await get21Things(gameIndex)
-        if (res && res.date) {
-          const initialized = res.prompts.map(p => ({
+        if (res && res.date && res.prompts) {
+          const parsedPrompts = JSON.parse(res.prompts)
+          const initialized = parsedPrompts.map(p => ({
             prompt: typeof p === 'string' ? p : p.prompt,
             color: 'white'
           }))

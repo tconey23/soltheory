@@ -17,7 +17,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
     const { user } = session
 
     const { data, error } = await supabase
-      .from('userlist')
+      .from('users')
       .upsert(
         [{ primary_id: user.id, email: user.email }],
         { onConflict: 'primary_id' } // this ensures upsert is based on the primary_id column

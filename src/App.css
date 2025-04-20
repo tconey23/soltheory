@@ -29,9 +29,10 @@
 }
 
 #textbox-wrapper > div > div > fieldset{
-  border-style: none !important;
-  border-bottom: 2px solid #282c34 !important;
-  
+  /* border-style: none !important;
+  border-bottom: 2px solid #282c34 !important; */
+  margin-left: 2px;
+  margin-left: 2px
 }
 
 

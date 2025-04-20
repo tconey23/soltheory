@@ -32,18 +32,29 @@ export const GlobalProvider = ({ children }) => {
   }, [recheckUser])
 
   const checkAdminAccess = async (email) => {
-    const res = await getUser(email)
+    const res = await getUser(email);
+  
+    // Only update if metadata is different
+    setUser(prev => {
+      if (!prev.metadata) {
+        return {
+          ...prev,
+          metadata: res
+        };
+      }
+      return prev;
+    });
+  };
 
-    setUser(prev => ({
-      ...prev,
-      metadata: res
-    }))
-}
+useEffect(() => {
+  if (user?.user?.email && !user?.metadata) {
+    checkAdminAccess(user.user.email)
+  }
+}, [user?.user?.email])
 
 useEffect(() =>{
-  if(user && user?.user?.email && !user?.metadata){
-    checkAdminAccess(user?.user?.email)
-  }
+
+  console.log(user)
 
   if(user?.metadata){
     setAvatar(user.metadata.avatar)
@@ -60,7 +71,6 @@ useEffect(() =>{
     if(!user){
       const storedUser = localStorage.getItem('user');
       const isAuth = localStorage.getItem('isAuthenticated') === 'true';
-      console.log(user)
       if (isAuth && storedUser) {
         setUser(JSON.parse(storedUser));
       }
@@ -69,20 +79,26 @@ useEffect(() =>{
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth Event]:', event)
+      console.log('[Auth Event]:', event);
+  
       if (event === 'SIGNED_IN' && session?.user) {
         await supabase
-          .from('userlist')
+          .from('users')
           .upsert([{ primary_id: session.user.id, email: session.user.email }], {
             onConflict: 'primary_id',
-          })
+          });
       }
-    })
+  
+      if (event === 'SIGNED_OUT') {
+        setUser(null); // Optional cleanup
+      }
+    });
   
     return () => {
-      authListener.subscription.unsubscribe()
-    }
-  }, [])
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+  
 
   
   return (

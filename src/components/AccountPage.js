@@ -86,6 +86,13 @@ const AccountPage = ({size}) => {
     const [avatarTerms, setAvatarTerms] = useState([
         'abstract', 'illustration', 'minimal', 'cartoon'
     ])
+
+    const getUserData = async () => {
+
+      const res = await getUser(user.user.email)
+      console.log(res)
+
+    }
   
 
     useEffect(() => {
@@ -120,10 +127,14 @@ const AccountPage = ({size}) => {
       }
 
     useEffect(() =>{
-      console.log(user)
+      console.log(user?.user.email)
         if(!user){
             nav('/login')
         }
+
+        // if(user?.user?.email){
+        //   getUserData()
+        // }
     }, [user])
 
 
