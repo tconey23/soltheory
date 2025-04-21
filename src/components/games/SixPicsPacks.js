@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { List, ListItem, Stack, Typography } from '@mui/material';
-import { getSixPicsPack } from '../../business/apiCalls';
+import { getSixPicsPack, getSixPicsPacks } from '../../business/apiCalls';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGlobalContext } from '../../business/GlobalContext';
 
@@ -51,7 +51,7 @@ const SixPicsPacks = ({setGamePack, gamePack}) => {
 
     const fetchPacks = async () => {
         try {
-            const res = await getSixPicsPack()
+            const res = await getSixPicsPacks()
             res.forEach((r) => {
                 setPacks(prev => [
                     ...prev,
@@ -74,10 +74,12 @@ useEffect(() => {
         <Stack sx={{overflow: 'auto'}}>
             <List sx={{width: '100%'}}>
                 {packs && packs.map((p, i) => {
-                    let fileType = p.graphic.split('')
+                    console.log(p)
+                    let fileType = p.graphic
+                    console.log(fileType)
                     return (
                         <ListItem onClick={() => setGamePack(p.pack_name)} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
-                            <PackButton name={p.pack_name} icon={p.graphic} iconType={fileType?.slice(-3).join().replaceAll(',','')} hover={hover}/>
+                            <PackButton name={p.pack_name} icon={p.graphic} iconType={fileType} hover={hover}/>
                         </ListItem>
                     )
                 })}

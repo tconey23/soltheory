@@ -3,7 +3,8 @@ import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip
 import { Box } from '@mui/system';
 import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
-import { addNewCategory, getSixPicsPack } from '../../../business/apiCalls';
+import { addNewCategory, getSixPicsPack, getSixPicsPacks } from '../../../business/apiCalls';
+import { supabase } from '../../../business/supabaseClient';
 
 const getVideoDuration = (videoUrl) => {
   return new Promise((resolve, reject) => {
@@ -22,23 +23,55 @@ const getVideoDuration = (videoUrl) => {
   });
 };
 
-const VideoEditor = () => {
+const VideoEditor = ({videoURL, setVideoToEdit}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [videoFile, setVideoFile] = useState(null);
-  const [videoURL, setVideoURL] = useState('');
   const [ready, setReady] = useState(false);
   const vidDuration = useRef();
   const currentVidTime = useRef();
   const [sliderTime, setSliderTime] = useState(0);
-  const [stops, setStops] = useState([]);
-  const [loops, setLoops] = useState([]);
+  const [stops, setStops] = useState([
+    2,
+    5,
+    41
+]);
+  const [loops, setLoops] = useState([
+    {
+        "start": 2,
+        "end": 5
+    },
+    {
+        "start": 5,
+        "end": 41,
+        "speed": 3
+    }
+]);
   const [selectedLoopIndex, setSelectedLoopIndex] = useState(null);
-  const [fileData, setFileData] = useState()
+  const [fileData, setFileData] = useState({})
   const [playBackSpeed, setPlaybackSpeed] = useState(1)
-  const [answer, setAnswer] = useState()
-  const [packName, setPackName] = useState()
-  const [packType, setPackType] = useState('existing')
-  const [packs, setPacks] = useState([])
+  const [answer, setAnswer] = useState('The sound of Music')
+
+  const getVideoFileFromPublicUrl = async (publicUrl, fileName = 'video.mp4') => {
+    const response = await fetch(publicUrl);
+  
+    if (!response.ok) {
+      throw new Error(`Failed to fetch video: ${response.status}`);
+    }
+  
+    const blob = await response.blob();
+
+    const file = new File([blob], fileName, { type: blob.type });
+    if(file){
+      setVideoFile(file)
+    }
+    return file;
+  };
+
+  useEffect(() => {
+    if(videoURL?.url){
+      getVideoFileFromPublicUrl(videoURL.url)
+    }
+  }, [videoURL])
 
   const marks = stops.map((s) => ({
     value: s,
@@ -55,18 +88,8 @@ const VideoEditor = () => {
     }
   };
 
-  const handleVideoSelect = (e) => {
-    const file = e.target.files[0];
-    if (file && file.type === 'video/mp4') {
-      setVideoFile(file);
-      setVideoURL(URL.createObjectURL(file));
-    } else {
-      alert('Please upload a valid .mp4 video file');
-    }
-  };
-
   const getMeta = async () => {
-    const res = await getVideoDuration(videoURL);
+    const res = await getVideoDuration(videoURL.url);
     if (res && typeof res === 'number' && res > 0) {
       setReady(true);
       vidDuration.current = res;
@@ -75,18 +98,47 @@ const VideoEditor = () => {
     }
   };
 
-  const renameFile = (originalFile, newFileName) => {
-    return new File([originalFile], newFileName, {
-      type: originalFile.type,
-      lastModified: new Date(),
-    });
-  };
+  const pushUpdatedData = async () => {
+    const { data, error } = await supabase
+    .from('sixpicspacks')
+    .update({ 'gifs': fileData })
+    .eq('pack_name', videoURL.pack)
+    .select()
+
+    
+    const findNull = Object.values(data?.[0]?.gifs).filter((f) => f === null)
+    
+    if(findNull.length === 0){
+        console.log(findNull)
+        setVideoToEdit(null)
+      }
+    
+  }
 
   const saveVideoFile = async  () => {
 
-    if(!packName || !answer || !stops || !loops || !playBackSpeed || !videoFile) {
+    if(!videoURL.url || !videoURL.pack || !answer || !stops || !loops || !playBackSpeed || !videoFile) {
+
+      const missingData = [
+        {key: 'url', val: videoURL.url},
+        {key: 'pack', val: videoURL.pack},
+        {key: 'answer', val: answer},
+        {key: 'stops', val: stops},
+        {key: 'loops', val: loops},
+        {key: 'play back speed', val: playBackSpeed},
+        {key: 'video file', val: videoFile},
+      ]
+
+      let missingKey
+
+      missingData.forEach((d, i) => {
+        if(d.val === null){
+          missingKey = d.key
+        }
+      })
+
         setAlertProps({
-            text: 'Missing metadata. Please check all require fields',
+            text: `Missing ${missingKey}. Please check all require fields`,
             disposition: 'error',
             severity: 'error',
             display: true
@@ -94,43 +146,27 @@ const VideoEditor = () => {
         return
     }
 
-    
     setFileData(
-        {
-            pack: packName,
-            answer: answer,
-            markers: stops,
-            loops: loops,
-            playBackSpeed: playBackSpeed
-        }
+      {
+        "answer": answer,
+        "url": videoURL.url,
+        "pack": videoURL.pack,
+        "markers": stops,
+        "loops": loops,
+        "playBackSpeed": 1
+      }
     )
-    
-    const renamedVid = renameFile(videoFile, `${packName.replaceAll(' ', '').toLowerCase()}_${answer.replaceAll(' ', '').toLowerCase()}`)
-
-    const checkPack = await getSixPicsPack (packName)
-
-    
-    if(checkPack){
-
-    } else {
-        
-        const addNewPack = await addNewCategory(packName)
-
-        console.log(addNewPack)
-    }
-
   }
 
-  useEffect(() =>{
-    if(fileData){
-        console.log(fileData)
+  useEffect(() => {
+    if(Object.entries(fileData).length > 0){
+      console.log(Object.entries(fileData))
+      pushUpdatedData()
     }
-
-    console.log(videoFile)
-  }, [fileData, videoFile])
+  }, [fileData])
 
   useEffect(() => {
-    if (videoURL) {
+    if (videoURL?.url) {
       getMeta();
     }
   }, [videoURL, videoFile]);
@@ -143,7 +179,6 @@ const VideoEditor = () => {
         const time = videoRef.current.currentTime;
         currentVidTime.current = time;
       
-        // Only update state if it differs by > 0.02s to prevent excessive renders
         setSliderTime((prev) => {
           if (Math.abs(prev - time) > 0.02) {
             return time;
@@ -193,25 +228,8 @@ const VideoEditor = () => {
   }, [playBackSpeed, videoRef])
 
   return (
-        <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'}>
-            <Stack direction={'column'} width={'60%'} height={'70%'} padding={5} justifyContent={'flex-start'} alignItems={'center'} backgroundColor={'#80808059'}>
-                {
-                    packType === 'existing' ? 
-                            <Select value={packName} 
-                            onChange={(e) => {
-                                if (e.target.value === 'NEW') 
-                                    {
-                                        setPackType(e.target.value)
-                                    } else {
-                                        setPackType('existing')
-                                        setPackName(e.target.value)
-                                    }
-                            }}>
-                                <MenuItem value={'NEW'}>NEW</MenuItem>
-                            </Select>
-                        :
-                        <TextField value={packName} onChange={(e) => setPackName(e.target.value)}></TextField>
-                }
+        <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'} backgroundColor={'#000000ab'}>
+            <Stack direction={'column'} width={'60%'} height={'70%'} padding={5} justifyContent={'flex-start'} alignItems={'center'} backgroundColor={'white'}>
                 <Stack direction={'row'} width={'100%'} height={'54%'}>
                     <Stack width={'33%'} height={'100%'}>
                         {ready &&
@@ -248,13 +266,10 @@ const VideoEditor = () => {
                     <Stack width={'33%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
                         {videoURL && ready && (
                             <video ref={videoRef} height={'85%'} muted preload='metadata'>
-                                <source src={videoURL} type="video/mp4" />
+                                <source src={videoURL.url} type="video/mp4" />
                                 Your browser does not support the video tag.
                             </video>
                         )}
-                        <Stack padding={2}>
-                            <input type="file" accept="video/mp4" onChange={handleVideoSelect} />
-                        </Stack>
                     </Stack>
 
 

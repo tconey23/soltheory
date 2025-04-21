@@ -118,16 +118,15 @@ const AppHeader = () => {
                   </Button>
                 </Box>
               ) : (
-                <>
+                
                 <Button
-                key={page}
+                key={`${page}${i}`}
                 onClick={handleCloseNavMenu}
                 sx={{ my: 2, color: "white", display: "block", margin: 1}}
                 variant="contained"
                 >
                     {page}
                   </Button>
-                </>
               )
             )}
 

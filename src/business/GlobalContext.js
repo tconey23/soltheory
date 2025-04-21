@@ -54,8 +54,6 @@ useEffect(() => {
 
 useEffect(() =>{
 
-  console.log(user)
-
   if(user?.metadata){
     setAvatar(user.metadata.avatar)
     setDisplayName(user.metadata.user_name)
@@ -79,7 +77,6 @@ useEffect(() =>{
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth Event]:', event);
   
       if (event === 'SIGNED_IN' && session?.user) {
         await supabase

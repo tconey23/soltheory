@@ -17,6 +17,7 @@ import Login from './components/Login';
 import AccountPage from './components/AccountPage';
 import Friends from './components/Friends';
 import VideoEditor from './components/games/pic6_images/VideoEditor';
+import VideoHandler from './components/games/pic6_images/VideoHandler';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
@@ -66,7 +67,7 @@ function App() {
               <Route path='/esc' element={null}/>
               <Route path='/error' element={<ErrorPage />}/>
               <Route path='/dev_canvas' element={<DevCanvas />}/>
-              <Route path='/dev_vids' element={<VideoEditor />}/>
+              {/* <Route path='/dev_vids' element={<VideoHandler />}/> */}
               <Route path='/login' element={<Login />}/>
               <Route path='/account' element={<AccountPage />}/>
               <Route path='/friends' element={<Friends />}/>

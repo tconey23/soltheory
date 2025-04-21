@@ -15,7 +15,6 @@ const UserAlert = () => {
   };
 
   useEffect(() => {
-    console.log(alertProps)
     if (alertProps.display) {
       setDisplay(true);
 

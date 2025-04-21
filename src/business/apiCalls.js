@@ -58,7 +58,6 @@ const addFriend = async (user, friend) => {
 
     }
 
-
         // const get21Things = async (date) =>{
 
     //     let { data, error } = await supabase
@@ -104,8 +103,6 @@ const addFriend = async (user, friend) => {
     
     const getUser = async (email) => {
         if (!email) return null;
-      
-        console.log('[getUser] Querying email:', email);
       
         const { data, error } = await supabase
           .from('users')
@@ -312,6 +309,7 @@ const addFriend = async (user, friend) => {
     }
     
     const getSixPicsPack = async (cat) => {
+        console.log(cat)
         
         try {
             
@@ -322,6 +320,7 @@ const addFriend = async (user, friend) => {
         .single()
 
         if(data){
+            console.log(data)
             return data
         }
         
@@ -330,7 +329,25 @@ const addFriend = async (user, friend) => {
         }
     }
 
+    const getSixPicsPacks = async () => {
+        
+        try {
+            
+        let { data, error } = await supabase
+        .from('sixpicspacks')
+        .select('*')
 
+        if(data){
+            console.log(data)
+            return data
+        }
+        
+        } catch (error) {
+            return error
+        }
+    }
+
+    getSixPicsPacks() 
 
     const addToExistingPack = async (cat, obj) => {
         try {
@@ -398,6 +415,16 @@ const addFriend = async (user, friend) => {
     };
 
 
+    const addNewPack = async (name) => {
+        const { data, error } = await supabase
+        .from('sixpicspacks')
+        .insert([
+        { pack_name: name, gifs: [], graphic: ''},
+        ])
+        .select()
+
+        console.log(data, error)
+    }
  
     const uploadVid = async (file) => {
 
@@ -546,4 +573,4 @@ const addFriend = async (user, friend) => {
       };
 
 
-    export {getAllUsers, updateUserAvatar, findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}
+    export {addNewPack, getSixPicsPacks, getAllUsers, updateUserAvatar, findAvatars, checkAndAddUsers, updatePackLogo, addNewCategory, get21Things, getUserGames, addGameToUser, addFriend, getUser, addNewPrompts, signIn, signOut, signUpUser, getGifs, getSixPicsPack, uploadVid, checkExistingPack, addToExistingPack, removeGifByName}

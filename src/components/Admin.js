@@ -5,6 +5,7 @@ import { useGlobalContext } from '../business/GlobalContext';
 import Papa from 'papaparse';
 import { addNewPrompts } from '../business/apiCalls';
 import EditablePromptItem from './EditablePromptItem';
+import VideoHandler from './games/pic6_images/VideoHandler';
 
 const AddPrompts = () => {
     const [date, setDate] = useState('');
@@ -329,7 +330,7 @@ const Admin = ({size}) => {
             </Select>
         </Stack>
         {selection === '6Pics' &&
-            <AddPics size={size}/>
+            <VideoHandler size={size}/>
         }
         {selection === '21Things' &&
             <AddPrompts /> 
