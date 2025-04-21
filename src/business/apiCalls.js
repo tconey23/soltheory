@@ -334,11 +334,10 @@ const addFriend = async (user, friend) => {
         try {
             
         let { data, error } = await supabase
-        .from('sixpicspacks')
+        .from('sixpicsvideos')
         .select('*')
 
         if(data){
-            console.log(data)
             return data
         }
         
@@ -346,8 +345,6 @@ const addFriend = async (user, friend) => {
             return error
         }
     }
-
-    getSixPicsPacks() 
 
     const addToExistingPack = async (cat, obj) => {
         try {

@@ -3,6 +3,7 @@ import { List, ListItem, Stack, Typography } from '@mui/material';
 import { getSixPicsPack, getSixPicsPacks } from '../../business/apiCalls';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGlobalContext } from '../../business/GlobalContext';
+import { supabase } from '../../business/supabaseClient';
 
 const PackButton = ({name, icon, iconType, hover}) => {
     const {isMobile} = useGlobalContext()
@@ -50,28 +51,21 @@ const SixPicsPacks = ({setGamePack, gamePack}) => {
     const [hover, setHover] = useState(false)
 
     const fetchPacks = async () => {
-        try {
-            const res = await getSixPicsPacks()
-            res.forEach((r) => {
-                setPacks(prev => [
-                    ...prev,
-                    r
-                ])
-            })
-            
-        } catch (error) {
-            console.error(error);
-        }
+        let { data: sixpicksvideos, error } = await supabase 
+        .from('sixpicksvideos')
+        .select('*')
+
+        console.log(sixpicksvideos, error) 
     }
 
 useEffect(() => {
-    fetchPacks()
+    fetchPacks() 
 }, [])
 
   return (
     <Stack direction={'column'} sx={{ height: '90%', width: '100%', scale: isMobile ? 0.8 : 1,}} justifyContent={'flex=start'} alignItems={'center'} >
         <Typography fontFamily={'Fredoka Regular'} fontSize={40}>Select Pack</Typography>
-        <Stack sx={{overflow: 'auto'}}>
+        {/* <Stack sx={{overflow: 'auto'}}>
             <List sx={{width: '100%'}}>
                 {packs && packs.map((p, i) => {
                     console.log(p)
@@ -84,7 +78,7 @@ useEffect(() => {
                     )
                 })}
             </List>
-        </Stack>
+        </Stack> */}
     </Stack>
   );
 };

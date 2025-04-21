@@ -1,10 +1,11 @@
 import { useEffect, useState, useRef } from 'react';
-import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar } from '@mui/material';
+import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, setRef } from '@mui/material';
 import { Box } from '@mui/system';
 import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
 import { addNewCategory, getSixPicsPack, getSixPicsPacks } from '../../../business/apiCalls';
 import { supabase } from '../../../business/supabaseClient';
+import { useMemo } from 'react';
 
 const getVideoDuration = (videoUrl) => {
   return new Promise((resolve, reject) => {
@@ -23,7 +24,7 @@ const getVideoDuration = (videoUrl) => {
   });
 };
 
-const VideoEditor = ({videoURL, setVideoToEdit}) => {
+const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
   const [videoFile, setVideoFile] = useState(null);
   const [ready, setReady] = useState(false);
@@ -31,25 +32,16 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
   const currentVidTime = useRef();
   const [sliderTime, setSliderTime] = useState(0);
   const [stops, setStops] = useState([
-    2,
-    5,
-    41
+
 ]);
   const [loops, setLoops] = useState([
-    {
-        "start": 2,
-        "end": 5
-    },
-    {
-        "start": 5,
-        "end": 41,
-        "speed": 3
-    }
 ]);
+
+  const [loopSpeeds, setLoopSpeeds] = useState({});
   const [selectedLoopIndex, setSelectedLoopIndex] = useState(null);
   const [fileData, setFileData] = useState({})
   const [playBackSpeed, setPlaybackSpeed] = useState(1)
-  const [answer, setAnswer] = useState('The sound of Music')
+  const [answer, setAnswer] = useState('')
 
   const getVideoFileFromPublicUrl = async (publicUrl, fileName = 'video.mp4') => {
     const response = await fetch(publicUrl);
@@ -66,6 +58,19 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
     }
     return file;
   };
+
+  const derivedLoops = useMemo(() => {
+    const loops = [];
+    for (let i = 0; i < stops.length - 1; i += 2) {
+      const key = `${stops[i]}-${stops[i + 1]}`;
+      loops.push({
+        start: stops[i],
+        end: stops[i + 1],
+        speed: loopSpeeds[key] || 1,
+      });
+    }
+    return loops;
+  }, [stops, loopSpeeds]);
 
   useEffect(() => {
     if(videoURL?.url){
@@ -116,17 +121,13 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
   }
 
   const saveVideoFile = async  () => {
+    // console.log(stops, loops)
 
-    if(!videoURL.url || !videoURL.pack || !answer || !stops || !loops || !playBackSpeed || !videoFile) {
+    if(!stops || !derivedLoops ) {
 
       const missingData = [
-        {key: 'url', val: videoURL.url},
-        {key: 'pack', val: videoURL.pack},
-        {key: 'answer', val: answer},
         {key: 'stops', val: stops},
-        {key: 'loops', val: loops},
-        {key: 'play back speed', val: playBackSpeed},
-        {key: 'video file', val: videoFile},
+        {key: 'loops', val: derivedLoops},
       ]
 
       let missingKey
@@ -146,16 +147,29 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
         return
     }
 
-    setFileData(
-      {
-        "answer": answer,
-        "url": videoURL.url,
-        "pack": videoURL.pack,
-        "markers": stops,
-        "loops": loops,
-        "playBackSpeed": 1
-      }
-    )
+            const { data, error } = await supabase
+            .from('sixpicksvideos')
+            .update({
+              stops,
+              loops: derivedLoops,
+              playback_speed: 1,
+            })
+            .eq('id', video.id)
+            .select();
+
+            if(data){
+                setVideoToEdit(null)
+                setRefresh(prev => prev +1)
+            } else {
+                console.log(error)
+                setAlertProps({
+                    text: `Something went wrong. ${error}`,
+                    disposition: 'error',
+                    severity: 'error',
+                    display: true
+                })
+            }
+
   }
 
   useEffect(() => {
@@ -276,15 +290,8 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
                     <Stack width={'33%'} height={'70%'}>
                         {ready &&
                             <>
-                                <Button 
-                                    onClick={() => {
-                                        const time = currentVidTime.current;
-                                        setLoops((prev) => [...prev, { start: time, end: time + 2, speed: 1 }]);
-                                    }}>
-                                        New Loop (2s)
-                                </Button>
                                 <Stack mt={2} spacing={1}>
-                                    {loops.map((loop, index) => (
+                                    {derivedLoops.map((loop, index) => (
                                         <Stack key={index} direction="column" spacing={1} alignItems="flex-start" mb={2}>
 
                                         <Stack direction="row" spacing={1} alignItems="center">
@@ -343,12 +350,12 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
                                             min={0.5}
                                             max={3}
                                             onChange={(e, newSpeed) => {
-                                              setLoops(prev =>
-                                                prev.map((l, i) =>
-                                                  i === index ? { ...l, speed: newSpeed } : l
-                                                )
-                                              );
-                                            }}
+                                                const key = `${loop.start}-${loop.end}`;
+                                                setLoopSpeeds((prev) => ({
+                                                  ...prev,
+                                                  [key]: newSpeed,
+                                                }));
+                                              }}
                                             valueLabelDisplay="auto"
                                             sx={{ width: '100px' }}
                                           />
@@ -451,10 +458,11 @@ const VideoEditor = ({videoURL, setVideoToEdit}) => {
                             </InputLabel>
                         </Stack>
 
-                        <Stack>
+                        <Stack alignItems={'center'}>
                             <InputLabel>Answer</InputLabel>
-                            <TextField value={answer} onChange={(e) => setAnswer(e.target.value)} />
+                            <TextField value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} />
                             <Button onClick={saveVideoFile} >Save Video</Button>
+                            <Button onClick={() => setVideoToEdit(null)} >Cancel</Button>
                         </Stack>
                     </>
                 }

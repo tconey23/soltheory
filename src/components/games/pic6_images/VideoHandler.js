@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, Accordion, AccordionSummary, AccordionDetails, Input, Modal } from '@mui/material';
+import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, Accordion, AccordionSummary, AccordionDetails, Input, Modal, Checkbox } from '@mui/material';
 import { Box } from '@mui/system';
 import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
@@ -32,80 +32,109 @@ const DeleteConfirmation = ({name, deletePack, setPackToDelete, setPendingDelete
     )
 }
 
-const Graphic = ({pack}) => {
-
-    const [hasGraphic, setHasGraphic] = useState()
-
-    const getGraphic = async () => {
-            let {data, error} = await supabase
-                .from('sixpicspacks')
-                .select("graphic")
-                .eq("pack_name", pack)
-                .single();
-            
-            if(data){
-                setHasGraphic(data.graphic)
-            } else {
-                setHasGraphic(false)
-            }
-    }
-
-    useEffect(() => {
-        getGraphic()
-        console.log(hasGraphic)
-    }, [])
-
-    return (
-       <>
-        {
-            hasGraphic ? 
-            <video
-                src={hasGraphic}
-                preload="metadata"
-                width={'50%'}
-                onLoadedMetadata={(e) => {
-                    e.target.currentTime = e.target.duration; // Tiny seek to get the actual first frame in some browsers
-                }}
-            />
-        :
-            <VideoImporter pack={pack} type={'graphic'} getGraphic={getGraphic}/>
-        }
-       </>
-    )
-
-
-}
-
-const Videos = ({pack, setVideoToEdit}) => {
+const Videos = ({pack, setVideoToEdit, refresh, readyPacks, setReadyPacks}) => {
     const [videos, setVideos] = useState([])
     const [addNewVideo, setAddNewVideo] = useState(false)
+    const [refreshKey, setRefreshKey] = useState(0)
+    const [isReady, setIsReady] = useState({
+        graphic: false,
+        objects: false
+    })
 
+    const lockPackIn = async () => {
+
+
+        // const { data, error } = await supabase
+        // .from('sixpicspacks')
+        // .insert([
+        // { some_column: 'someValue', other_column: 'otherValue' },
+        // ])
+        // .select()
+
+    }
     
     const getVids = async () => {
-        const { data, error } = await supabase
-        .storage
-        .from('6picsvideos')
-        .list(pack);
-        
-        console.log(pack)
+        let { data: sixpicksvideos, error } = await supabase
+            .from('sixpicksvideos')
+            .select("*")
+            .eq('pack_name', pack)
+
         
         if (error) {
             console.error('Could not list files:', error);
             return [];
         }
         
-        const mp4s = data.filter((f) => f.name.endsWith('.mp4'));
-        
-        const publicUrls = mp4s.map((file) =>
-            supabase.storage.from('6picsvideos').getPublicUrl(`oscars/${file.name}`).data.publicUrl
-    );
+    if(sixpicksvideos) {
+        setVideos(sixpicksvideos)
+    }
     
-    setVideos(publicUrls)
-    
-    
-    
-    return publicUrls;
+    return 
 };
+
+const checkReady = async (v) => {
+    console.log(v)
+    if (readyPacks.includes(v.pack_name)) return;
+  
+    const {
+      id,
+      name,
+      public_url,
+      pack_name,
+      video_type,
+      stops,
+      loops,
+      ready,
+    } = v;
+  
+    const requiredFields = {
+        name,
+        public_url,
+        pack_name,
+        video_type,
+        stops,
+        loops,
+      };
+      
+      const missingFields = Object.entries(requiredFields)
+        .filter(([key, value]) => {
+          if (Array.isArray(value)) return value.length === 0; // empty arrays are missing
+          return !value; // falsy strings, null, undefined
+        })
+        .map(([key]) => key);
+  
+        const updateReady = async (key) => {
+            console.log(`Updating ${key}...`);
+            const { data, error } = await supabase
+              .from('sixpicksvideos')
+              .update({ ready: true })
+              .eq('id', id)
+              .select();
+          
+            if (error) {
+              console.error(`Failed to update ready for ${name}:`, error.message);
+              return;
+            }
+          
+            console.log(`${name} updated successfully`, data);
+          
+            setIsReady((prev) => ({
+              ...prev,
+              [key]: true,
+            }));
+          };
+  
+    // Check for object type videos
+    if (name && name !== 'Main graphic' && !ready) {
+      await updateReady('objects');
+    }
+  
+    // Check for the main graphic
+    if (name === 'Main graphic' && !ready) {
+      await updateReady('graphic');
+    }
+  };
+
 const deleteFileByPublicUrl = async (publicUrl) => {
     const match = publicUrl.match(/\/storage\/v1\/object\/public\/6picsvideos\/(.+)$/);
   
@@ -132,42 +161,58 @@ const deleteFileByPublicUrl = async (publicUrl) => {
 
     useEffect(() => {
         getVids()
+    }, [refreshKey, refresh])
+
+    useEffect(() => {
+        console.log(isReady)
+    }, [isReady])
+
+    useEffect(() => {
+        setRefreshKey(prev => prev +1)
     }, [])
 
         return (
             <Stack direction={'column'} alignItems={'flex-start'} justifyContent={'flex-start'}> 
-                <Stack>
+                <Stack direction={'row'}>
+                    {
+                        !isReady.objects || !isReady.graphic ?
                     <Button onClick={() => setAddNewVideo(prev => !prev)} >
                         <Avatar>
                             <i class="fi fi-sr-video-plus"></i>
                         </Avatar>
                     </Button>
+                    :
+                    <Button>
+                        <Avatar>
+                            <i class="fi fi-sr-thumbs-up-trust"></i>
+                        </Avatar>
+                    </Button>
+                    }
                 </Stack>
 
-            {addNewVideo &&
-                <>
-                    <VideoImporter pack={pack} getVids={getVids} type={'video'}/>
-                </>
-            }
 
 
-            <Stack direction={'column'}>
-                    {videos.map((v, i) => (
-                        <Stack key={i} direction={'row'} border={'1px solid grey'} height={'100px'} alignItems={'center'}>
+            <Stack key={refreshKey} direction={'column'} width={'100%'}>
+                    {videos.map((v, i) => {
+                        checkReady(v)
+                        return (
+                            <Stack key={i} direction={'row'} border={'1px solid grey'} height={'100px'} alignItems={'center'}>
                                 <video
-                                    src={v}
+                                    src={v.public_url}
                                     preload="metadata"
                                     height={'100%'}
                                     onLoadedMetadata={(e) => {
-                                        e.target.currentTime = e.target.duration; // Tiny seek to get the actual first frame in some browsers
+                                        e.target.currentTime = e.target.duration;
                                     }}
-                                />
+                                    />
                                 <Box>
-                                    <Button onClick={() => setVideoToEdit({url: v, pack: pack})}>
+                                {v.name !== 'Main graphic' &&
+                                    <Button onClick={() => setVideoToEdit({url: v.public_url, pack: v.pack_name, id: v.id, name: v.name})}>
                                         <Avatar>
                                             <i class="fi fi-rr-customize"></i>
                                         </Avatar>
                                     </Button>
+                                    }
                                 </Box>
                                 <Box>
                                     <Button onClick={() => deleteFileByPublicUrl(v)}>
@@ -176,38 +221,141 @@ const deleteFileByPublicUrl = async (publicUrl) => {
                                         </Avatar>
                                     </Button>
                                 </Box>
+                                {v &&
+                                 <Stack direction={'row'} width={'75%'} justifyContent={'space-evenly'}>
+                                    {
+                                        !v.ready ? 
+                                    <>
+                                        <Stack>
+                                            <InputLabel>Name</InputLabel>
+                                            <Checkbox disabled checked={!!v.name} 
+                                            sx={{
+                                                color: 'gray', 
+                                                '&.Mui-checked': {
+                                                    color: 'limeGreen'
+                                                }
+                                            }}
+                                            />
+                                        </Stack>
+                                        <Stack>
+                                            <InputLabel>Public URL</InputLabel>
+                                            <Checkbox disabled checked={!!v.public_url} 
+                                            sx={{
+                                                color: 'gray', 
+                                                '&.Mui-checked': {
+                                                    color: 'limeGreen'
+                                                }
+                                            }}
+                                            />
+                                        </Stack>
+                                        <Stack>
+                                            <InputLabel>Pack assigned</InputLabel>
+                                            <Checkbox disabled checked={!!v.pack_name} 
+                                            sx={{
+                                                color: 'gray', 
+                                                '&.Mui-checked': {
+                                                    color: 'limeGreen'
+                                                }
+                                            }}
+                                            />
+                                        </Stack>
+                                        <Stack>
+                                            <InputLabel>Stops</InputLabel>
+                                            <Checkbox disabled checked={!!v.stops} 
+                                            sx={{
+                                                color: 'gray', 
+                                                '&.Mui-checked': {
+                                                    color: 'limeGreen'
+                                                }
+                                            }}
+                                            />
+                                        </Stack>
+                                        <Stack>
+                                            <InputLabel>Loops</InputLabel>
+                                            <Checkbox disabled checked={!!v.loops} 
+                                            sx={{
+                                                color: 'gray', 
+                                                '&.Mui-checked': {
+                                                    color: 'limeGreen'
+                                                }
+                                            }}
+                                            />
+                                        </Stack>
+                                    </>
+                                    :
+                                        <Stack>
+                                            <InputLabel>Ready</InputLabel>
+                                            <Checkbox disabled checked={!!v.ready} 
+                                                sx={{
+                                                    color: 'gray', 
+                                                    '&.Mui-checked': {
+                                                        color: 'limeGreen'
+                                                    }
+                                                }}
+                                            />
+                                        </Stack>
+                                    }
+                                    
+
+                                </Stack>}
                         </Stack>
-                    ))}
+                    )}
+                    
+                )}
             </Stack>
+                {addNewVideo &&
+                    <>
+                        <VideoImporter pack={pack} getVids={getVids} type={'video'} setRefreshKey={setRefreshKey}/>
+                    </>
+                }
         </Stack>
         )
-
-}
-
-const VideoHandler = () => {
-
-    const [packs, setPacks] = useState([])
-    const [addNewPack, setAddNewPack] = useState(false)
-    const [newPackName, setNewPackName] = useState()
-    const {alertProps, setAlertProps} = useGlobalContext()
-    const [pendingDelete, setPendingDelete] = useState(false)
+        
+    }
+    
+    const VideoHandler = () => {
+        
+        const [packs, setPacks] = useState([])
+        const [addNewPack, setAddNewPack] = useState(false)
+        const [newPackName, setNewPackName] = useState()
+        const {alertProps, setAlertProps} = useGlobalContext()
+        const [pendingDelete, setPendingDelete] = useState(false)
     const [packToDelete, setPackToDelete] = useState()
     const [videoToEdit, setVideoToEdit] = useState()
     const [packGraphic, setPackGraphic] = useState()
+    const [refresh, setRefresh] = useState(0)
+    const [expandedPack, setExpandedPack] = useState(null);
+    const [readyPacks, setReadyPacks] = useState([])
+
+    const handleChange = (packName) => (event, isExpanded) => {
+      setExpandedPack(isExpanded ? packName : null);
+    };
+    
 
     const importPacks = async () => {
+        
+        let { data: sixpicksvideos, error } = await supabase
+        .from('sixpicksvideos')
+        .select('*')
+    
+        const uniqueKeys = [...new Set(sixpicksvideos.map(child => child.pack_name))];
+        setPacks(uniqueKeys);
 
-        const res = await getSixPicsPacks()
+    }
 
-        if(res){
-            setPacks(res.map((p) => (
-                p.pack_name
-            )))
-        }
+    const getReadyPacks = async () => {
+        
+        let { data: sixpicspacks, error } = await supabase
+        .from('sixpicspacks')
+        .select('*')
+        
+        setReadyPacks(sixpicspacks)
+
     }
 
     useEffect(() => {
             importPacks()
+            getReadyPacks()
     }, [])
 
     const handleSubmitPack = async () => {
@@ -304,40 +452,67 @@ const VideoHandler = () => {
 
     return (
         <Stack direction={'column'} width={'80%'} height={'90%'} overflow={'auto'} justifyContent={'flex-start'} alignItems={'center'}>
-            <Stack width={'30%'} justifyContent={'center'} alignItems={'center'}>
+            <Stack width={'30%'} justifyContent={'center'} alignItems={'center'} marginTop={1}>
                 {!addNewPack ?
                     <Button onClick={() => setAddNewPack(prev => !prev)} variant='contained' >Add Pack</Button>
                 :
                 <>
                     <Box sx={{justifyContent: 'center', alignItems: 'center', display:'flex', flexDirection: 'column'}} >
-                        <TextField inputProps={{ autoComplete: 'off' }} value={newPackName} onChange={(e) => setNewPackName(e.target.value)} ></TextField>
+                        <TextField
+                         placeholder={'Pack name'} 
+                         inputProps={{ autoComplete: 'off' }} 
+                         value={newPackName} 
+                         onChange={(e) => setNewPackName(e.target.value)} 
+                         onKeyDown={(e) => {
+                            if(e.key === "Enter"){
+                                if(e.target.value){
+                                    handleSubmitPack()
+                                } else {
+                                    setAlertProps({
+                                        text: 'Missing pack name',
+                                        display: true,
+                                        severity: 'error'
+                                    })
+                                }
+                            }
+                         }}
+                         >
+                         
+                        </TextField> 
                     </Box>
                     <Box sx={{justifyContent: 'center', alignItems: 'center', display:'flex', flexDirection: 'column', marginTop: 1}} >
-                        <Button variant='contained' onClick={() => handleSubmitPack()} >Submit</Button>
+                        <Button disabled={!newPackName} variant='contained' onClick={() => handleSubmitPack()} >Submit</Button>
                     </Box>
                 </>
                 }
             </Stack>
             
             <Stack width={'100%'}>
-            {packs.map((p, i) => {
-                return (
-                    <Accordion key={i}>
-                        <AccordionSummary sx={{backgroundColor: 'skyBlue', borderRadius: 2}}>
-                            <Stack direction={'row'} alignItems={'center'}>
-                                <Typography sx={{marginRight: 1}} >{p}</Typography>
-                                <i onClick={() => confirmDelete(i, p)} class="fi fi-sr-trash"></i>
-                            </Stack>
-                        </AccordionSummary>
-                        <AccordionDetails sx={{boxShadow: 'inset 3px 3px 12px 0px #00000063', borderRadius: 2}} >
-                            <Stack direction={'column'}>
-                                <Graphic pack={p}/>
-                                <Videos pack={p} setVideoToEdit={setVideoToEdit}/>
-                            </Stack>
-                        </AccordionDetails>
-                    </Accordion>
-                )
-            })}
+            {packs.map((p, i) => (
+        <Accordion key={i} expanded={expandedPack === p} onChange={handleChange(p)}>
+          <AccordionSummary
+            sx={{ backgroundColor: 'skyBlue', borderRadius: 2 }}
+            expandIcon={null}
+          >
+            <Stack direction="row" alignItems="center">
+              <Typography sx={{ marginRight: 1 }}>{p}</Typography>
+            </Stack>
+          </AccordionSummary>
+
+          {expandedPack === p && (
+            <AccordionDetails sx={{ boxShadow: 'inset 3px 3px 12px 0px #00000063', borderRadius: 2 }}>
+              <Stack direction="column">
+                <Button onClick={() => confirmDelete(i, p)}>
+                  <Avatar>
+                    <i className="fi fi-sr-trash"></i>
+                  </Avatar>
+                </Button>
+                <Videos pack={p} setVideoToEdit={setVideoToEdit} refresh={1} setReadyPacks={setReadyPacks} readyPacks={readyPacks}/>
+              </Stack>
+            </AccordionDetails>
+          )}
+        </Accordion>
+      ))}
             </Stack>
             <Modal
                 open={pendingDelete && packToDelete}
@@ -349,7 +524,7 @@ const VideoHandler = () => {
             <Modal
                 open={videoToEdit}
             >
-                <VideoEditor videoURL={videoToEdit} setVideoToEdit={setVideoToEdit} />
+                <VideoEditor videoURL={videoToEdit} setVideoToEdit={setVideoToEdit} video={videoToEdit} setRefresh={setRefresh}/>
             </Modal>
         </Stack>
     )
