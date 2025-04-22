@@ -1,9 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, Accordion, AccordionSummary, AccordionDetails, Input, Modal, Checkbox } from '@mui/material';
 import { Box } from '@mui/system';
-import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
-import { addNewCategory, getSixPicsPack, getSixPicsPacks, addNewPack } from '../../../business/apiCalls';
 import { supabase } from '../../../business/supabaseClient';
 import VideoImporter from './VideoImporter';
 import VideoEditor from './VideoEditor';
@@ -40,18 +38,6 @@ const Videos = ({pack, setVideoToEdit, refresh, readyPacks, setReadyPacks}) => {
         graphic: false,
         objects: false
     })
-
-    const lockPackIn = async () => {
-
-
-        // const { data, error } = await supabase
-        // .from('sixpicspacks')
-        // .insert([
-        // { some_column: 'someValue', other_column: 'otherValue' },
-        // ])
-        // .select()
-
-    }
     
     const getVids = async () => {
         let { data: sixpicksvideos, error } = await supabase
@@ -72,8 +58,13 @@ const Videos = ({pack, setVideoToEdit, refresh, readyPacks, setReadyPacks}) => {
     return 
 };
 
+
 const checkReady = async (v) => {
-    console.log(v)
+
+
+    if(v.ready){
+
+    }
     if (readyPacks.includes(v.pack_name)) return;
   
     const {
@@ -136,6 +127,7 @@ const checkReady = async (v) => {
   };
 
 const deleteFileByPublicUrl = async (publicUrl) => {
+    console.log(publicUrl)
     const match = publicUrl.match(/\/storage\/v1\/object\/public\/6picsvideos\/(.+)$/);
   
     if (!match || !match[1]) {
@@ -194,7 +186,7 @@ const deleteFileByPublicUrl = async (publicUrl) => {
 
             <Stack key={refreshKey} direction={'column'} width={'100%'}>
                     {videos.map((v, i) => {
-                        checkReady(v)
+                        // checkReady(v)
                         return (
                             <Stack key={i} direction={'row'} border={'1px solid grey'} height={'100px'} alignItems={'center'}>
                                 <video
@@ -332,14 +324,19 @@ const deleteFileByPublicUrl = async (publicUrl) => {
     };
     
 
-    const importPacks = async () => {
+    const importPacks = async () => { 
         
         let { data: sixpicksvideos, error } = await supabase
         .from('sixpicksvideos')
         .select('*')
     
         const uniqueKeys = [...new Set(sixpicksvideos.map(child => child.pack_name))];
-        setPacks(uniqueKeys);
+        if(uniqueKeys){
+            setPacks(uniqueKeys);
+        } else {
+
+        }
+
 
     }
 
@@ -378,10 +375,12 @@ const deleteFileByPublicUrl = async (publicUrl) => {
             console.error('Error uploading file:', error);
         }
         else {
-            const { data: insertData, error: insertError } = await supabase
-            .from('sixpicspacks')
-            .insert([{ pack_name: newPackName, gifs: [], graphic: '' }])
-            .select();
+            const { data, error } = await supabase
+            .from('sixpicksvideos')
+            .insert([
+                { name: 'Placeholder', public_url: '', pack_name: newPackName, video_type: null, stops: [], loops: [], ready: false},
+            ])
+            .select()
 
             setAlertProps({
                 text: 'Pack added successfully',

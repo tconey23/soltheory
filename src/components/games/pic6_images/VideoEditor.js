@@ -3,61 +3,41 @@ import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip
 import { Box } from '@mui/system';
 import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
-import { addNewCategory, getSixPicsPack, getSixPicsPacks } from '../../../business/apiCalls';
-import { supabase } from '../../../business/supabaseClient';
 import { useMemo } from 'react';
+import VideoObject from '../six_pics/VideoObject';
+import { supabase } from '../../../business/supabaseClient';
 
-const getVideoDuration = (videoUrl) => {
+const getVideoDuration = (videoSrc) => {
   return new Promise((resolve, reject) => {
-    const video = document.createElement("video");
-    video.preload = "metadata";
-    video.src = videoUrl;
+    const vid = document.createElement("video");
+    vid.preload = "metadata";
+    vid.src = videoSrc;
 
-    video.onloadedmetadata = () => {
-      resolve(video.duration);
-      video.remove();
+    vid.onloadedmetadata = () => {
+      resolve(vid.duration);
+      vid.remove();
     };
 
-    video.onerror = () => {
+    vid.onerror = () => {
       reject("Error loading video metadata.");
     };
   });
 };
 
-const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
+
+const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
   const {alertProps, setAlertProps} = useGlobalContext()
-  const [videoFile, setVideoFile] = useState(null);
   const [ready, setReady] = useState(false);
   const vidDuration = useRef();
   const currentVidTime = useRef();
   const [sliderTime, setSliderTime] = useState(0);
-  const [stops, setStops] = useState([
-
-]);
-  const [loops, setLoops] = useState([
-]);
-
+  const [stops, setStops] = useState([]);
+  const [loops, setLoops] = useState([]);
   const [loopSpeeds, setLoopSpeeds] = useState({});
   const [selectedLoopIndex, setSelectedLoopIndex] = useState(null);
-  const [fileData, setFileData] = useState({})
   const [playBackSpeed, setPlaybackSpeed] = useState(1)
   const [answer, setAnswer] = useState('')
 
-  const getVideoFileFromPublicUrl = async (publicUrl, fileName = 'video.mp4') => {
-    const response = await fetch(publicUrl);
-  
-    if (!response.ok) {
-      throw new Error(`Failed to fetch video: ${response.status}`);
-    }
-  
-    const blob = await response.blob();
-
-    const file = new File([blob], fileName, { type: blob.type });
-    if(file){
-      setVideoFile(file)
-    }
-    return file;
-  };
 
   const derivedLoops = useMemo(() => {
     const loops = [];
@@ -72,11 +52,6 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
     return loops;
   }, [stops, loopSpeeds]);
 
-  useEffect(() => {
-    if(videoURL?.url){
-      getVideoFileFromPublicUrl(videoURL.url)
-    }
-  }, [videoURL])
 
   const marks = stops.map((s) => ({
     value: s,
@@ -94,96 +69,43 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
   };
 
   const getMeta = async () => {
-    const res = await getVideoDuration(videoURL.url);
-    if (res && typeof res === 'number' && res > 0) {
-      setReady(true);
-      vidDuration.current = res;
+    try {
+      const res = await getVideoDuration(video.public_url);
+      if (res && typeof res === 'number' && res > 0) {
+        setReady(true);
+        vidDuration.current = res;
+      }         
+    } catch (error) {
+        console.error(error);
+    }
+    
+  };
+
+  const saveVideoFile = async () => {
+    const updatedVideo = {
+      stops,
+      loops: derivedLoops,
+      playback_speed: playBackSpeed,
+      name: answer || video.name,
+      ready: true,
+    };
+  
+    const { data, error } = await supabase
+      .from('sixpicksvideos')
+      .update(updatedVideo)
+      .eq('id', video.id);
+  
+    if (error) {
+      console.error('Save error:', error);
+      setAlertProps({ open: true, message: 'Failed to save video edits.', severity: 'error' });
     } else {
-      setReady(false);
+      setAlertProps({ open: true, message: 'Video saved successfully!', severity: 'success' });
+      setVideoToEdit(null); // Exit edit mode
+      setRefresh((prev) => !prev); // Optional: trigger re-fetch or re-render
     }
   };
 
-  const pushUpdatedData = async () => {
-    const { data, error } = await supabase
-    .from('sixpicspacks')
-    .update({ 'gifs': fileData })
-    .eq('pack_name', videoURL.pack)
-    .select()
 
-    
-    const findNull = Object.values(data?.[0]?.gifs).filter((f) => f === null)
-    
-    if(findNull.length === 0){
-        console.log(findNull)
-        setVideoToEdit(null)
-      }
-    
-  }
-
-  const saveVideoFile = async  () => {
-    // console.log(stops, loops)
-
-    if(!stops || !derivedLoops ) {
-
-      const missingData = [
-        {key: 'stops', val: stops},
-        {key: 'loops', val: derivedLoops},
-      ]
-
-      let missingKey
-
-      missingData.forEach((d, i) => {
-        if(d.val === null){
-          missingKey = d.key
-        }
-      })
-
-        setAlertProps({
-            text: `Missing ${missingKey}. Please check all require fields`,
-            disposition: 'error',
-            severity: 'error',
-            display: true
-        })
-        return
-    }
-
-            const { data, error } = await supabase
-            .from('sixpicksvideos')
-            .update({
-              stops,
-              loops: derivedLoops,
-              playback_speed: 1,
-            })
-            .eq('id', video.id)
-            .select();
-
-            if(data){
-                setVideoToEdit(null)
-                setRefresh(prev => prev +1)
-            } else {
-                console.log(error)
-                setAlertProps({
-                    text: `Something went wrong. ${error}`,
-                    disposition: 'error',
-                    severity: 'error',
-                    display: true
-                })
-            }
-
-  }
-
-  useEffect(() => {
-    if(Object.entries(fileData).length > 0){
-      console.log(Object.entries(fileData))
-      pushUpdatedData()
-    }
-  }, [fileData])
-
-  useEffect(() => {
-    if (videoURL?.url) {
-      getMeta();
-    }
-  }, [videoURL, videoFile]);
 
   useEffect(() => {
     if (!videoRef.current) return;
@@ -241,6 +163,10 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
     }
   }, [playBackSpeed, videoRef])
 
+  useEffect(() => {
+    getMeta(video)
+  }, [video])
+
   return (
         <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'} backgroundColor={'#000000ab'}>
             <Stack direction={'column'} width={'60%'} height={'70%'} padding={5} justifyContent={'flex-start'} alignItems={'center'} backgroundColor={'white'}>
@@ -277,12 +203,9 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
                     </Stack>
 
 
-                    <Stack width={'33%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
-                        {videoURL && ready && (
-                            <video ref={videoRef} height={'85%'} muted preload='metadata'>
-                                <source src={videoURL.url} type="video/mp4" />
-                                Your browser does not support the video tag.
-                            </video>
+                    <Stack width={'50%'} height={'80%'} justifyContent={'flex-start'} alignItems={'center'}>
+                        {video && video.public_url && (
+                           <VideoObject URL={video.public_url} videoRef={videoRef} w={'100%'} h={'100%'}/>
                         )}
                     </Stack>
 
@@ -319,12 +242,10 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
                                                         }
                                                     }, 50);
 
-                                                    // Optional: clean up if navigating away
                                                     const stopLoop = () => clearInterval(interval);
                                                     videoRef.current.addEventListener('pause', stopLoop);
                                                     videoRef.current.addEventListener('ended', stopLoop);
 
-                                                    // Clean up event listeners after loop ends
                                                     setTimeout(() => {
                                                         videoRef.current.removeEventListener('pause', stopLoop);
                                                         videoRef.current.removeEventListener('ended', stopLoop);
@@ -458,11 +379,11 @@ const VideoEditor = ({videoURL, setVideoToEdit, video, setRefresh}) => {
                             </InputLabel>
                         </Stack>
 
-                        <Stack alignItems={'center'}>
+                        <Stack alignItems={'center'} width={'80%'} justifyContent={'center'}>
                             <InputLabel>Answer</InputLabel>
-                            <TextField value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} />
+                            <TextField sx={{width: '100%', textAlign: 'center'}} value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} />
                             <Button onClick={saveVideoFile} >Save Video</Button>
-                            <Button onClick={() => setVideoToEdit(null)} >Cancel</Button>
+                            <Button onClick={() => setSelection(null)} >Cancel</Button>
                         </Stack>
                     </>
                 }

@@ -6,18 +6,16 @@ import { useEffect, useState } from 'react';
 import TwentyOneThings from './components/games/TwentyOneThings';
 import Pic6 from './components/games/Pic6';
 import GamePageComp from './components/games/GamePageComp';
-import { Alert } from '@mui/material';
 import { Stack } from '@mui/system';
 import { useGlobalContext } from './business/GlobalContext';
 import UserAlert from './components/UserAlert';
-import { checkAndAddUsers } from './business/apiCalls';
 import ErrorPage from './components/ErrorPage';
 import DevCanvas from './r3fAssets/DevCanvas';
 import Login from './components/Login';
 import AccountPage from './components/AccountPage';
 import Friends from './components/Friends';
-import VideoEditor from './components/games/pic6_images/VideoEditor';
-import VideoHandler from './components/games/pic6_images/VideoHandler';
+import Admin from './components/Admin';
+import SPAdminWrapper from './components/games/six_pics/SPAdminWrapper';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
@@ -71,6 +69,9 @@ function App() {
               <Route path='/login' element={<Login />}/>
               <Route path='/account' element={<AccountPage />}/>
               <Route path='/friends' element={<Friends />}/>
+              <Route path='/admin' element={<Admin />}/>
+              <Route path='acount/admin/21things' element={<Admin />}/>
+              <Route path='account/admin/6pics' element={<SPAdminWrapper />}/>
             {!toggleQuit && 
               <>
                 <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

@@ -141,46 +141,61 @@ const AccountPage = ({size}) => {
   return (
         <Stack direction={'column'} sx={{ height: '100%', width: '100%', overflow: 'auto'}} justifyContent={'flex-start'} alignItems={'flex-start'}>
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
-                    <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
+                    <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
+                      <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
                         <Typography variant="h7">Welcome, {user?.user?.email}!</Typography>
+                      </Stack>
+                        <Stack width={'80%'}>
+                          <Accordion>
+                              <AccordionSummary>
+                                Account Controls
+                              </AccordionSummary>
+                              <AccordionDetails>
+                                <Stack width={'85%'} overflow={'auto'} userdata='accrodion_wrapper' height={'60%'}>
+                                  <Accordion>
+                                    <AccordionSummary>
+                                      <Typography>Account Details</Typography>
+                                    </AccordionSummary>
+                                    <AccordionDetails>
+                                      <Stack justifyContent={'center'} alignItems={'center'}>
+                                          <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
+                                          <Select value={imageType} onChange={(e) => setImageType(e.target.value)}> 
+                                              {avatarTerms.map((t, i) => (
+                                                <MenuItem key={i} value={t}>
+                                                      <Typography>{t}</Typography>
+                                                  </MenuItem>
+                                              ))}
+                                          </Select>
+                                          <FormLabel>Image Search Term</FormLabel>
+                                          <TextField value={avatarSearch} onChange={(e) => setAvatarSearch(e.target.value)}/>
+                                          <Button onClick={() => setSubmit(true)} >Search</Button>
+                                          <AvatarSelect results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit}/>
+                                      </Stack>
+                                    </AccordionDetails>
+                                  </Accordion>
+                                    {isAdmin && 
+                                      <Accordion>
+                                        <AccordionSummary>
+                                            <Typography>Admin Controls</Typography>
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
+                                                <Admin size={size}/>
+                                            </Stack>
+                                        </AccordionDetails>
+                                      </Accordion>
+                                    }
+                                </Stack>
+                              </AccordionDetails>
+                            </Accordion>
+                          </Stack>
                         <Button variant="contained" color="error" onClick={handleLogout} sx={{ mt: 2 }}>
                             Logout
                         </Button>
-                    </Stack>
-                    <Stack width={'85%'} overflow={'auto'} userdata='accrodion_wrapper' height={'60%'}>
-                    <Accordion>
-                        <AccordionSummary>
-                            <Typography>Account Details</Typography>
-                        </AccordionSummary>
-                        <AccordionDetails>
-                                <Stack justifyContent={'center'} alignItems={'center'}>
-                                    <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
-                                    <Select value={imageType} onChange={(e) => setImageType(e.target.value)}> 
-                                        {avatarTerms.map((t, i) => (
-                                            <MenuItem key={i} value={t}>
-                                                <Typography>{t}</Typography>
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                    <FormLabel>Image Search Term</FormLabel>
-                                    <TextField value={avatarSearch} onChange={(e) => setAvatarSearch(e.target.value)}/>
-                                    <Button onClick={() => setSubmit(true)} >Search</Button>
-                                    <AvatarSelect results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit}/>
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
-                        <Accordion>
-                            <AccordionSummary>
-                                <Typography>Admin Controls</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
-                                <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
-                                    {isAdmin && <Admin size={size}/>}
-                                </Stack>
-                            </AccordionDetails>
-                        </Accordion>
-                    </Stack>
+                      </Stack>
+
+
                 </Stack>
         </Stack>
   );

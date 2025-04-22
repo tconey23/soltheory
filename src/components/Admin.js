@@ -5,7 +5,10 @@ import { useGlobalContext } from '../business/GlobalContext';
 import Papa from 'papaparse';
 import { addNewPrompts } from '../business/apiCalls';
 import EditablePromptItem from './EditablePromptItem';
-import VideoHandler from './games/pic6_images/VideoHandler';
+import { useNavigate } from 'react-router-dom';
+import Hexagon from './games/Hexagon';
+import TwentOneThingsButton from './games/TwentOneThingsButton';
+import SixPicsButton from './games/SixPicsButton';
 
 const AddPrompts = () => {
     const [date, setDate] = useState('');
@@ -321,20 +324,30 @@ const AddPrompts = () => {
 const Admin = ({size}) => {
     const {alertProps, setAlertProps} = useGlobalContext()
     const [selection, setSelection] = useState()
+    const nav = useNavigate()
+
+    useEffect(() =>{
+      switch(selection){
+        case '6Pics': nav('/account/admin/6pics');
+        break;
+        case '21Things': nav('/account/admin/21things');
+        break;
+
+      }
+    }, [selection])
+
   return (
-    <Stack direction={'column'} sx={{ height: '98%', width: '100%', overflow: 'scroll'}}>
+    <Stack direction={'column'} sx={{ height: '98%', width: '100%'}}>
         <Stack width={'50%'}>
-            <Select value={selection} onChange={(e) => setSelection(e.target.value)}>
-                <MenuItem value={'6Pics'}>6Pics</MenuItem>
-                <MenuItem value={'21Things'}>21Things</MenuItem>
+            <Select value={selection} onChange={(e) => setSelection(e.target.value)} sx={{padding: 2}}>
+                <MenuItem value={'6Pics'} sx={{margin: 1}}>
+                  <SixPicsButton admin={true}/>
+                </MenuItem>
+                <MenuItem value={'21Things'} sx={{margin: 1}}>
+                  <TwentOneThingsButton admin={true}/>
+                </MenuItem>
             </Select>
         </Stack>
-        {selection === '6Pics' &&
-            <VideoHandler size={size}/>
-        }
-        {selection === '21Things' &&
-            <AddPrompts /> 
-        }
     </Stack>
   );
 };
