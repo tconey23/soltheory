@@ -42,7 +42,7 @@
     "eject": "react-scripts eject",
     "serve": "serve -s build",
     "push": "git add . && git commit -m \"adds recent changes\" && git push origin main",
-    "dev-pwa": "npm-run-all build "
+    "dev-pwa": "npm-run-all build && push"
   },
   "eslintConfig": {
     "extends": [

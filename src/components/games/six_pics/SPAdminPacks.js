@@ -50,7 +50,7 @@ const SPAdminPacks = () => {
                 {selection
                 ?
                     <>
-                        <ViewPack setSelection={setSelection} selection={selection}/>
+                        <ViewPack setSelection={setSelection} selection={selection}/> 
                     </>
                 :
                     <>

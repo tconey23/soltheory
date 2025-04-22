@@ -172,7 +172,7 @@ const AddPackForm = ({setExpandAddNewPack, resetData}) => {
                           onChange={(e) => setPackName(e.target.value)}
                       />
                         <FormHelperText error={errors.packName}>
-                          {errors.packName || 'Enter the name of the pack as you would like it to appear in game'}
+                          {errors.packName || 'Enter the name of the pack as you would like it to appear in game'} 
                       </FormHelperText>
                   </FormControl>
                   <br></br>

@@ -5,7 +5,7 @@ import SPAdminPacks from './SPAdminPacks';
 const SPAdminWrapper = () => {
 
   return (
-    <Stack direction={'column'} sx={{ height: '98vh', width: '100vw' }} fontFamily={'Fredoka Regular'}>
+    <Stack direction={'column'} sx={{ height: '98vh', width: '100vw' }} fontFamily={'Fredoka Regular'}> 
         <Stack>
             <Accordion>
                 <AccordionSummary>

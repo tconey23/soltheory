@@ -322,7 +322,7 @@ const AddPrompts = () => {
   };
 
 const Admin = ({size}) => {
-    const {alertProps, setAlertProps} = useGlobalContext()
+    const {alertProps, setAlertProps} = useGlobalContext() 
     const [selection, setSelection] = useState()
     const nav = useNavigate()
 

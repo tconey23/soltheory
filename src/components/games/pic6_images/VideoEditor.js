@@ -381,7 +381,7 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
 
                         <Stack alignItems={'center'} width={'80%'} justifyContent={'center'}>
                             <InputLabel>Answer</InputLabel>
-                            <TextField sx={{width: '100%', textAlign: 'center'}} value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} />
+                            <TextField sx={{width: '100%', textAlign: 'center'}} value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} /> 
                             <Button onClick={saveVideoFile} >Save Video</Button>
                             <Button onClick={() => setSelection(null)} >Cancel</Button>
                         </Stack>

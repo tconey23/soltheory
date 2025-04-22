@@ -66,7 +66,7 @@ const ViewPack = ({setSelection, selection}) => {
                     <VideoObject URL={packData.graphic}/>
                 </Box>
             </Stack>
-            <Stack width={'50%'} justifyContent={'flex-start'} alignItems={'center'} sx={{height: '400px', overflowY: 'scroll'}}>
+            <Stack width={'50%'} justifyContent={'flex-start'} alignItems={'center'} sx={{height: '400px', overflowY: 'scroll'}}> 
                 <List>
                     {packVideos?.map((v) => {
                         if(v){

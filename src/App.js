@@ -49,7 +49,7 @@ function App() {
   
 
   return (
-      <Stack userdata='app_wrapper' direction={'column'} height={'100vh'} width={'100vw'}>
+      <Stack userdata='app_wrapper' direction={'column'} height={'100vh'} width={'100vw'}> 
          
           <Stack userdata='app_header' width={'100%'} height={'10%'}>
             <AppHeader />
