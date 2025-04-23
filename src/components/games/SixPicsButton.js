@@ -10,7 +10,9 @@ const SixPicsButton = ({admin}) => {
         
         if(!admin){nav('/6pics')}
         
-        }} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}> 
+        }} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}
+        sx={{scale: admin ? 0.5 : 1}}
+        > 
         <SixPics dims={100}/>
         <Typography fontSize={50} fontFamily={'Fredoka Regular'}>6Pics</Typography>
     </Stack>

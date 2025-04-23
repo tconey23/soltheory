@@ -2,145 +2,10 @@ import { useEffect, useState, useRef } from 'react';
 import { Button, InputLabel, List, ListItem, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { checkExistingPack, getGifs, getSixPicsPack, uploadVid, removeGifByName, addNewCategory, updatePackLogo } from '../business/apiCalls'; 
 import { useGlobalContext } from '../business/GlobalContext';
-import Papa from 'papaparse';
-import { addNewPrompts } from '../business/apiCalls';
-import EditablePromptItem from './EditablePromptItem';
 import { useNavigate } from 'react-router-dom';
 import Hexagon from './games/Hexagon';
 import TwentOneThingsButton from './games/TwentOneThingsButton';
-import SixPicsButton from './games/SixPicsButton';
-
-const AddPrompts = () => {
-    const [date, setDate] = useState('');
-    const [author, setAuthor] = useState('');
-    const [prompts, setPrompts] = useState([]);
-    const [newPrompt, setNewPrompt] = useState('');
-    const [toggleMulti, setToggleMulti] = useState(false);
-    const [data, setData] = useState([]);
-    const [readyToSubmit, setReadyToSubmit] = useState(false);
-    const { user, isMobile } = useGlobalContext();
-  
-    useEffect(() => {
-      if (user) setAuthor(user.name);
-    }, [user]);
-  
-    useEffect(() => {
-      const valid = date && author && ((prompts.length === 21) || (data.length === 21));
-      setReadyToSubmit(valid);
-    }, [data, prompts, date, author]);
-  
-    const handlePost = async () => {
-      const formatted = new Date(date).toLocaleDateString("en-US");
-      const promptList = prompts.length ? prompts : data;
-  
-      const payload = {
-        date: formatted,
-        author,
-        prompts: promptList,
-      };
-  
-      const res = await addNewPrompts(payload);
-      if (res === 'success') {
-        setDate('');
-        setData([]);
-        setPrompts([]);
-        setAuthor('');
-      }
-    };
-  
-    const handleFileUpload = (e) => {
-      const file = e.target.files[0];
-      if (!file) return;
-  
-      Papa.parse(file, {
-        header: false,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const promptArray = results.data.map(row => ({ prompt: row[0]?.trim() })).filter(p => p.prompt);
-          setData(promptArray);
-        }
-      });
-    };
-  
-    const handleAddPrompt = () => {
-      if (newPrompt) {
-        setPrompts(prev => [...prev, newPrompt]);
-        setNewPrompt('');
-      }
-    };
-  
-    const handleKeyDown = (key) => {
-      if (key === "Enter" && prompts.length < 21 && newPrompt) {
-        handleAddPrompt();
-      }
-    };
-  
-    const handleDelete = (index, type) => {
-      if (type === 'data') setData(prev => prev.filter((_, i) => i !== index));
-      if (type === 'prompts') setPrompts(prev => prev.filter((_, i) => i !== index));
-    };
-  
-    const handleSaveEdit = (index, updatedText, type) => {
-      if (type === 'data') {
-        setData(prev => prev.map((item, i) => i === index ? { ...item, prompt: updatedText } : item));
-      } else if (type === 'prompts') {
-        setPrompts(prev => prev.map((item, i) => i === index ? updatedText : item));
-      }
-    };
-  
-    return (
-      <Stack alignItems='center' paddingTop={4}>
-        <Typography variant='h6'>Add Prompts</Typography>
-        {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
-  
-        <TextField
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          sx={{ marginTop: 2 }}
-        />
-        <TextField
-          value={author}
-          onChange={(e) => setAuthor(e.target.value)}
-          label="Author"
-          sx={{ marginTop: 2 }}
-        />
-  
-        <Button onClick={() => setToggleMulti(!toggleMulti)} sx={{ mt: 2 }}>
-          {toggleMulti ? 'Single Prompt' : 'Upload CSV'}
-        </Button>
-  
-        {toggleMulti ? (
-          <input type="file" accept=".csv" onChange={handleFileUpload} />
-        ) : (
-          <Stack direction={'column'} alignItems={'center'}>
-            <TextField
-              value={newPrompt}
-              onChange={(e) => setNewPrompt(e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e.key)}
-              label="New Prompt"
-              sx={{ marginTop: 2 }}
-            />
-            <Button onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
-          </Stack>
-        )}
-  
-        <List sx={{ width: isMobile ? '100%' : '75%' }}>
-          {(toggleMulti ? data : prompts).map((item, i) => (
-            <EditablePromptItem
-              key={i}
-              index={i}
-              value={item}
-              type={toggleMulti ? 'data' : 'prompts'}
-              onDelete={handleDelete}
-              onSave={handleSaveEdit}
-              isMobile={isMobile}
-            />
-          ))}
-        </List>
-      </Stack>
-    );
-  };
+import SixPicsButton from './games/SixPicsButton'
 
 
   export const AddPics = ({ size }) => {
@@ -322,32 +187,87 @@ const AddPrompts = () => {
   };
 
 const Admin = ({size}) => {
-    const {alertProps, setAlertProps} = useGlobalContext() 
-    const [selection, setSelection] = useState()
+    const {alertProps, setAlertProps, user} = useGlobalContext() 
+    const [gameSelection, setGameSelection] = useState()
+    const [userSelection, setUserSelection] = useState()
     const nav = useNavigate()
 
     useEffect(() =>{
-      switch(selection){
-        case '6Pics': nav('/account/admin/6pics');
+      // console.log(user.metadata.is_admin)
+      switch(gameSelection){
+        case '6Pics': nav(user.metadata.is_admin ? '/account/admin/6pics' : '/error');
         break;
-        case '21Things': nav('/account/admin/21things');
+        case '21Things': nav(user.metadata.is_admin ? '/account/admin/21things' : '/error');
+        break;
+      }
+    }, [gameSelection])
+
+    useEffect(() =>{
+      switch(userSelection){
+        case 'adminrights': nav('/account/admin/adminrights');
+        break;
+        case 'userstatus': nav('/account/admin/adminrights');
         break;
 
       }
-    }, [selection])
+    }, [userSelection])
 
   return (
     <Stack direction={'column'} sx={{ height: '98%', width: '100%'}}>
-        <Stack width={'50%'}>
-            <Select value={selection} onChange={(e) => setSelection(e.target.value)} sx={{padding: 2}}>
-                <MenuItem value={'6Pics'} sx={{margin: 1}}>
+        <Stack width={'40%'} height={'10%'} paddingY={1}>
+            <Typography>Games</Typography>
+            <Select
+             value={gameSelection} 
+             onChange={(e) => setGameSelection(e.target.value)} 
+             sx={{padding: 2, height: '10px'}} 
+             displayEmpty
+             renderValue={(selected) => {
+              if (!selected) {
+                return <em>Select game</em>;
+              }
+              return selected;
+            }}
+             >
+                <MenuItem value='' disabled>
+                  <em>Select game</em>
+                </MenuItem>
+                <MenuItem value={'6Pics'} sx={{margin: 1, height: '50px'}}>
                   <SixPicsButton admin={true}/>
                 </MenuItem>
-                <MenuItem value={'21Things'} sx={{margin: 1}}>
+                <MenuItem value={'21Things'} sx={{margin: 1, height: '50px'}}>
                   <TwentOneThingsButton admin={true}/>
                 </MenuItem>
             </Select>
         </Stack>
+
+
+
+        <Stack width={'40%'} height={'10%'} paddingY={1}>
+            <Typography>Users</Typography>
+            <Select
+             value={userSelection} 
+             onChange={(e) => setUserSelection(e.target.value)} 
+             sx={{padding: 2, height: '10px'}} 
+             displayEmpty
+             renderValue={(selected) => {
+              if (!selected) {
+                return <em>Select option</em>;
+              }
+              return selected;
+            }}
+             >
+                <MenuItem value='' disabled>
+                  <em>Select option</em>
+                </MenuItem>
+                <MenuItem value={'adminrights'} sx={{margin: 1, height: '50px'}}>
+                  <Typography>Manage admin rights</Typography>
+                </MenuItem>
+                {/* <MenuItem value={'userstatus'} sx={{margin: 1, height: '50px'}}>
+                  <Typography>Change user status</Typography>
+                </MenuItem> */}
+            </Select>
+        </Stack>
+            
     </Stack>
   );
 };

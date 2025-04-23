@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import './index.css';
-import App from './App';
+import App from './App.js';
 import { GlobalProvider } from './business/GlobalContext';
 
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';

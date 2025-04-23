@@ -18,14 +18,15 @@ import ViewPack from './ViewPack';
 //     }
 // ]
 
-const SPAdminPacks = () => {
+const SPAdminPacks = ({setForceRefresh, forceRefresh}) => {
 
     const [packs, setPacks] = useState([])
     const [fieldCount, setFieldCount] = useState()
-    const [isHover, setisHover] = useState(null)
+    const [isHover, setisHover] = useState(false)
     const [selection, setSelection] = useState()
     const [expandAddNewPack, setExpandAddNewPack] = useState(false)
     const [resetForm, setResetForm] = useState(0)
+    
 
     const packRef = useRef()
 
@@ -39,6 +40,12 @@ const SPAdminPacks = () => {
         }
     }
 
+    useEffect(() => {console.log(forceRefresh)
+        if(forceRefresh > 1){
+            getAllPacks()
+        }
+    }, [forceRefresh])
+
     useEffect(() =>{
         if(packs.length == 0){
             getAllPacks()
@@ -50,7 +57,7 @@ const SPAdminPacks = () => {
                 {selection
                 ?
                     <>
-                        <ViewPack setSelection={setSelection} selection={selection}/> 
+                        <ViewPack setSelection={setSelection} selection={selection} forceRefresh={forceRefresh} setForceRefresh={setForceRefresh}/> 
                     </>
                 :
                     <>
@@ -72,7 +79,12 @@ const SPAdminPacks = () => {
                             <AddPackForm setExpandAddNewPack={setExpandAddNewPack} resetData={resetForm}/>
                         </AccordionDetails>
                     </Accordion>
-                
+                <Accordion>
+                    <AccordionSummary>
+                        Existing packs
+                    </AccordionSummary>
+                    <AccordionDetails>
+                    
                 <List>
                     {packs.length > 0 &&
                         packs.map((p, i) => {
@@ -97,8 +109,8 @@ const SPAdminPacks = () => {
                             
                             return (
                                 <ListItem key={i}>
-                                    <Accordion sx={{width: '100%'}}>
-                                        <AccordionSummary>
+                                    <Accordion sx={{width: '100%'}} defaultExpanded>
+                                        <AccordionSummary sx={{transition: 'all 1s ease-in-out', bgcolor: isHover === `pack${i}` ? '#1976d224' : 'white', boxShadow: isHover === `pack${i}` ? '5px 5px 16px 0px #00000045' : 'none'}} onMouseOver={() => setisHover(`pack${i}`)} onMouseOut={() => setisHover(false)}>
                                             {p['pack_name']}
                                         </AccordionSummary>
                                         <AccordionDetails>
@@ -152,7 +164,9 @@ const SPAdminPacks = () => {
                             </ListItem>
                         );
                     })}
-                </List>
+                </List>    
+                    </AccordionDetails>
+                </Accordion>
                 </>
                 }
             </Stack>

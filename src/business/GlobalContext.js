@@ -81,7 +81,7 @@ useEffect(() =>{
       if (event === 'SIGNED_IN' && session?.user) {
         await supabase
           .from('users')
-          .upsert([{ primary_id: session.user.id, email: session.user.email }], {
+          .upsert([{ primary_id: session.user.id, email: session.user.email, currently_online: true }], {
             onConflict: 'primary_id',
           });
       }

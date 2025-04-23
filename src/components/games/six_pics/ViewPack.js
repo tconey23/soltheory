@@ -1,14 +1,72 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Button, List, ListItem, MenuItem, Modal, Select, Stack, Tooltip, Typography } from '@mui/material';
+import { Avatar, Button, CircularProgress, List, ListItem, MenuItem, Modal, Select, Stack, TextField, Tooltip, Typography } from '@mui/material';
 import { supabase } from '../../../business/supabaseClient';
 import VideoObject from './VideoObject';
 import { Box } from '@mui/system';
-import VideoEditor from '../pic6_images/VideoEditor';
+import { Suspense, lazy } from 'react';
+import { useGlobalContext } from '../../../business/GlobalContext';
 
-const ViewPack = ({setSelection, selection}) => {
+const VideoEditor = lazy(() => import('../pic6_images/VideoEditor'));
+
+const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
     const [packData, setPackData] = useState()
     const [videoToEdit, setVideoToEdit] = useState()
     const [packVideos, setPackVideos] = useState([])
+    const [editPackName, setEditPackName] = useState(false)
+    const [newPackName, setNewPackName] = useState(null)
+   
+
+    const {alertProps, setAlertProps} = useGlobalContext()
+
+    const updatePackName = async () => {
+        const { data: existing, error: checkError } = await supabase
+        .from('sixpicspacks')
+        .select('id')
+        .eq('pack_name', newPackName)
+        .neq('pack_name', selection);
+      
+      if (checkError) {
+        console.error('Error checking existing name:', checkError);
+        return;
+      }
+      
+      if (existing.length > 0) {
+        setAlertProps({
+            text: 'A pack with this name already exists. Please choose a different name.',
+            severity: 'error',
+            display: true
+        })
+        return;
+      }
+      
+      const { data, error } = await supabase
+        .from('sixpicspacks')
+        .update({ pack_name: newPackName })
+        .eq('pack_name', selection)
+        .select();
+      
+      if (error) {
+        setAlertProps({
+            text: error,
+            severity: 'error',
+            display: true
+        })
+      } else {
+        setPackData(data[0])
+        setForceRefresh(prev => prev +1)
+        setAlertProps({
+            text: 'Pack name changed successfully',
+            severity: 'success',
+            display: true
+        })
+      }
+    }
+
+    const handleUpdateName = () => {
+        if(editPackName && newPackName){
+            updatePackName()
+        }
+    }
 
 
     const getSelectedPack = async () => {
@@ -31,6 +89,8 @@ const ViewPack = ({setSelection, selection}) => {
     }
 
     useEffect(() => {
+        setEditPackName(false)
+        setNewPackName(null)
         if(packData && packVideos.length < 1){
             if(packData.videos){
                 setPackVideos(packData.videos.map((v) => {
@@ -41,25 +101,38 @@ const ViewPack = ({setSelection, selection}) => {
     }, [packData])
 
     useEffect(() => {
-        if(packVideos){
-            packVideos.forEach((v) =>{
-                
-            })
-        }
-    }, [packVideos])
-
-    useEffect(() => {
         if(selection){
             getSelectedPack()
         }
     }, [selection])
     
   return (
-    <Stack direction={'column'} sx={{ height: '98%', width: '100%' }} justifyContent={'center'} alignItems={'center'}>
+    <Stack key={forceRefresh} direction={'column'} sx={{ height: '98%', width: '100%' }} justifyContent={'center'} alignItems={'center'}>
         {packData && packVideos &&
         <>
             <Stack width={'50%'} justifyContent={'center'} alignItems={'center'}>
-                <Typography fontSize={'4vw'}>{packData.pack_name}</Typography>
+
+                {editPackName
+                 ? 
+                    <>
+                        <TextField value={newPackName} onChange={(e) => setNewPackName(e.target.value)}></TextField>
+                        <Stack direction={'row'}>
+                            <Button
+                                onClick={() => {
+                                    handleUpdateName()
+                                }}
+                                >Save</Button>
+                            <Button onClick={() => {
+                                setEditPackName(false)
+                            }} >Cancel</Button>
+                        </Stack>
+                    </>
+                 :
+                    <Tooltip title='Click to change pack name' followCursor sx={{cursor: 'pointer'}}>
+                        <Typography onClick={() => setEditPackName(true)} fontSize={'4vw'}>{packData.pack_name}</Typography>
+                    </Tooltip>
+                }
+
             </Stack>
             <Stack width={'50%'} justifyContent={'center'} alignItems={'center'}>
                 <Box sx={{width: '50%'}}>
@@ -130,11 +203,16 @@ const ViewPack = ({setSelection, selection}) => {
         </>
         }
         <Stack padding={2}>
-            <Button onClick={() => setSelection(null)} variant='contained'>Done</Button>
+            <Button onClick={() => {
+                setSelection(null)
+                setForceRefresh(prev => prev +1)
+                }} variant='contained'>Done</Button>
         </Stack>
         <Modal open={videoToEdit}>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-                <VideoEditor video={videoToEdit} setSelection={setVideoToEdit}/>
+                <Suspense fallback={<CircularProgress />}>
+                    <VideoEditor video={videoToEdit} setSelection={setVideoToEdit}/>
+                </Suspense>
             </Stack>
         </Modal>
     </Stack>

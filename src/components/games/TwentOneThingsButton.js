@@ -10,7 +10,9 @@ const TwentOneThingsButton = ({admin}) => {
         
       if(!admin){nav('/21things')}
       
-      }} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}>  
+      }} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}
+      sx={{scale: admin ? 0.5 : 1}}
+      >  
         <Hexagon dims={100}/>
         <Typography fontSize={50} fontFamily={'Fredoka Regular'}>21Things</Typography>
     </Stack>

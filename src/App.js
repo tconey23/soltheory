@@ -16,6 +16,8 @@ import AccountPage from './components/AccountPage';
 import Friends from './components/Friends';
 import Admin from './components/Admin';
 import SPAdminWrapper from './components/games/six_pics/SPAdminWrapper';
+import AdminRights from './components/AdminRights';
+import AddPrompts from './components/games/twentyone_things/AddPrompts';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
@@ -70,8 +72,9 @@ function App() {
               <Route path='/account' element={<AccountPage />}/>
               <Route path='/friends' element={<Friends />}/>
               <Route path='/admin' element={<Admin />}/>
-              <Route path='acount/admin/21things' element={<Admin />}/>
+              <Route path='account/admin/21things' element={<AddPrompts />}/>
               <Route path='account/admin/6pics' element={<SPAdminWrapper />}/>
+              <Route path='account/admin/adminrights' element={<AdminRights />}/>
             {!toggleQuit && 
               <>
                 <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

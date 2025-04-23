@@ -1,11 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
-import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, setRef } from '@mui/material';
+import { Avatar, Button, InputLabel, MenuItem, Select, Stack, TextField, Tooltip, Typography, Snackbar, setRef, FormControl, FormLabel } from '@mui/material';
 import { Box } from '@mui/system';
 import { Slider } from '@mui/material';
 import { useGlobalContext } from '../../../business/GlobalContext';
 import { useMemo } from 'react';
-import VideoObject from '../six_pics/VideoObject';
+
 import { supabase } from '../../../business/supabaseClient';
+import { Suspense, lazy } from 'react';
+import {CircularProgress} from '@mui/material';
+import LoadingScreen from '../../LoadingScreen';
 
 const getVideoDuration = (videoSrc) => {
   return new Promise((resolve, reject) => {
@@ -24,9 +27,10 @@ const getVideoDuration = (videoSrc) => {
   });
 };
 
+const VideoObject = lazy(() => import('../six_pics/VideoObject'));
 
-const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
-  const {alertProps, setAlertProps} = useGlobalContext()
+const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
+  const {alertProps, setAlertProps, isMobile} = useGlobalContext()
   const [ready, setReady] = useState(false);
   const vidDuration = useRef();
   const currentVidTime = useRef();
@@ -37,6 +41,20 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
   const [selectedLoopIndex, setSelectedLoopIndex] = useState(null);
   const [playBackSpeed, setPlaybackSpeed] = useState(1)
   const [answer, setAnswer] = useState('')
+
+  useEffect(() => {
+    if(video){
+      setStops(video.stops)
+      setLoops(video.loops)
+      setPlaybackSpeed(video.playback_speed)
+
+      if(video.answer){
+        setAnswer(video.answer)
+      }
+
+
+    }
+  }, [video])
 
 
   const derivedLoops = useMemo(() => {
@@ -82,29 +100,49 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
   };
 
   const saveVideoFile = async () => {
-    const updatedVideo = {
+    const updatedFields = {
       stops,
       loops: derivedLoops,
       playback_speed: playBackSpeed,
-      name: answer || video.name,
+      name: video.name,
       ready: true,
+      answer: answer
     };
   
-    const { data, error } = await supabase
-      .from('sixpicksvideos')
-      .update(updatedVideo)
-      .eq('id', video.id);
+    try {
+
+      const { data: packRows, error: selectError } = await supabase
+        .from('sixpicspacks')
+        .select('id, videos')
+        .eq('pack_name', video.pack_name)
+        .single();
   
-    if (error) {
-      console.error('Save error:', error);
-      setAlertProps({ open: true, message: 'Failed to save video edits.', severity: 'error' });
-    } else {
-      setAlertProps({ open: true, message: 'Video saved successfully!', severity: 'success' });
-      setVideoToEdit(null); // Exit edit mode
-      setRefresh((prev) => !prev); // Optional: trigger re-fetch or re-render
+      if (selectError || !packRows) {
+        throw selectError || new Error('Pack not found');
+      }
+  
+      const updatedVideos = packRows.videos.map((vid) =>
+        vid.public_url === video.public_url
+          ? { ...vid, ...updatedFields }
+          : vid
+      );
+  
+      const { error: updateError } = await supabase
+        .from('sixpicspacks')
+        .update({ videos: updatedVideos })
+        .eq('id', packRows.id);
+  
+      if (updateError) {
+        throw updateError;
+      }
+  
+      setAlertProps({ display: true, text: 'Video saved successfully!', severity: 'success' });
+      setSelection(null);
+    } catch (err) {
+      console.error('Save error:', err);
+      setAlertProps({ display: true, text: 'Failed to save video edits.', severity: 'error' });
     }
   };
-
 
 
   useEffect(() => {
@@ -171,96 +209,119 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
         <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'} backgroundColor={'#000000ab'}>
             <Stack direction={'column'} width={'60%'} height={'70%'} padding={5} justifyContent={'flex-start'} alignItems={'center'} backgroundColor={'white'}>
                 <Stack direction={'row'} width={'100%'} height={'54%'}>
-                    <Stack width={'33%'} height={'100%'}>
-                        {ready &&
-                            <Stack direction="column" spacing={2} mt={2} flexWrap="wrap" height={'100%'}>
+                    <Stack width={'33%'} height={'100%'} alignItems={'center'}>
+                        
+                        {ready
+                          ? <>
+                            <Stack direction="column" spacing={2} mt={2} flexWrap="wrap" height={'100%'} width={'30%'}>
                                 <Button disabled={!currentVidTime.current} 
                                     onClick={() => {
-                                        const currentTime = currentVidTime.current;
-                                        setStops((prev) => [...prev, parseFloat(currentTime.toFixed(2))]);
+                                      const currentTime = currentVidTime.current;
+                                      setStops((prev) => [...prev, parseFloat(currentTime.toFixed(2))]);
                                     }}>
                                     Add Marker
                                 </Button>
                                 {stops.map((time, index) => (
-                                    <Tooltip key={index} title={'Alt + click to delete'}>
+                                  <Tooltip key={index} title={'Alt + click to delete'}>
                                         <Button
                                             variant="outlined"
                                             size="small"
                                             onClick={(e) => {
-                                                if (e.altKey) {
-                                                    setStops((prev) => prev.filter((_, i) => i !== index));
-                                                } else if (videoRef.current) {
-                                                    videoRef.current.currentTime = time;
-                                                }
+                                              if (e.altKey) {
+                                                setStops((prev) => prev.filter((_, i) => i !== index));
+                                              } else if (videoRef.current) {
+                                                videoRef.current.currentTime = time;
+                                              }
                                             }}
-                                        >
+                                            >
                                         {time.toFixed(2)}s
                                         </Button>
                                     </Tooltip>
                                 ))}
                             </Stack>
+                            </>
+  
+                            :
+  
+                            <LoadingScreen />
+                          }
+
+                    </Stack>
+
+
+                    
+                      <Stack userdata='video-wrapper' width={'33%'} height={'80%'} justifyContent={'flex-start'} alignItems={'center'} marginX={1} visibility={ready}>
+                        <Typography>{video?.name}</Typography>
+                        {ready
+                          ? 
+                          <>
+                            {video && video.public_url && (
+                              <VideoObject URL={video.public_url} videoRef={videoRef} w={'100%'} h={'100%'} outerWidth={'80%'} outerHeight={'100%'}/>
+                            )}
+                          </>
+                        :
+                        <LoadingScreen />
                         }
-                    </Stack>
+                          
+                      </Stack>
+                   
 
-
-                    <Stack width={'50%'} height={'80%'} justifyContent={'flex-start'} alignItems={'center'}>
-                        {video && video.public_url && (
-                           <VideoObject URL={video.public_url} videoRef={videoRef} w={'100%'} h={'100%'}/>
-                        )}
-                    </Stack>
-
+                    <Suspense>
 
                     <Stack width={'33%'} height={'70%'}>
-                        {ready &&
+                        {ready ?
                             <>
-                                <Stack mt={2} spacing={1}>
+                                <Stack mt={2} spacing={1} width={'100%'} alignItems="center">
                                     {derivedLoops.map((loop, index) => (
-                                        <Stack key={index} direction="column" spacing={1} alignItems="flex-start" mb={2}>
+                                        <Stack key={index} direction="column" spacing={1} alignItems="center" mb={2} maxWidth={'71%'} sx={{scale: isMobile ? 0.5 : 0.8}}>
 
-                                        <Stack direction="row" spacing={1} alignItems="center">
-                                          <Typography>{loop.start.toFixed(2)}s - {loop.end.toFixed(2)}s</Typography>
+                                        <Stack direction="column" spacing={1} alignItems="center" maxWidth={'71%'} justifyContent={'center'}>
+                                          <Typography fontSize={'1vw'}>{loop.start.toFixed(2)}s to {loop.end.toFixed(2)}s</Typography>
                                       
+                                      <Stack direction="row" spacing={1} alignItems="center" justifyContent={'center'} maxWidth={'100%'}>
                                             <Button
                                                 onClick={() => {
-                                                    if (videoRef.current) {
+                                                  if (videoRef.current) {
                                                     videoRef.current.currentTime = loop.start;
                                                     videoRef.current.playbackRate = loop.speed || 1;
                                                     videoRef.current.play();
-
+                                                    
                                                     const interval = setInterval(() => {
-                                                        if (
+                                                      if (
                                                         videoRef.current.currentTime >= loop.end ||
                                                         videoRef.current.paused ||
                                                         videoRef.current.ended
-                                                        ) {
+                                                      ) {
                                                         videoRef.current.currentTime = loop.start;
                                                         if (videoRef.current.paused || videoRef.current.ended) {
-                                                            clearInterval(interval);
+                                                          clearInterval(interval);
                                                         } else {
-                                                            videoRef.current.play();
+                                                          videoRef.current.play();
                                                         }
-                                                        }
+                                                      }
                                                     }, 50);
-
+                                                    
                                                     const stopLoop = () => clearInterval(interval);
                                                     videoRef.current.addEventListener('pause', stopLoop);
                                                     videoRef.current.addEventListener('ended', stopLoop);
-
+                                                    
                                                     setTimeout(() => {
-                                                        videoRef.current.removeEventListener('pause', stopLoop);
-                                                        videoRef.current.removeEventListener('ended', stopLoop);
+                                                      videoRef.current.removeEventListener('pause', stopLoop);
+                                                      videoRef.current.removeEventListener('ended', stopLoop);
                                                     }, (loop.end - loop.start) * 1000 + 1000); // buffer time
-                                                    }
+                                                  }
                                                 }}
                                                 >
                                                 Play
                                             </Button>
-                                      
+
                                           <Button onClick={() => setSelectedLoopIndex(index)}>Edit</Button>
+
                                           <Button onClick={() => setLoops(prev => prev.filter((_, i) => i !== index))}>
                                             Delete
                                           </Button>
                                         </Stack>
+                                      </Stack>
                                       
                                         <Stack direction="row" alignItems="center" spacing={2} width="100%">
                                           <Typography variant="caption" minWidth={60}>Speed: {loop.speed?.toFixed(2)}x</Typography>
@@ -271,43 +332,48 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
                                             min={0.5}
                                             max={3}
                                             onChange={(e, newSpeed) => {
-                                                const key = `${loop.start}-${loop.end}`;
-                                                setLoopSpeeds((prev) => ({
-                                                  ...prev,
-                                                  [key]: newSpeed,
-                                                }));
-                                              }}
+                                              const key = `${loop.start}-${loop.end}`;
+                                              setLoopSpeeds((prev) => ({
+                                                ...prev,
+                                                [key]: newSpeed,
+                                              }));
+                                            }}
                                             valueLabelDisplay="auto"
                                             sx={{ width: '100px' }}
-                                          />
+                                            />
                                         </Stack>
                                       </Stack>
                                       
                                     ))}
                                 </Stack>
                                 {selectedLoopIndex !== null && loops[selectedLoopIndex] && (
-                                    <Stack mt={2}>
+                                  <Stack mt={2}>
                                         <Slider
                                             value={[loops[selectedLoopIndex].start, loops[selectedLoopIndex].end]}
                                             min={0}
                                             max={vidDuration.current || 100}
                                             step={0.01}
                                             onChange={(e, newValue) => {
-                                                const [newStart, newEnd] = newValue;
-                                                setLoops(prev =>
-                                                    prev.map((loop, idx) =>
-                                                        idx === selectedLoopIndex ? { start: newStart, end: newEnd } : loop
+                                              const [newStart, newEnd] = newValue;
+                                              setLoops(prev =>
+                                                prev.map((loop, idx) =>
+                                                  idx === selectedLoopIndex ? { start: newStart, end: newEnd } : loop
                                             )
-                                        );
-                                    }}
-                                    valueLabelDisplay="auto"
-                                    />
+                                          );
+                                        }}
+                                        valueLabelDisplay="auto"
+                                        />
                                         <Button onClick={() => setSelectedLoopIndex(null)}>Done Editing</Button>
                                     </Stack>
                                 )}
                             </>
+                            :
+                            <LoadingScreen />
                         }
                     </Stack>
+                  </Suspense>
+
+
                 </Stack>
 
 
@@ -380,10 +446,12 @@ const VideoEditor = ({setVideoToEdit, video, setRefresh, setSelection}) => {
                         </Stack>
 
                         <Stack alignItems={'center'} width={'80%'} justifyContent={'center'}>
-                            <InputLabel>Answer</InputLabel>
-                            <TextField sx={{width: '100%', textAlign: 'center'}} value={video.name || answer} onChange={(e) => setAnswer(e.target.value)} /> 
+                          <FormControl sx={{width: '100%', alignItems: 'center'}}>
+                            <FormLabel>Answer</FormLabel>
+                            <TextField sx={{width: '80%', textAlign: 'center'}} value={answer} onChange={(e) => setAnswer(e.target.value)} /> 
                             <Button onClick={saveVideoFile} >Save Video</Button>
                             <Button onClick={() => setSelection(null)} >Cancel</Button>
+                          </FormControl>
                         </Stack>
                     </>
                 }

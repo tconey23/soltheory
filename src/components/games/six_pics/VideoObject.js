@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Stack } from '@mui/material';
+import { Suspense } from 'react';
 
-const VideoObject = ({fileInfo, URL, videoRef, w, h}) => {
+const VideoObject = ({fileInfo, URL, videoRef, w, h, outerWidth, outerHeight}) => {
     // console.log(fileInfo)
   return (
-    <Stack direction={'column'} sx={{ height: '98%', width: '100%' }} border={'1px solid black'} padding={1}> 
+    <Stack direction={'column'} sx={{ height: outerHeight ? outerHeight : '100%', width: outerWidth ? outerWidth : '100%' }} border={'1px solid black'} padding={1}> 
         <video
             ref={videoRef}
             src={fileInfo?.URL || URL}
