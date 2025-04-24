@@ -153,11 +153,11 @@ const AppHeader = () => {
               <i className="fi fi-sr-envelope"></i>
             </Avatar>
           </Button>
-          <Button onClick={() => nav('/friends')} >
+          {/* <Button onClick={() => nav('/friends')} >
             <Avatar>
               <i className="fi fi-rr-users"></i>
             </Avatar>
-          </Button>
+          </Button> */}
           <Button onClick={() => handleAccount()}>
             <Avatar key={user} src={avatar ? avatar : null}/>
           </Button>

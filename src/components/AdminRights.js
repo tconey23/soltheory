@@ -73,7 +73,7 @@ const AdminRights = () => {
                                 }
                             }} >
                             <Avatar>
-                                <i class="fi fi-rr-customize"></i>
+                                <i className="fi fi-rr-customize"></i>
                             </Avatar>
                         </Button>
                     </Tooltip>

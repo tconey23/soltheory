@@ -1,6 +1,24 @@
 import { dispose } from "@react-three/fiber";
 import { supabase } from "./supabaseClient";
 
+
+export const sendPush = async (to, from, message) => {
+    console.log(to, from, message)
+    await fetch('https://bueukhsebcjxwebldmmi.functions.supabase.co/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        to: to.email,
+        subject: 'New Friend Request!',
+        message: `${from.user_name} ${message} on Sol Theory.`
+      })
+    });
+  };
+  
+
+
 async function checkAndAddUsers(user) {
 
 

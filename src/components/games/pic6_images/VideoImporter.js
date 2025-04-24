@@ -102,7 +102,7 @@ const NewVideo = ({file, pack, index, setRefreshKey, setUploaded, uploaded}) => 
         {  !uploaded.includes(index) && <Stack width={'98%'} height={150} justifyContent={'flex-start'} alignItems={'center'} border={'1px solid grey'} marginBottom={1}>
                 <Stack direction={'row'} alignItems={'space-between'} width={'95%'} justifyContent={'flex-start'} paddingY={1}>
                     <Stack width={'10%'} height={'10%'}>
-                        {pubURL && <i style={{color: 'limeGreen'}} class="fi fi-sr-check-circle"></i>}
+                        {pubURL && <i style={{color: 'limeGreen'}} className="fi fi-sr-check-circle"></i>}
                     </Stack>
                     <Stack width={'70%'} direction={'row'} justifyContent={'center'}>
                         <InputLabel >File name: </InputLabel>

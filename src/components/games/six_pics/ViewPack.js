@@ -153,7 +153,7 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                 <Button onClick={() => setVideoToEdit(v)}>
                                     <Tooltip title={`Edit Video`}>
                                         <Avatar>
-                                            <i class="fi fi-rr-customize"></i>
+                                            <i className="fi fi-rr-customize"></i>
                                         </Avatar>
                                     </Tooltip>
                                     </Button>
@@ -164,7 +164,7 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                                     <Stack direction={'row'} justifyContent={'center'} alignItems={'center'} padding={1}>
                                                         {
                                                             f[1] && typeof f[1] !== 'object' &&
-                                                            <i style={{color: 'limeGreen'}} class="fi fi-sr-thumbs-up"></i>
+                                                            <i style={{color: 'limeGreen'}} className="fi fi-sr-thumbs-up"></i>
                                                         }
 
                                                         {
@@ -172,9 +172,9 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                                             <>
                                                                 {f[1].length > 0 ?
 
-                                                                    <i style={{color: 'limeGreen'}} class="fi fi-sr-thumbs-up"></i>
+                                                                    <i style={{color: 'limeGreen'}} className="fi fi-sr-thumbs-up"></i>
                                                                 :
-                                                                    <i style={{color: 'red'}} class="fi fi-sr-thumbs-down"></i>
+                                                                    <i style={{color: 'red'}} className="fi fi-sr-thumbs-down"></i>
                                                                 }
                                                             </>
                                                         }
@@ -190,9 +190,9 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                             <Typography paddingX={1}>Ready?</Typography>
                                             {v.ready 
                                             ? 
-                                            <i style={{color: 'limeGreen'}} class="fi fi-sr-thumbs-up"></i>
+                                            <i style={{color: 'limeGreen'}} className="fi fi-sr-thumbs-up"></i>
                                             : 
-                                            <i style={{color: 'red'}} class="fi fi-sr-thumbs-down"></i>
+                                            <i style={{color: 'red'}} className="fi fi-sr-thumbs-down"></i>
                                             }
                                     </MenuItem>
                                         )

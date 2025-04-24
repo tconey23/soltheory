@@ -170,13 +170,13 @@ const deleteFileByPublicUrl = async (publicUrl) => {
                         !isReady.objects || !isReady.graphic ?
                     <Button onClick={() => setAddNewVideo(prev => !prev)} >
                         <Avatar>
-                            <i class="fi fi-sr-video-plus"></i>
+                            <i className="fi fi-sr-video-plus"></i>
                         </Avatar>
                     </Button>
                     :
                     <Button>
                         <Avatar>
-                            <i class="fi fi-sr-thumbs-up-trust"></i>
+                            <i className="fi fi-sr-thumbs-up-trust"></i>
                         </Avatar>
                     </Button>
                     }
@@ -201,7 +201,7 @@ const deleteFileByPublicUrl = async (publicUrl) => {
                                 {v.name !== 'Main graphic' &&
                                     <Button onClick={() => setVideoToEdit({url: v.public_url, pack: v.pack_name, id: v.id, name: v.name})}>
                                         <Avatar>
-                                            <i class="fi fi-rr-customize"></i>
+                                            <i className="fi fi-rr-customize"></i>
                                         </Avatar>
                                     </Button>
                                     }
@@ -209,7 +209,7 @@ const deleteFileByPublicUrl = async (publicUrl) => {
                                 <Box>
                                     <Button onClick={() => deleteFileByPublicUrl(v)}>
                                         <Avatar>
-                                            <i class="fi fi-sr-trash"></i>
+                                            <i className="fi fi-sr-trash"></i>
                                         </Avatar>
                                     </Button>
                                 </Box>

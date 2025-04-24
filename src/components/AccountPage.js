@@ -32,12 +32,13 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
     const handleAvatarChange = async (selectedUrl) => {
       setNewAvatar(selectedUrl);
       setAvatar(selectedUrl);
-      const res = await updateUserAvatar(user?.user?.id, selectedUrl);
-      if (res?.success) {
-        console.log('Avatar updated in Supabase');
-      } else {
-        console.error('Avatar update failed');
-      }
+      
+      const { data, error } = await supabase
+      .from('users')
+      .update({ avatar: selectedUrl })
+      .eq('primary_id', user?.metadata?.primary_id)
+      .select()
+        
     };
   
     useEffect(() => {
@@ -127,7 +128,6 @@ const AccountPage = ({size}) => {
       }
 
     useEffect(() =>{
-      console.log(user?.user.email)
         if(!user){
             nav('/login')
         }

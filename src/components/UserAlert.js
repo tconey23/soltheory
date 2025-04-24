@@ -21,7 +21,7 @@ const UserAlert = () => {
       switch(alertProps.severity) {
         case 'error': setIcon(<i className="fi fi-sr-exclamation" style={{color: 'gold'}}></i>)
         break;
-        case 'success': setIcon(<i class="fi fi-sr-check-circle" style={{color: 'green'}}></i>)
+        case 'success': setIcon(<i className="fi fi-sr-check-circle" style={{color: 'green'}}></i>)
         break;
       }
 

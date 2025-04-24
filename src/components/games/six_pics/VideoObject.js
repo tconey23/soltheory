@@ -3,10 +3,19 @@ import { Stack } from '@mui/material';
 import { Suspense } from 'react';
 
 const VideoObject = ({fileInfo, URL, videoRef, w, h, outerWidth, outerHeight}) => {
-    // console.log(fileInfo)
+  
+    const [isHover, setIsHover] = useState(false)
+  
   return (
-    <Stack direction={'column'} sx={{ height: outerHeight ? outerHeight : '100%', width: outerWidth ? outerWidth : '100%' }} border={'1px solid black'} padding={1}> 
+    <Stack
+     direction={'column'} 
+     sx={{ height: outerHeight ? outerHeight : '100%', width: outerWidth ? outerWidth : '100%' }} 
+     border={'1px solid black'} 
+     padding={1}
+     > 
         <video
+             onMouseOver={() => setIsHover(true)}
+             onMouseOut={() => setIsHover(false)}
             ref={videoRef}
             src={fileInfo?.URL || URL}
             preload="metadata"
@@ -15,7 +24,7 @@ const VideoObject = ({fileInfo, URL, videoRef, w, h, outerWidth, outerHeight}) =
             onLoadedMetadata={(e) => {
                 e.target.currentTime = e.target.duration;
             }}
-            controls={false}
+            controls={isHover}
         />
     </Stack>
   );

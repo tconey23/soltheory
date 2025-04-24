@@ -3,10 +3,8 @@ import { useMediaQuery } from '@mui/material'
 import { getUser } from './apiCalls';
 import { supabase } from './supabaseClient';
 
-// Create Context
 const GlobalContext = createContext();
 
-// Provider Component
 export const GlobalProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [alertProps, setAlertProps] = useState({
@@ -23,19 +21,14 @@ export const GlobalProvider = ({ children }) => {
   const [displayName, setDisplayName] = useState()
   const [isAdmin, setisAdmin] = useState(false)
   const [avatar, setAvatar] = useState(null)
-  const [recheckUser, setRecheckUser] = useState(0)
   const [cipherKey, setCipherKey] = useState()
+  const [mySolMates, setMySolMates] = useState([])
 
   const degrees = (degrees) => degrees * (Math.PI / 180)
-
-  useEffect(() => {
-    // console.log(recheckUser)
-  }, [recheckUser])
 
   const checkAdminAccess = async (email) => {
     const res = await getUser(email);
   
-    // Only update if metadata is different
     setUser(prev => {
       if (!prev.metadata) {
         return {
@@ -74,19 +67,49 @@ useEffect(() =>{
         setUser(JSON.parse(storedUser));
       }
     }
-  }, [user, recheckUser]);
+  }, [user]);
 
-  const generateKey = async () => {
-    console.log('here')
+  const generateAndStoreKey = async () => {
     const key = await crypto.subtle.generateKey(
       { name: "AES-GCM", length: 256 },
       true,
       ["encrypt", "decrypt"]
     );
-
-    setCipherKey(key)
-
+  
+    const raw = await crypto.subtle.exportKey("raw", key);
+    const base64Key = btoa(String.fromCharCode(...new Uint8Array(raw)));
+  
+    localStorage.setItem("cipherKey", base64Key);
+    setCipherKey(key);
   };
+  
+  const importKeyFromStorage = async () => {
+    const base64Key = localStorage.getItem("cipherKey");
+  
+    if (!base64Key) {
+      await generateAndStoreKey();
+      return;
+    }
+  
+    const raw = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
+    const key = await crypto.subtle.importKey(
+      "raw",
+      raw,
+      "AES-GCM",
+      true,
+      ["encrypt", "decrypt"]
+    );
+  
+    setCipherKey(key);
+  };
+
+  const resetCipherKey = () => {
+    localStorage.removeItem("cipherKey");
+    setCipherKey(null);
+    importKeyFromStorage(); // Regenerate
+  };
+  
+  
 
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -100,30 +123,54 @@ useEffect(() =>{
       }
   
       if (event === 'SIGNED_OUT') {
-        setUser(null); // Optional cleanup
+        setUser(null);
       }
     });
 
 
-  
-    generateKey()
+    importKeyFromStorage()
+
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
-  
 
   useEffect(() => {
-    console.log(cipherKey)
-  }, [cipherKey])
+    console.log(user)
+      
+    const channel = supabase
+      .channel('users')
+      .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'users',
+        }, async (payload) => {
 
+          console.log(payload.new.primary_id, user.metadata.primary_id)
+          
+          if(payload.eventType === 'UPDATE' && payload.new.primary_id === user.metadata.primary_id){
+
+            // console.log(payload.new)
+            
+            setUser(prev => 
+              ({
+              ...prev,
+              metadata: payload.new
+            }))            
+
+          }
+
+        })
+      .subscribe();
+  
+    return () => supabase.removeChannel(channel);
+  }, [user]);
   
   return (
-    <GlobalContext.Provider value={{ setRecheckUser, avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName, cipherKey, setCipherKey}}>
+    <GlobalContext.Provider value={{ avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName, cipherKey, setCipherKey}}>
       {children}
     </GlobalContext.Provider>
   );
 };
 
-// Custom Hook to Use Context
 export const useGlobalContext = () => useContext(GlobalContext);
