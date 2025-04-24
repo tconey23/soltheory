@@ -24,6 +24,7 @@ export const GlobalProvider = ({ children }) => {
   const [isAdmin, setisAdmin] = useState(false)
   const [avatar, setAvatar] = useState(null)
   const [recheckUser, setRecheckUser] = useState(0)
+  const [cipherKey, setCipherKey] = useState()
 
   const degrees = (degrees) => degrees * (Math.PI / 180)
 
@@ -75,6 +76,18 @@ useEffect(() =>{
     }
   }, [user, recheckUser]);
 
+  const generateKey = async () => {
+    console.log('here')
+    const key = await crypto.subtle.generateKey(
+      { name: "AES-GCM", length: 256 },
+      true,
+      ["encrypt", "decrypt"]
+    );
+
+    setCipherKey(key)
+
+  };
+
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
   
@@ -90,16 +103,23 @@ useEffect(() =>{
         setUser(null); // Optional cleanup
       }
     });
+
+
   
+    generateKey()
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
   
 
+  useEffect(() => {
+    console.log(cipherKey)
+  }, [cipherKey])
+
   
   return (
-    <GlobalContext.Provider value={{ setRecheckUser, avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName}}>
+    <GlobalContext.Provider value={{ setRecheckUser, avatar, setAvatar, isAdmin, setisAdmin, user, setUser, alertProps, setAlertProps, returnUrl, setReturnUrl, font, speed, setSpeed, isMobile, showJoystick, setShowJoystick, degrees, fontTTF, displayName, setDisplayName, cipherKey, setCipherKey}}>
       {children}
     </GlobalContext.Provider>
   );
