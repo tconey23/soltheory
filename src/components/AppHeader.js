@@ -148,7 +148,7 @@ const AppHeader = () => {
                 </Stack>
               </>
           }
-          <Button>
+          <Button onClick={() => nav('/messaging')}>
             <Avatar sx={{background: 'limeGreen'}}>
               <i className="fi fi-sr-envelope"></i>
             </Avatar>

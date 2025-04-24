@@ -18,6 +18,7 @@ import Admin from './components/Admin';
 import SPAdminWrapper from './components/games/six_pics/SPAdminWrapper';
 import AdminRights from './components/AdminRights';
 import AddPrompts from './components/games/twentyone_things/AddPrompts';
+import Messaging from './components/Messaging';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
@@ -72,6 +73,7 @@ function App() {
               <Route path='/account' element={<AccountPage />}/>
               <Route path='/friends' element={<Friends />}/>
               <Route path='/admin' element={<Admin />}/>
+              <Route path='/messaging' element={<Messaging />}/>
               <Route path='account/admin/21things' element={<AddPrompts />}/>
               <Route path='account/admin/6pics' element={<SPAdminWrapper />}/>
               <Route path='account/admin/adminrights' element={<AdminRights />}/>
