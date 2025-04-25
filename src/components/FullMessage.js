@@ -12,6 +12,16 @@ const FullMessage = ({ message, setSelectedMessage }) => {
   const { user } = useGlobalContext();
   const [showAttachment, setShowAttachment] = useState(false);
 
+  const deleteMessage = async () => {
+    console.log(message)
+        const { error } = await supabase
+      .from('messaging')
+      .delete()
+      .eq('id', message.id)
+  }
+
+  // deleteMessage()
+
   const updateFriendsAfterAcceptance = async (userA, userB) => {
     try {
       // 1. Fetch A's current friends
@@ -74,6 +84,7 @@ const FullMessage = ({ message, setSelectedMessage }) => {
         .from('users')
         .update({ friends: updatedFriendsB })
         .eq('primary_id', userB.primary_id);
+        deleteMessage()
   
       console.log('Both friend lists updated!');
     } catch (error) {

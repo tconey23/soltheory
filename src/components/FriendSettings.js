@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Stack, Checkbox, Table, TableBody, TableCell, TableRow, TableContainer, InputLabel, Typography, Avatar, Button } from '@mui/material';
+import { Stack, Checkbox, Table, TableBody, TableCell, TableRow, TableContainer, InputLabel, Typography, Avatar, Button, FormLabel, Modal } from '@mui/material';
 import { supabase } from '../business/supabaseClient';
 import { useGlobalContext } from '../business/GlobalContext';
 
 const FriendSettings = ({friend, setEditFriendSettings}) => {
     const {user, setAlertProps} = useGlobalContext()
-
-    const [settings, setSettings] = useState({
-  
-    })
-
+    const [settings, setSettings] = useState({})
     const [friendData, setFriendData] = useState()
+    const [pendingUnfriend, setPendingUnfriend] = useState(false)
 
     const saveSettings = async () => {
 
@@ -115,9 +112,12 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
             .from('users')
             .update({ friends: updatedFriendFriends })
             .eq('primary_id', friendId);
-      
-          // 3. Confirm and clean up UI
-          console.log(`Removed friend ${friendId} from user ${userId}`);
+
+          setAlertProps({
+            text: `Removed friend ${friend.user_name} from user ${user.metadata.user_name}`,
+            severity: 'success',
+            display: true
+          })
           setEditFriendSettings(null);
         } catch (error) {
           console.error("Failed to remove friend:", error);
@@ -133,6 +133,10 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
             getFriendData()
         }
     }, [friendData])
+
+    useEffect(() => {
+        console.log(friend)
+    }, [settings])
 
   return (
     <Stack direction={'column'} sx={{ height: '50%', width: '50%', bgcolor: 'white'}} justifyContent={'flex-start'} alignItems={'center'} padding={3}>
@@ -165,7 +169,7 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
                 let formatFirstWord = `${capFirstWord} ${splitDesc.splice(1, 2).join(' ')}`
                 return (
                     <Stack marginX={2}>
-                    <InputLabel>{formatFirstWord}</InputLabel>
+                    <FormLabel>{formatFirstWord}</FormLabel>
                     <Checkbox checked={s[1]} onChange={(e) => setSettings(prev => ({
                         ...prev,
                         [rawDesc]: e.target.checked
@@ -174,12 +178,27 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
                 )
             })}
         </Stack>
-            <Button onClick={() => handleRemoveFriend()} >End Friendship</Button>
+        <Stack justifyContent={'center'} alignItems={'center'} width={'100%'} paddingY={2}>
+            <Button variant='contained' sx={{marginY: 2, bgcolor:'red'}} onClick={() => setPendingUnfriend(true)} >End Friendship</Button>
+        </Stack>
         </Stack>
         <Stack justifyContent={'space-evenly'} direction={'row'} width={'25%'}>
-            <Button sx={{marginY: 2}} onClick={() => saveSettings()}> Save</Button>
-            <Button sx={{marginY: 2}} onClick={() => setEditFriendSettings(null)} >Done</Button>
+            <Button variant='contained' sx={{marginY: 2}} onClick={() => saveSettings()}> Save</Button>
+            <Stack>
+                <Button variant='contained' sx={{marginY: 2}} onClick={() => setEditFriendSettings(null)} >Done</Button>
+            </Stack>
         </Stack>
+        <Modal open={pendingUnfriend}>
+            <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack bgcolor={'white'} width={'25%'} height={'25%'} justifyContent={'center'} alignItems={'center'}>
+                    <Typography>{`Are you sure you want to end your friendship with ${friend.user_name}?`}</Typography>
+                    <Stack width={'50%'} direction={'row'} justifyContent={'space-evenly'}>
+                        <Button onClick={() => handleRemoveFriend()}>YES</Button>
+                        <Button onClick={() => setPendingUnfriend(false)} >NO</Button>
+                    </Stack>
+                </Stack>
+            </Stack>
+        </Modal>
     </Stack>
   );
 };

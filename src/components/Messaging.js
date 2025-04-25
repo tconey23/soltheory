@@ -7,6 +7,8 @@ import { NewMessage } from './NewMessage';
 import UserCard from './UserCard';
 import FriendSettings from './FriendSettings';
 import { decryptWithKey, importKeyFromBase64 } from '../business/cryptoUtils';
+import ReceivedMessages from './ReceivedMessages';
+import SentMessages from './SentMessages';
 
 const Messaging = () => {
   const { user } = useGlobalContext();
@@ -17,6 +19,7 @@ const Messaging = () => {
   const [solMate, setSolMate] = useState();
   const [friendList, setFriendList] = useState([]);
   const [editFriendSetting, setEditFriendSettings] = useState(null);
+  const [toggleSentRec, setToggleSentRec] = useState('rec')
 
   const decryptRealtime = async (data) => {
     try {
@@ -176,8 +179,22 @@ const Messaging = () => {
                                     <Stack direction={'row'}>
                                     <MenuItem onClick={() => setDraftMessage(true)} sx={{justifyContent: 'center'}}>
                                         <Tooltip followCursor title='New message'>
-                                            <Avatar>
-                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '40px'}} className="fi fi-sr-circle-envelope"></i>
+                                            <Avatar sx={{padding: 0.5}}>
+                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-circle-envelope"></i>
+                                            </Avatar>
+                                        </Tooltip>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => setToggleSentRec('sent')} sx={{justifyContent: 'center'}}>
+                                        <Tooltip followCursor title='Outbound Messages'>
+                                            <Avatar sx={{padding: 0.5}}>
+                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-upload"></i>
+                                            </Avatar>
+                                        </Tooltip>
+                                    </MenuItem>
+                                    <MenuItem onClick={() => setToggleSentRec('rec')} sx={{justifyContent: 'center'}}>
+                                        <Tooltip followCursor title='Inbound Messages'>
+                                            <Avatar sx={{padding: 0.5}}>
+                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-download"></i>
                                             </Avatar>
                                         </Tooltip>
                                     </MenuItem>
@@ -185,16 +202,18 @@ const Messaging = () => {
                                 </TableRow>
                                 <TableRow>
                                     <TableCell><i className="fi fi-rr-settings"></i></TableCell>
-                                    <TableCell>Received</TableCell>
-                                    <TableCell>From</TableCell>
+                                    <TableCell>{toggleSentRec === 'rec' ? 'Received' : 'Sent'}</TableCell>
+                                    <TableCell>{toggleSentRec === 'rec' ? 'From' : 'To'}</TableCell>
                                     <TableCell>Subject</TableCell>
                                 </TableRow>
                             </TableHead>
-                            <TableBody>
-                                {messages.map((m) => (
-                                    <MessageItem data={m}/>
-                                ))}
-                            </TableBody>
+                            {
+                              toggleSentRec === 'rec' 
+                              ? 
+                              <ReceivedMessages  messages={messages}/>
+                              :
+                              <SentMessages user={user}/>
+                            }
                         </Table>
                     </TableContainer>
                 }
