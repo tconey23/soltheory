@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Stack, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, MenuItem, Tooltip, Avatar, Modal, FormControl, Input, InputLabel, MenuList } from '@mui/material';
+import {Switch, Stack, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, MenuItem, Tooltip, Avatar, Modal, FormControl, Input, InputLabel, MenuList } from '@mui/material';
 import { supabase } from '../business/supabaseClient';
 import { useGlobalContext } from '../business/GlobalContext';
-import { MessageItem } from './MessageItem';
 import { NewMessage } from './NewMessage';
 import UserCard from './UserCard';
 import FriendSettings from './FriendSettings';
@@ -10,8 +9,133 @@ import { decryptWithKey, importKeyFromBase64 } from '../business/cryptoUtils';
 import ReceivedMessages from './ReceivedMessages';
 import SentMessages from './SentMessages';
 
+const MessageBox = (props) => {
+
+  const {
+    user, isMobile,
+    messages, setMessages,
+    draftMessage, setDraftMessage,
+    userSearch, setUserSearch,
+    userMatches, setUserMatches,
+    solMate, setSolMate,
+    friendList, setFriendList,
+    editFriendSetting, setEditFriendSettings,
+    toggleSentRec, setToggleSentRec,
+    toggleMessages, setToggleMessages
+  } = props
+
+  return (
+    <Stack padding={1} justifyContent={'flex-start'} alignItems={'center'} width={isMobile ? '100%' : '70%'} height={'90%'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} >
+          {
+            draftMessage || solMate
+            ? 
+            <Stack justifyContent={'center'} alignItems={'center'} width={'100%'} height={'100%'}>
+              <NewMessage setDraftMessage={setDraftMessage} solMate={solMate} setSolMate={setSolMate}/> 
+            </Stack>
+          : 
+          <Stack width={'100%'}>
+            <TableContainer>
+              <Table size='small' stickyHeader sx={{minWidth: '80%'}}>
+                <TableHead>
+                  <TableRow sx={{width: '80%'}}>
+                    <Stack direction={'row'}>
+                    <MenuItem onClick={() => setDraftMessage(true)} sx={{justifyContent: 'center'}}>
+                      <Tooltip followCursor title='New message'>
+                        <Avatar sx={{padding: 0.5}}>
+                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-circle-envelope"></i>
+                        </Avatar>
+                      </Tooltip>
+                    </MenuItem>
+                    <MenuItem onClick={() => setToggleSentRec('sent')} sx={{justifyContent: 'center'}}>
+                      <Tooltip followCursor title='Outbound Messages'>
+                        <Avatar sx={{padding: 0.5}}>
+                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-upload"></i>
+                        </Avatar>
+                      </Tooltip>
+                    </MenuItem>
+                      <MenuItem onClick={() => setToggleSentRec('rec')} sx={{justifyContent: 'center'}}>
+                        <Tooltip followCursor title='Inbound Messages'>
+                        <Avatar sx={{padding: 0.5}}>
+                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-download"></i>
+                        </Avatar>
+                      </Tooltip>
+                      </MenuItem>
+                    </Stack>
+                  </TableRow>
+                  <TableRow sx={{width: '80%'}}>
+                    <TableCell size='small' sx={{width: '25%'}}><i className="fi fi-rr-settings"></i></TableCell>
+                    <TableCell sx={{width: '25%'}}>{toggleSentRec === 'rec' ? 'Received' : 'Sent'}</TableCell>
+                    <TableCell sx={{width: '25%'}}>{toggleSentRec === 'rec' ? 'From' : 'To'}</TableCell>
+                    <TableCell sx={{width: '25%'}}>Subject</TableCell>
+                  </TableRow>
+                </TableHead>
+                {
+                  toggleSentRec === 'rec' 
+                  ? 
+                  <ReceivedMessages  messages={messages}/>
+                  :
+                  <SentMessages user={user}/>
+                }
+              </Table>
+            </TableContainer>
+            </Stack>
+          }
+        </Stack>
+  )
+
+}
+
+const SolMatesBox = (props) => {
+  const {
+    user, isMobile,
+    messages, setMessages,
+    draftMessage, setDraftMessage,
+    userSearch, setUserSearch,
+    userMatches, setUserMatches,
+    solMate, setSolMate,
+    friendList, setFriendList,
+    editFriendSetting, setEditFriendSettings,
+    toggleSentRec, setToggleSentRec,
+    toggleMessages, setToggleMessages
+  } = props
+
+  return (
+    <Stack padding={1} alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} width={isMobile ? '100%' : '20%'} height={'90%'}>
+            <Stack margin={2} alignItems={'center'} justifyContent={'center'}>
+              <Typography fontFamily={'Fredoka Bold'} fontSize={25}>SOL Mates</Typography>
+            </Stack>
+            <Stack height={'40%'}>
+              <FormControl sx={{width: '80%'}}>
+                <InputLabel>Find SOL Mates</InputLabel>
+                <Input value={userSearch} onChange={(e) => setUserSearch(e.target.value)}/>
+              </FormControl>
+              <MenuList sx={{width: '80%'}}>
+                {userMatches?.map((u) => {
+                  return (
+                    <MenuItem onClick={() => setSolMate(u)}>
+                      <UserCard card={u}/>
+                    </MenuItem>
+                  )})}
+              </MenuList>
+          </Stack>
+
+          <Stack height={'60%'} width={'80%'}>
+            <Typography fontFamily={'Fredoka Bold'}>Your SOL Mates</Typography>
+            <MenuList sx={{width: '80%'}}>
+              {friendList?.map((f) => {
+                return (
+                  <MenuItem onClick={() => setEditFriendSettings(f)}>
+                    <UserCard user={f}/>
+                  </MenuItem>
+                )})}
+            </MenuList>
+          </Stack>
+        </Stack>
+  )
+}
+
 const Messaging = () => {
-  const { user } = useGlobalContext();
+  const { user, isMobile } = useGlobalContext();
   const [messages, setMessages] = useState([]);
   const [draftMessage, setDraftMessage] = useState();
   const [userSearch, setUserSearch] = useState();
@@ -20,6 +144,20 @@ const Messaging = () => {
   const [friendList, setFriendList] = useState([]);
   const [editFriendSetting, setEditFriendSettings] = useState(null);
   const [toggleSentRec, setToggleSentRec] = useState('rec')
+  const [toggleMessages, setToggleMessages] = useState(false)
+
+  const props ={
+    user, isMobile,
+    messages, setMessages,
+    draftMessage, setDraftMessage,
+    userSearch, setUserSearch,
+    userMatches, setUserMatches,
+    solMate, setSolMate,
+    friendList, setFriendList,
+    editFriendSetting, setEditFriendSettings,
+    toggleSentRec, setToggleSentRec,
+    toggleMessages, setToggleMessages
+  }
 
   const decryptRealtime = async (data) => {
     try {
@@ -129,106 +267,40 @@ const Messaging = () => {
     <Stack alignItems={'center'} justifyContent={'flex-start'} direction={'column'} sx={{ height: '98%', width: '100%' }} >
       <Typography fontFamily={'Fredoka Bold'} fontSize={30}>Messaging</Typography>
 
-        <Stack justifyContent={'space-around'} padding={2} alignItems={'center'} direction={'row'} height={'90%'} width={'90%'} borderRadius={5} boxShadow={'1px 1px 12px 2px #0000005e'}>
-
-            <Stack alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} minWidth={'100px'} width={'20%'} height={'90%'}>
-                <Stack margin={2} alignItems={'center'} justifyContent={'center'}>
-                    <Typography fontFamily={'Fredoka Bold'} fontSize={25}>SOL Mates</Typography>
-                </Stack>
-                <Stack height={'40%'}>
-                    <FormControl sx={{width: '80%'}}>
-                        <InputLabel>Find SOL Mates</InputLabel>
-                        <Input value={userSearch} onChange={(e) => setUserSearch(e.target.value)}/>
-                    </FormControl>
-                    <MenuList sx={{width: '80%'}}>
-                        {userMatches.map((u) => {
-                            
-                            return (
-                            <MenuItem onClick={() => setSolMate(u)}>
-                                <UserCard card={u}/>
-                            </MenuItem>
-                            )})}
-                    </MenuList>
-                </Stack>
-                <Stack height={'60%'} width={'80%'}>
-                    <Typography fontFamily={'Fredoka Bold'}>Your SOL Mates</Typography>
-                    <MenuList sx={{width: '80%'}}>
-                        {friendList.map((f) => {
-                            return (
-                            <MenuItem onClick={() => setEditFriendSettings(f)}>
-                                <UserCard user={f}/>
-                            </MenuItem>
-                            )})}
-                    </MenuList>
-                </Stack>
-            </Stack>
-
-            <Stack padding={1} justifyContent={'flex-start'} alignItems={'center'} width={'70%'} height={'90%'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} >
-
-                {
-                    draftMessage || solMate
-                    ? 
-                    <Stack justifyContent={'center'} alignItems={'center'} width={'100%'} height={'100%'}>
-                        <NewMessage setDraftMessage={setDraftMessage} solMate={solMate} setSolMate={setSolMate}/> 
-                    </Stack>
-                    : 
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow>
-                                    <Stack direction={'row'}>
-                                    <MenuItem onClick={() => setDraftMessage(true)} sx={{justifyContent: 'center'}}>
-                                        <Tooltip followCursor title='New message'>
-                                            <Avatar sx={{padding: 0.5}}>
-                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-circle-envelope"></i>
-                                            </Avatar>
-                                        </Tooltip>
-                                    </MenuItem>
-                                    <MenuItem onClick={() => setToggleSentRec('sent')} sx={{justifyContent: 'center'}}>
-                                        <Tooltip followCursor title='Outbound Messages'>
-                                            <Avatar sx={{padding: 0.5}}>
-                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-upload"></i>
-                                            </Avatar>
-                                        </Tooltip>
-                                    </MenuItem>
-                                    <MenuItem onClick={() => setToggleSentRec('rec')} sx={{justifyContent: 'center'}}>
-                                        <Tooltip followCursor title='Inbound Messages'>
-                                            <Avatar sx={{padding: 0.5}}>
-                                                <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-download"></i>
-                                            </Avatar>
-                                        </Tooltip>
-                                    </MenuItem>
-                                    </Stack>
-                                </TableRow>
-                                <TableRow>
-                                    <TableCell><i className="fi fi-rr-settings"></i></TableCell>
-                                    <TableCell>{toggleSentRec === 'rec' ? 'Received' : 'Sent'}</TableCell>
-                                    <TableCell>{toggleSentRec === 'rec' ? 'From' : 'To'}</TableCell>
-                                    <TableCell>Subject</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            {
-                              toggleSentRec === 'rec' 
-                              ? 
-                              <ReceivedMessages  messages={messages}/>
-                              :
-                              <SentMessages user={user}/>
-                            }
-                        </Table>
-                    </TableContainer>
-                }
-            </Stack>
+        <Stack justifyContent={'space-around'} padding={2} alignItems={'center'} direction={'column'} height={'90%'} width={'90%'} borderRadius={5} boxShadow={'1px 1px 12px 2px #0000005e'}>
+        <Stack>
+          {isMobile && <Switch checked={toggleMessages} onChange={() => setToggleMessages(prev => !prev)}/>}
         </Stack>
-        <Modal
-          open={editFriendSetting}
-        >
-          <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'} >
-                <FriendSettings setEditFriendSettings={setEditFriendSettings} friend={editFriendSetting}/>
-          </Stack>
-        </Modal>
-   
+      <Stack padding={2} height={'90%'} width={'90%'} direction={'row'}>
+
+      {isMobile?
+        <>
+          {
+            toggleMessages?
+            <MessageBox {...props}/>
+            :
+            <SolMatesBox {...props}/>
+          }
+        </>
+        :
+        <>
+          <SolMatesBox {...props}/>
+          <MessageBox {...props}/>
+        </>
+      }
+      
+      </Stack>
     </Stack>
-  );
+    <Modal
+    open={editFriendSetting}
+    >
+      <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'} >
+            <FriendSettings setEditFriendSettings={setEditFriendSettings} friend={editFriendSetting}/>
+      </Stack>
+    </Modal>
+
+</Stack>
+);
 };
 
 export default Messaging;
