@@ -1,175 +1,126 @@
 import { useEffect, useState } from 'react';
-import { AppBar, Avatar, Button, FormControl, Input, InputLabel, List, Menu, MenuItem, MenuList, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
+import { Stack, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, MenuItem, Tooltip, Avatar, Modal, FormControl, Input, InputLabel, MenuList } from '@mui/material';
 import { supabase } from '../business/supabaseClient';
 import { useGlobalContext } from '../business/GlobalContext';
 import { MessageItem } from './MessageItem';
 import { NewMessage } from './NewMessage';
 import UserCard from './UserCard';
+import FriendSettings from './FriendSettings';
+import { decryptWithKey, importKeyFromBase64 } from '../business/cryptoUtils';
 
 const Messaging = () => {
+  const { user } = useGlobalContext();
+  const [messages, setMessages] = useState([]);
+  const [draftMessage, setDraftMessage] = useState();
+  const [userSearch, setUserSearch] = useState();
+  const [userMatches, setUserMatches] = useState([]);
+  const [solMate, setSolMate] = useState();
+  const [friendList, setFriendList] = useState([]);
+  const [editFriendSetting, setEditFriendSettings] = useState(null);
 
-    const {cipherKey, avatar} = useGlobalContext()
-    const {user, setAlertProps} = useGlobalContext()
-    const [messages, setMessages] = useState([])
-    const [draftMessage, setDraftMessage] = useState()
-    const [userSearch, setUserSearch] = useState()
-    const [userMatches, setUserMatches] = useState([])
-    const [solMate, setSolMate] = useState()
-    const [friendList, setFriendList] = useState([])
+  const decryptRealtime = async (data) => {
+    try {
+      const base64Key = data.message_cipher_key;
+      if (!base64Key) throw new Error("No message cipher key attached");
+      const key = await importKeyFromBase64(base64Key);
+      const decSub = await decryptWithKey(data.subject, data.subject_iv, key);
+      const decMess = await decryptWithKey(data.message_content, data.message_iv, key);
 
-    useEffect(() => {
-        if(user && user?.metadata?.friends){
-            setFriendList(user.metadata.friends)
-        }
-    }, [user])
+      data.subject = decSub;
+      data.message_content = decMess;
 
-    const decryptText = async ({ data, iv }) => {
+      return data;
+    } catch (err) {
+      console.error("Realtime decryption failed:", err);
+      return data;
+    }
+  };
 
-        const decoder = new TextDecoder();
-        const ivBytes = Uint8Array.from(atob(iv), c => c.charCodeAt(0));
-        const encryptedBytes = Uint8Array.from(atob(data), c => c.charCodeAt(0));
-      
-        const decrypted = await crypto.subtle.decrypt(
-          { name: "AES-GCM", iv: ivBytes },
-          cipherKey,
-          encryptedBytes
-        );
-      
-        return decoder.decode(decrypted);
-      };
+  const handleDecrypt = async (messData) => {
+    setMessages([]);
+    for (let message of messData) {
+      try {
+        const base64Key = message.message_cipher_key;
+        if (!base64Key) continue;
+        const key = await importKeyFromBase64(base64Key);
+        const decSub = await decryptWithKey(message.subject, message.subject_iv, key);
+        const decMess = await decryptWithKey(message.message_content, message.message_iv, key);
 
-      const handleDecrypt = async (messData) => {
-        setMessages([])
-        for(let i = 0; i < messData.length; i ++){
+        message.subject = decSub;
+        message.message_content = decMess;
 
-            const decSub = await decryptText({
-                data: messData[i].subject,
-                iv: messData[i].subject_iv,
-              });
-
-              const decMess = await decryptText({
-                data: messData[i].message_content,
-                iv: messData[i].message_iv,
-              });
-
-              messData[i].message_content = decMess
-              messData[i].subject = decSub
-
-              setMessages(prev => [
-                ...prev,
-                messData[i]
-              ])
-        }
+        setMessages(prev => [...prev, message]);
+      } catch (error) {
+        console.error("Failed decrypting message:", message, error);
       }
-
-    const initialFetch = async () => {
-        try {
-
-            let { data: messData, error } = await supabase
-            .from('messaging')
-            .select('*')
-            .filter('to->>primary_id', 'eq', user.metadata.primary_id)
-
-            if(messData){
-                handleDecrypt(messData)
-            } else if (error) {
-                console.log(error)
-                throw new Error(error)
-            }
-            
-        } catch (err) {
-            console.log(err);
-            
-        }
     }
+  };
 
-    const decryptRealtime = async (data) => {
-        const decSub = await decryptText({
-          data: data.subject,
-          iv: data.subject_iv,
-        });
-      
-        const decMess = await decryptText({
-          data: data.message_content,
-          iv: data.message_iv,
-        });
+  const initialFetch = async () => {
+    try {
+      const { data: messData, error } = await supabase
+        .from('messaging')
+        .select('*')
+        .filter('to->>primary_id', 'eq', user.metadata.primary_id);
 
-        data.subject = decSub
-        data.message_content = decMess
-      
-        return data
-      };
-
-
-    useEffect(() =>{
-        if(user?.metadata?.primary_id){
-            initialFetch()
-        }
-    }, [user])
-
-    useEffect(() => {
-      
-      const channel = supabase
-        .channel('messaging')
-        .on('postgres_changes', {
-            event: '*',
-            schema: 'public',
-            table: 'messaging',
-          }, async (payload) => {
-
-            console.log(payload.eventType)
-          
-            if (payload.eventType === 'DELETE' && payload.old.message_id) {
-              setMessages((prevMessages) =>
-                prevMessages.filter((m) => m.message_id !== payload.old.message_id)
-              );
-            }
-          
-            if (payload.eventType === 'INSERT' && payload.new.to.primary_id === user?.metadata.primary_id) {
-              const foundDup = messages.findIndex((m) => m.id === payload.new.id);
-          
-              const decryptedMessage = await decryptRealtime(payload.new);
-              
-          
-              if (foundDup < 0) {
-                setMessages((prev) => [...prev, decryptedMessage]);
-              }
-            }
-          })
-        .subscribe();
-    
-      return () => supabase.removeChannel(channel);
-    }, [user]);
-
-    const userFuzzySearch = async (searchTerm) => {
-        const { data: users, error } = await supabase
-          .from('users')
-          .select('*')
-          .ilike('user_name', `%${searchTerm}%`);
-      
-        if (error) {
-          console.error('Search error:', error);
-        } else {
-          setUserMatches(users)
-        }
-    };
-
-    useEffect(() =>{
-        if(userSearch){
-            userFuzzySearch(userSearch)
-        } else {
-            setUserMatches([])
-        }
-    }, [userSearch])
-
-    const getUserData = async (friend) => {
-        let { data: user, error } = await supabase
-        .from('users')
-        .select("*")
-        .eq('primary_id', friend)
-
-        return user
+      if (messData) {
+        handleDecrypt(messData);
+      } else if (error) {
+        console.log(error);
+        throw new Error(error);
+      }
+    } catch (err) {
+      console.log(err);
     }
+  };
+
+  useEffect(() => {
+    if (user?.metadata?.primary_id) {
+      setFriendList(user.metadata.friends)
+      initialFetch();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const channel = supabase
+      .channel('messaging')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'messaging',
+      }, async (payload) => {
+        if (payload.eventType === 'DELETE' && payload.old.message_id) {
+          setMessages(prevMessages =>
+            prevMessages.filter(m => m.message_id !== payload.old.message_id)
+          );
+        }
+
+        if (payload.eventType === 'INSERT' && payload.new.to.primary_id === user?.metadata.primary_id) {
+          const foundDup = messages.findIndex(m => m.id === payload.new.id);
+          const decryptedMessage = await decryptRealtime(payload.new);
+
+          if (foundDup < 0) {
+            setMessages(prev => [...prev, decryptedMessage]);
+          }
+        }
+      })
+      .subscribe();
+
+    return () => supabase.removeChannel(channel);
+  }, [user]);
+
+  const userFuzzySearch = async (searchTerm) => {
+    const { data: users, error } = await supabase.from('users').select('*').ilike('user_name', `%${searchTerm}%`);
+    if (users) setUserMatches(users);
+  };
+
+  useEffect(() => {
+    if (userSearch) {
+      userFuzzySearch(userSearch);
+    } else {
+      setUserMatches([]);
+    }
+  }, [userSearch]);
 
   return (
     <Stack alignItems={'center'} justifyContent={'flex-start'} direction={'column'} sx={{ height: '98%', width: '100%' }} >
@@ -201,7 +152,7 @@ const Messaging = () => {
                     <MenuList sx={{width: '80%'}}>
                         {friendList.map((f) => {
                             return (
-                            <MenuItem>
+                            <MenuItem onClick={() => setEditFriendSettings(f)}>
                                 <UserCard user={f}/>
                             </MenuItem>
                             )})}
@@ -249,6 +200,13 @@ const Messaging = () => {
                 }
             </Stack>
         </Stack>
+        <Modal
+          open={editFriendSetting}
+        >
+          <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'} >
+                <FriendSettings setEditFriendSettings={setEditFriendSettings} friend={editFriendSetting}/>
+          </Stack>
+        </Modal>
    
     </Stack>
   );

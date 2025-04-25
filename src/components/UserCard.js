@@ -7,7 +7,6 @@ import { supabase } from '../business/supabaseClient';
 
 const UserCard = ({user, card}) => {
     const [spreadNum, setSpreadNum] = useState(2);
-    const {avatar} = useGlobalContext()
     const [userData, setUserData] = useState()
 
     const getFriends = async (friendIds) => {
@@ -23,7 +22,7 @@ const UserCard = ({user, card}) => {
       
     useEffect(() => {
         if(user){
-            getFriends(user)
+            getFriends(user.primary_id)
         }
 
         if(card){

@@ -3,7 +3,7 @@ import { supabase } from "./supabaseClient";
 
 
 export const sendPush = async (to, from, message) => {
-    console.log(to, from, message)
+    console.log(to, from, message);
     await fetch('https://bueukhsebcjxwebldmmi.functions.supabase.co/send-email', {
       method: 'POST',
       headers: {
@@ -11,8 +11,13 @@ export const sendPush = async (to, from, message) => {
       },
       body: JSON.stringify({
         to: to.email,
-        subject: 'New Friend Request!',
-        message: `${from.user_name} ${message} on Sol Theory.`
+        subject: 'New SOL Mate Request!',
+        message: `
+          <p><strong>${from.user_name}</strong> ${message} on Sol Theory.</p>
+          <p>
+            <a href="https://soltheory.com/messaging" style="color: #2c7be5;">Log in to your SOL Theory account to respond.</a>
+          </p>
+        `
       })
     });
   };

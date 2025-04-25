@@ -6,6 +6,7 @@ import "react-resizable/css/styles.css";
 import { useGlobalContext } from '../business/GlobalContext';
 import { checkAndAddUsers } from '../business/apiCalls';
 import { useNavigate } from 'react-router-dom';
+import { supabase } from '../business/supabaseClient';
 
 
 const Login = ({ setSelectedOption }) => {
@@ -31,6 +32,16 @@ const Login = ({ setSelectedOption }) => {
     
   }, [])
 
+  const resendConfEmail = async (email) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: 'https://soltheory.com/login'
+      }
+    });
+  }
+
   const handleLogin = async () => {
     
     if(isSignUp){
@@ -48,6 +59,9 @@ const Login = ({ setSelectedOption }) => {
       }
 
       if(res && res.disposition){
+        if(res.message === 'Email not confirmed'){
+          resendConfEmail(email)
+        }
         setAlertProps({
           text: res.message,
           severity: res.disposition,
