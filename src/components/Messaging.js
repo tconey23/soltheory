@@ -131,7 +131,7 @@ const Messaging = () => {
 
         <Stack justifyContent={'space-around'} padding={2} alignItems={'center'} direction={'row'} height={'90%'} width={'90%'} borderRadius={5} boxShadow={'1px 1px 12px 2px #0000005e'}>
 
-            <Stack alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} width={'20%'} height={'90%'}>
+            <Stack alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} minWidth={'100px'} width={'20%'} height={'90%'}>
                 <Stack margin={2} alignItems={'center'} justifyContent={'center'}>
                     <Typography fontFamily={'Fredoka Bold'} fontSize={25}>SOL Mates</Typography>
                 </Stack>
