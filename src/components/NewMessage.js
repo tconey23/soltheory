@@ -63,6 +63,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
       is_solreq: solMate ? true : false,
       message_cipher_key: messageCipherKeyBase64
     };
+    // console.log(payload)
 
     try {
       const { data, error } = await supabase.from('messaging').insert([payload]).select();
