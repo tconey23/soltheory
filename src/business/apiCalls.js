@@ -262,7 +262,13 @@ const addFriend = async (user, friend) => {
       const signUpUser = async (email, password, username) => {
         console.log(email, password, username);
       
-        const { data, error } = await supabase.auth.signUp({ email, password });
+        const { data, error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: 'https://soltheory.com/login'
+          }
+        });
       
         if (error) {
           return {
@@ -282,23 +288,23 @@ const addFriend = async (user, friend) => {
           };
         }
       
-        const { updateData, error: updateError } = await supabase
-        .from('users') // ← make sure this matches your table name exactly
-        .update({ user_name: username })
-        .eq('primary_id', user.id)
-        .select(); // ← removes the .single() so it won't throw if no match
-
+        const { data: updateData, error: updateError } = await supabase
+          .from('users') // ← make sure table name is correct
+          .update({ user_name: username })
+          .eq('primary_id', user.id)
+          .select(); 
+      
         if (updateError) {
-        console.error("Error updating username:", updateError);
-        return {
+          console.error("Error updating username:", updateError);
+          return {
             message: 'Error updating username',
             disposition: 'error',
             error: updateError
-        };
+          };
         }
-
+      
         if (!updateData || updateData.length === 0) {
-        console.warn("No rows returned on username update — possible bad primary_id");
+          console.warn("No rows returned on username update — possible bad primary_id");
         }
       
         console.log("User profile created!");
@@ -307,6 +313,7 @@ const addFriend = async (user, friend) => {
           disposition: 'success'
         };
       };
+      
       
       
     

@@ -50,6 +50,11 @@ const Login = ({ setSelectedOption }) => {
 
       if(res && res.id){
         setUser(res)
+        setAlertProps({
+          text: 'Thank you for signing up for SolTheory! Check you email to confirm your account',
+          severity: res.disposition,
+          display: true
+        })
       }
     } else {
 
