@@ -6,6 +6,7 @@ import { useGlobalContext } from '../business/GlobalContext';
 import { supabase } from '../business/supabaseClient';
 
 const UserCard = ({user, card}) => {
+    const {isMobile} = useGlobalContext()
     const [spreadNum, setSpreadNum] = useState(2);
     const [userData, setUserData] = useState()
 
@@ -39,9 +40,9 @@ const UserCard = ({user, card}) => {
                         marginRight: 2, 
                         boxShadow: `0px 0px 7px ${spreadNum}px ${userData?.currently_online ? '#32cd32d9' : '#ff000094'}`
                     }}/>
-            <Stack justifyContent={'center'} alignItems={'flex=start'}>
-                <Typography>{userData?.user_name}</Typography>
-                <Typography>{userData?.email}</Typography>
+            <Stack overflow={'hidden'} justifyContent={'center'} alignItems={'flex=start'}>
+                <Typography fontSize={isMobile ? '4vw' : 'auto'}>{userData?.user_name}</Typography>
+                <Typography fontSize={isMobile ? '4vw' : 'auto'}>{userData?.email}</Typography>
             </Stack>
         </Stack>
     </Stack>

@@ -2,8 +2,10 @@ import { useEffect, useState } from 'react';
 import { AppBar, Avatar, Button, FormControl, Input, InputLabel, List, Menu, MenuItem, MenuList, Modal, Select, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Toolbar, Tooltip, Typography } from '@mui/material';
 import { supabase } from '../business/supabaseClient';
 import FullMessage from './FullMessage';
+import { useGlobalContext } from '../business/GlobalContext';
 
 export const MessageItem = ({data}) => {
+    const {isMobile} = useGlobalContext()
     const [isHover, setIsHover] = useState(false)
     const [pendingDelete, setPendingDelete] = useState(false)
     const [selectedMessage, setSelectedMessage] = useState(null)
@@ -58,10 +60,7 @@ export const MessageItem = ({data}) => {
                 }}
                 >
                 <TableCell>
-                    <Select sx={{width: '30%', height: '20px'}}>
-                        <MenuItem onClick={() => setPendingDelete(data)} ><i className="fi fi-sr-trash"></i></MenuItem>
-                        {/* <MenuItem ><i className="fi fi-sr-folder-open"></i></MenuItem> */}
-                    </Select>
+                    <MenuItem onClick={() => setPendingDelete(data)} ><i className="fi fi-sr-trash"></i></MenuItem>
                 </TableCell>
                 <TableCell 
                     onClick={(e) =>{ 
@@ -93,16 +92,16 @@ export const MessageItem = ({data}) => {
                 <Stack height={'100%'} justifyContent={'center'} alignItems={'center'}>
                     {
                         pendingDelete.message_id ?
-                            <Stack width={'25%'} height={'25%'} bgcolor={'white'} justifyContent={'center'} alignItems={'center'}>
-                                <Typography>Are you sure you want to delete the message?</Typography>
-                                <Typography>This action cannot be undone</Typography>
+                            <Stack width={isMobile ? '80%' : '25'} height={'25%'} bgcolor={'white'} justifyContent={'center'} alignItems={'center'}>
+                                <Typography fontFamily={'Fredoka Regular'} fontSize={isMobile ? '3.5vw': 16} paddingX={1}>Are you sure you want to delete the message?</Typography>
+                                <Typography fontFamily={'Fredoka Regular'} fontSize={isMobile ? '3.5vw': 15}>This action cannot be undone</Typography>
                                 <Stack direction={'row'}>
                                     <Button onClick={() => handleDelete(pendingDelete)}>Yes</Button>
                                     <Button onClick={() => setPendingDelete(false)}>Cancel</Button>
                                 </Stack>
                             </Stack>
                     :
-                        <FullMessage message={data} setSelectedMessage={setSelectedMessage}/>
+                        <FullMessage message={data} setSelectedMessage={setSelectedMessage} setPendingDelete={setPendingDelete}/>
                     }
                 </Stack>
             </Modal>

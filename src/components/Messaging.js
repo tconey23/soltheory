@@ -12,20 +12,11 @@ import SentMessages from './SentMessages';
 const MessageBox = (props) => {
 
   const {
-    user, isMobile,
-    messages, setMessages,
-    draftMessage, setDraftMessage,
-    userSearch, setUserSearch,
-    userMatches, setUserMatches,
-    solMate, setSolMate,
-    friendList, setFriendList,
-    editFriendSetting, setEditFriendSettings,
-    toggleSentRec, setToggleSentRec,
-    toggleMessages, setToggleMessages
+    user, isMobile, messages,draftMessage, setDraftMessage, solMate, setSolMate, toggleSentRec, setToggleSentRec
   } = props
 
   return (
-    <Stack padding={1} justifyContent={'flex-start'} alignItems={'center'} width={isMobile ? '100%' : '70%'} height={'90%'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} >
+    <Stack padding={1} justifyContent={'flex-start'} alignItems={'center'} width={isMobile ? '100%' : '100%'} height={'90%'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} >
           {
             draftMessage || solMate
             ? 
@@ -34,34 +25,32 @@ const MessageBox = (props) => {
             </Stack>
           : 
           <Stack width={'100%'}>
-            <TableContainer>
-              <Table size='small' stickyHeader sx={{minWidth: '80%'}}>
+           <Stack direction={'row'} width={'100%'}>
+            <MenuItem onClick={() => setDraftMessage(true)} sx={{justifyContent: 'center'}}>
+                <Tooltip followCursor title='New message'>
+                    <Avatar sx={{padding: 0.5}}>
+                        <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-circle-envelope"></i>
+                    </Avatar>
+                </Tooltip>
+            </MenuItem>
+            <MenuItem onClick={() => setToggleSentRec('sent')} sx={{justifyContent: 'center'}}>
+                <Tooltip followCursor title='Outbound Messages'>
+                    <Avatar sx={{padding: 0.5}}>
+                        <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-upload"></i>
+                    </Avatar>
+                </Tooltip>
+            </MenuItem>
+            <MenuItem onClick={() => setToggleSentRec('rec')} sx={{justifyContent: 'center'}}>
+                <Tooltip followCursor title='Inbound Messages'>
+                    <Avatar sx={{padding: 0.5}}>
+                        <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-download"></i>
+                    </Avatar>
+                </Tooltip>
+            </MenuItem>
+            </Stack>
+            <TableContainer sx={{width: '98%'}}>
+              <Table>
                 <TableHead>
-                  <TableRow sx={{width: '80%'}}>
-                    <Stack direction={'row'}>
-                    <MenuItem onClick={() => setDraftMessage(true)} sx={{justifyContent: 'center'}}>
-                      <Tooltip followCursor title='New message'>
-                        <Avatar sx={{padding: 0.5}}>
-                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-circle-envelope"></i>
-                        </Avatar>
-                      </Tooltip>
-                    </MenuItem>
-                    <MenuItem onClick={() => setToggleSentRec('sent')} sx={{justifyContent: 'center'}}>
-                      <Tooltip followCursor title='Outbound Messages'>
-                        <Avatar sx={{padding: 0.5}}>
-                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-upload"></i>
-                        </Avatar>
-                      </Tooltip>
-                    </MenuItem>
-                      <MenuItem onClick={() => setToggleSentRec('rec')} sx={{justifyContent: 'center'}}>
-                        <Tooltip followCursor title='Inbound Messages'>
-                        <Avatar sx={{padding: 0.5}}>
-                          <i style={{color: 'skyBlue', filter: 'drop-shadow(1px 3px 4px black)', fontSize: '30px'}} className="fi fi-sr-file-download"></i>
-                        </Avatar>
-                      </Tooltip>
-                      </MenuItem>
-                    </Stack>
-                  </TableRow>
                   <TableRow sx={{width: '80%'}}>
                     <TableCell size='small' sx={{width: '25%'}}><i className="fi fi-rr-settings"></i></TableCell>
                     <TableCell sx={{width: '25%'}}>{toggleSentRec === 'rec' ? 'Received' : 'Sent'}</TableCell>
@@ -88,23 +77,17 @@ const MessageBox = (props) => {
 const SolMatesBox = (props) => {
   const {
     user, isMobile,
-    messages, setMessages,
-    draftMessage, setDraftMessage,
     userSearch, setUserSearch,
-    userMatches, setUserMatches,
-    solMate, setSolMate,
-    friendList, setFriendList,
-    editFriendSetting, setEditFriendSettings,
-    toggleSentRec, setToggleSentRec,
-    toggleMessages, setToggleMessages
+    userMatches,setSolMate,
+    friendList, setEditFriendSettings
   } = props
 
   return (
-    <Stack padding={1} alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} width={isMobile ? '100%' : '20%'} height={'90%'}>
-            <Stack margin={2} alignItems={'center'} justifyContent={'center'}>
-              <Typography fontFamily={'Fredoka Bold'} fontSize={25}>SOL Mates</Typography>
+    <Stack marginRight={'2vw'}  sx={{overflow:'hidden'}} padding={1} alignItems={'center'} borderRadius={5} boxShadow={'inset 1px 1px 12px 2px #0000005e'} width={isMobile ? '100%' : '30%'} height={'90%'}>
+            <Stack margin={1} alignItems={'center'} justifyContent={'center'}>
+              <Typography fontSize={'2.5vw'} sx={{textAlign: 'center'}}  fontFamily={'Fredoka Bold'} >SOL Mates</Typography>
             </Stack>
-            <Stack height={'40%'}>
+            <Stack height={'40%'} width={'100%'} alignItems={'center'}>
               <FormControl sx={{width: '80%'}}>
                 <InputLabel>Find SOL Mates</InputLabel>
                 <Input value={userSearch} onChange={(e) => setUserSearch(e.target.value)}/>
@@ -113,20 +96,22 @@ const SolMatesBox = (props) => {
                 {userMatches?.map((u) => {
                   return (
                     <MenuItem onClick={() => setSolMate(u)}>
-                      <UserCard card={u}/>
+                            <UserCard card={u}/>
                     </MenuItem>
                   )})}
               </MenuList>
           </Stack>
 
-          <Stack height={'60%'} width={'80%'}>
-            <Typography fontFamily={'Fredoka Bold'}>Your SOL Mates</Typography>
-            <MenuList sx={{width: '80%'}}>
+          <Stack height={'60%'} width={'100%'} alignItems={'center'}>
+            <Typography sx={{textAlign: 'center'}} fontSize={'2vw'} fontFamily={'Fredoka Bold'}>Your SOL Mates</Typography>
+            <MenuList sx={{width: '100%'}}>
               {friendList?.map((f) => {
                 return (
-                  <MenuItem onClick={() => setEditFriendSettings(f)}>
-                    <UserCard user={f}/>
-                  </MenuItem>
+                    <Tooltip followCursor title={f.user_name} >
+                        <MenuItem onClick={() => setEditFriendSettings(f)}>
+                                <UserCard user={f}/>
+                        </MenuItem>
+                    </Tooltip>
                 )})}
             </MenuList>
           </Stack>
@@ -158,6 +143,14 @@ const Messaging = () => {
     toggleSentRec, setToggleSentRec,
     toggleMessages, setToggleMessages
   }
+
+  useEffect(() => {
+    
+    if(solMate || draftMessage){
+        setToggleMessages(true)
+    }
+
+  }, [draftMessage, solMate])
 
   const decryptRealtime = async (data) => {
     try {
@@ -267,11 +260,11 @@ const Messaging = () => {
     <Stack alignItems={'center'} justifyContent={'flex-start'} direction={'column'} sx={{ height: '98%', width: '100%' }} >
       <Typography fontFamily={'Fredoka Bold'} fontSize={30}>Messaging</Typography>
 
-        <Stack justifyContent={'space-around'} padding={2} alignItems={'center'} direction={'column'} height={'90%'} width={'90%'} borderRadius={5} boxShadow={'1px 1px 12px 2px #0000005e'}>
+        <Stack justifyContent={'space-around'} padding={0} alignItems={'center'} direction={'column'} height={'90%'} width={'90%'} borderRadius={5} boxShadow={'1px 1px 12px 2px #0000005e'}>
         <Stack>
           {isMobile && <Switch checked={toggleMessages} onChange={() => setToggleMessages(prev => !prev)}/>}
         </Stack>
-      <Stack padding={2} height={'90%'} width={'90%'} direction={'row'}>
+      <Stack padding={2} height={'96%'} width={'96%'} direction={'row'}>
 
       {isMobile?
         <>

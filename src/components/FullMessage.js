@@ -8,7 +8,7 @@ import { supabase } from '../business/supabaseClient';
 import { encryptWithKey, importKeyFromBase64, generateCipherKey } from '../business/cryptoUtils';
 import { sendPush } from '../business/apiCalls';
 
-const FullMessage = ({ message, setSelectedMessage }) => {
+const FullMessage = ({ message, setSelectedMessage, setPendingDelete }) => {
   const { user } = useGlobalContext();
   const [showAttachment, setShowAttachment] = useState(false);
 
@@ -136,6 +136,9 @@ const FullMessage = ({ message, setSelectedMessage }) => {
 
   return (
     <Stack direction={'column'} bgcolor={'white'} sx={{ height: '45%', width: '45%', overflowY: 'auto' }} padding={2}>
+      <Button>
+        <i onClick={() => setPendingDelete(message)} className="fi fi-sr-trash"></i>
+      </Button>
       <Stack marginY={2}>
         <Typography>From:</Typography>
         <Stack direction={'row'} justifyContent={'flex-start'} alignItems={'center'}>
