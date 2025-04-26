@@ -7,7 +7,7 @@ const TwentOneThingsButton = ({admin}) => {
     const nav = useNavigate()
   return (
     <Stack onClick={() => {
-        
+         
       if(!admin){nav('/21things')}
       
       }} direction={'row'} height={100} justifyContent={'center'} alignItems={'center'}

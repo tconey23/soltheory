@@ -139,7 +139,7 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
     }, [settings])
 
   return (
-    <Stack direction={'column'} sx={{ height: '50%', width: '50%', bgcolor: 'white'}} justifyContent={'flex-start'} alignItems={'center'} padding={3}>
+    <Stack direction={'column'} sx={{ height: '50%', width: '70%', bgcolor: 'white'}} justifyContent={'flex-start'} alignItems={'center'} padding={3}>
         
         <Stack direction={'row'} justifyContent={'flex-end'}>
             <Avatar sx={{scale: 1.5}} src={friendData?.avatar} />
@@ -158,9 +158,9 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
 
         <Typography>User-Specific Settings</Typography>
 
-        <Stack direction={'column'} justifyContent={'center'} marginY={2} border={'1px solid grey'} height={'25%'} padding={1}>
+        <Stack direction={'column'} alignItems={'center'} justifyContent={'center'} marginY={2} border={'1px solid grey'} height={'40%'} padding={0}>
 
-        <Stack direction={'row'} justifyContent={'center'} marginY={2} height={'25%'} padding={1}>
+        <Stack direction={'row'} justifyContent={'center'} marginY={2} height={'40%'} padding={1}>
             {Object.entries(settings).map((s) => {
                 let rawDesc = s[0]
                 let splitDesc = rawDesc.split('_')
@@ -168,13 +168,13 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
                 let capFirstWord = `${capFirstLetter}${splitDesc[0].split(',')[0].split('').splice(1, splitDesc[0].split(',')[0].split('').length-1).join('')}`
                 let formatFirstWord = `${capFirstWord} ${splitDesc.splice(1, 2).join(' ')}`
                 return (
-                    <Stack marginX={2}>
-                    <FormLabel>{formatFirstWord}</FormLabel>
-                    <Checkbox checked={s[1]} onChange={(e) => setSettings(prev => ({
-                        ...prev,
-                        [rawDesc]: e.target.checked
-                    }))}/>
-                </Stack>
+                    <Stack marginX={2} height={'30%'} alignItems={'center'}>
+                      <FormLabel sx={{fontSize:15, textAlign:'center'}}>{formatFirstWord}</FormLabel>
+                      <Checkbox checked={s[1]} onChange={(e) => setSettings(prev => ({
+                          ...prev,
+                          [rawDesc]: e.target.checked
+                      }))}/>
+                    </Stack>
                 )
             })}
         </Stack>
@@ -190,9 +190,9 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
         </Stack>
         <Modal open={pendingUnfriend}>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-                <Stack bgcolor={'white'} width={'25%'} height={'25%'} justifyContent={'center'} alignItems={'center'}>
+                <Stack bgcolor={'white'} width={'100%'} height={'25%'} justifyContent={'center'} alignItems={'center'}>
                     <Typography>{`Are you sure you want to end your friendship with ${friend.user_name}?`}</Typography>
-                    <Stack width={'50%'} direction={'row'} justifyContent={'space-evenly'}>
+                    <Stack width={'50%'} direction={'row'} justifyContent={'space-evenly'} alignItems={'center'}>
                         <Button onClick={() => handleRemoveFriend()}>YES</Button>
                         <Button onClick={() => setPendingUnfriend(false)} >NO</Button>
                     </Stack>

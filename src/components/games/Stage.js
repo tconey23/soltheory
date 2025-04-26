@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react'
 import { useGlobalContext } from '../../business/GlobalContext'
 import Prompt from './Prompt'
 
-const Stage = ({
+const Stage = ({ 
   stageNum,
   prompts,
   setPrompts,

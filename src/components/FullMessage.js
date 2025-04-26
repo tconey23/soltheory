@@ -9,7 +9,7 @@ import { encryptWithKey, importKeyFromBase64, generateCipherKey } from '../busin
 import { sendPush } from '../business/apiCalls';
 
 const FullMessage = ({ message, setSelectedMessage, setPendingDelete }) => {
-  const { user } = useGlobalContext();
+  const { user, isMobile } = useGlobalContext();
   const [showAttachment, setShowAttachment] = useState(false);
 
   const deleteMessage = async () => {
@@ -135,13 +135,13 @@ const FullMessage = ({ message, setSelectedMessage, setPendingDelete }) => {
   };
 
   return (
-    <Stack direction={'column'} bgcolor={'white'} sx={{ height: '45%', width: '45%', overflowY: 'auto' }} padding={2}>
+    <Stack alignItems={'center'} direction={'column'} bgcolor={'white'} sx={{ height: '60%', width: '60%', overflowY: 'auto' }} padding={4}>
       <Button>
         <i onClick={() => setPendingDelete(message)} className="fi fi-sr-trash"></i>
       </Button>
-      <Stack marginY={2}>
+      <Stack marginY={2} width={'100%'}>
         <Typography>From:</Typography>
-        <Stack direction={'row'} justifyContent={'flex-start'} alignItems={'center'}>
+        <Stack direction={isMobile ? 'column' : 'row'} justifyContent={'flex-start'} alignItems={'center'}>
           <Avatar sx={{ marginX: 1 }} src={message.from.avatar}></Avatar>
           <Typography sx={{ marginX: 1 }}>{message.from.user_name}</Typography>
           <Typography sx={{ marginX: 1 }}>({message.from.email})</Typography>
