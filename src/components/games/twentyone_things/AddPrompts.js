@@ -90,20 +90,19 @@ const AddPrompts = () => {
     return (
       <Stack alignItems='center' height={'100%'} width={'100%'}>
         <Typography variant='h6'>Add Prompts</Typography>
-        {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
   
         <TextField
           type="date"
           value={date}
           onChange={(e) => setDate(e.target.value)}
           sx={{ marginTop: 2 }}
-        />
+          />
         <TextField
           value={author}
           onChange={(e) => setAuthor(e.target.value)}
           label="Author"
           sx={{ marginTop: 2 }}
-        />
+          />
   
         <Button onClick={() => setToggleMulti(!toggleMulti)} sx={{ mt: 2 }}>
           {toggleMulti ? 'Single Prompt' : 'Upload CSV'}
@@ -119,16 +118,18 @@ const AddPrompts = () => {
               onKeyDown={(e) => handleKeyDown(e.key)}
               label="New Prompt"
               sx={{ marginTop: 2 }}
-            />
+              />
             <Button onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
           </Stack>
         )}
   
+        {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
+        
         <List sx={{ width: isMobile ? '100%' : '75%' }}>
           {(toggleMulti ? data : prompts).map((item, i) => (
             <EditablePromptItem
-              key={i}
-              index={i}
+            key={i}
+            index={i}
               value={item}
               type={toggleMulti ? 'data' : 'prompts'}
               onDelete={handleDelete}

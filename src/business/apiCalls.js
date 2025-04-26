@@ -197,34 +197,35 @@ const addFriend = async (user, friend) => {
     };
 
     const signIn = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       
-        if (error) {
-          console.error("Login error:", error);
-          // Optional: clear storage on failed login
-          localStorage.removeItem('user');
-          localStorage.setItem('isAuthenticated', 'false');
+          if (error) {
+            return {
+              disposition: 'error',
+              message: error.message,
+            };
+          }
+      
+          if (data?.session) {
+            return {
+              disposition: 'success',
+              session: data.session,
+            };
+          }
+      
+          // Just in case something weird happens
           return {
             disposition: 'error',
-            message: error.message,
+            message: 'Unknown login error.',
+          };
+        } catch (err) {
+          console.error('Unexpected error in signIn:', err);
+          return {
+            disposition: 'error',
+            message: 'Unexpected login failure.',
           };
         }
-
-        const responseData = {
-          disposition: 'success',
-          message: `Welcome ${data.user.email}`,
-          session: data?.session,
-          user: data?.user,
-        }
-      
-        // Save user info to localStorage
-        localStorage.setItem('user', JSON.stringify(responseData));
-        localStorage.setItem('isAuthenticated', 'true');
-      
-        return responseData
       };
 
       const signOut = async () => {

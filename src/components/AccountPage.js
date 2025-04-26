@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { Accordion, AccordionDetails, AccordionSummary, FormLabel, ImageList, MenuItem, Select, Stack, TextField } from '@mui/material';
+import { use, useEffect, useState } from 'react';
+import { Accordion, AccordionDetails, AccordionSummary, FormLabel, ImageList, MenuItem, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
 import {Avatar} from '@mui/material';
 import {Typography} from '@mui/material';
 import {Button} from '@mui/material';
@@ -11,6 +11,7 @@ import { useGlobalContext } from '../business/GlobalContext'
 import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
 import { supabase } from '../business/supabaseClient';
+import { Box } from '@mui/system';
 
 const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
     const {
@@ -19,7 +20,8 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
       setAvatar,
       isMobile
     } = useGlobalContext();
-  
+    
+
     const [newAvatar, setNewAvatar] = useState('');
     const [images, setImages] = useState([]);
   
@@ -87,13 +89,65 @@ const AccountPage = ({size}) => {
     const [avatarTerms, setAvatarTerms] = useState([
         'abstract', 'illustration', 'minimal', 'cartoon'
     ])
+    const [pendingDeleteAccount, setPendingDeleteAccount] = useState()
+    const [canDelete, setCanDelete] = useState(false)
+    const [hoverDelete, setHoverDelete] = useState(false)
 
-    const getUserData = async () => {
+    const [deleteTimeout, setDeleteTimeout] = useState(3)
+    const [deleteError, setDeleteError] = useState()
 
-      const res = await getUser(user.user.email)
-      console.log(res)
+    useEffect(() => {
+      console.log(deleteError)
+    }, [deleteError])
 
-    }
+    const handleDeleteAccount = async () => {
+      const accessToken = user?.user?.access_token;
+      const userId = user?.user?.user?.id;
+    
+      if (!accessToken || !userId) {
+        console.error(`token: ${accessToken} id: ${userId}`);
+        return;
+      }
+
+      try {          
+        const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('primary_id', userId)
+        if(error){
+          console.log(error)
+          throw new Error(error)
+        }
+      } catch (err) {
+          setDeleteError(err)
+          return
+      }
+    
+      if(deleteError){
+        return
+      }
+
+      const response = await fetch(`${process.env.REACT_APP_SUPABASE_URL}/functions/v1/delete-user`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({ userId })
+      });
+    
+      const result = await response.json();
+    
+      if (response.ok) {
+        console.log('Account deleted successfully:', result);
+        await supabase.auth.signOut();
+        window.location.href = '/';
+      } else {
+        console.error('Failed to delete account:', result);
+      }
+    };
+    
+    
   
 
     useEffect(() => {
@@ -131,11 +185,19 @@ const AccountPage = ({size}) => {
         if(!user){
             nav('/login')
         }
-
-        // if(user?.user?.email){
-        //   getUserData()
-        // }
     }, [user])
+
+  
+    useEffect(() => {
+      console.log(hoverDelete, deleteTimeout)
+      if(hoverDelete && deleteTimeout > 0){
+        setTimeout(() => {
+          setDeleteTimeout(prev => prev -1)
+        }, 1000);
+      } else if(!hoverDelete) {
+        setDeleteTimeout(3)
+      }
+    }, [hoverDelete, deleteTimeout])
 
 
   return (
@@ -187,6 +249,15 @@ const AccountPage = ({size}) => {
                                       </Accordion>
                                     }
                                 </Stack>
+                                <Tooltip followCursor title={deleteTimeout > 0 ? deleteTimeout : 'Delete Account'}>
+                                  <Stack
+                                      justifySelf={'flex-start'}
+                                      onMouseOver={() => setHoverDelete(true)}
+                                      onMouseOut={() => setHoverDelete(false)}
+                                  >
+                                  <Button onClick={() => setPendingDeleteAccount(true)} disabled={deleteTimeout > 0} >Delete Account</Button>
+                                  </Stack>
+                                </Tooltip>
                               </AccordionDetails>
                             </Accordion>
                           </Stack>
@@ -194,9 +265,18 @@ const AccountPage = ({size}) => {
                             Logout
                         </Button>
                       </Stack>
-
-
                 </Stack>
+                <Modal
+                  open={pendingDeleteAccount}
+                >
+                  <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+                    <Box bgcolor={'white'} padding={3}>
+                      <Typography>Are you sure you want to delete your account?</Typography>
+                      <Button onClick={() => handleDeleteAccount()}>Yes</Button>
+                      <Button onClick={() => setPendingDeleteAccount(false)}>No</Button>
+                    </Box>
+                  </Stack>
+                </Modal>
         </Stack>
   );
 };
