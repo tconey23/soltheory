@@ -1,5 +1,5 @@
 import { use, useEffect, useState } from 'react';
-import { Accordion, AccordionDetails, AccordionSummary, FormLabel, ImageList, MenuItem, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
+import { Accordion, AccordionDetails, AccordionSummary, FormControl, FormLabel, ImageList, Input, InputLabel, MenuItem, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
 import {Avatar} from '@mui/material';
 import {Typography} from '@mui/material';
 import {Button} from '@mui/material';
@@ -12,6 +12,87 @@ import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
 import { supabase } from '../business/supabaseClient';
 import { Box } from '@mui/system';
+
+const UserName = () => {
+  const { user, setUser } = useGlobalContext();
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    if (user?.user?.user?.user_metadata?.name) {
+      setUserName(user.user.user.user_metadata.name);
+    }
+    console.log(user)
+  }, [user]);
+
+  const saveUserName = async () => {
+    const primaryId = user?.user?.user?.id;
+  
+    console.log('Primary ID:', primaryId);
+    console.log('User Name:', userName);
+  
+    if (!primaryId || !userName) {
+      console.error('Missing user data!');
+      return;
+    }
+  
+    // 1. Update users table
+    const { data, error } = await supabase
+      .from('users')
+      .update({ user_name: userName })
+      .eq('primary_id', primaryId)
+      .select();
+  
+    if (error) {
+      console.error('Error updating user name:', error.message);
+      return;
+    }
+  
+    console.log('User name updated in users table:', data);
+  
+    // 2. Update Auth user metadata
+    const { data: authData, error: authError } = await supabase.auth.updateUser({
+      data: { name: userName }
+    });
+  
+    if (authError) {
+      console.error('Error updating auth metadata:', authError.message);
+    } else {
+      console.log('User metadata updated successfully:', authData);
+  
+      // 3. Optimistically update local user state
+      setUser((prev) => ({
+        ...prev,
+        user: {
+          ...prev.user,
+          user: {
+            ...prev.user.user,
+            user_metadata: {
+              ...prev.user.user.user_metadata,
+              name: userName
+            }
+          }
+        }
+      }));
+    }
+  };
+  
+  
+  
+
+  return (
+    <FormControl>
+      {!userName && <InputLabel>User name</InputLabel>}
+      <Input 
+        value={userName} 
+        onChange={(e) => setUserName(e.target.value)} 
+      />
+      <Button onClick={saveUserName} variant="contained" sx={{ mt: 2 }}>
+        Save
+      </Button>
+    </FormControl>
+  );
+};
+
 
 const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
     const {
@@ -185,11 +266,11 @@ const AccountPage = ({size}) => {
         if(!user){
             nav('/login')
         }
+        console.log(user)
     }, [user])
 
   
     useEffect(() => {
-      console.log(hoverDelete, deleteTimeout)
       if(hoverDelete && deleteTimeout > 0){
         setTimeout(() => {
           setDeleteTimeout(prev => prev -1)
@@ -206,7 +287,7 @@ const AccountPage = ({size}) => {
                     <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                       <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
-                        <Typography variant="h7">Welcome, {user?.user?.email}!</Typography>
+                        <Typography variant="h7">Welcome, {user?.metadata?.email}!</Typography>
                       </Stack>
                         <Stack width={'80%'}>
                           <Accordion>
@@ -220,7 +301,14 @@ const AccountPage = ({size}) => {
                                       <Typography>Account Details</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-                                      <Stack justifyContent={'center'} alignItems={'center'}>
+
+
+                                      <Accordion>
+                                        <AccordionSummary>
+                                          Change avatar
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                        <Stack justifyContent={'center'} alignItems={'center'}>
                                           <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
                                           <Select value={imageType} onChange={(e) => setImageType(e.target.value)}>  
                                               {avatarTerms.map((t, i) => (
@@ -234,6 +322,18 @@ const AccountPage = ({size}) => {
                                           <Button onClick={() => setSubmit(true)} >Search</Button>
                                           <AvatarSelect results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit}/>
                                       </Stack>
+                                        </AccordionDetails>
+                                      </Accordion>
+                                      
+                                      <Accordion>
+                                        <AccordionSummary>
+                                          Change user name
+                                        </AccordionSummary>
+                                          <AccordionDetails>
+                                              <UserName />
+                                          </AccordionDetails>
+                                      </Accordion>
+
                                     </AccordionDetails>
                                   </Accordion>
                                     {isAdmin && 
