@@ -18,7 +18,7 @@ const isLocalhost = Boolean(
         if (isLocalhost) {
           checkValidServiceWorker(swUrl, config);
           navigator.serviceWorker.ready.then(() => {
-            console.log('This app is being served cache-first by a service worker.');
+            // console.log('This app is being served cache-first by a service worker.');
           });
         } else {
           registerValidSW(swUrl, config);
@@ -44,7 +44,7 @@ const isLocalhost = Boolean(
                 console.log('New content is available; please refresh.');
                 config?.onUpdate?.(registration);
               } else {
-                console.log('Content cached for offline use.');
+                // console.log('Content cached for offline use.');
                 config?.onSuccess?.(registration);
               }
             }

@@ -1,6 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from '@mui/material';
-import { getUser } from './apiCalls';
 import { supabase } from './supabaseClient';
 
 const GlobalContext = createContext();
@@ -13,125 +12,21 @@ export const GlobalProvider = ({ children }) => {
     display: false,
   });
   const [returnUrl, setReturnUrl] = useState();
-  const [font] = useState("/fonts/Fredoka_Regular.json");
-  const [fontTTF] = useState("/fonts/Fredoka/static/Fredoka-Bold.ttf");
-  const [speed, setSpeed] = useState(4);
   const [avatar, setAvatar] = useState(null);
-  const [displayName, setDisplayName] = useState();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [cipherKey, setCipherKey] = useState();
   const [mySolMates, setMySolMates] = useState([]);
   const [showJoystick, setShowJoystick] = useState(true);
   const isMobile = useMediaQuery("(max-width:430px)");
+  const [sessionState, setSessionState] = useState()
+  const [sessionData, setSessionData] = useState()
+  const [userData, setUserData] = useState()
+  const [userMetaData, setUserMetaData] = useState()
+  const justLoggedIn = useRef(false);
+
 
   const degrees = (degrees) => degrees * (Math.PI / 180);
 
-  // Fetch full metadata if needed
-  const checkAdminAccess = async (email) => {
-    const res = await getUser(email);
 
-    setUser(prev => ({
-      ...prev,
-      metadata: res
-    }));
-  };
-
-  // Load session on app start
-  useEffect(() => {
-    const loadSession = async () => {
-      const { data, error } = await supabase.auth.getSession();
-
-      if (data?.session) {
-        setUser({ user: data.session.user });
-      }
-    };
-
-    loadSession();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        await supabase
-          .from('users')
-          .upsert([{ primary_id: session.user.id, email: session.user.email, currently_online: true }], {
-            onConflict: 'primary_id',
-          });
-        setUser({ user: session.user });
-      }
-
-      if (event === 'SIGNED_OUT') {
-        setUser(null);
-      }
-    });
-
-    importKeyFromStorage();
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
-
-  // When we have a user, fetch their metadata if missing
-  useEffect(() => {
-    if (user?.user?.email && !user?.metadata) {
-      checkAdminAccess(user.user.email);
-    }
-  }, [user?.user?.email]);
-
-  // When metadata arrives, update avatar, display name, admin flag
-  useEffect(() => {
-    if (user?.metadata) {
-      setAvatar(user.metadata.avatar);
-      setDisplayName(user.metadata.user_name);
-      setIsAdmin(user.metadata.is_admin);
-    } else {
-      setAvatar(null);
-      setDisplayName(null);
-      setIsAdmin(false);
-    }
-  }, [user?.metadata]);
-
-  // Cipher Key Storage & Import
-  const generateAndStoreKey = async () => {
-    const key = await crypto.subtle.generateKey(
-      { name: "AES-GCM", length: 256 },
-      true,
-      ["encrypt", "decrypt"]
-    );
-
-    const raw = await crypto.subtle.exportKey("raw", key);
-    const base64Key = btoa(String.fromCharCode(...new Uint8Array(raw)));
-
-    localStorage.setItem("cipherKey", base64Key);
-    setCipherKey(key);
-  };
-
-  const importKeyFromStorage = async () => {
-    const base64Key = localStorage.getItem("cipherKey");
-
-    if (!base64Key) {
-      await generateAndStoreKey();
-      return;
-    }
-
-    const raw = Uint8Array.from(atob(base64Key), c => c.charCodeAt(0));
-    const key = await crypto.subtle.importKey(
-      "raw",
-      raw,
-      "AES-GCM",
-      true,
-      ["encrypt", "decrypt"]
-    );
-
-    setCipherKey(key);
-  };
-
-  const resetCipherKey = () => {
-    localStorage.removeItem("cipherKey");
-    setCipherKey(null);
-    importKeyFromStorage();
-  };
-
-  // Live update listener for user's own metadata changes
   useEffect(() => {
     if (!user?.metadata?.primary_id) return;
 
@@ -154,7 +49,138 @@ export const GlobalProvider = ({ children }) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.metadata?.primary_id]);
+  }, [user]);
+
+  useEffect(() => {
+    if(userData?.user_metadata){
+      setUserMetaData(userData.user_metadata)
+    }
+  }, [userData])
+
+  useEffect(() =>{
+    console.log(sessionData)
+    if(sessionData?.user){
+      setUserData(sessionData.user)
+    }
+  }, [sessionData])
+
+  useEffect(() => {
+    if(user?.data?.session){
+      setSessionData(user.data.session)
+    }
+  }, [user])
+
+  useEffect(() => {
+
+    if(sessionData && userData && userMetaData){
+      console.log({
+        session: sessionData,
+        user: userData, 
+        meta: userMetaData
+      })
+    }
+
+  }, [sessionData, userData, userMetaData])
+
+  const login = async (email, password) => {  
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  
+      if (error) {
+        console.error('Login error:', error);
+        throw new Error(error.message);  // STOP EXECUTION here
+      }
+  
+      if (!data?.session?.access_token) {
+        throw new Error('Login succeeded but no session token found.');
+      }
+  
+      console.log('Login successful:', data);
+  
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+  
+      if (sessionError) {
+        console.error('Session fetch error after login:', sessionError);
+        throw new Error('Failed to refresh session after login');
+      }
+  
+      if (sessionData?.session) {
+        justLoggedIn.current = true;
+        setUser({ data: sessionData });
+      } else {
+        throw new Error('No valid session data after login.');
+      }
+  
+    } catch (err) {
+      console.error('Unexpected login failure:', err.message || err);
+      throw err;  // rethrow so caller can handle it too
+    }
+  };
+  
+
+  const logout = async () => {
+    await supabase.auth.signOut()
+    setUser(null)
+    localStorage.clear()
+    sessionStorage.clear()
+    indexedDB.deleteDatabase('supabase-auth-token')
+    window.location.href = '/login'
+  }
+
+  const waitForStateChange = (getValue, validate = (v) => !!v, timeout = 5000) => {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
+      const interval = setInterval(() => {
+        const value = getValue();
+        console.log('[Polling]', value);  // ✅ correct log
+  
+        if (validate(value)) {
+          clearInterval(interval);
+          resolve(value);
+        }
+  
+        if (Date.now() - start > timeout) {
+          clearInterval(interval);
+          reject(new Error('Timeout waiting for state change'));
+        }
+      }, 50);
+    });
+  };
+  
+  const checkUser = async () => {
+    try {
+      const userResp = await waitForStateChange(() => userData, (u) => u !== null);
+      console.log('User is ready:', userResp);
+    } catch (err) {
+      console.error('Failed to detect user readiness:', err.message);
+    }
+  };
+  
+  useEffect(() => {
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('[Auth Event]', event);
+  
+      if (event === 'SIGNED_IN') {
+        await waitForStateChange(
+          () => supabase.auth.getUser().then(r => r.data?.user),  // ✅ dynamic fresh user
+          (u) => u !== null,
+        ).then((userResp) => {
+          console.log('User is ready:', userResp);
+        }).catch((err) => {
+          console.error('Timeout waiting for user:', err.message);
+        });
+      }
+    });
+  
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, []);
+  
+  
+
+
+
 
   return (
     <GlobalContext.Provider
@@ -162,15 +188,15 @@ export const GlobalProvider = ({ children }) => {
         user, setUser,
         alertProps, setAlertProps,
         returnUrl, setReturnUrl,
-        font, fontTTF,
-        speed, setSpeed,
         avatar, setAvatar,
-        displayName, setDisplayName,
         isAdmin, setIsAdmin,
-        cipherKey, setCipherKey,
         mySolMates, setMySolMates,
         showJoystick, setShowJoystick,
-        degrees,
+        isMobile, degrees,
+        sessionState,
+        justLoggedIn,
+        login,
+        logout
       }}
     >
       {children}

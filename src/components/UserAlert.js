@@ -38,7 +38,7 @@ const UserAlert = () => {
       message={
             <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {icon}
-            {alertProps.text}
+            {alertProps?.text}
             </span>
         }
     />

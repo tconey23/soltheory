@@ -21,7 +21,6 @@ const UserName = () => {
     if (user?.user?.user?.user_metadata?.name) {
       setUserName(user.user.user.user_metadata.name);
     }
-    console.log(user)
   }, [user]);
 
   const saveUserName = async () => {
@@ -160,7 +159,7 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
   };
 
 const AccountPage = ({size}) => {
-    const {alertProps, setAlertProps , user, setUser, isAdmin, setisAdmin, displayName, setDisplayName, avatar, setAvatar} = useGlobalContext()
+    const {alertProps, setAlertProps , user, setUser, avatar, isAdmin, logout} = useGlobalContext()
     const nav = useNavigate()
     const [results, setResults] = useState([])
     const [submit, setSubmit] = useState(false)
@@ -173,13 +172,8 @@ const AccountPage = ({size}) => {
     const [pendingDeleteAccount, setPendingDeleteAccount] = useState()
     const [canDelete, setCanDelete] = useState(false)
     const [hoverDelete, setHoverDelete] = useState(false)
-
     const [deleteTimeout, setDeleteTimeout] = useState(3)
     const [deleteError, setDeleteError] = useState()
-
-    useEffect(() => {
-      console.log(deleteError)
-    }, [deleteError])
 
     const handleDeleteAccount = async () => {
       const accessToken = user?.user?.access_token;
@@ -227,9 +221,6 @@ const AccountPage = ({size}) => {
         console.error('Failed to delete account:', result);
       }
     };
-    
-    
-  
 
     useEffect(() => {
         if(imageType && avatarSearch){
@@ -237,37 +228,17 @@ const AccountPage = ({size}) => {
         }
     }, [imageType, avatarSearch])
 
-    const handleLogout = async () => {
-        localStorage.removeItem('supabase.auth.token');
-        localStorage.removeItem('user');
-        localStorage.setItem('isAuthenticated', 'false');
 
-        const res = await signOut()
-        console.log('[Logout Result]', res)
-      
-        if (res.disposition === 'success') {
-          setUser(null)
-          setAlertProps({
-            text: 'You have been logged out',
-            severity: 'success',
-            display: true,
-          })
-        } else {
-          console.error('[Logout Error]', res.error)
-          setAlertProps({
-            text: res.message,
-            severity: 'error',
-            display: true,
-          })
-        }
+
+      const handleLogout = async () => {
+        try {
+          await logout()
+          setAlertProps({ text: 'Login successful', severity: 'success', display: true })
+          nav('/account')
+      } catch (err) {
+        setAlertProps({ text: err.message, severity: 'error', display: true })
       }
-
-    useEffect(() =>{
-        if(!user){
-            nav('/login')
         }
-        console.log(user)
-    }, [user])
 
   
     useEffect(() => {
@@ -367,7 +338,7 @@ const AccountPage = ({size}) => {
                       </Stack>
                 </Stack>
                 <Modal
-                  open={pendingDeleteAccount}
+                  open={!!pendingDeleteAccount}
                 >
                   <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
                     <Box bgcolor={'white'} padding={3}>

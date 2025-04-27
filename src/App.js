@@ -23,11 +23,6 @@ import Messaging from './components/Messaging';
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
   const {alertProps, setAlertProps, user, setUser} = useGlobalContext()
-  const [toggleHeader, setToggleHeader] = useState(true)
-
-  useEffect(() => {
-    // console.log(user)
-  }, [user])
 
   useEffect(()=>{
     if(toggleQuit){
@@ -35,11 +30,10 @@ function App() {
         setToggleQuit(false)
       }, 100);
     }
-    // console.log(toggleQuit)
   },[toggleQuit])
 
   useEffect(() => {
-    if(alertProps.display){
+    if(alertProps?.display){
       setTimeout(() => {
         setAlertProps(prev => ({
           ...prev,
@@ -47,9 +41,7 @@ function App() {
         }))
       }, 5000);
     }
-  }, [alertProps])
-
-  
+  }, [alertProps])  
 
   return (
       <Stack userdata='app_wrapper' direction={'column'} height={'100vh'} width={'100vw'}> 
