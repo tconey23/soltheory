@@ -72,7 +72,7 @@ export const GlobalProvider = ({ children }) => {
 
   useEffect(() => {
 
-    if(sessionData && userData && userMetaData){
+    if(sessionData || userData || userMetaData){
       console.log({
         session: sessionData,
         user: userData, 
@@ -81,6 +81,43 @@ export const GlobalProvider = ({ children }) => {
     }
 
   }, [sessionData, userData, userMetaData])
+
+  const updateAdmin = async (admin) => {
+    const { data, error } = await supabase.auth.updateUser({
+      data: { 
+        is_admin: admin
+      }
+    })
+    
+    if(data){
+      setUserData(data.user)
+      return data
+    }
+
+    if(error){
+      return error
+    }
+}
+
+  const updateUser = async (name) => {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { 
+          display_name: name,
+          is_admin: false,
+          friends: []
+        }
+      })
+      
+      if(data){
+        setUserData(data.user)
+        return data
+      }
+
+      if(error){
+        return error
+      }
+  }
+
 
   const login = async (email, password) => {  
     try {
@@ -116,6 +153,32 @@ export const GlobalProvider = ({ children }) => {
       throw err;  // rethrow so caller can handle it too
     }
   };
+
+  const signUp = async (email, password, name) => {  
+    try {
+      let { data, error } = await supabase.auth.signUp({
+        email: email,
+        password: password
+      })
+
+      if(data){
+        if(data.user){setUserData(data.user)}
+        if(data.session){setSessionData(data.session)}
+        updateUser(name)
+        return data
+      }
+
+      if (error) {
+        console.error('Sign up error:', error);
+        throw new Error(error.message);  // STOP EXECUTION here
+      }
+
+  
+    } catch (err) {
+      console.error('Unexpected signup failure:', err.message || err);
+      throw err;  // rethrow so caller can handle it too
+    }
+  };
   
 
   const logout = async () => {
@@ -127,48 +190,26 @@ export const GlobalProvider = ({ children }) => {
     window.location.href = '/login'
   }
 
-  const waitForStateChange = (getValue, validate = (v) => !!v, timeout = 5000) => {
-    return new Promise((resolve, reject) => {
-      const start = Date.now();
-      const interval = setInterval(() => {
-        const value = getValue();
-        console.log('[Polling]', value);  // ✅ correct log
-  
-        if (validate(value)) {
-          clearInterval(interval);
-          resolve(value);
-        }
-  
-        if (Date.now() - start > timeout) {
-          clearInterval(interval);
-          reject(new Error('Timeout waiting for state change'));
-        }
-      }, 50);
-    });
-  };
-  
-  const checkUser = async () => {
+  const getLoggedInUser = async () => {
+
     try {
-      const userResp = await waitForStateChange(() => userData, (u) => u !== null);
-      console.log('User is ready:', userResp);
+      const { data: { user }, error } = await supabase.auth.getUser()
+      if(user){
+        console.log(user)
+      } else {
+        throw new Error(error)
+      }
     } catch (err) {
-      console.error('Failed to detect user readiness:', err.message);
+      console.log(err)
     }
-  };
+
+  }
   
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('[Auth Event]', event);
-  
-      if (event === 'SIGNED_IN') {
-        await waitForStateChange(
-          () => supabase.auth.getUser().then(r => r.data?.user),  // ✅ dynamic fresh user
-          (u) => u !== null,
-        ).then((userResp) => {
-          console.log('User is ready:', userResp);
-        }).catch((err) => {
-          console.error('Timeout waiting for user:', err.message);
-        });
+      setSessionState(event)
+      if(event === 'SIGNED_IN'){
+        getLoggedInUser()
       }
     });
   
@@ -177,11 +218,6 @@ export const GlobalProvider = ({ children }) => {
     };
   }, []);
   
-  
-
-
-
-
   return (
     <GlobalContext.Provider
       value={{
@@ -196,7 +232,13 @@ export const GlobalProvider = ({ children }) => {
         sessionState,
         justLoggedIn,
         login,
-        logout
+        logout,
+        signUp,
+        userData,
+        sessionData,
+        updateUser,
+        sessionState,
+        updateAdmin
       }}
     >
       {children}

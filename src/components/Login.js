@@ -9,24 +9,28 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '../business/supabaseClient';
 
 
-const Login = ({ setSelectedOption }) => {
-  const {user, isMobile, sessionState, login, logout, setAlertProps} = useGlobalContext()
+const Login = () => {
+  const {user, isMobile, sessionState, login, signUp, setAlertProps, userData, sessionData} = useGlobalContext()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState(''); 
-  const [isSignUp, setIsSignUp] = useState(false); 
-  const [resConf, setResConf] = useState(false)
+  const [isSignUp, setIsSignUp] = useState(false);
 
   const nav = useNavigate()
 
   useEffect(() =>{
 
-  }, [user, sessionState])
+    if(userData && sessionData){
+      setAlertProps({
+        text: 'Welcome to SOL Theory!',
+        severity: 'success',
+        display: true
+      })
+      nav('/account')
+    }
 
+  }, [userData, sessionData])
 
-
-  const resendConfEmail = async () => {
-  }
 
   const handleLogin = async () => {
     try {
@@ -41,7 +45,9 @@ const Login = ({ setSelectedOption }) => {
   
 
   const handleSignUp = async () => {
-    
+    const signUpRes = await signUp(email, password, name)
+
+    console.log(signUpRes)
   };
   
   
@@ -63,8 +69,6 @@ const Login = ({ setSelectedOption }) => {
           sx={isMobile ? styles.mobileInputWrapper : styles.inputWrapper}
         >
           <Stack userdata="login_styling" padding={'30px'} width={'100%'}>
-            
-            {resConf && <Button onClick={() => resendConfEmail()} >Resend Confirmation Email</Button>}
             
             <Stack userdata="input_fields" width={'100%'} alignItems={'center'}>
               <Box>

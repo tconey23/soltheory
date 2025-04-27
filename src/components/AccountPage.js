@@ -1,12 +1,9 @@
-import { use, useEffect, useState } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 import { Accordion, AccordionDetails, AccordionSummary, FormControl, FormLabel, ImageList, Input, InputLabel, MenuItem, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
 import {Avatar} from '@mui/material';
 import {Typography} from '@mui/material';
 import {Button} from '@mui/material';
 import Admin from './Admin';
-import { ResizableBox } from "react-resizable";
-import "react-resizable/css/styles.css";
-import { getUser, signOut, updateUserAvatar } from '../business/apiCalls';
 import { useGlobalContext } from '../business/GlobalContext'
 import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
@@ -14,84 +11,38 @@ import { supabase } from '../business/supabaseClient';
 import { Box } from '@mui/system';
 
 const UserName = () => {
-  const { user, setUser } = useGlobalContext();
+  const { updateUser, setAlertProps } = useGlobalContext();
   const [userName, setUserName] = useState('');
 
-  useEffect(() => {
-    if (user?.user?.user?.user_metadata?.name) {
-      setUserName(user.user.user.user_metadata.name);
-    }
-  }, [user]);
-
   const saveUserName = async () => {
-    const primaryId = user?.user?.user?.id;
   
-    console.log('Primary ID:', primaryId);
-    console.log('User Name:', userName);
-  
-    if (!primaryId || !userName) {
-      console.error('Missing user data!');
-      return;
+    const updateRes = await updateUser(userName)
+    if(updateRes?.data || updateRes?.user){
+      setUserName('')
+      setAlertProps({
+        text: 'User name updated!',
+        severity: 'success',
+        display: true
+      })
     }
-  
-    // 1. Update users table
-    const { data, error } = await supabase
-      .from('users')
-      .update({ user_name: userName })
-      .eq('primary_id', primaryId)
-      .select();
-  
-    if (error) {
-      console.error('Error updating user name:', error.message);
-      return;
-    }
-  
-    console.log('User name updated in users table:', data);
-  
-    // 2. Update Auth user metadata
-    const { data: authData, error: authError } = await supabase.auth.updateUser({
-      data: { name: userName }
-    });
-  
-    if (authError) {
-      console.error('Error updating auth metadata:', authError.message);
-    } else {
-      console.log('User metadata updated successfully:', authData);
-  
-      // 3. Optimistically update local user state
-      setUser((prev) => ({
-        ...prev,
-        user: {
-          ...prev.user,
-          user: {
-            ...prev.user.user,
-            user_metadata: {
-              ...prev.user.user.user_metadata,
-              name: userName
-            }
-          }
-        }
-      }));
-    }
+
   };
-  
-  
   
 
   return (
-    <FormControl>
-      {!userName && <InputLabel>User name</InputLabel>}
+    <FormControl title='userNameComp' >
+      {!userName && <InputLabel title='userNameComp'>User name</InputLabel>}
       <Input 
+      title='userNameComp'
         value={userName} 
         onChange={(e) => setUserName(e.target.value)} 
       />
-      <Button onClick={saveUserName} variant="contained" sx={{ mt: 2 }}>
+      <Button title='userNameComp' onClick={saveUserName} variant="contained" sx={{ mt: 2 }}>
         Save
       </Button>
     </FormControl>
   );
 };
-
 
 const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
     const {
@@ -159,7 +110,7 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
   };
 
 const AccountPage = ({size}) => {
-    const {alertProps, setAlertProps , user, setUser, avatar, isAdmin, logout} = useGlobalContext()
+    const {setAlertProps , user, avatar, isAdmin, logout, userData, sessionData, sessionState} = useGlobalContext()
     const nav = useNavigate()
     const [results, setResults] = useState([])
     const [submit, setSubmit] = useState(false)
@@ -170,14 +121,33 @@ const AccountPage = ({size}) => {
         'abstract', 'illustration', 'minimal', 'cartoon'
     ])
     const [pendingDeleteAccount, setPendingDeleteAccount] = useState()
-    const [canDelete, setCanDelete] = useState(false)
     const [hoverDelete, setHoverDelete] = useState(false)
     const [deleteTimeout, setDeleteTimeout] = useState(3)
     const [deleteError, setDeleteError] = useState()
+    const [displayName, setDisplayName] = useState()
+    
+
+    useEffect(() => {
+
+      if(userData?.email && !userData?.user_metadata?.display_name){
+        setDisplayName(userData.email)
+      }
+
+      if(userData?.user_metadata?.display_name){
+        setDisplayName(userData.user_metadata.display_name)
+      }
+
+      if(!userData && !sessionData){ 
+        nav('/login')
+      }
+
+    }, [userData, sessionData, sessionState])
+
+
 
     const handleDeleteAccount = async () => {
-      const accessToken = user?.user?.access_token;
-      const userId = user?.user?.user?.id;
+      const accessToken = sessionData?.access_token;
+      const userId = userData?.id;
     
       if (!accessToken || !userId) {
         console.error(`token: ${accessToken} id: ${userId}`);
@@ -235,10 +205,10 @@ const AccountPage = ({size}) => {
           await logout()
           setAlertProps({ text: 'Login successful', severity: 'success', display: true })
           nav('/account')
-      } catch (err) {
-        setAlertProps({ text: err.message, severity: 'error', display: true })
-      }
+        } catch (err) {
+          setAlertProps({ text: err.message, severity: 'error', display: true })
         }
+      }
 
   
     useEffect(() => {
@@ -258,7 +228,7 @@ const AccountPage = ({size}) => {
                     <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                       <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
-                        <Typography variant="h7">Welcome, {user?.metadata?.email}!</Typography>
+                        {displayName && <Typography variant="h7">Welcome, {displayName}!</Typography>}
                       </Stack>
                         <Stack width={'80%'}>
                           <Accordion>
@@ -272,8 +242,6 @@ const AccountPage = ({size}) => {
                                       <Typography>Account Details</Typography>
                                     </AccordionSummary>
                                     <AccordionDetails>
-
-
                                       <Accordion>
                                         <AccordionSummary>
                                           Change avatar
@@ -295,13 +263,13 @@ const AccountPage = ({size}) => {
                                       </Stack>
                                         </AccordionDetails>
                                       </Accordion>
-                                      
-                                      <Accordion>
-                                        <AccordionSummary>
+                                
+                                      <Accordion title='userNameAccordion'>
+                                        <AccordionSummary title='userNameAccordionSummary'>
                                           Change user name
                                         </AccordionSummary>
-                                          <AccordionDetails>
-                                              <UserName />
+                                          <AccordionDetails title='userNameAccordionDetails'>
+                                              <UserName/>
                                           </AccordionDetails>
                                       </Accordion>
 

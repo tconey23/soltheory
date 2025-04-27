@@ -8,7 +8,7 @@ import UserInfo from './UserInfo';
 
 const AdminRights = () => {
     const nav = useNavigate()
-    const {setAlertProps, user} = useGlobalContext()
+    const {setAlertProps, user, userData, udateAdmin} = useGlobalContext()
     const [userList, setUserList] = useState()
     const [columns, setColumns] = useState([])
     const [selectedUser, setSelectedUser] = useState()

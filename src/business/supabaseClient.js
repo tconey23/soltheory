@@ -11,15 +11,4 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-supabase.auth.onAuthStateChange(async (event, session) => {
-  if (event === 'SIGNED_IN') {
-    const { user } = session;
-    const { data, error } = await supabase
-      .from('users')
-      .upsert([{ primary_id: user.id, email: user.email }], { onConflict: 'primary_id' })
-      .select();
-    if (error) console.error('Error syncing user to Users table:', error);
-  }
-});
-
 window.supabase = supabase;
