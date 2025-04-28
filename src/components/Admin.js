@@ -187,17 +187,16 @@ import SixPicsButton from './games/SixPicsButton'
   };
 
 const Admin = ({size}) => {
-    const {alertProps, setAlertProps, user} = useGlobalContext() 
+    const {alertProps, setAlertProps, user, userMetaData} = useGlobalContext() 
     const [gameSelection, setGameSelection] = useState()
     const [userSelection, setUserSelection] = useState()
     const nav = useNavigate()
 
     useEffect(() =>{
-      // console.log(user.metadata.is_admin)
       switch(gameSelection){
-        case '6Pics': nav(user.metadata.is_admin ? '/account/admin/6pics' : '/error');
+        case '6Pics': nav(userMetaData?.is_admin ? '/account/admin/6pics' : '/error');
         break;
-        case '21Things': nav(user.metadata.is_admin ? '/account/admin/21things' : '/error');
+        case '21Things': nav(userMetaData?.is_admin ? '/account/admin/21things' : '/error');
         break;
       }
     }, [gameSelection])
@@ -262,9 +261,6 @@ const Admin = ({size}) => {
                 <MenuItem value={'adminrights'} sx={{margin: 1, height: '50px'}}>
                   <Typography>Manage admin rights</Typography>
                 </MenuItem>
-                {/* <MenuItem value={'userstatus'} sx={{margin: 1, height: '50px'}}>
-                  <Typography>Change user status</Typography>
-                </MenuItem> */}
             </Select>
         </Stack>
             

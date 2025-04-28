@@ -9,7 +9,7 @@ import { Stack } from "@mui/material";
 import {Modal} from "@mui/material";
 
 const AppHeader = () => {
-  const {alertProps, setAlertProps, isMobile, user, setUser, avatar} = useGlobalContext()
+  const {alertProps, setAlertProps, isMobile, user, setUser, avatar, userMetaData} = useGlobalContext()
   const [deferredPrompt, setDeferredPrompt] = useState(null);
   const [isReady, setIsReady] = useState(false);
   const [isInstalled, setIsInstalled] = useState(false);
@@ -159,7 +159,7 @@ const AppHeader = () => {
             </Avatar>
           </Button> */}
           <Button onClick={() => handleAccount()}>
-            <Avatar key={user} src={avatar ? avatar : null}/>
+            <Avatar key={user} src={avatar ? avatar : userMetaData?.avatar}/>
           </Button>
         </Toolbar>
       </Container>

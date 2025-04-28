@@ -6,7 +6,7 @@ import { useGlobalContext } from '../../business/GlobalContext'
 import { addGameToUser } from '../../business/apiCalls'
 
 const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
-  const { isMobile, setAlertProps, user} = useGlobalContext()
+  const { isMobile, setAlertProps, user, updateUserField, userMetaData} = useGlobalContext()
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const greenPrompt = selections[3]?.[0] || null
@@ -21,26 +21,30 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   }
 
   const handleSubmit = async () => {
+    let currentGameData = userMetaData?.game_data
     const gameData = {
+      id: Date.now(),
       game: 'TwentyOneThings',
       stages: [selections[1], selections[2], selections[3]],
       game_date: date,
       note,
     }
 
-    const result = await addGameToUser(user, gameData)
+    currentGameData.push(gameData)
+    console.log(currentGameData)
+
+    const result = await updateUserField({'game_data': currentGameData})
     console.log(result)
-    if (result?.disposition) {
+    if (result?.user?.user_metadata?.game_data) {
       setAlertProps({
-        text: result.message,
-        severity: result.disposition,
+        text: 'Successfully saved game data!',
+        severity: 'success',
         display: true,
       })
+      setCurrentStage(0)
+      setNote('')
+      setSelections({ 1: [], 2: [], 3: [], note: '' })
     }
-
-    setCurrentStage(0)
-    setNote('')
-    setSelections({ 1: [], 2: [], 3: [], note: '' })
   }
 
   const renderStageList = (stageKey, color) => (

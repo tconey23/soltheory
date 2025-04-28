@@ -10,13 +10,90 @@ import { findAvatars } from '../business/apiCalls';
 import { supabase } from '../business/supabaseClient';
 import { Box } from '@mui/system';
 
+const UserGames = () => {
+
+  const {userMetaData, updateUserField} = useGlobalContext()
+  const [gameData, setGameData] = useState()
+
+  useEffect(() => {
+    if(userMetaData?.game_data){
+      setGameData(userMetaData?.game_data)
+    }
+  }, [userMetaData])
+
+  const handleDelete = async (index) => {
+    let currentGameData = userMetaData?.game_data || [];
+    
+    const updatedGameData = currentGameData.filter((_, i) => i !== index);
+  
+    console.log('Updated game data:', updatedGameData);
+  
+    const res = await updateUserField({ game_data: updatedGameData });
+  
+    if (res) {
+      console.log('Game data updated successfully');
+    }
+  };
+
+  const games = ['TwentyOneThings', '6Pics']
+  
+
+  return (
+    <>
+    {games.map((g) => (
+
+      <Accordion>
+        <AccordionSummary>{g}</AccordionSummary>
+
+        <AccordionDetails>
+          {gameData?.map((d,i) => {
+            if(d.game === g){
+              return <>
+                        <Accordion>
+                          <AccordionSummary>
+                            {d.game_date}
+                          </AccordionSummary>
+                          <AccordionDetails>
+                            <Button onClick={() => handleDelete(i)}>
+                              <i class="fi fi-sr-trash"></i>
+                            </Button>
+                            {d.stages.map((s) => {
+                              return <Stack direction={'row'} justifyContent={'center'} marginY={2}>
+                                {s.map((p) => {
+                                  return (
+                                  <Stack borderRadius={5} boxShadow={`0px 0px 3px 4px ${p.color}`} padding={1} alignItems={'center'}  justifyContent={'center'} height={100} width={'11%'} marginX={1} bgcolor={p.color}>
+                                    <Typography sx={{width:'100%'}} alignItems={'center'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={12}>{p.prompt}</Typography>
+                                  </Stack>)
+                                })}
+                              </Stack>
+                            })}
+                         
+                            <Stack alignItems={'center'}  justifyContent={'center'} height={100} width={'100%'} marginX={1} bgcolor={'white'}>
+                              <Stack alignItems={'center'} height={100} width={'50%'} borderRadius={5} boxShadow={`0px 0px 3px 4px black`} padding={1}>
+                                <Typography sx={{height: '100%'}} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={12}>{d.note}</Typography>
+                              </Stack>
+                            </Stack>
+                          </AccordionDetails>
+                        </Accordion>
+                     </>
+            }
+          })}
+        </AccordionDetails>
+      </Accordion>
+      ))}
+    </>
+  )
+}
+
 const UserName = () => {
-  const { updateUser, setAlertProps } = useGlobalContext();
+  const { updateUser, setAlertProps, updateUserField } = useGlobalContext();
   const [userName, setUserName] = useState('');
 
   const saveUserName = async () => {
+
+
   
-    const updateRes = await updateUser(userName)
+    const updateRes = await updateUserField({'display_name': userName})
     if(updateRes?.data || updateRes?.user){
       setUserName('')
       setAlertProps({
@@ -44,12 +121,13 @@ const UserName = () => {
   );
 };
 
-const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
+const AvatarSelect = ({ search, setResults, results, submit, setSubmit, userMetaData }) => {
     const {
       user,
       avatar,
       setAvatar,
-      isMobile
+      isMobile,
+      updateUserField
     } = useGlobalContext();
     
 
@@ -64,13 +142,8 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
   
     const handleAvatarChange = async (selectedUrl) => {
       setNewAvatar(selectedUrl);
-      setAvatar(selectedUrl);
       
-      const { data, error } = await supabase
-      .from('users')
-      .update({ avatar: selectedUrl })
-      .eq('primary_id', user?.metadata?.primary_id)
-      .select()
+      updateUserField({avatar: selectedUrl})
         
     };
   
@@ -110,7 +183,7 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit }) => {
   };
 
 const AccountPage = ({size}) => {
-    const {setAlertProps , user, avatar, isAdmin, logout, userData, sessionData, sessionState} = useGlobalContext()
+    const {setAlertProps , user, avatar, isAdmin, logout, userData, sessionData, sessionState, userMetaData} = useGlobalContext()
     const nav = useNavigate()
     const [results, setResults] = useState([])
     const [submit, setSubmit] = useState(false)
@@ -125,7 +198,7 @@ const AccountPage = ({size}) => {
     const [deleteTimeout, setDeleteTimeout] = useState(3)
     const [deleteError, setDeleteError] = useState()
     const [displayName, setDisplayName] = useState()
-    
+    const [adminControls, setAdminControls] = useState()
 
     useEffect(() => {
 
@@ -192,6 +265,10 @@ const AccountPage = ({size}) => {
       }
     };
 
+    useEffect(() =>{
+      // console.log(userData)
+    }, [userData])
+
     useEffect(() => {
         if(imageType && avatarSearch){
             setSearchTerm(`${imageType} + ${avatarSearch}`)
@@ -227,8 +304,8 @@ const AccountPage = ({size}) => {
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
                     <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                       <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
-                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar} />
-                        {displayName && <Typography variant="h7">Welcome, {displayName}!</Typography>}
+                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={userMetaData?.avatar} />
+                        {displayName && <Typography variant="h7">Welcome, {userMetaData?.display_name}!</Typography>}
                       </Stack>
                         <Stack width={'80%'}>
                           <Accordion>
@@ -248,7 +325,7 @@ const AccountPage = ({size}) => {
                                         </AccordionSummary>
                                         <AccordionDetails>
                                         <Stack justifyContent={'center'} alignItems={'center'}>
-                                          <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={avatar}/>
+                                          <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={userMetaData?.avatar}/>
                                           <Select value={imageType} onChange={(e) => setImageType(e.target.value)}>  
                                               {avatarTerms.map((t, i) => (
                                                 <MenuItem key={i} value={t}>
@@ -273,6 +350,15 @@ const AccountPage = ({size}) => {
                                           </AccordionDetails>
                                       </Accordion>
 
+                                      <Accordion title='gameAccordion'>
+                                        <AccordionSummary title='gameAccordionSummary'>
+                                          My games
+                                        </AccordionSummary>
+                                          <AccordionDetails title='gameAccordionDetails'>
+                                              <UserGames />
+                                          </AccordionDetails>
+                                      </Accordion>
+
                                     </AccordionDetails>
                                   </Accordion>
                                     {isAdmin && 
@@ -282,6 +368,9 @@ const AccountPage = ({size}) => {
                                         </AccordionSummary>
                                         <AccordionDetails>
                                             <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
+                                              <Stack width={'25%'}>
+                                                {userMetaData?.is_super_admin && <Button onClick={() => nav('/account/admin/super_user_controls')}>Super User Controls</Button>}
+                                              </Stack>
                                                 <Admin size={size}/>
                                             </Stack>
                                         </AccordionDetails>
