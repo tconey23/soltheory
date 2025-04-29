@@ -405,10 +405,10 @@ const Pic6 = ({user}) => {
 
   const fetchGifs = async (name) => {
     const res = await getGifs(name)
-    console.log(res)
-    if(res && res.gifs){
-      const gifs = JSON.parse(res.gifs)
-      gifs.forEach((l, i) => {
+    if(res && res?.videos){
+      // const gifs = JSON.parse(res.videos[0])
+      res.videos.forEach((l, i) => {
+        console.log(l)
         setLevels(prev => [
           ...prev,
           {

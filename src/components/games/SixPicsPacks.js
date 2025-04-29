@@ -20,7 +20,7 @@ const PackButton = ({name, icon, iconType, hover}) => {
         <Stack
             padding={2} 
             direction={'row'}
-            height={100} justifyContent={'center'} alignItems={'center'}
+            height={100} justifyContent={'center'} alignItems={'center'} overflow={'hidden'}
             sx={{
 
                 transition: 'all 0.25s ease-in-out',
@@ -35,11 +35,11 @@ const PackButton = ({name, icon, iconType, hover}) => {
                     iconType === 'svg' ? 
                 <img height={'80px'}  src={icon}/>
                 :
-                <video ref={videoRef} style={{height: '60px', margin: 5}} muted autoplay loop>
+                <video ref={videoRef} style={{height: '200px', margin: 5}} muted autoplay loop>
                     <source src={icon} type="video/mp4"/>
                 </video>
                 }
-            <Typography fontSize={50} fontFamily={font}>{name.toUpperCase()}</Typography>
+            <Typography fontSize={25} fontFamily={font}>{name.toUpperCase()}</Typography>
         </Stack>
     )
 }
@@ -51,11 +51,13 @@ const SixPicsPacks = ({setGamePack, gamePack}) => {
     const [hover, setHover] = useState(false)
 
     const fetchPacks = async () => {
-        let { data: sixpicksvideos, error } = await supabase 
-        .from('sixpicksvideos')
+        let { data: sixpicspacks, error } = await supabase
+        .from('sixpicspacks')
         .select('*')
 
-        console.log(sixpicksvideos, error) 
+        if(sixpicspacks){
+            setPacks(sixpicspacks)
+        }
     }
 
 useEffect(() => {
@@ -65,20 +67,21 @@ useEffect(() => {
   return (
     <Stack direction={'column'} sx={{ height: '90%', width: '100%', scale: isMobile ? 0.8 : 1,}} justifyContent={'flex=start'} alignItems={'center'} >
         <Typography fontFamily={'Fredoka Regular'} fontSize={40}>Select Pack</Typography>
-        {/* <Stack sx={{overflow: 'auto'}}>
+        <Stack sx={{overflow: 'auto'}}>
             <List sx={{width: '100%'}}>
                 {packs && packs.map((p, i) => {
-                    console.log(p)
                     let fileType = p.graphic
-                    console.log(fileType)
                     return (
-                        <ListItem onClick={() => setGamePack(p.pack_name)} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
+                        <ListItem onClick={() => {
+                            console.log(p)
+                            setGamePack(p)
+                            }} onMouseOver={() => setHover(true)} onMouseOut={() => setHover(false)}>
                             <PackButton name={p.pack_name} icon={p.graphic} iconType={fileType} hover={hover}/>
                         </ListItem>
                     )
                 })}
             </List>
-        </Stack> */}
+        </Stack>
     </Stack>
   );
 };

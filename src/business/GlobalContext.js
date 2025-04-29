@@ -54,6 +54,37 @@ export const GlobalProvider = ({ children }) => {
     }
   }, [user])
 
+
+
+  const getUserData = async (to, from) => {
+
+    const capitalizeFirst = str => str.charAt(0).toUpperCase() + str.slice(1)
+
+    let { data: toUser, error: toErr } = await supabase
+      .from('users')
+      .select("*")
+      .eq('primary_id', to)
+
+    let { data: fromUser, error: fromErr } = await supabase
+      .from('users')
+      .select("*")
+      .eq('primary_id', from)
+
+    if(toUser && fromUser){
+      return {
+        to: `${capitalizeFirst(toUser?.[0].user_name)} (${toUser[0]?.email})`,
+        from: `${capitalizeFirst(fromUser?.[0].user_name)} (${fromUser[0]?.email})`
+      }
+    }
+
+    if(toUser){
+      return {
+        to: `${capitalizeFirst(toUser?.[0].user_name)} (${toUser[0]?.email})`
+      }
+    }
+
+  }
+
   useEffect(() => {
 
     if(sessionData || userData || user){
@@ -83,21 +114,20 @@ export const GlobalProvider = ({ children }) => {
     }
 }
 
-const updateUserField = async (field) => {
-  console.log(field)
-  const { data, error } = await supabase.auth.updateUser({
-    data: field
-  })
-  
-  if(data){
-    setUserData(data.user)
-    await getLoggedInUser()
-    return data
-  }
+const updateUserField = async (field, data) => {
+  console.log('field', field)
+  console.log('data', data)
+  console.log('user id', user?.primary_id)
 
-  if(error){
-    return error
-  }
+  const { data: response, error } = await supabase
+  .from('users')
+  .update({ [field]: data})
+  .eq('primary_id', user?.primary_id)
+  .select()
+
+  console.log('response', response)
+  console.log('error',error)
+  return 'success'
 }
 
   const updateUser = async (name) => {
@@ -261,6 +291,7 @@ const updateUserField = async (field) => {
     
     if(user) {
       setUser(user[0])
+      console.log(user)
       return user
     }
     
@@ -324,10 +355,11 @@ const updateUserField = async (field) => {
     
           // Now determine if it's inbound or outbound
           const isInbound = message.to.primary_id === user.sub;
+          const isOutbound = message.from.primary_id === user.sub
     
           setMessages(prev => ({
             inbound: isInbound ? [...prev.inbound, message] : prev.inbound,
-            outbound: !isInbound ? [...prev.outbound, message] : prev.outbound
+            outbound: isOutbound ? [...prev.outbound, message] : prev.outbound
           }));
     
         } catch (error) {
@@ -338,21 +370,29 @@ const updateUserField = async (field) => {
     
 
     const initialFetch = async () => {
+      const userId = user?.primary_id;
+      if (!userId || !messages.inbound || !messages.outbound) return;
+      // console.log('userId', userId)
+    
       try {
         const { data: messData, error } = await supabase
-          .from('messaging')
-          .select('*')
-          .or(`to->>primary_id.eq.${user?.sub},from->>primary_id.eq.${user?.sub}`); 
-          // ← this fetches messages either *to* or *from* the user
+        .from('messaging')
+        .select('*')
+        .or(`to.eq.${userId},from.eq.${userId}`);
+
+          // console.log(`to.eq.${userId},from.eq.${userId}`)
+          // console.log('messData', messData)
+          // console.log('error', error)
     
         if (messData) {
+          // console.log('[Fetched messages]', messData);
           handleDecrypt(messData);
         } else if (error) {
-          console.log(error);
+          // console.error('[Supabase error]', error);
           throw new Error(error);
         }
       } catch (err) {
-        console.log(err);
+        console.error('[initialFetch error]', err);
       }
     };
 
@@ -371,23 +411,23 @@ const updateUserField = async (field) => {
           schema: 'public',
           table: 'messaging',
         }, async (payload) => {
-          // console.log('[Realtime payload]', payload);
-          // console.log(payload.new.to, user.primary_id)
-    
+
           const message = payload.new || payload.old;
           if (!message) return;
 
-          console.log(message)
-    
+          
           const isInbound = message?.to === user?.primary_id;
           const isOutbound = message?.from === user?.primary_id;
-          // const inboundId = messages?.inbound.find(m => m.message_id !== message.message_id)
-          // const outboundId = messages?.outbound.find(m => m.message_id !== message.message_id)
-    
-          // console.log(isInbound, isOutbound)
 
-          if (!isInbound && !isOutbound) return; // Ignore messages not related to user
-          // if (!inboundId && !outboundId) return
+          const dataPackage = {
+            payload: payload,
+            message: message,
+            isInbound: isInbound,
+            isOutbound: isOutbound,
+            toId: message?.to,
+            fromId: message?.from,
+            userId: user?.primary_id
+          }
 
           if (payload.eventType === 'DELETE') {
             setMessages(prev => ({
@@ -397,15 +437,18 @@ const updateUserField = async (field) => {
 
               initialFetch()
           }
-    
-    
+
+          
+          if (!isInbound && !isOutbound){
+            return 
+          }
+ 
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const decryptedMessage = await decryptRealtime(message);
             
             setMessages(prev => {
               const newInbound = [...prev.inbound];
               const newOutbound = [...prev.outbound];
-              console.log(isInbound)
               if (isInbound) {
                 // Remove old if exists
                 const idx = newInbound.findIndex(m => m.id === decryptedMessage.id);
@@ -423,13 +466,13 @@ const updateUserField = async (field) => {
               newInbound.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
               newOutbound.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
               
-            
               return {
                 inbound: newInbound,
                 outbound: newOutbound
               };
             });
           }
+          
         })
         .subscribe();
     
@@ -446,8 +489,10 @@ const updateUserField = async (field) => {
         event: '*',
         schema: 'public',
         table: 'users',
-        filter: `primary_id=eq.${userData?.id}`
+        filter: `primary_id=eq.${user?.primary_id}`
       }, (payload) => {
+
+        console.log(payload)
   
         if (payload.eventType === 'UPDATE') {
           const { avatar, friends, game_data, is_admin } = payload.new;
@@ -459,7 +504,7 @@ const updateUserField = async (field) => {
             is_admin: is_admin
           };
   
-          updateUserField(fields);
+          getUserTable(user?.primary_id)
           
           setIsAdmin(is_admin);  
         }
@@ -469,7 +514,7 @@ const updateUserField = async (field) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [userData?.id]);
+  }, [user?.primary_id]);
 
   const windowGetLoggedInUser = async () => {
     const res = await getLoggedInUser()
@@ -507,7 +552,7 @@ const updateUserField = async (field) => {
 
   useEffect(() => {
       setMessageKey(prev => prev +1)
-      console.log(messages)
+      // console.log(messages)
   }, [messages.inbound, messages.outbound])
 
   useEffect(() =>{
@@ -551,7 +596,8 @@ const updateUserField = async (field) => {
         setMessages,
         initialFetch,
         messageKey,
-        setMessageKey
+        setMessageKey,
+        getUserData
       }}
     >
       {children}

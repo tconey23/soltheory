@@ -8,8 +8,9 @@ import { generateCipherKey, importKeyFromBase64, encryptWithKey } from '../busin
 import { sendPush } from '../business/apiCalls';
 
 export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
-  const { user} = useGlobalContext();
+  const { user, getUserData} = useGlobalContext();
   const [to, setTo] = useState();
+  const [toData, setToData] = useState()
   const [subject, setSubject] = useState();
   const [messageText, setMessageText] = useState();
   const [file, setFile] = useState(null);
@@ -22,7 +23,6 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
   };
 
   const uploadFile = async () => {
-    console.log(file)
     if (!file) return null;
 
     const filePath = `${user?.metadata?.primary_id}/${Date.now()}_${file.name}`;
@@ -53,7 +53,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
 
     const payload = {
       from: user.primary_id,
-      to: to.primary_id,
+      to: to,
       subject: encryptedSubject.data,
       subject_iv: encryptedSubject.iv,
       message_content: encryptedMessage.data,
@@ -63,7 +63,6 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
       is_solreq: solMate ? true : false,
       message_cipher_key: messageCipherKeyBase64
     };
-    console.log(payload)
 
     try {
       const { data, error } = await supabase.from('messaging').insert([payload]).select();
@@ -88,6 +87,14 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
     if (users) setSuggestions(users);
   };
 
+  const fetchUser = async (toUser, fromUser) => {
+    const tofrom = await getUserData(toUser, fromUser)
+
+    if(tofrom) {
+        setToData(tofrom.to)
+    }
+}
+
   useEffect(() => {
     getUserSuggestions();
   }, []);
@@ -100,7 +107,8 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
 
   useEffect(() => {
     if (solMate) {
-      setTo(solMate);
+      fetchUser(solMate.id, null)
+      setTo(solMate.id);
       setSubject('SOL Mate request');
       setMessageText("Let's be SOL Mates!");
     }
@@ -112,7 +120,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
         {!to && <InputLabel>To:</InputLabel>}
         <Input
           disabled={solMate}
-          value={to?.email || ""}
+          value={to?.email || toData}
           onFocus={() => setShowSuggestions(true)}
           onChange={(e) => setTo(e.target.value)}
         />

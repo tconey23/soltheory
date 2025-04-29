@@ -15,7 +15,7 @@ const ReceivedMessages = () => {
   return (
     <TableBody key={messageKey}>
       {messages?.inbound?.map((m) => (
-        <MessageItem key={m.message_id} data={m} /> 
+        <MessageItem key={m.message_id} data={m} origin={'received'}/> 
       ))}
     </TableBody>
   );

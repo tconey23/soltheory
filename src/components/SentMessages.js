@@ -18,7 +18,7 @@ const SentMessages = ({ user }) => {
         ?.slice()
         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         .map((m) => (
-          <MessageItem key={m.message_id} data={m} />
+          <MessageItem key={m.message_id} data={m} origin={'sent'}/>
       ))}
     </TableBody>
   );

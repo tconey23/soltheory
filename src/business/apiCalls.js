@@ -3,7 +3,6 @@ import { supabase } from "./supabaseClient";
 
 
 export const sendPush = async (to, from, message) => {
-    console.log(to, from, message);
     await fetch('https://bueukhsebcjxwebldmmi.functions.supabase.co/send-email', {
       method: 'POST',
       headers: {
@@ -316,13 +315,12 @@ const addFriend = async (user, friend) => {
     
 
     const getGifs = async (packName) => {
-        console.log(packName)
         try {  
 
         let { data, error } = await supabase
         .from('sixpicspacks')
         .select("*")
-        .eq('pack_name', packName)
+        .eq('pack_name', packName?.pack_name)
 
         if(data && data[0]){
             return data[0]
@@ -570,16 +568,119 @@ const addFriend = async (user, friend) => {
         }
     }
 
-    const findAvatars = async (query) => {
-        const res = await fetch(`https://api.unsplash.com/search/photos?query=${query ? query : 'abstract'}&per_page=10&client_id=9IrboRmW-r0KlptyqhiWGlB4Bt_QWPOR4Y11SS5wxAs`)
-        const data = await res.json()
-
-        if(data.total > 0 && data.results.length > 0) {
-            return data
-        } else {
-            return 'Search returned 0 results'
+    const openverseAPI = async () => {
+      try {
+        const res = await fetch(`https://api.openverse.org/v1/auth_tokens/register/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: "SolTheory",
+            description: "Health and wellness app",
+            email: "tom@soltheory.com"
+          })
+        });
+    
+        if (!res.ok) {
+          throw new Error(`Request failed: ${res.status}`);
         }
-    }    
+    
+        const data = await res.json();
+        console.log('✅ Token registration success:', data);
+    
+      } catch (error) {
+        console.error('❌ Token registration error:', error);
+      }
+    };
+
+    const getAccessToken = async () => {
+      const res = await fetch('https://api.openverse.org/v1/auth_tokens/token/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          client_id: '32L2fWIjueTLZ6fnoQNrOa9zZxWe4Ke81OnVdamS',
+          client_secret: '9yZkCno7YnPm4vYYYPyGfYPuWfUAfvGk4u2vXt3du2LVeYrj3A5Xoo7q5K4BvHCmo1FQ0MrQ8a8PbEBvz3Mog6AHY93007gVRKKg0CBpdNzpLaAnEXCnAhdTOqi1aKou',
+          grant_type: 'client_credentials'
+        })
+      });
+    
+      const data = await res.json();
+ 
+      return data.access_token;
+    };
+
+  
+
+    const findAvatars = async (query, mature, cat) => {
+      const token = await getAccessToken();
+    
+      let page = 1;
+      const pageSize = 20;
+      let allMatchingImages = [];
+      let maxPages = 5
+
+    
+      while (page <= maxPages) {
+
+    
+        const endpoint = `https://api.openverse.org/v1/images?q=${encodeURIComponent(query)}&page=${page}`
+          + (mature ? `&mature=${mature}` : '')
+          + (cat ? `&category=${encodeURIComponent(cat)}` : '');
+    
+          console.log(endpoint)
+    
+        try {
+          const res = await fetch(endpoint, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+    
+          if (!res.ok) {
+            console.error(`❌ Error fetching page ${page}:`, res.status, res.statusText);
+            break;
+          }
+    
+          const { results } = await res.json();
+    
+          if (!results || results.length === 0) {
+            console.log('⚠️ No more results.');
+            break;
+          }
+    
+          // Filter: must have tags and match the query string
+          const matching = results.filter(image => {
+            return (
+              image.tags &&
+              image.tags.length > 0 &&
+              image.tags.some(tag =>
+                tag.name.toLowerCase().includes(query.toLowerCase())
+              )
+            );
+          });
+    
+          allMatchingImages.push(...matching);
+    
+    
+          if (allMatchingImages.length >= 30) {
+            console.log('🎯 Found enough matching images. Stopping early.');
+            break;
+          }
+    
+          page++;
+        } catch (error) {
+          console.error('❌ Fetch failed:', error);
+          break;
+        }
+      }
+    
+      return allMatchingImages;
+    };
+    
+    
 
     const updateUserAvatar = async (userId, avatarUrl) => {
         const { data, error } = await supabase

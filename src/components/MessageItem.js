@@ -4,11 +4,29 @@ import { supabase } from '../business/supabaseClient';
 import FullMessage from './FullMessage';
 import { useGlobalContext } from '../business/GlobalContext';
 
-export const MessageItem = ({data}) => {
-    const {isMobile} = useGlobalContext()
+export const MessageItem = ({data, origin}) => {
+    const {isMobile, getUserData} = useGlobalContext()
     const [isHover, setIsHover] = useState(false)
     const [pendingDelete, setPendingDelete] = useState(false)
     const [selectedMessage, setSelectedMessage] = useState(null)
+    const [to, setTo] = useState()
+    const [from, setFrom] = useState()
+    
+    const fetchUser = async (toUser, fromUser) => {
+
+        const tofrom = await getUserData(toUser, fromUser)
+
+        if(tofrom) {
+            setTo(tofrom.to)
+            setFrom(tofrom.from)
+        }
+    }
+
+    useEffect(() => {
+        if(data.to && data.from){
+            fetchUser(data.to, data.from)
+        }
+    }, [data])
 
     const handleDelete = async (data) => {
         try {
@@ -77,7 +95,7 @@ export const MessageItem = ({data}) => {
                             setSelectedMessage(data)
                         }
                     }}
-                >{data.from.email}</TableCell>
+                >{origin === 'sent' ? to : from}</TableCell>
                 <TableCell 
                     open
                     onClick={(e) =>{ 

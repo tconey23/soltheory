@@ -1,5 +1,5 @@
-import { use, useEffect, useRef, useState } from 'react';
-import { Accordion, AccordionDetails, AccordionSummary, FormControl, FormLabel, ImageList, Input, InputLabel, MenuItem, Modal, Select, Stack, TextField, Tooltip } from '@mui/material';
+import { lazy, Suspense, use, useEffect, useRef, useState } from 'react';
+import { Accordion, AccordionDetails, AccordionSummary, FormControl, FormLabel, ImageList, Input, InputLabel, MenuItem, Modal, Select, Stack, TextField, Tooltip, ImageListItem, CircularProgress, ImageListItemBar, Switch } from '@mui/material';
 import {Avatar} from '@mui/material';
 import {Typography} from '@mui/material';
 import {Button} from '@mui/material';
@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { findAvatars } from '../business/apiCalls';
 import { supabase } from '../business/supabaseClient';
 import { Box } from '@mui/system';
+const LazyImage = lazy(() => import('./ImageComponent'))
+
 
 const UserGames = () => {
 
@@ -90,11 +92,10 @@ const UserName = () => {
   const [userName, setUserName] = useState('');
 
   const saveUserName = async () => {
-
-
   
-    const updateRes = await updateUserField({'display_name': userName})
-    if(updateRes?.data || updateRes?.user){
+    const updateRes = await updateUserField('user_name', userName)
+    console.log(updateRes)
+    if(updateRes === 'success'){
       setUserName('')
       setAlertProps({
         text: 'User name updated!',
@@ -121,66 +122,113 @@ const UserName = () => {
   );
 };
 
-const AvatarSelect = ({ search, setResults, results, submit, setSubmit}) => {
-    const {
-      user,
-      avatar,
-      setAvatar,
-      isMobile,
-      updateUserField
-    } = useGlobalContext();
-    
+const ImageDisplay = ({ i, handleAvatarChange, url, mature, meta, thumb}) => {
 
-    const [newAvatar, setNewAvatar] = useState('');
-    const [images, setImages] = useState([]);
-  
-    const searchAvatars = async () => {
-      const res = await findAvatars(search);
-      setResults(res);
-      setSubmit(false);
-    };
-  
-    const handleAvatarChange = async (selectedUrl) => {
-      setNewAvatar(selectedUrl);
-      
-      updateUserField({avatar: selectedUrl})
-        
-    };
-  
-    useEffect(() => {
-      if (results?.results?.length > 0) {
-        setImages(results.results.map((r, i) => (
-          <MenuItem key={i} value={r.urls.small}>
-            <Stack direction="row" spacing={2} alignItems="center">
-              <Avatar src={r.urls.small} sx={{ width: 32, height: 32 }} />
-              <span>{`Avatar ${i + 1}`}</span>
-            </Stack>
-          </MenuItem>
-        )));
-      }
-    }, [results]);
-  
-    useEffect(() => {
-      if (search && submit) {
-        searchAvatars();
-      }
-    }, [search, submit]);
-  
-    return (
-      <Stack width={'100%'} maxWidth={isMobile ? '100%' : '300px'} overflow={'scroll'}>
-        <Select
-          fullWidth
-          value={newAvatar || avatar || ''}
-          onChange={(e) => handleAvatarChange(e.target.value)}
-          renderValue={(selected) => (
-            <Avatar src={selected} sx={{ width: 32, height: 32 }} />
-          )}
-        >
-          {images}
-        </Select>
+  const [imgLoaded, setImgLoaded] = useState(false)
+
+  return (
+    <ImageListItem 
+    key={i}
+    sx={{ cursor: 'pointer', position: 'relative', alignItems: 'center'}}
+    onClick={() => handleAvatarChange(url)}
+  >
+    {!imgLoaded && (
+      <Stack
+        position="absolute"
+        top="50%"
+        left="50%"
+        sx={{ transform: 'translate(-50%, -50%)' }}
+      >
+        <CircularProgress size={24} />
       </Stack>
-    );
+    )}
+
+    <Tooltip followCursor title={
+      <img
+        src={url}
+        alt="Thumbnail"
+        style={{ width: 500, height: 500, borderRadius: 8 }}
+      />
+    }>
+
+      <img
+        src={`${thumb}?w=200&h=200&fit=crop&auto=format`}
+        srcSet={`${thumb}?w=200&h=200&fit=crop&auto=format&dpr=2 2x`}
+        alt={thumb}
+        style={{
+          filter: mature ? 'blur(10px)' : 'blur(0px)',
+          height: '100%',
+          width: '75%',
+          opacity: imgLoaded ? 1 : 0, // 🔥 smooth fade-in
+          transition: 'opacity 0.3s ease'
+        }}
+        onLoad={() => setImgLoaded(true)} // ✅ will now fire
+        />
+    </Tooltip>
+          <ImageListItemBar title={meta.title} subtitle={meta.creator}/>
+  </ImageListItem>
+  )
+}
+
+const AvatarSelect = ({ search, setResults, results, submit, setSubmit, imageType, mature, setSearchTerm}) => {
+  const { user, avatar, setAvatar, isMobile, updateUserField } = useGlobalContext();
+
+  const [newAvatar, setNewAvatar] = useState('');
+  const [images, setImages] = useState([]);
+  const [maxResults, setMaxResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+
+
+  const searchAvatars = async () => {
+    const res = await findAvatars(search, mature, imageType);
+    console.log(res);
+    setResults(res);
+    setSubmit(false);
   };
+
+  const handleAvatarChange = async (selectedUrl) => {
+    setNewAvatar(selectedUrl);
+    updateUserField('avatar', selectedUrl);
+    setSearchTerm('')
+    setImages([])
+  };
+
+  useEffect(() => {
+    if(currentPage > 1){
+      setImages([])
+      searchAvatars()
+    }
+  }, [currentPage])
+
+  useEffect(() => {
+    if (results?.length > 0) {
+      setMaxResults(results?.length);
+      setImages(results);
+    }
+  }, [results]);
+
+  useEffect(() => {
+    if (search && submit) {
+      setCurrentPage(1)
+      setImages([]);
+      searchAvatars();
+    }
+  }, [search, submit]);
+
+  return (
+    <Stack width="100%" maxWidth={isMobile ? '100%' : '100%'} overflow="auto">
+      <ImageList variant="standard" sx={{ width: '100%', height: '100%', maxHeight: 250 }} cols={2} rowHeight={200}>
+        {images.map((r, i) => {
+          const url = r.url;
+          const thumb = r.thumbnail;
+          return (
+            <ImageDisplay i={i} handleAvatarChange={handleAvatarChange} url={url} mature={r.mature} meta={r} thumb={thumb}/>
+          );
+        })}
+      </ImageList>
+    </Stack>
+  );
+};
 
 const AccountPage = ({size}) => {
     const {setAlertProps, isAdmin, logout, userData, sessionData, sessionState, user} = useGlobalContext()
@@ -188,17 +236,17 @@ const AccountPage = ({size}) => {
     const [results, setResults] = useState([])
     const [submit, setSubmit] = useState(false)
     const [searchTerm, setSearchTerm] = useState()
-    const [imageType, setImageType] = useState('abstract')
+    const [imageType, setImageType] = useState('digitized_artwork')
     const [avatarSearch, setAvatarSearch] = useState()
     const [avatarTerms, setAvatarTerms] = useState([
-        'abstract', 'illustration', 'minimal', 'cartoon'
+        'photograph', 'abstract', 'digitized_artwork', 'minimal', 'cartoon'
     ])
     const [pendingDeleteAccount, setPendingDeleteAccount] = useState()
     const [hoverDelete, setHoverDelete] = useState(false)
     const [deleteTimeout, setDeleteTimeout] = useState(3)
     const [deleteError, setDeleteError] = useState()
     const [displayName, setDisplayName] = useState()
-    const [adminControls, setAdminControls] = useState()
+    const [mature, setMature] = useState(false)
 
     useEffect(() => {
 
@@ -271,7 +319,7 @@ const AccountPage = ({size}) => {
 
     useEffect(() => {
         if(imageType && avatarSearch){
-            setSearchTerm(`${imageType} + ${avatarSearch}`)
+            setSearchTerm(`${avatarSearch}`)
         }
     }, [imageType, avatarSearch])
 
@@ -305,7 +353,7 @@ const AccountPage = ({size}) => {
                     <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                       <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
                         <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={user?.avatar} />
-                        {displayName && <Typography variant="h7">Welcome, {user?.display_name}!</Typography>}
+                        {displayName && <Typography variant="h7">Welcome, {user?.user_name || user?.email}!</Typography>}
                       </Stack>
                         <Stack width={'80%'}>
                           <Accordion>
@@ -335,8 +383,9 @@ const AccountPage = ({size}) => {
                                           </Select>
                                           <FormLabel>Image Search Term</FormLabel>
                                           <TextField value={avatarSearch} onChange={(e) => setAvatarSearch(e.target.value)}/>
+                                            <Switch checked={mature} onChange={() => setMature(prev => !prev)}/>
                                           <Button onClick={() => setSubmit(true)} >Search</Button>
-                                          <AvatarSelect results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit}/>
+                                          <AvatarSelect setSearchTerm={setSearchTerm} results={results} setResults={setResults} search={searchTerm} submit={submit} setSubmit={setSubmit} imageType={imageType} mature={mature}/>
                                       </Stack>
                                         </AccordionDetails>
                                       </Accordion>
