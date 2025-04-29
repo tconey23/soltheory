@@ -414,7 +414,7 @@ const Pic6 = ({user}) => {
           {
             level: i,
             score: 100,
-            url: l.url,
+            url: l.public_url,
             answer: l.answer
           }
         ])
