@@ -134,7 +134,7 @@ console.log(newFilter)
       </Stack>
       <Modal open={selectedUser}>
         <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-              <SuperUserDetail user={selectedUser}/>
+              <SuperUserDetail user={selectedUser} setUser={setSelectedUser}/>
         </Stack>
       </Modal>
     </Stack>

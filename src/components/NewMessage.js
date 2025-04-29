@@ -8,7 +8,7 @@ import { generateCipherKey, importKeyFromBase64, encryptWithKey } from '../busin
 import { sendPush } from '../business/apiCalls';
 
 export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
-  const { user } = useGlobalContext();
+  const { user, userMetaData } = useGlobalContext();
   const [to, setTo] = useState();
   const [subject, setSubject] = useState();
   const [messageText, setMessageText] = useState();
@@ -52,7 +52,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
     const encryptedMessage = await encryptWithKey(messageText, messageCryptoKey);
 
     const payload = {
-      from: user?.metadata,
+      from: userMetaData,
       to: to,
       subject: encryptedSubject.data,
       subject_iv: encryptedSubject.iv,
@@ -63,7 +63,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
       is_solreq: solMate ? true : false,
       message_cipher_key: messageCipherKeyBase64
     };
-    // console.log(payload)
+    console.log(payload)
 
     try {
       const { data, error } = await supabase.from('messaging').insert([payload]).select();

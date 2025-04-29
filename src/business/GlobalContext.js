@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { useMediaQuery } from '@mui/material';
 import { supabase } from './supabaseClient';
-
+import { decryptWithKey, importKeyFromBase64 } from '../business/cryptoUtils';
 
 const GlobalContext = createContext(); 
  
@@ -22,7 +22,12 @@ export const GlobalProvider = ({ children }) => {
   const [sessionData, setSessionData] = useState()
   const [userData, setUserData] = useState()
   const [userMetaData, setUserMetaData] = useState()
+  const [allUsers, setAllUsers] = useState()
   const justLoggedIn = useRef(false);
+  const [messages, setMessages] = useState({ inbound: [], outbound: [] });
+  const [messageKey, setMessageKey] = useState(0)
+  const [deleteKey, setDeleteKey] = useState(0)
+
 
 
   const degrees = (degrees) => degrees * (Math.PI / 180);
@@ -217,6 +222,10 @@ const updateUserField = async (field) => {
     }
 
   }
+
+  const getUserById = async () => {
+
+  }
   
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -238,6 +247,152 @@ const updateUserField = async (field) => {
     };
   }, []);
 
+    const decryptRealtime = async (data) => {
+      try {
+        const base64Key = data.message_cipher_key;
+        if (!base64Key) throw new Error("No message cipher key attached");
+        const key = await importKeyFromBase64(base64Key);
+        const decSub = await decryptWithKey(data.subject, data.subject_iv, key);
+        const decMess = await decryptWithKey(data.message_content, data.message_iv, key);
+  
+        data.subject = decSub;
+        data.message_content = decMess;
+  
+        return data;
+      } catch (err) {
+        console.error("Realtime decryption failed:", err);
+        return data;
+      }
+    };
+
+    const handleDecrypt = async (messData) => {
+      setMessages({ inbound: [], outbound: [] }); // reset
+    
+      for (let message of messData) {
+        try {
+          const base64Key = message.message_cipher_key;
+          if (!base64Key) continue;
+          const key = await importKeyFromBase64(base64Key);
+          const decSub = await decryptWithKey(message.subject, message.subject_iv, key);
+          const decMess = await decryptWithKey(message.message_content, message.message_iv, key);
+    
+          message.subject = decSub;
+          message.message_content = decMess;
+    
+          // Now determine if it's inbound or outbound
+          const isInbound = message.to.primary_id === userMetaData.sub;
+    
+          setMessages(prev => ({
+            inbound: isInbound ? [...prev.inbound, message] : prev.inbound,
+            outbound: !isInbound ? [...prev.outbound, message] : prev.outbound
+          }));
+    
+        } catch (error) {
+          console.error("Failed decrypting message:", message, error);
+        }
+      }
+    };
+    
+
+    const initialFetch = async () => {
+      try {
+        const { data: messData, error } = await supabase
+          .from('messaging')
+          .select('*')
+          .or(`to->>primary_id.eq.${userMetaData?.sub},from->>primary_id.eq.${userMetaData?.sub}`); 
+          // ← this fetches messages either *to* or *from* the user
+    
+        if (messData) {
+          handleDecrypt(messData);
+        } else if (error) {
+          console.log(error);
+          throw new Error(error);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    useEffect(() =>{
+      if(userMetaData){
+        initialFetch()
+      }
+    }, [userMetaData])
+    
+
+    useEffect(() => {
+      const channel = supabase
+        .channel('messaging')
+        .on('postgres_changes', {
+          event: '*',
+          schema: 'public',
+          table: 'messaging',
+        }, async (payload) => {
+          console.log('[Realtime payload]', payload);
+    
+          const message = payload.new || payload.old;
+          if (!message) return;
+    
+          const isInbound = message?.to?.primary_id === userMetaData?.sub;
+          const isOutbound = message?.from?.primary_id === userMetaData?.sub;
+          const inboundId = messages?.inbound.find(m => m.message_id !== message.message_id)
+          const outboundId = messages?.outbound.find(m => m.message_id !== message.message_id)
+    
+          console.log(inboundId, outboundId)
+
+          if (!isInbound && !isOutbound) return; // Ignore messages not related to user
+          if (!inboundId && !outboundId) return
+
+          if (payload.eventType === 'DELETE') {
+            setMessages(prev => ({
+                  inbound: prev.inbound.filter(m => m.message_id !== message.message_id),
+                  outbound: prev.outbound.filter(m => m.message_id !== message.message_id)
+              }))
+
+              initialFetch()
+          }
+    
+    
+          if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
+            const decryptedMessage = await decryptRealtime(message);
+    
+            setMessages(prev => {
+              const newInbound = [...prev.inbound];
+              const newOutbound = [...prev.outbound];
+    
+              if (isInbound) {
+                // Remove old if exists
+                const idx = newInbound.findIndex(m => m.id === decryptedMessage.id);
+                if (idx >= 0) newInbound.splice(idx, 1);
+                newInbound.push(decryptedMessage);
+              }
+    
+              if (isOutbound) {
+                const idx = newOutbound.findIndex(m => m.id === decryptedMessage.id);
+                if (idx >= 0) newOutbound.splice(idx, 1);
+                newOutbound.push(decryptedMessage);
+              }
+    
+              // Optional: sort each array by newest first
+              newInbound.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              newOutbound.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+              
+            
+              return {
+                inbound: newInbound,
+                outbound: newOutbound
+              };
+            });
+          }
+        })
+        .subscribe();
+    
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    }, [userMetaData]);
+    
+    
   useEffect(() => {
     const channel = supabase
       .channel('user-updates')
@@ -258,12 +413,9 @@ const updateUserField = async (field) => {
             is_admin: is_admin
           };
   
-          console.log(fields);
-  
-          updateUserField(fields); // ✅ updates metadata
+          updateUserField(fields);
           
-          // ⬇️ ⬇️ ⬇️ ADD THIS
-          setIsAdmin(is_admin);    // ✅ updates the top-level isAdmin state immediately
+          setIsAdmin(is_admin);  
         }
       })
       .subscribe();
@@ -282,7 +434,6 @@ const updateUserField = async (field) => {
   const fetchAuthUsers = async () => {
 
     try {
-
       const res = await fetch('https://bueukhsebcjxwebldmmi.supabase.co/auth/v1/admin/users', {
         method: 'GET',
         headers: {
@@ -291,20 +442,34 @@ const updateUserField = async (field) => {
         }
       });
       
-      const allUsers = await res.json();
-      if(allUsers){
-        return allUsers
-      } else {throw new Error(allUsers)}
+      const authUsers = await res.json();
+      if(authUsers){
+        setAllUsers(authUsers)
+        return authUsers
+      } else {throw new Error(authUsers)}
 
     } catch (err){
       console.log(err)
     }
   }
 
-  // fetchAuthUsers()
+  useEffect(() =>{
+    if(!allUsers){
+      fetchAuthUsers()
+    }
+  }, [])
 
+  useEffect(() => {
+      setMessageKey(prev => prev +1)
+      console.log(messages)
+  }, [messages.inbound, messages.outbound])
 
+  useEffect(() =>{
+    console.log(deleteKey)
+    initialFetch()
+  }, [deleteKey])
 
+  window.setMessageKey = setMessageKey
   window.updateAdmin = updateAdmin
   window.getLoggedInUser = windowGetLoggedInUser
   
@@ -331,7 +496,14 @@ const updateUserField = async (field) => {
         updateAdmin,
         updateUserField,
         userMetaData,
-        fetchAuthUsers
+        fetchAuthUsers,
+        getUserById,
+        allUsers,
+        messages, 
+        setMessages,
+        initialFetch,
+        messageKey,
+        setMessageKey
       }}
     >
       {children}
