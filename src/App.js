@@ -24,7 +24,7 @@ import RestrictedArea from './components/RestrictedArea';
 
 function App() {
   const [toggleQuit, setToggleQuit] = useState(false)
-  const {alertProps, setAlertProps, user, setUser, userMetaData} = useGlobalContext()
+  const {alertProps, setAlertProps, user, setUser} = useGlobalContext()
 
   useEffect(()=>{
     if(toggleQuit){
@@ -71,7 +71,7 @@ function App() {
               <Route path='account/admin/21things' element={<AddPrompts />}/>
               <Route path='account/admin/6pics' element={<SPAdminWrapper />}/>
               <Route path='account/admin/adminrights' element={<AdminRights />}/>
-              <Route path='account/admin/super_user_controls' element={userMetaData?.is_super_admin ? <SuperUserControls  /> : <RestrictedArea />}/>
+              <Route path='account/admin/super_user_controls' element={user?.is_super_admin ? <SuperUserControls  /> : <RestrictedArea />}/>
             {!toggleQuit && 
               <>
                 <Route path="/21Things" element={<GamePageComp setToggleQuit={setToggleQuit} user={user} setUser={setUser} selectedGame={{name: '21things', displayName: '21 Things', component: TwentyOneThings}}/>}/>

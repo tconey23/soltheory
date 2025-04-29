@@ -6,7 +6,11 @@ import { decryptWithKey, importKeyFromBase64 } from '../business/cryptoUtils';
 const GlobalContext = createContext(); 
  
 export const GlobalProvider = ({ children }) => {
+
   const [user, setUser] = useState(null);
+  const [authUser, setAuthUser] = useState()
+
+
   const [alertProps, setAlertProps] = useState({
     text: 'this is an alert',
     severity: 'success',
@@ -21,7 +25,6 @@ export const GlobalProvider = ({ children }) => {
   const [sessionState, setSessionState] = useState()
   const [sessionData, setSessionData] = useState()
   const [userData, setUserData] = useState()
-  const [userMetaData, setUserMetaData] = useState()
   const [allUsers, setAllUsers] = useState()
   const justLoggedIn = useRef(false);
   const [messages, setMessages] = useState({ inbound: [], outbound: [] });
@@ -30,20 +33,14 @@ export const GlobalProvider = ({ children }) => {
 
 
 
+
   const degrees = (degrees) => degrees * (Math.PI / 180);
 
   useEffect(() => {
-    if(userMetaData && userMetaData?.['is_admin']){
-      setIsAdmin(userMetaData?.['is_admin'])
+    if(user && user?.['is_admin']){
+      setIsAdmin(user?.['is_admin'])
     }
-  }, [userMetaData])
-
-  useEffect(() => {
-    if(userData?.user_metadata){
-      setUserMetaData(userData.user_metadata)
-    }
-
-  }, [userData])
+  }, [user])
 
   useEffect(() =>{
     if(sessionData?.user){
@@ -59,28 +56,15 @@ export const GlobalProvider = ({ children }) => {
 
   useEffect(() => {
 
-    if(sessionData || userData || userMetaData){
+    if(sessionData || userData || user){
       // console.log({
       //   session: sessionData,
       //   user: userData, 
-      //   meta: userMetaData
+      //   meta: user
       // })
     }
 
-  }, [sessionData, userData, userMetaData])
-
-  const pullUserListRecord = async (user) => {
-    
-    let { data: userRec, error } = await supabase
-    .from('users')
-    .select("*")
-    .eq('primary_id', user?.id)
-
-   if(userRec?.[0]){
-    console.log(userRec[0])
-   }
-
-  }
+  }, [sessionData, userData, user])
 
   const updateAdmin = async (admin) => {
     const { data, error } = await supabase.auth.updateUser({
@@ -139,6 +123,8 @@ const updateUserField = async (field) => {
   const login = async (email, password) => {  
     try {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+      // console.log('login', data)
   
       if (error) {
         console.error('Login error:', error);
@@ -160,7 +146,7 @@ const updateUserField = async (field) => {
   
       if (sessionData?.session) {
         justLoggedIn.current = true;
-        setUser({ data: sessionData });
+        // setUser({ data: sessionData });
       } else {
         throw new Error('No valid session data after login.');
       }
@@ -171,7 +157,7 @@ const updateUserField = async (field) => {
     }
   };
 
-  const signUp = async (email, password, name) => {  
+  const addAuthRecord = async (email, password, name) => {
     try {
       let { data, error } = await supabase.auth.signUp({
         email: email,
@@ -187,13 +173,57 @@ const updateUserField = async (field) => {
 
       if (error) {
         console.error('Sign up error:', error);
-        throw new Error(error.message);  // STOP EXECUTION here
+        throw new Error(error.message); 
       }
 
   
     } catch (err) {
       console.error('Unexpected signup failure:', err.message || err);
       throw err;  // rethrow so caller can handle it too
+    }
+  }
+
+  const addUserRecord = async (email, name) => {
+
+    const { data, error } = await supabase
+    .from('users')
+    .insert([
+      {
+        email: email,
+        user_name: name,
+        friends: [],
+        game_data: [],
+        currently_online: false,
+        is_admin: false,
+        is_super: false,
+        avatar: ''
+      },
+    ])
+    .select()
+
+    if(data){
+      return data
+    } else {
+      console.log(error)
+    }
+        
+  }
+
+
+  const signUp = async (email, password, name) => {  
+
+    const auth = await addAuthRecord(email, password, name)
+
+    if(auth) {
+      console.log(auth)
+      setAuthUser(auth)
+      const user = await addUserRecord(email, password, name)
+
+      if(user){
+        console.log(user)
+        setUser(user)
+      }
+
     }
   };
   
@@ -223,12 +253,24 @@ const updateUserField = async (field) => {
 
   }
 
-  const getUserById = async () => {
-
+  const getUserTable = async (id) => {
+    let { data: user, error } = await supabase
+    .from('users')
+    .select("*")
+    .eq('primary_id', id)
+    
+    if(user) {
+      setUser(user[0])
+      return user
+    }
+    
+    if(error) return error
   }
+
   
   useEffect(() => {
     const { data: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // console.log(session)
       setSessionState(event)
       
       if(event === 'USER_UPDATED'){
@@ -237,6 +279,7 @@ const updateUserField = async (field) => {
 
       // console.log(event, !!userData, session)
       if(event === 'SIGNED_IN' && !userData){
+        getUserTable(session.user.id)
         setSessionData(session)
         setUserData(session.user)
       }
@@ -280,7 +323,7 @@ const updateUserField = async (field) => {
           message.message_content = decMess;
     
           // Now determine if it's inbound or outbound
-          const isInbound = message.to.primary_id === userMetaData.sub;
+          const isInbound = message.to.primary_id === user.sub;
     
           setMessages(prev => ({
             inbound: isInbound ? [...prev.inbound, message] : prev.inbound,
@@ -299,7 +342,7 @@ const updateUserField = async (field) => {
         const { data: messData, error } = await supabase
           .from('messaging')
           .select('*')
-          .or(`to->>primary_id.eq.${userMetaData?.sub},from->>primary_id.eq.${userMetaData?.sub}`); 
+          .or(`to->>primary_id.eq.${user?.sub},from->>primary_id.eq.${user?.sub}`); 
           // ← this fetches messages either *to* or *from* the user
     
         if (messData) {
@@ -314,10 +357,10 @@ const updateUserField = async (field) => {
     };
 
     useEffect(() =>{
-      if(userMetaData){
+      if(user){
         initialFetch()
       }
-    }, [userMetaData])
+    }, [user])
     
 
     useEffect(() => {
@@ -328,20 +371,23 @@ const updateUserField = async (field) => {
           schema: 'public',
           table: 'messaging',
         }, async (payload) => {
-          console.log('[Realtime payload]', payload);
+          // console.log('[Realtime payload]', payload);
+          // console.log(payload.new.to, user.primary_id)
     
           const message = payload.new || payload.old;
           if (!message) return;
+
+          console.log(message)
     
-          const isInbound = message?.to?.primary_id === userMetaData?.sub;
-          const isOutbound = message?.from?.primary_id === userMetaData?.sub;
-          const inboundId = messages?.inbound.find(m => m.message_id !== message.message_id)
-          const outboundId = messages?.outbound.find(m => m.message_id !== message.message_id)
+          const isInbound = message?.to === user?.primary_id;
+          const isOutbound = message?.from === user?.primary_id;
+          // const inboundId = messages?.inbound.find(m => m.message_id !== message.message_id)
+          // const outboundId = messages?.outbound.find(m => m.message_id !== message.message_id)
     
-          console.log(inboundId, outboundId)
+          // console.log(isInbound, isOutbound)
 
           if (!isInbound && !isOutbound) return; // Ignore messages not related to user
-          if (!inboundId && !outboundId) return
+          // if (!inboundId && !outboundId) return
 
           if (payload.eventType === 'DELETE') {
             setMessages(prev => ({
@@ -355,11 +401,11 @@ const updateUserField = async (field) => {
     
           if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
             const decryptedMessage = await decryptRealtime(message);
-    
+            
             setMessages(prev => {
               const newInbound = [...prev.inbound];
               const newOutbound = [...prev.outbound];
-    
+              console.log(isInbound)
               if (isInbound) {
                 // Remove old if exists
                 const idx = newInbound.findIndex(m => m.id === decryptedMessage.id);
@@ -390,7 +436,7 @@ const updateUserField = async (field) => {
       return () => {
         supabase.removeChannel(channel);
       };
-    }, [userMetaData]);
+    }, [user]);
     
     
   useEffect(() => {
@@ -465,9 +511,12 @@ const updateUserField = async (field) => {
   }, [messages.inbound, messages.outbound])
 
   useEffect(() =>{
-    console.log(deleteKey)
     initialFetch()
   }, [deleteKey])
+
+  useEffect(() => {
+    // console.log('user', user)
+  }, [user])
 
   window.setMessageKey = setMessageKey
   window.updateAdmin = updateAdmin
@@ -495,9 +544,8 @@ const updateUserField = async (field) => {
         sessionState,
         updateAdmin,
         updateUserField,
-        userMetaData,
+        user,
         fetchAuthUsers,
-        getUserById,
         allUsers,
         messages, 
         setMessages,

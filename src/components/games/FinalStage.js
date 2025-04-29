@@ -3,10 +3,10 @@ import { Stack, Button, Typography, ImageList, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import Prompt from './Prompt'
 import { useGlobalContext } from '../../business/GlobalContext'
-import { addGameToUser } from '../../business/apiCalls'
+import { supabase } from '../../business/supabaseClient'
 
 const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
-  const { isMobile, setAlertProps, user, updateUserField, userMetaData} = useGlobalContext()
+  const { isMobile, setAlertProps, user} = useGlobalContext()
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const greenPrompt = selections[3]?.[0] || null
@@ -21,7 +21,8 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   }
 
   const handleSubmit = async () => {
-    let currentGameData = userMetaData?.game_data
+    console.log(user)
+    let currentGameData = user?.game_data
     const gameData = {
       id: Date.now(),
       game: 'TwentyOneThings',
@@ -33,9 +34,14 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
     currentGameData.push(gameData)
     console.log(currentGameData)
 
-    const result = await updateUserField({'game_data': currentGameData})
-    console.log(result)
-    if (result?.user?.user_metadata?.game_data) {
+    
+    const { data, error } = await supabase
+    .from('users')
+    .update({ game_data: currentGameData })
+    .eq('primary_id', user.primary_id)
+    .select()
+        
+    if (data[0].primary_id) {
       setAlertProps({
         text: 'Successfully saved game data!',
         severity: 'success',

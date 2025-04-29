@@ -11,10 +11,10 @@ import SentMessages from './SentMessages';
 
 const MessageBox = (props) => {
 
-  const {userMetaData, messages} = useGlobalContext()
+  const {user, messages} = useGlobalContext()
 
   const {
-    user, isMobile, draftMessage, setDraftMessage, solMate, setSolMate, toggleSentRec, setToggleSentRec
+    isMobile, draftMessage, setDraftMessage, solMate, setSolMate, toggleSentRec, setToggleSentRec
   } = props
 
   return (
@@ -65,7 +65,7 @@ const MessageBox = (props) => {
                   ? 
                   <ReceivedMessages />
                   :
-                  <SentMessages user={userMetaData}/>
+                  <SentMessages user={user}/>
                 }
               </Table>
             </TableContainer>
@@ -122,7 +122,7 @@ const SolMatesBox = (props) => {
 }
 
 const Messaging = () => {
-  const { user, isMobile, allUsers, userMetaData, messages, setMessages, initialFetch} = useGlobalContext();
+  const { user, isMobile, allUsers, messages, setMessages, initialFetch} = useGlobalContext();
   const [draftMessage, setDraftMessage] = useState();
   const [userSearch, setUserSearch] = useState();
   const [userMatches, setUserMatches] = useState([]);
@@ -155,10 +155,10 @@ const Messaging = () => {
 
 
   useEffect(() => {
-    if (userMetaData?.friends) {
-      setFriendList(userMetaData?.friends)
+    if (user?.friends) {
+      setFriendList(user?.friends)
     }
-  }, [userMetaData]);
+  }, [user]);
 
 
   const userFuzzySearch = async (searchTerm, dataTable) => {

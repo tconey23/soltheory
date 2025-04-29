@@ -187,16 +187,16 @@ import SixPicsButton from './games/SixPicsButton'
   };
 
 const Admin = ({size}) => {
-    const {alertProps, setAlertProps, user, userMetaData} = useGlobalContext() 
+    const {alertProps, setAlertProps, user} = useGlobalContext() 
     const [gameSelection, setGameSelection] = useState()
     const [userSelection, setUserSelection] = useState()
     const nav = useNavigate()
 
     useEffect(() =>{
       switch(gameSelection){
-        case '6Pics': nav(userMetaData?.is_admin ? '/account/admin/6pics' : '/error');
+        case '6Pics': nav(user?.is_admin ? '/account/admin/6pics' : '/error');
         break;
-        case '21Things': nav(userMetaData?.is_admin ? '/account/admin/21things' : '/error');
+        case '21Things': nav(user?.is_admin ? '/account/admin/21things' : '/error');
         break;
       }
     }, [gameSelection])

@@ -8,7 +8,7 @@ import { generateCipherKey, importKeyFromBase64, encryptWithKey } from '../busin
 import { sendPush } from '../business/apiCalls';
 
 export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
-  const { user, userMetaData } = useGlobalContext();
+  const { user} = useGlobalContext();
   const [to, setTo] = useState();
   const [subject, setSubject] = useState();
   const [messageText, setMessageText] = useState();
@@ -52,8 +52,8 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
     const encryptedMessage = await encryptWithKey(messageText, messageCryptoKey);
 
     const payload = {
-      from: userMetaData,
-      to: to,
+      from: user.primary_id,
+      to: to.primary_id,
       subject: encryptedSubject.data,
       subject_iv: encryptedSubject.iv,
       message_content: encryptedMessage.data,

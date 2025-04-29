@@ -12,17 +12,17 @@ import { Box } from '@mui/system';
 
 const UserGames = () => {
 
-  const {userMetaData, updateUserField} = useGlobalContext()
+  const {user, updateUserField} = useGlobalContext()
   const [gameData, setGameData] = useState()
 
   useEffect(() => {
-    if(userMetaData?.game_data){
-      setGameData(userMetaData?.game_data)
+    if(user?.game_data){
+      setGameData(user?.game_data)
     }
-  }, [userMetaData])
+  }, [user])
 
   const handleDelete = async (index) => {
-    let currentGameData = userMetaData?.game_data || [];
+    let currentGameData = user?.game_data || [];
     
     const updatedGameData = currentGameData.filter((_, i) => i !== index);
   
@@ -121,7 +121,7 @@ const UserName = () => {
   );
 };
 
-const AvatarSelect = ({ search, setResults, results, submit, setSubmit, userMetaData }) => {
+const AvatarSelect = ({ search, setResults, results, submit, setSubmit}) => {
     const {
       user,
       avatar,
@@ -183,7 +183,7 @@ const AvatarSelect = ({ search, setResults, results, submit, setSubmit, userMeta
   };
 
 const AccountPage = ({size}) => {
-    const {setAlertProps , user, avatar, isAdmin, logout, userData, sessionData, sessionState, userMetaData} = useGlobalContext()
+    const {setAlertProps, isAdmin, logout, userData, sessionData, sessionState, user} = useGlobalContext()
     const nav = useNavigate()
     const [results, setResults] = useState([])
     const [submit, setSubmit] = useState(false)
@@ -304,8 +304,8 @@ const AccountPage = ({size}) => {
                 <Stack width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'} sx={{resize: 'both'}}>
                     <Stack width={'100%'} justifyContent={'center'} alignItems={'center'} padding={1} margin={2}>
                       <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} padding={1}>
-                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={userMetaData?.avatar} />
-                        {displayName && <Typography variant="h7">Welcome, {userMetaData?.display_name}!</Typography>}
+                        <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={user?.avatar} />
+                        {displayName && <Typography variant="h7">Welcome, {user?.display_name}!</Typography>}
                       </Stack>
                         <Stack width={'80%'}>
                           <Accordion>
@@ -325,7 +325,7 @@ const AccountPage = ({size}) => {
                                         </AccordionSummary>
                                         <AccordionDetails>
                                         <Stack justifyContent={'center'} alignItems={'center'}>
-                                          <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={userMetaData?.avatar}/>
+                                          <Avatar sx={{ width: 50, height: 50, mb: 2 }} src={user?.avatar}/>
                                           <Select value={imageType} onChange={(e) => setImageType(e.target.value)}>  
                                               {avatarTerms.map((t, i) => (
                                                 <MenuItem key={i} value={t}>
@@ -369,7 +369,7 @@ const AccountPage = ({size}) => {
                                         <AccordionDetails>
                                             <Stack height={'100%'} width={'95%'} justify-content={'space-evenly'}>
                                               <Stack width={'25%'}>
-                                                {userMetaData?.is_super_admin && <Button onClick={() => nav('/account/admin/super_user_controls')}>Super User Controls</Button>}
+                                                {user?.is_super && <Button onClick={() => nav('/account/admin/super_user_controls')}>Super User Controls</Button>}
                                               </Stack>
                                                 <Admin size={size}/>
                                             </Stack>

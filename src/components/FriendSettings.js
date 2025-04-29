@@ -4,14 +4,14 @@ import { supabase } from '../business/supabaseClient';
 import { useGlobalContext } from '../business/GlobalContext';
 
 const FriendSettings = ({friend, setEditFriendSettings}) => {
-    const {user, setAlertProps, userMetaData} = useGlobalContext()
+    const {user, setAlertProps} = useGlobalContext()
     const [settings, setSettings] = useState({})
     const [friendData, setFriendData] = useState()
     const [pendingUnfriend, setPendingUnfriend] = useState(false)
 
     const saveSettings = async () => {
 
-        const friendIndex = userMetaData?.friends?.findIndex(
+        const friendIndex = user?.friends?.findIndex(
           (f) => f.primary_id === friend.primary_id
         );
       
@@ -72,7 +72,7 @@ const FriendSettings = ({friend, setEditFriendSettings}) => {
 
     const handleRemoveFriend = async () => {
         console.log(user?.metadata?.primary_id, friend)
-        const userId = userMetaData?.primary_id;
+        const userId = user?.primary_id;
         const friendId = friend?.primary_id;
       
         if (!userId || !friendId) {
