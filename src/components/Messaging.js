@@ -147,7 +147,7 @@ const Messaging = () => {
 
   useEffect(() => {
     
-    if(solMate || draftMessage){
+    if(solMate || draftMessage){ 
         setToggleMessages(true)
     }
 

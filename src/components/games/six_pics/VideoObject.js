@@ -22,7 +22,7 @@ const VideoObject = ({fileInfo, URL, videoRef, w, h, outerWidth, outerHeight}) =
             width={w || '50%'}
             height={h || '50%'}
             onLoadedMetadata={(e) => {
-                e.target.currentTime = e.target.duration;
+                e.target.currentTime = e.target.duration; 
             }}
             controls={isHover}
         />

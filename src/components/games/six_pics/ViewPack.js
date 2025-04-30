@@ -256,7 +256,7 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                             : 
                                             <i style={{color: 'red'}} className="fi fi-sr-thumbs-down"></i>
                                             }
-                                    </MenuItem>
+                                    </MenuItem> 
                                         )
                                     }
                                     })}

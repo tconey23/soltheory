@@ -133,7 +133,7 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
 
       console.log(updatedVideos)
   
-      const { error: updateError } = await supabase
+      const { error: updateError } = await supabase 
         .from('sixpicspacks')
         .update({ videos: updatedVideos })
         .eq('id', packRows.id);

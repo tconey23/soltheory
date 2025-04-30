@@ -61,7 +61,7 @@ export const NewMessage = ({ setDraftMessage, solMate, setSolMate }) => {
       created_at: date.toISOString(),
       attachment: attachmentUrl || null,
       is_solreq: solMate ? true : false,
-      message_cipher_key: messageCipherKeyBase64
+      message_cipher_key: messageCipherKeyBase64 
     };
 
     try {

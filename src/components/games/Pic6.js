@@ -179,7 +179,7 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
         });
       }, 50);
   
-      return () => clearInterval(interval);
+      return () => clearInterval(interval); 
     }
 
 

@@ -18,7 +18,7 @@ const SPAdminWrapper = () => {
                     }
                 }}>
                 <AccordionSummary>
-                    View / Edit Packs
+                    View / Edit Packs 
                 </AccordionSummary>
                 <AccordionDetails>
                     <SPAdminPacks forceRefresh={forceRefresh} setForceRefresh={setForceRefresh}/>

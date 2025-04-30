@@ -51,7 +51,7 @@ const SixPicsPacks = ({setGamePack, gamePack}) => {
     const [hover, setHover] = useState(false)
 
     const fetchPacks = async () => {
-        let { data: sixpicspacks, error } = await supabase
+        let { data: sixpicspacks, error } = await supabase 
         .from('sixpicspacks')
         .select('*')
 

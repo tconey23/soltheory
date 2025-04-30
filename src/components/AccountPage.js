@@ -52,7 +52,7 @@ const UserGames = () => {
             if(d.game === g){
               return <>
                         <Accordion>
-                          <AccordionSummary>
+                          <AccordionSummary> 
                             {d.game_date}
                           </AccordionSummary>
                           <AccordionDetails>

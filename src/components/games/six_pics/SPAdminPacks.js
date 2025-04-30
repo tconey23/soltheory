@@ -18,7 +18,7 @@ import ViewPack from './ViewPack';
 //     }
 // ]
 
-const SPAdminPacks = ({setForceRefresh, forceRefresh}) => {
+const SPAdminPacks = ({setForceRefresh, forceRefresh}) => { 
 
     const [packs, setPacks] = useState([])
     const [fieldCount, setFieldCount] = useState()

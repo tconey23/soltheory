@@ -314,7 +314,7 @@ const addFriend = async (user, friend) => {
       
     
 
-    const getGifs = async (packName) => {
+    const getGifs = async (packName) => { 
         try {  
 
         let { data, error } = await supabase

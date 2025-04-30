@@ -8,7 +8,7 @@ export const MessageItem = ({data, origin}) => {
     const {isMobile, getUserData} = useGlobalContext()
     const [isHover, setIsHover] = useState(false)
     const [pendingDelete, setPendingDelete] = useState(false)
-    const [selectedMessage, setSelectedMessage] = useState(null)
+    const [selectedMessage, setSelectedMessage] = useState(null) 
     const [to, setTo] = useState()
     const [from, setFrom] = useState()
     

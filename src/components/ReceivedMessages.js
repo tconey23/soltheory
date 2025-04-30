@@ -4,7 +4,7 @@ import { useGlobalContext } from '../business/GlobalContext';
 import { MessageItem } from './MessageItem';
 
 const ReceivedMessages = () => {
-  const { messages, initialFetch, messageKey } = useGlobalContext();
+  const { messages, initialFetch, messageKey } = useGlobalContext(); 
 
   useEffect(() => {
     if (!messages?.inbound?.length) {

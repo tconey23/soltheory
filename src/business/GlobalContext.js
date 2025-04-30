@@ -95,7 +95,7 @@ export const GlobalProvider = ({ children }) => {
       // })
     }
 
-  }, [sessionData, userData, user])
+  }, [sessionData, userData, user]) 
 
   const updateAdmin = async (admin) => {
     const { data, error } = await supabase.auth.updateUser({
