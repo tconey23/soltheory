@@ -52,6 +52,46 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
             display: true
         })
       } else {
+          
+          
+          
+          try {
+
+            let array = []
+            let data
+
+            let { data: sixpicspacks, error } = await supabase
+            .from('sixpicspacks')
+            .select("*")
+            .eq('pack_name', newPackName)
+            console.log(sixpicspacks)
+            data = sixpicspacks[0]
+
+            data?.videos?.forEach((v) => {
+                v.pack_name = newPackName
+                array.push(v)
+            })
+
+            if(array?.length > 0){
+                const { data, error } = await supabase
+                .from('sixpicspacks')
+                .update({ videos: array })
+                .eq('pack_name', newPackName)
+                .select()
+            }
+
+            if(error){ throw new Error(error)}
+            
+        } catch (err) {
+            console.error(err);
+            setAlertProps({
+                text: 'Error saving pack name',
+                severity: 'error',
+                display: true
+            })
+        }
+
+
         setPackData(data[0])
         setForceRefresh(prev => prev +1)
         setAlertProps({
@@ -105,13 +145,33 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
             getSelectedPack()
         }
     }, [selection])
+
+    const handleDeletePack = async () => {
+        const { error } = await supabase
+        .from('sixpicspacks')
+        .delete()
+        .eq('id', packData?.id)
+
+        if(error){
+            console.log(error)
+        } else {
+            setAlertProps({
+                text: 'Successfully deleted pack',
+                severity: 'success',
+                display: true
+            })
+            setSelection(null)
+        }
+    }
     
   return (
     <Stack key={forceRefresh} direction={'column'} sx={{ height: '98%', width: '100%' }} justifyContent={'center'} alignItems={'center'}>
         {packData && packVideos &&
         <>
             <Stack width={'50%'} justifyContent={'center'} alignItems={'center'}>
-
+                <Button onClick={() => {
+                    handleDeletePack()
+                }}>Delete Pack</Button>
                 {editPackName
                  ? 
                     <>
@@ -158,6 +218,8 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
                                     </Tooltip>
                                     </Button>
                                     <Select sx={{width: '30%'}}>
+                                        <Typography>{v.pack_name}</Typography>
+                                        
                                         {
                                             Object.entries(v)?.map((f) => {
                                                 return  (
@@ -211,7 +273,7 @@ const ViewPack = ({setSelection, selection, forceRefresh, setForceRefresh}) => {
         <Modal open={videoToEdit}>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
                 <Suspense fallback={<CircularProgress />}>
-                    <VideoEditor video={videoToEdit} setSelection={setVideoToEdit}/>
+                    <VideoEditor video={videoToEdit} setSelection={setVideoToEdit} setForceRefresh={setForceRefresh}/>
                 </Suspense>
             </Stack>
         </Modal>

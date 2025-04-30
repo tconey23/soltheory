@@ -29,7 +29,7 @@ const getVideoDuration = (videoSrc) => {
 
 const VideoObject = lazy(() => import('../six_pics/VideoObject'));
 
-const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
+const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => {
   const {alertProps, setAlertProps, isMobile} = useGlobalContext()
   const [ready, setReady] = useState(false);
   const vidDuration = useRef();
@@ -108,6 +108,8 @@ const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
       ready: true,
       answer: answer
     };
+
+    console.log(updatedFields)
   
     try {
 
@@ -116,6 +118,8 @@ const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
         .select('id, videos')
         .eq('pack_name', video.pack_name)
         .single();
+
+        console.log(packRows)
   
       if (selectError || !packRows) {
         throw selectError || new Error('Pack not found');
@@ -126,6 +130,8 @@ const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
           ? { ...vid, ...updatedFields }
           : vid
       );
+
+      console.log(updatedVideos)
   
       const { error: updateError } = await supabase
         .from('sixpicspacks')
@@ -138,6 +144,7 @@ const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
   
       setAlertProps({ display: true, text: 'Video saved successfully!', severity: 'success' });
       setSelection(null);
+      setForceRefresh(prev => prev +1)
     } catch (err) {
       console.error('Save error:', err);
       setAlertProps({ display: true, text: 'Failed to save video edits.', severity: 'error' });
@@ -204,6 +211,10 @@ const VideoEditor = ({setVideoToEdit, video, setSelection}) => {
   useEffect(() => {
     getMeta(video)
   }, [video])
+
+  useEffect(() => {
+    console.log(stops, loops)
+  }, [stops, loops])
 
   return (
         <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'} backgroundColor={'#000000ab'}>

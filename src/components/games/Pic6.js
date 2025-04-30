@@ -135,7 +135,6 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
   }
 
   useEffect(() => {
-    console.log(drawNum)
     if (!giveUp && level.level != null) {
       let target = levelScore;
   
@@ -196,6 +195,7 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
 
   useEffect(() => {
     if (answer) {
+      // console.log(answer)
       setLetterCount(answer.replaceAll(" ", "").split("").length);
     }
   }, [answer]);
@@ -408,7 +408,7 @@ const Pic6 = ({user}) => {
     if(res && res?.videos){
       // const gifs = JSON.parse(res.videos[0])
       res.videos.forEach((l, i) => {
-        console.log(l)
+        console.log(l['answer'])
         setLevels(prev => [
           ...prev,
           {
