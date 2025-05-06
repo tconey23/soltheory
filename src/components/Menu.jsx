@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
-import { logout } from '../business/supabase_calls';
+import { login, logout } from '../business/supabase_calls';
 
 const Menu = ({renders, setRenders}) => {
   const MotionStack = motion(Stack)
@@ -41,6 +41,7 @@ const Menu = ({renders, setRenders}) => {
   }
 
   const handleLogin = async () =>{
+    delayedNav('/login')
   }
 
   const handleAccount = () => {

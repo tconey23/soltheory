@@ -15,6 +15,7 @@ import TwentyOneThings from './components/games/21Things/TwentyOneThings';
 
 function App() {
   const navTo = useNavigate()
+  const location = useLocation()
   const isMobile = useGlobalStore((state) => state.isMobile)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
@@ -26,7 +27,6 @@ function App() {
   const [appReady, setAppReady] = useState(false)
 
   useEffect(() => {
-    // console.log(user, userMeta)
           if (user) {
             (async () => {
               const res = await getMeta(user?.id);
@@ -52,6 +52,12 @@ function App() {
   }, [user, userMeta])
 
   useEffect(() => {
+    if(location.pathname === '/'){
+      navTo('/home')
+    }
+  }, [location])
+
+  useEffect(() => {
     setTimeout(() => {
       setAppReady(true)
     }, 1000);
@@ -67,6 +73,7 @@ function App() {
 
       <Route path='*' element={<Error/>} />
 
+      <Route path={"/"} element={<HomePage />}/>
       <Route path={"/home" || "/"} element={<HomePage />}/>
       <Route path={"/login"} element={<Modals needsLogin={true}/>} />
 

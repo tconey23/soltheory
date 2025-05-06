@@ -17,7 +17,7 @@ const Modals = ({needsLogin}) => {
   return (
     <>
         {/* Login menu */}
-        <Modal open={!user || !!needsLogin}>
+        <Modal open={!!needsLogin}>
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
         <Stack bgcolor={'white'} width={isMobile ? '77%' : '50%'} height={'50%'} borderRadius={1} justifyContent={'center'} alignItems={'center'}>
           <Login />

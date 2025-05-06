@@ -1,7 +1,6 @@
 import { Canvas } from '@react-three/fiber'
 import { useState, useEffect, useRef} from 'react'
 import React from 'react'
-import { useGlobalContext } from '../../business/GlobalContext'
 import Lighting from './Lighting'
 import Backdrop from './Backdrop'
 import ThreeLetters from './ThreeLetters'
@@ -11,14 +10,46 @@ import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import NPRobot from './NPRobot'
 import useGlobalStore from '../../business/useGlobalStore'
+import { PerformanceMonitor } from '@react-three/drei'
+import { AdaptiveEvents } from '@react-three/drei'
+import { usePerf } from 'r3f-perf'
+import { PerfHeadless } from 'r3f-perf'
 
-const FadeIn = ({canvasRef}) => {
+const PerfHook = () => {
+  const perf = usePerf()
+  console.log(perf.getReport())
+  return <PerfHeadless />
+}
+
+const PerfMonitor = ({setIncline, setDecline, incline, decline, setDpr, dpr}) => {
+  const maxDpr = 1
+
+  useFrame(() =>{
+    if(incline && !decline && dpr < maxDpr){
+      setDpr(prev => prev + 0.01)
+    }
+
+    if(decline && !incline && dpr > 0){
+      setDpr(prev => prev -0.01)
+    }
+  })
+
+
+  return <PerformanceMonitor onIncline={() => setIncline(true)} onDecline={() => setDecline(true)} />
+
+}
+
+const FadeIn = ({canvasRef, assetsReady}) => {
 
     const [start, setStart] = useState(false)
 
-    setTimeout(() => {
-        setStart(true)
-    }, 2000);
+    useEffect(() =>{
+      if(assetsReady){
+        setTimeout(() => {
+          setStart(true)
+        }, 500);
+      }      
+    }, [assetsReady])
 
     useFrame(() => {
         if (start && canvasRef.current?.parentElement?.style) {
@@ -32,12 +63,12 @@ const FadeIn = ({canvasRef}) => {
     return null
 }
 
-const StaticCamera = ({ animate, startPosition=[0,3,50], targetPosition = [-3, 10, -6], lookAt = [2, 5, 9] }) => { 
+const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, animate, startPosition=[0,3,50], targetPosition = [-3, 7, -6], lookAt = [2, 2, 9] }) => { 
     const { camera } = useThree()
-  
-    // Set the starting position once
+    const [start, setStart] = useState(false)
+
     useEffect(() => {
-      if(animate){
+      if(animate && start){
         camera.position.set(...startPosition)
       } else {
         camera.position.set(...targetPosition)
@@ -47,36 +78,68 @@ const StaticCamera = ({ animate, startPosition=[0,3,50], targetPosition = [-3, 1
   
     // Animate camera toward target each frame
     useFrame(() => {
+      if(allAssetsReady && !start){setStart(true)}
       if(animate){
         camera.position.lerp(new THREE.Vector3(...targetPosition), 0.009)
         camera.lookAt(new THREE.Vector3(...lookAt))
+      }
+      if(camera.position.x < -2.98 && !initialAnimation){
+        setInitialAnimation(true)
       }
     })
   
     return null
   }
 
-const HomePage = ({showBot = true, animate = true}) => {
+const HomePage = ({showBot = true}) => {
     const degrees = useGlobalStore((state) => state.degrees)
     const canvasRef = useRef()
-  
-    
+    const animate = useGlobalStore((state) => state.animate)
+    const setAnimate = useGlobalStore((state) => state.setAnimate)
+    const [initialAnimation, setInitialAnimation] = useState(false)
+    const [groundReady, setGroundReady] = useState(false)
+    const [lightingReady, setLightingReady] = useState(false)
+    const [backdropReady, setBackdropReady] = useState(false)
+    const [lettersReady, setLettersReady] = useState(false)
+    const [dpr, setDpr] = useState(0.5)
+    const [incline, setIncline] = useState(false)
+    const [decline, setDecline] = useState(false)
+    const allAssetsReady = groundReady && lettersReady
+
+    useEffect(() =>{
+      if(initialAnimation){
+        setAnimate(false)
+      } else {
+        setAnimate(true)
+      }
+    },[initialAnimation])
+
+    useEffect(() => {
+      // console.log(incline, decline)
+      // console.log(dpr)
+    }, [incline, decline, dpr])
+
+
+    useEffect(() =>{
+    }, [groundReady, backdropReady, lettersReady, lightingReady, allAssetsReady])
+
     return (
     <div style={{height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
   
-        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows>
-          <FadeIn canvasRef={canvasRef}/>
-          
-          <Lighting pos={[0, 40, 0]} xOffset={10} zOffset={-5} intensity={8} color1={'pink'} color2={'deepSkyBlue'} />
-          <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720}/>
+        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr}>
+
+          {/* <PerfHook /> */}
+        <AdaptiveEvents />
+        <PerfMonitor setDecline={setDecline} setIncline={setIncline} incline={incline} decline={decline} setDpr={setDpr} dpr={dpr}/>
+
+          <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720} setBackdropReady={setBackdropReady}/>
+          <ThreeLetters setLettersReady={setLettersReady}/>
+          <GroundPlane setGroundReady={setGroundReady}/>
   
-            <StaticCamera animate={animate}/>
-            <GroundPlane physics={false} />
-            
-            {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(0), degrees(0)]}/>}
-            
-            <ThreeLetters />
-      
+          <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
+          <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
+          {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(0), degrees(0)]}/>}
+
       </Canvas>
             
     </div>

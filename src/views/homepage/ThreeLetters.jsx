@@ -3,13 +3,29 @@ import React from 'react'
 import { useGlobalContext } from '../../business/GlobalContext'
 import { Center, Outlines, Text3D } from '@react-three/drei'
 import { useFont } from '@react-three/drei'
+import { useIntersect } from '@react-three/drei'
 
-const ThreeLetters = () => {
+const ThreeLetters = ({setLettersReady}) => {
     const {degrees} = useGlobalContext()
     const font = useFont('/fonts/Fredoka_Regular.json')
-    const meshRef = useRef()
-    const meshRef2 = useRef()
-  
+    const [readyCount, setReadyCount] = useState(0)
+
+    const meshRef = useIntersect((visible) => {
+      if(visible){
+        setReadyCount(prev => prev +1 )
+      }})
+
+    const meshRef2 = useIntersect((visible) => {
+      if(visible){
+        setReadyCount(prev => prev +1 )
+      }})
+
+    useEffect(() => {
+      if(readyCount == 2){
+        setLettersReady(true)
+      }
+    }, [readyCount])
+
   
     return (
       <>

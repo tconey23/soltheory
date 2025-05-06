@@ -6,8 +6,8 @@ import { useAnimations } from '@react-three/drei'
 import { useGlobalContext } from "../../business/GlobalContext"
 
 const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isJumping, setTurnAround, turnAround}) => {
-    useGLTF.preload('/AnimatedRobot.glb')
-    const { scene, animations } = useGLTF('/AnimatedRobot.glb')
+    useGLTF.preload('/Compressed.glb')
+    const { scene, animations } = useGLTF('/Compressed.glb')
     const [ready, setReady] = useState(false);
     const { actions } = useAnimations(animations, ready ? groupRef : undefined);
     const [robot, setRobot] = useState()
@@ -39,34 +39,13 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isJumping, setTu
         action.reset().fadeIn(0.3).play();
       };
 
-    useEffect(() => {
-        if (!actions || Object.keys(actions).length === 0) return;
-
-        setIsIdle(false)
-      
-        Object.values(actions).forEach((action) => {
-          if (action && action.isRunning()) {
-            action.fadeOut(0.2)
-            action.enabled = false}
-        });
-      
-        if (isJumping) {
-          play(animJump, 1, THREE.LoopOnce, 1);
-          return;
-        }
-      
-        if (isMoving && !isSprinting) {
-          play(animWalking, 1, THREE.LoopRepeat, 1);
-          return;
-        }
-      
-        if (isMoving && isSprinting) {
-          play(animRunning, 1, THREE.LoopRepeat, 1);
-          return;
-        }
-        setIsIdle(true)
-      
-      }, [isMoving, isSprinting, sprintMult, isJumping, isIdle, actions]);
+        useEffect(() =>{
+          if(animations){
+            setIsIdle(true)
+          } else {
+            setIsIdle(false)
+          }
+        }, [animations])
       
 
       useEffect(() => {
@@ -76,39 +55,8 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isJumping, setTu
           if (!actions[animIdle].isRunning()) {
             play(animIdle, 1, THREE.LoopRepeat, 0.5);
           }
-      
-          clearTimeout(idleTimeoutRef.current)
-      
-          idleTimeoutRef.current = setTimeout(() => {
-            setTurnAround(true);
-          }, 3000000);
-        } else {
-          setTurnAround(false);
-          clearTimeout(idleTimeoutRef.current)
         }
       }, [isIdle]);
-
-      useEffect(() => {
-        if (turnAround && actions[animWave] && actions[animDance]) {
-          play(animWave, 1, THREE.LoopOnce, 0.5);
-      
-          const waveAction = actions[animWave];
-          waveAction.clampWhenFinished = true;
-      
-          const mixer = waveAction.getMixer();
-      
-          const onWaveFinished = (e) => {
-            if (e.action === waveAction) {
-              play(animDance, 1, THREE.LoopOnce, 1);
-              mixer.removeEventListener('finished', onWaveFinished);
-            }
-          };
-      
-          mixer.addEventListener('finished', onWaveFinished);
-      
-          return () => mixer.removeEventListener('finished', onWaveFinished);
-        }
-      }, [turnAround, actions]);
 
       useEffect(() => {
         return () => {

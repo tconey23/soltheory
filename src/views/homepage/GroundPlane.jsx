@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
-import { useMemo } from 'react'
-import { RigidBody } from '@react-three/rapier'
+import { useMemo, useRef, useState, useEffect } from 'react'
 import * as THREE from 'three'
-import { useTexture } from '@react-three/drei'
-import { TrimeshCollider } from '@react-three/rapier'
+import { useIntersect } from '@react-three/drei'
 
+const GroundPlane = ({setGroundReady}) => {
+const ref = useIntersect((visible) => {
+  if(visible){
+    setGroundReady(true)
+  }})
 
-const GroundPlane = ({showEnvironment, physics}) => {
     const curvedPlane = useMemo(() => {
-      const geometry = new THREE.PlaneGeometry(100, 100, 100, 100)
+      const geometry = new THREE.PlaneGeometry(75, 75, 20, 20)
       geometry.rotateX(-Math.PI / 2)
       geometry.toNonIndexed()
     
@@ -26,27 +27,10 @@ const GroundPlane = ({showEnvironment, physics}) => {
       return geometry
     }, [])
   
-    const textures = useTexture({
-      map: '/ground_texture/BaseColor.png',
-      aoMap: '/ground_texture/AmbientOcclusion.jpg',
-      displacementMap: '/ground_texture/Displacement.png',
-      metalnessMap: '/ground_texture/Metallic.png',
-      normalMap: '/ground_texture/Normal.png',
-      roughnessMap: '/ground_texture/Roughness.png',
-    })
-  
-    useEffect(() => {
-      Object.values(textures).forEach((tex) => {
-        tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-        tex.repeat.set(10, 10)
-        tex.anisotropy = 16
-      })
-    }, [textures])
-  
     return (
         <>
-            <mesh geometry={curvedPlane} receiveShadow>
-                <meshStandardMaterial {...textures} metalness={1} roughness={1.5} />
+            <mesh ref={ref} geometry={curvedPlane} receiveShadow>
+                <meshStandardMaterial metalness={1} roughness={0} color={'grey'}/>
             </mesh>
         </>
     )

@@ -46,9 +46,21 @@ export const updateUserName = async (id, name) => {
         }
 }
 
+export const login = async (email, password) => {
+  let { data, error } = await supabase.auth.signInWithPassword({
+    email: email,
+    password: password
+  })
+
+  if(data){
+    return data
+  } else if(error){
+    console.log(error)
+  }
+}
+
 export const logout = async () => {
-console.log("Forced logout triggered");
-  
+
     try {
       // Attempt Supabase logout but don't wait forever
       const timeout = new Promise((_, reject) =>
@@ -69,7 +81,7 @@ console.log("Forced logout triggered");
     indexedDB.deleteDatabase('supabase-auth-token');
   
     setTimeout(() => {
-      window.location.href = '/login';
+      window.location.href = '/home';
     }, 100);
 }
 
