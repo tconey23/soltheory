@@ -10,8 +10,8 @@ const LoginForm = () => {
   const isMobile = useGlobalStore((state) => state.isMobile)
   const setSession = useGlobalStore((state) => state.setSession)
   
-  const [email, setEmail] = useState('tom@soltheory.com')
-  const [password, setPassword] = useState('MaddMax1987')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [confPassword, setConfPassword] = useState()
   const [newUser, setNewUser] = useState(false)
   const [userName, setUserName] = useState()
