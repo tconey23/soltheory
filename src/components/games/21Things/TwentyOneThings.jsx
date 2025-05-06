@@ -50,13 +50,13 @@ const green = '#45d500'
     const renderStage = () => {
       switch (currentStage) {
         case 1:
-          return <Stage stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />
+          return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />
         case 2:
-          return <Stage stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#c956ff" />
+          return <Stage height={'100%'} stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#c956ff" />
         case 3:
-          return <Stage stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
+          return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:
-          return <FinalStage user={user} date={payload.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} />
+          return <FinalStage height={'100%'} user={user} date={payload.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} />
         default:
           return <Home onPlay={() => setCurrentStage(1)} payload={payload} setGameIndex={setGameIndex} gameIndex={gameIndex} />
       }

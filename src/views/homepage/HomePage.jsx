@@ -14,6 +14,7 @@ import { PerformanceMonitor } from '@react-three/drei'
 import { AdaptiveEvents } from '@react-three/drei'
 import { usePerf } from 'r3f-perf'
 import { PerfHeadless } from 'r3f-perf'
+import { useGlobalContext } from '../../business/GlobalContext'
 
 const PerfHook = () => {
   const perf = usePerf()
@@ -63,9 +64,19 @@ const FadeIn = ({canvasRef, assetsReady}) => {
     return null
 }
 
-const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, animate, startPosition=[0,3,50], targetPosition = [-3, 7, -6], lookAt = [2, 2, 9] }) => { 
+const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, animate }) => { 
     const { camera } = useThree()
     const [start, setStart] = useState(false)
+    const [startPosition, setStartPosition] = useState([0,3,50])
+    const [targetPosition, setTargetPosition] = useState([-3, 7, -6])
+    const [lookAt, setLookAt] = useState([2, 2, 9])
+    const {screen} = useGlobalContext()
+
+    useEffect(() =>{
+
+      if(screen.isDesktop){setTargetPosition([0, 5, 2])}
+
+    }, [])
 
     useEffect(() => {
       if(animate && start){

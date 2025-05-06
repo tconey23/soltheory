@@ -44,7 +44,7 @@ const GamesWrapper = () => {
     const MotionAvatar = motion(Avatar);
   
     const font = useGlobalStore((state) => state.font);
-    const isMobile = useGlobalStore((state) => state.isMobile);
+    const screen = useGlobalStore((state) => state.screen);
     const userMeta = useGlobalStore((state) => state.userMeta);
     const user = useGlobalStore((state) => state.user)
   

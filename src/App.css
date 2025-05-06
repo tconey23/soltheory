@@ -21,8 +21,21 @@
   font-style: normal;
 }
 
-#root {
+html, body {
+  overscroll-behavior: none;
+  overscroll-behavior-y: none;
+  overscroll-behavior-x: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  touch-action: none;
+}
+
+#root, .App{
+  overflow: hidden;
   max-width: 100dvw;
+  height: 100vh;
   margin: 0 auto;
   padding: 0rem;
   text-align: center;

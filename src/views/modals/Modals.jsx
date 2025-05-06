@@ -10,7 +10,7 @@ const Modals = ({needsLogin}) => {
     const user = useGlobalStore((state) => state.user)
     const toggleMenu = useGlobalStore((state) => state.toggleMenu)
     const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
-    const isMobile = useGlobalStore((state) => state.isMobile)
+    const screen = useGlobalStore((state) => state.screen)
 
     const [renders, setRenders] = useState(0)
 
@@ -19,7 +19,7 @@ const Modals = ({needsLogin}) => {
         {/* Login menu */}
         <Modal open={!!needsLogin}>
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-        <Stack bgcolor={'white'} width={isMobile ? '77%' : '50%'} height={'50%'} borderRadius={1} justifyContent={'center'} alignItems={'center'}>
+        <Stack bgcolor={'white'} width={screen ? '77%' : '50%'} height={'50%'} borderRadius={1} justifyContent={'center'} alignItems={'center'}>
           <Login />
         </Stack>
       </Stack>

@@ -6,7 +6,7 @@ const useGlobalStore = create((set) => ({
   session: null,
   userMeta: null,
   toggleMenu: false,
-  isMobile: window.innerWidth <= 430,
+  screen: window.innerWidth <= 430,
   font: '/fonts/Fredoka/Fredoka-VariableFont_wdth,wght.ttf',
   degrees: (deg) => deg * (Math.PI / 180),
   gameIndex: 0,

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Modal, Stack, Tooltip, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
+import { useGlobalContext } from '../business/GlobalContext';
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -14,13 +15,24 @@ const Menu = ({renders, setRenders}) => {
 
   const [isVisible, setIsVisible] = useState(true);
   const font = useGlobalStore((state) => state.font)
-  const isMobile = useGlobalStore((state) => state.isMobile)
+  const {screen} = useGlobalContext()
   const user = useGlobalStore((state) => state.user)
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
   const [buttons, setButtons] = useState([])
   const [curLoc, setCurLoc] = useState()
 
+  const [width, setWidth] = useState('10%')
+
+  useEffect(() =>{
+
+    if(screen.isXs){setWidth('50%')}
+    if(screen.isDesktop){setWidth('10%')}
+    if(screen.isMd){setWidth('20%')}
+    if(screen.isSm && screen.isLandscape){setWidth('35%')}
+    if(screen.isLandscape){setWidth('15%')}
+
+  }, [screen])
 
   useEffect(()=>{
     setCurLoc(loc.pathname)
@@ -103,17 +115,21 @@ const Menu = ({renders, setRenders}) => {
       setButtons(
         menuButtons.map((b) => {
           if(loc.pathname !== b.pathFilter){
-              console.log(loc.pathname, b.pathFilter)
             return (
-              <Tooltip title={b.tooltip} followCursor>
-            <Stack paddingY={2}>
-              <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>
-            </Stack>
-          </Tooltip>
-        )
-      }
-      
-      })
+                <Tooltip title={b.tooltip} followCursor>
+                  <Stack paddingY={2}>
+                    {user ?
+                      <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>
+                    :
+                      <>
+                        {!user && b.name === 'Login' && <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>}
+                      </>
+                    }
+                  </Stack>
+                </Tooltip>
+              )
+            }     
+        })
       )
     
   }, [])
@@ -123,28 +139,28 @@ const Menu = ({renders, setRenders}) => {
         if(e.target.title === 'modal_inner_wrapper'){
           setToggleMenu(false)
         }
-      }} direction={'column'} width={'100%'} height={'100%'} justifyContent={'center'} title="modal_inner_wrapper">
+      }} direction={'column'} width={'100%'} height={'100%'} justifyContent={'center'} title="modal_inner_wrapper" >
 
         <AnimatePresence>
           {isVisible 
             &&
           <MotionStack
-          title="motion_stack"
-          bgcolor={'#474973'} 
-          width={isMobile ? '33%' : '10%'} 
-          height={'85%'}
-          initial={{ x: -200, y: 0 }}
-          animate={{ x: 2, y: 0 }}
-          exit={{ x: -200, y: 0 }}
-          transition={{ duration: 0.5 }}
-          direction="column"
-          spacing={2}
-          paddingX={2}
-          paddingY={3}
-          borderRadius={1}
+            title="motion_stack"
+            bgcolor={'#474973'} 
+            width={width} 
+            height={'85%'}
+            initial={{ x: -200, y: 0 }}
+            animate={{ x: 2, y: 0 }}
+            exit={{ x: -200, y: 0 }}
+            transition={{ duration: 0.5 }}
+            direction="column"
+            spacing={2}
+            paddingX={2}
+            paddingY={3}
+            borderRadius={1}
           >
 
-          <Typography sx={{textOverflow: 'ellipsis', whiteSpace: 'wrap'}} overflow={'hidden'} font={font} textAlign={'center'} fontSize={12}>{`Welcome ${user?.email}`}</Typography>
+          <Typography sx={{textOverflow: 'ellipsis', whiteSpace: 'wrap'}} overflow={'hidden'} font={'Fredoka Regular'} textAlign={'center'} fontSize={12}>{`Welcome ${user ? user?.email : 'to SolTheory'}`}</Typography>
 
             <Stack>
               {curLoc && buttons}

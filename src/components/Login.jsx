@@ -7,7 +7,7 @@ const LoginForm = () => {
 
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
-  const isMobile = useGlobalStore((state) => state.isMobile)
+  const screen = useGlobalStore((state) => state.screen)
   const setSession = useGlobalStore((state) => state.setSession)
   
   const [email, setEmail] = useState('')
@@ -108,7 +108,7 @@ const LoginForm = () => {
 const Login = () => {
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
-  const isMobile = useGlobalStore((state) => state.isMobile)
+  const screen = useGlobalStore((state) => state.screen)
   return (
     <Stack direction={'column'} width={'98%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={1} overflow={'auto'}>
       <Stack paddingY={1} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>

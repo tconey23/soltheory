@@ -10,7 +10,7 @@ import { useNavigate } from 'react-router-dom'
 const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   const navTo = useNavigate()
   const userMeta = useGlobalStore((state) => state.userMeta)
-  const { isMobile, setAlertProps, user} = useGlobalContext()
+  const { screen, setAlertProps, user} = useGlobalContext()
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const greenPrompt = selections[3]?.[0] || null
@@ -61,12 +61,12 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
 
   const renderStageList = (stageKey, color) => (
     <ImageList
-      sx={{ width: '100%', justifyContent: 'center', alignItems: 'center' }}
+      sx={{ width: '100%', justifyContent: 'center', alignItems: 'center', paddingX: 2}}
       gap={'0px'}
       cols={stageKey === '3' ? 1 : 3}
     >
       {selections[stageKey]?.map((p, i) => (
-        <Stack key={i} padding={isMobile ? 0 : 0.3} justifyContent="center" alignItems="center">
+        <Stack marginX={'0.5px'} key={i} padding={screen ? 0 : 0.3} justifyContent="center" alignItems="center">
           <Prompt prompt={p.prompt} color={color} />
         </Stack>
       ))}
@@ -76,7 +76,7 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   return (
     <Stack
       userdata="21things final stage"
-      sx={{ scale: isMobile ? 0.89 : 1 }}
+      sx={{ scale: screen ? 0.89 : 1 }}
       height="100%"
       width="100%"
       alignItems="center"
@@ -85,10 +85,11 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
       {renderStageList('2', '#fff200')}
       {renderStageList('3', '#45d500')}
 
-      <Stack width="75%" mt={4}>
-        <Typography>
+      <Stack width="100%" mt={4}>
+        <Typography fontFamily={'Fredoka Regular'}>
           Why does{' '}
           <Typography
+            fontFamily={'Fredoka Regular'}
             display="inline"
             paddingX={1}
             borderRadius={20}

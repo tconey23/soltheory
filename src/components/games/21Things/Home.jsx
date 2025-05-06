@@ -5,7 +5,7 @@ import Hexagon from '../Hexagon';
 
 
 const Home = ({ onPlay, payload }) => {
-    const isMobile = useGlobalStore((state) => state.isMobile)
+    const screen = useGlobalStore((state) => state.screen)
     const user = useGlobalStore((state) => state.user)
     const setUser = useGlobalStore((state) => state.setUser)
     const session = useGlobalStore((state) => state.session)
@@ -24,7 +24,7 @@ const Home = ({ onPlay, payload }) => {
     }, [clicked])
   
     return (
-      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: isMobile ? 0.8 : 1 }}>
+      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 0.8 : 1 }}>
         <Stack>
           <Hexagon dims={100}/>
         </Stack>

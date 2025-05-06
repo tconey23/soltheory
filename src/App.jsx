@@ -16,7 +16,7 @@ import TwentyOneThings from './components/games/21Things/TwentyOneThings';
 function App() {
   const navTo = useNavigate()
   const location = useLocation()
-  const isMobile = useGlobalStore((state) => state.isMobile)
+  const screen = useGlobalStore((state) => state.screen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
   const session = useGlobalStore((state) => state.session)
@@ -25,6 +25,8 @@ function App() {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
 
   const [appReady, setAppReady] = useState(false)
+
+  console.log(screen)
 
   useEffect(() => {
           if (user) {
@@ -64,7 +66,7 @@ function App() {
   })
 
   return (
-   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
+   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'} overflow={'hidden'}>
     <Stack width={'100%'} height={'10%'}>
       <AppHeader />
     </Stack>

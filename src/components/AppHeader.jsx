@@ -4,7 +4,7 @@ import useGlobalStore from '../business/useGlobalStore';
 
 const AppHeader = () => {
 
-  const isMobile = useGlobalStore((state) => state.isMobile)
+  const screen = useGlobalStore((state) => state.screen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
   const session = useGlobalStore((state) => state.session)
@@ -26,12 +26,12 @@ const AppHeader = () => {
 
   return (
     <Stack direction={'row'} width={'100%'} height={'100%'} bgcolor={'#372248'} alignItems={'center'} paddingY={1}>
-      <Stack>
+      <Stack paddingX={2}>
         <Button onClick={() => setToggleMenu(true)}>
           <i className="fi fi-br-menu-dots-vertical"></i>
         </Button>
       </Stack>
-      <Stack width={'90%'} alignItems={'flex-end'} paddingX={3}>
+      <Stack width={'90%'}  alignItems={'flex-end'} paddingX={3}>
         <Avatar src={avatar}/>
       </Stack>
     </Stack>
