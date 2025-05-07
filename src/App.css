@@ -21,6 +21,14 @@
   font-style: normal;
 }
 
+.css-1nv1aer-MuiStack-root, .css-1o6xuaw-MuiFormControl-root{
+  /* min-width: 100% !important; */
+}
+
+.css-900r8q-MuiStack-root{
+  height: 25px;
+}
+
 html, body {
   overscroll-behavior: none;
   overscroll-behavior-y: none;

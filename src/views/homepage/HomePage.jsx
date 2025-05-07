@@ -14,7 +14,6 @@ import { PerformanceMonitor } from '@react-three/drei'
 import { AdaptiveEvents } from '@react-three/drei'
 import { usePerf } from 'r3f-perf'
 import { PerfHeadless } from 'r3f-perf'
-import { useGlobalContext } from '../../business/GlobalContext'
 
 const PerfHook = () => {
   const perf = usePerf()
@@ -70,13 +69,6 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     const [startPosition, setStartPosition] = useState([0,3,50])
     const [targetPosition, setTargetPosition] = useState([-3, 7, -6])
     const [lookAt, setLookAt] = useState([2, 2, 9])
-    const {screen} = useGlobalContext()
-
-    useEffect(() =>{
-
-      if(screen.isDesktop){setTargetPosition([0, 5, 2])}
-
-    }, [])
 
     useEffect(() => {
       if(animate && start){

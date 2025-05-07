@@ -1,12 +1,11 @@
 import { useState, useEffect, useRef} from 'react'
 import React from 'react'
-import { useGlobalContext } from '../../business/GlobalContext'
 import { Center, Outlines, Text3D } from '@react-three/drei'
 import { useFont } from '@react-three/drei'
 import { useIntersect } from '@react-three/drei'
 
 const ThreeLetters = ({setLettersReady}) => {
-    const {degrees} = useGlobalContext()
+  const degrees = (degrees) => degrees * (Math.PI / 180);
     const font = useFont('/fonts/Fredoka_Regular.json')
     const [readyCount, setReadyCount] = useState(0)
 

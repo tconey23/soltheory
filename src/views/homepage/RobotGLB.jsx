@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { useAnimations } from '@react-three/drei'
 
-import { useGlobalContext } from "../../business/GlobalContext"
 
 const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isJumping, setTurnAround, turnAround}) => {
     useGLTF.preload('/Compressed.glb')
@@ -15,7 +14,7 @@ const RobotGLB = ({groupRef, isMoving, isSprinting, sprintMult, isJumping, setTu
     const idleTimeoutRef = useRef()
     const waveTimeoutRef = useRef()
     const danceTimeoutRef = useRef()
-    const {degrees} = useGlobalContext()
+    const degrees = (degrees) => degrees * (Math.PI / 180);
     const [isIdle, setIsIdle] = useState(false)
     const animWalking = 'Bip_Walking'
     const animRunning = 'Bip_Running'

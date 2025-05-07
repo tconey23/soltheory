@@ -1,8 +1,18 @@
 import { supabase } from "./supabaseClient"
 
+export const listAllPacks = async () => {
+  let { data: sixpicspacks, error } = await supabase
+  .from('sixpicspacks')
+  .select('*')
+
+  if(sixpicspacks){
+    return sixpicspacks
+  }
+}
+
 export const getGames = async () => {
 
-    let { data: games, error } = await supabase
+    let { data: games, error } = await supabase 
     .from('games')
     .select('*')
 
@@ -33,6 +43,10 @@ export const get21Things = async (index) =>{
         return error 
 
     }
+
+export const getGifs = async () => {
+
+}
 
 export const addGameToUser = async (user, newGameData) => {
         const { data: foundUser, error: fetchError } = await supabase

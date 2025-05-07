@@ -3,10 +3,10 @@ import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography 
 import { motion, AnimatePresence } from 'framer-motion';
 import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
-import AvatarForm from '../AvatarForm';
 import TwentOneThingsButton from './TwentyOneThingsButton';
+import { useNavigate } from 'react-router-dom';
 import SixPicsButton from './SixPicsButton';
-import TwentyOneThings from './21Things/TwentyOneThings';
+
 const HeaderImage = () => {
 
     const [imgIndex, setImgIndex] = useState(0)
@@ -17,8 +17,6 @@ const HeaderImage = () => {
         <img src={'/puzzle.gif'} style={{height: '100%'}}/>, 
         <img src={'/game-controller.gif'} style={{height: '100%'}}/>
     ]
-  
-  //   console.log(userMeta)
 
   useEffect(() => {
     setHeaderImg(headerImages[imgIndex])
@@ -42,6 +40,7 @@ const GamesWrapper = () => {
 
     const MotionText = motion(Typography);
     const MotionAvatar = motion(Avatar);
+    const navTo = useNavigate()
   
     const font = useGlobalStore((state) => state.font);
     const screen = useGlobalStore((state) => state.screen);
@@ -53,10 +52,6 @@ const GamesWrapper = () => {
     const [gameObj, setGameObj] = useState()
     const [hasMounted, setHasMounted] = useState(false);
 
-    useEffect(() => {
-        console.log(gameObj)
-    }, [selectedGame, gameObj])
-
       useEffect(() => {
           setTimeout(() => {
               setHasMounted(true);
@@ -64,14 +59,7 @@ const GamesWrapper = () => {
       }, []);
   
   
-      useEffect(() => {
-          switch(selectedGame){
-              case '21things': setGameObj(<TwentyOneThings />);
-              break;
-              case '6pics': setGameObj(<Password />);
-              break;
-          }
-      }, [selectedGame])
+
   
     return (
       <Stack
@@ -126,44 +114,22 @@ const GamesWrapper = () => {
               borderRadius: 1,
             }}
           >
-              {/* <Typography sx={{bgcolor: '#f4f6f8', marginY: 2}}>Select Game</Typography> */}
-            
+ 
             <Select
-              value={selectedGame}
+              value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
-              <MenuItem value="21things">
+              <MenuItem value="21things" onClick={() => navTo(`/games/21things`)}>
                 <TwentOneThingsButton />
               </MenuItem>
 
-              <MenuItem value="6pics">
+              <MenuItem value="6pics"  onClick={() => navTo(`/games/6pics`)}>
                 <SixPicsButton />
               </MenuItem>
 
             </Select>
           </Stack>
         </MotionStack>
-  
-        <AnimatePresence mode="wait">
-          {selectedGame && (
-            <MotionStack
-              key={selectedGame}
-              width="85%"
-              sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 8}}
-              alignItems="center"
-              justifyContent="center"
-              direction="column"
-              paddingY={2}
-              borderRadius={1}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 30 }}
-              transition={{ duration: 0.5 }}
-            >
-              {gameObj}
-            </MotionStack>
-          )}
-        </AnimatePresence>
       </Stack>
     );
 };

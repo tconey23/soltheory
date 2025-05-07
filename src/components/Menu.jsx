@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Button, Modal, Stack, Tooltip, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
-import { useGlobalContext } from '../business/GlobalContext';
+
 import { useNavigate } from 'react-router-dom';
 import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
@@ -15,7 +15,7 @@ const Menu = ({renders, setRenders}) => {
 
   const [isVisible, setIsVisible] = useState(true);
   const font = useGlobalStore((state) => state.font)
-  const {screen} = useGlobalContext()
+
   const user = useGlobalStore((state) => state.user)
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
@@ -24,15 +24,6 @@ const Menu = ({renders, setRenders}) => {
 
   const [width, setWidth] = useState('10%')
 
-  useEffect(() =>{
-
-    if(screen.isXs){setWidth('50%')}
-    if(screen.isDesktop){setWidth('10%')}
-    if(screen.isMd){setWidth('20%')}
-    if(screen.isSm && screen.isLandscape){setWidth('35%')}
-    if(screen.isLandscape){setWidth('15%')}
-
-  }, [screen])
 
   useEffect(()=>{
     setCurLoc(loc.pathname)
@@ -113,10 +104,10 @@ const Menu = ({renders, setRenders}) => {
   useEffect(() => {
     
       setButtons(
-        menuButtons.map((b) => {
+        menuButtons.map((b, i) => {
           if(loc.pathname !== b.pathFilter){
             return (
-                <Tooltip title={b.tooltip} followCursor>
+                <Tooltip key={i} title={b.tooltip} followCursor>
                   <Stack paddingY={2}>
                     {user ?
                       <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>

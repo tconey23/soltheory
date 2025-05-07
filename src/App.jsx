@@ -12,21 +12,22 @@ import { checkSession, getMeta } from './business/supabase_calls';
 import Error from './views/Error';
 import GamesWrapper from './components/games/GamesWrapper';
 import TwentyOneThings from './components/games/21Things/TwentyOneThings';
+import SixPics from './assets/SixPics';
+import Pic6 from './components/games/6pics/Pic6';
+import AdminControls from './components/AdminControls';
 
 function App() {
   const navTo = useNavigate()
-  const location = useLocation()
-  const screen = useGlobalStore((state) => state.screen)
+  // const location = useLocation()
+  // const screen = useGlobalStore((state) => state.screen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
-  const session = useGlobalStore((state) => state.session)
+  // const session = useGlobalStore((state) => state.session)
   const setSession = useGlobalStore((state) => state.setSession)
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
 
   const [appReady, setAppReady] = useState(false)
-
-  console.log(screen)
 
   useEffect(() => {
           if (user) {
@@ -48,22 +49,21 @@ function App() {
         }, [user]);
 
   useEffect(() => {
-    if(user && userMeta){
-      navTo('/home')
-    }
-  }, [user, userMeta])
-
-  useEffect(() => {
-    if(location.pathname === '/'){
-      navTo('/home')
-    }
-  }, [location])
-
-  useEffect(() => {
     setTimeout(() => {
       setAppReady(true)
     }, 1000);
-  })
+  }, [])
+
+  useEffect(() => {
+    console.log('App mounted');
+  }, []);
+
+  useEffect(() =>{
+    if(user){
+      navTo('/home')
+    }
+  }, [user])
+  
 
   return (
    <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'} overflow={'hidden'}>
@@ -74,10 +74,8 @@ function App() {
     <Routes>
 
       <Route path='*' element={<Error/>} />
-
-      <Route path={"/"} element={<HomePage />}/>
-      <Route path={"/home" || "/"} element={<HomePage />}/>
-      <Route path={"/login"} element={<Modals needsLogin={true}/>} />
+      <Route path={"/home"} element={<HomePage />}/>
+      {!user && <Route path={"/login"} element={<Modals needsLogin={true}/>} />}
 
       <Route 
         path={"/account"}
@@ -102,6 +100,24 @@ function App() {
         element={
           <PrivateRoute userData={userMeta}>
             <TwentyOneThings />
+          </PrivateRoute>
+        } 
+      />
+
+      <Route 
+        path={"/games/6pics"}
+        element={
+          <PrivateRoute userData={userMeta}>
+            <Pic6/>
+          </PrivateRoute>
+        } 
+      />
+
+<Route 
+        path={"/account/admin"}
+        element={
+          <PrivateRoute userData={userMeta}>
+            <AdminControls />
           </PrivateRoute>
         } 
       />

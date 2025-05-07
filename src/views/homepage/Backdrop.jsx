@@ -1,11 +1,10 @@
 import { Environment, Lightformer } from "@react-three/drei"
-import { useGlobalContext } from "../../business/GlobalContext"
 import { useIntersect } from '@react-three/drei'
 import { useRef } from "react"
 
-const Backdrop = ({blur, int, backRot, envRot, res, setBackdropReady}) => {
+const degrees = (degrees) => degrees * (Math.PI / 180);
 
-  const {degrees} = useGlobalContext()
+const Backdrop = ({blur, int, backRot, envRot, res, setBackdropReady}) => {
   const ref = useIntersect((visible) => {
     if(visible){
       setBackdropReady(true)

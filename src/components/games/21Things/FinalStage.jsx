@@ -3,14 +3,12 @@ import { Stack, Button, Typography, ImageList, TextField } from '@mui/material'
 import { useEffect, useState } from 'react'
 import Prompt from './Prompt'
 import useGlobalStore from '../../../business/useGlobalStore'
-import { useGlobalContext } from '../../../business/GlobalContext'
 import { supabase } from '../../../business/supabaseClient'
 import { useNavigate } from 'react-router-dom'
 
 const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   const navTo = useNavigate()
   const userMeta = useGlobalStore((state) => state.userMeta)
-  const { screen, setAlertProps, user} = useGlobalContext()
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const greenPrompt = selections[3]?.[0] || null
@@ -76,7 +74,6 @@ const FinalStage = ({ selections, setSelections, setCurrentStage, date }) => {
   return (
     <Stack
       userdata="21things final stage"
-      sx={{ scale: screen ? 0.89 : 1 }}
       height="100%"
       width="100%"
       alignItems="center"

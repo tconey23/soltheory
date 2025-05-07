@@ -8,11 +8,13 @@ import { updateUserName } from '../business/supabase_calls';
 import Username from './Username';
 import Password from './Password';
 import AdminControls from './AdminControls';
+import { useNavigate } from 'react-router-dom';
 
 const Account = () => {
   const MotionText = motion(Typography);
   const MotionAvatar = motion(Avatar);
 
+  const navTo = useNavigate()
   const font = useGlobalStore((state) => state.font);
   const screen = useGlobalStore((state) => state.screen);
   const userMeta = useGlobalStore((state) => state.userMeta);
@@ -43,7 +45,7 @@ const Account = () => {
             break;
             case 'update_password': setAccountObj(<Password />);
             break;
-            case 'admin_controls': setAccountObj(<AdminControls />);
+            case 'admin_controls': navTo('/account/admin');
             break;
         }
     }, [selectedAccountOption])

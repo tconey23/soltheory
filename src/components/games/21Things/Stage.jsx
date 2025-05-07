@@ -2,7 +2,6 @@ import { Stack, Button, Typography, ImageList, Table, TableHead, TableBody, Tabl
 import { useState, useEffect } from 'react'
 import useGlobalStore from '../../../business/useGlobalStore'
 import Prompt from './Prompt'
-import { useGlobalContext } from '../../../business/GlobalContext'
 
 const Stage = ({ 
   stageNum,
@@ -16,30 +15,9 @@ const Stage = ({
   currentColor,
   prevColor
 }) => {
-  const {screen} = useGlobalContext()
   const [displayPrompts, setDisplayPrompts] = useState([])
-  const [width, setWidth] = useState('30%')
-  const [height, setHeight] = useState('30%')
-
-  useEffect(() =>{
-    console.log(screen)
-    if(screen.isMobile){
-      setWidth('100%')
-    }
-    if(screen.isLandscape){
-      setWidth('45%')
-    }
-    if(screen.isXs){
-      setWidth('40%')
-    }
-    if(screen.isXs && screen.isPortrait && screen.isMobile && screen.isShort){
-      setHeight('85%')
-    }
-    if(screen.isXs && screen.isPortrait && screen.isMobile && !screen.isShort){
-      setHeight('100%')
-      setWidth('100%')
-    }
-  }, [screen])
+  const [width, setWidth] = useState('33%')
+  const [height, setHeight] = useState('83%')
 
   
   useEffect(() => {
@@ -92,8 +70,8 @@ const Stage = ({
   const rows = chunkArray(displayPrompts, 3);
 
   return (
-    <Stack height="100%" width={'100%'} alignItems="center" sx={{ scale: screen.isXs ? 0.98 : 1, overflow: 'hidden' }}>
-      <Stack direction="row" spacing={2} mt={0} justifyContent="space-around" width="100%" alignItems="center">
+    <Stack height={"100%"} width={'100%'} alignItems="center" sx={{overflow: 'hidden' }}>
+      <Stack height={"5%"} direction="row" spacing={2} mt={0} justifyContent="space-around" width="100%" alignItems="center">
         <Stack userdata="stage wrapper" width="66%">
           <Typography>
             Select {maxSelect}: {selectCount}/{maxSelect}
