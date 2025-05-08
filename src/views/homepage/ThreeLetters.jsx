@@ -32,7 +32,7 @@ const ThreeLetters = ({setLettersReady}) => {
               <Center>
                 <Text3D
                         castShadow
-                        position={[0, 0, 0]}
+                        position={[0, 1, 0]}
                         font={'/fonts/Fredoka_Regular.json'}
                         size={4}
                         height={0.1}

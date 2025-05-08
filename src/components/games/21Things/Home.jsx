@@ -6,13 +6,6 @@ import Hexagon from '../Hexagon';
 
 const Home = ({ onPlay, payload }) => {
     const screen = useGlobalStore((state) => state.screen)
-    const user = useGlobalStore((state) => state.user)
-    const setUser = useGlobalStore((state) => state.setUser)
-    const session = useGlobalStore((state) => state.session)
-    const setSession = useGlobalStore((state) => state.setSession)
-    const userMeta = useGlobalStore((state) => state.userMeta)
-    const setUserMeta = useGlobalStore((state) => state.setUserMeta)
-    const setGameIndex = useGlobalStore((state) => state.setGameIndex)
     const gameIndex = useGlobalStore((state) => state.gameIndex)
 
     const [clicked, setClicked] = useState(1)

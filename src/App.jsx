@@ -38,10 +38,6 @@ function App() {
     setScreen(sz[0])
   }, [screenSize])
 
-  useEffect(() =>{
-    console.log(screen)
-  }, [screen])
-
   useEffect(() => {
           if (user) {
             (async () => {

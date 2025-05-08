@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import SPAdminWrapper from './games/6pics/admin/SPAdminWrapper';
 import SPAdminPacks from './games/6pics/admin/SPAdminPacks';
 import InProgress from '../ui_elements/InProgress';
+import AddPrompts from './games/6pics/admin/AddPrompts';
 
 const AdminControls = () => {
   const MotionText = motion(Typography);
@@ -30,7 +31,7 @@ const AdminControls = () => {
 
     useEffect(() => {
           switch(selectedOption){
-              case '21things_prompts': setAccountObj(<InProgress />);
+              case '21things_prompts': setAccountObj(<AddPrompts />);
               break;
               case '6pics_packs': setAccountObj(<SPAdminPacks setSelectedOption={setSelectedOption}/>);
               break;
@@ -54,7 +55,7 @@ const AdminControls = () => {
       initial={hasMounted ? false : { y: -300, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 1 }}
+      transition={{ duration: 0.5 }}
     >
       Admin Controls
     </MotionText>
@@ -83,7 +84,7 @@ const AdminControls = () => {
       initial={hasMounted ? false : { opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.5, delay: 1.5  }}
     >
       <Stack
         sx={{

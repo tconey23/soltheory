@@ -73,19 +73,22 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     const screen = useGlobalStore((state) => state.screen)
 
     useEffect(() => {
-      console.log(targetPosition)
-    }, [targetPosition])
+      console.log(screen)
+    }, [screen])
    
     useEffect(() =>{
      
       switch(screen){
-        case 'xs':  setTargetPosition([0, 7, -2])
-                    setLookAt([1.6, 4, 9])
+        case 'xs':  setTargetPosition([0, 6, -4])
+                    setLookAt([1.6, 2, 9])
         break
         case 'sm':  setTargetPosition([0, 5.5, 0])
                     setLookAt([1.6, 2, 9])
         break
         case 'md':  setTargetPosition([-3, 5, 0])
+                    setLookAt([1.6, 2, 9])
+        break
+        case 'lg':  setTargetPosition([-1, 5, 0])
                     setLookAt([1.6, 2, 9])
         break
       }
@@ -164,7 +167,7 @@ const HomePage = ({showBot = true}) => {
   
           <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
           <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
-          {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(0), degrees(0)]}/>}
+          {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
 
       </Canvas>
             

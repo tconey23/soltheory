@@ -25,6 +25,7 @@ const Menu = ({renders, setRenders}) => {
   const [curLoc, setCurLoc] = useState()
 
   const [width, setWidth] = useState('10%')
+  const {screen} = useGlobalStore()
 
 
   useEffect(()=>{
@@ -60,6 +61,8 @@ const Menu = ({renders, setRenders}) => {
   const handleGames = async () => {
     delayedNav('/games')
   }
+
+  //<i class="fi fi-sr-psychology"></i>
   
   const menuButtons = [
     {
@@ -68,7 +71,8 @@ const Menu = ({renders, setRenders}) => {
       color: 'primary',
       display: true,
       tooltip: userMeta ? 'Modify account' : 'Login to SOLTheory',
-      pathFilter: '/home'
+      pathFilter: '/home',
+      icon: <i style={{marginRight: 10}} className="fi fi-rr-house-chimney"></i>
     },
     {
       name: userMeta ? 'mySOL' : "Login",
@@ -76,7 +80,8 @@ const Menu = ({renders, setRenders}) => {
       color: 'primary',
       display: true,
       tooltip: userMeta ? 'Modify account' : 'Login to SOLTheory',
-      pathFilter: '/account'
+      pathFilter: '/account',
+      icon: userMeta ? <i style={{marginRight: 8}} class="fi fi-ss-user-skill-gear"></i> : <i style={{marginRight: 8}} class="fi fi-rr-sign-in-alt"></i>
     },
     {
       name: userMeta && 'SOLGames',
@@ -84,7 +89,8 @@ const Menu = ({renders, setRenders}) => {
       color: userMeta ? 'primary' : 'disabled',
       display: userMeta ? true : false,
       tooltip: userMeta ? 'Play SOLGames' : 'Login to play SOLGames',
-      pathFilter: '/games'
+      pathFilter: '/games',
+      icon: <i style={{marginRight: 5}} className="fi fi-rs-gamepad"></i>
     },
     {
       name: userMeta && 'SOLMates',
@@ -92,14 +98,16 @@ const Menu = ({renders, setRenders}) => {
       color: userMeta ? 'primary' : 'disabled',
       display: userMeta ? true : false,
       tooltip: userMeta ? 'See SOLMates' : 'Login to see SOLMates',
-      pathFilter: '/mates'
+      pathFilter: '/mates',
+      icon: <i style={{marginRight: 5}} className="fi fi-rr-following"></i>
     },
     {
       name: userMeta && 'Logout',
       function: userMeta ? handleLogout : handleLogin,
       color: userMeta ? 'important' : 'disabled',
       display: userMeta ? true : false,
-      tooltip: 'Log out of SOLTheory'
+      tooltip: 'Log out of SOLTheory',
+      icon: <i style={{marginRight: 5}} className="fi fi-rr-leave"></i>
     }
   ]
 
@@ -110,12 +118,19 @@ const Menu = ({renders, setRenders}) => {
           if(loc.pathname !== b.pathFilter){
             return (
                 <Tooltip key={i} title={b.tooltip} followCursor>
-                  <Stack paddingY={2}>
+                  <Stack paddingY={2} paddingX={5} alignItems={'center'}>
                     {user ?
-                      <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>
+                      <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
+                        <Typography fontSize={15}>{b?.icon}</Typography>
+                        <Typography fontSize={15}>{b.name}</Typography>
+                      </Button>
                     :
                       <>
-                        {!user && b.name === 'Login' && <Button title="button" disabled={!b.display} color={b.color} onClick={b.function}>{b.name}</Button>}
+                        {!user && b.name === 'Login' &&                       
+                        <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
+                        <Typography fontSize={15}>{b?.icon}</Typography>
+                        <Typography fontSize={15}>{b.name}</Typography>
+                      </Button>}
                       </>
                     }
                   </Stack>
@@ -140,7 +155,7 @@ const Menu = ({renders, setRenders}) => {
           <MotionStack
             title="motion_stack"
             bgcolor={'#474973'} 
-            width={xs ? '50%' : '25%'} 
+            width={screen === 'xs' ? '50%' : '25%'} 
             height={'85%'}
             initial={{ x: -200, y: 0 }}
             animate={{ x: 2, y: 0 }}

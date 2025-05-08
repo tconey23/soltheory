@@ -1,109 +1,167 @@
-import { Stack, Button, Typography, ImageList, Table, TableHead, TableBody, TableContainer, TableRow, TableCell } from '@mui/material'
-import { useState, useEffect } from 'react'
-import useGlobalStore from '../../../business/useGlobalStore'
-import Prompt from './Prompt'
+import {
+  Stack,
+  Button,
+  Typography,
+  Table,
+  TableBody,
+  TableContainer,
+  TableRow,
+  TableCell,
+  Box,
+} from '@mui/material';
+import { useState, useEffect } from 'react';
+import Prompt from './Prompt';
 
-const Stage = ({ 
+const Stage = ({
   stageNum,
   prompts,
   setPrompts,
-  selections,
-  setSelections,
   setCurrentStage,
   nextStage,
   maxSelect,
   currentColor,
-  prevColor
+  prevColor,
 }) => {
-  const [displayPrompts, setDisplayPrompts] = useState([])
-  const [width, setWidth] = useState('33%')
-  const [height, setHeight] = useState('83%')
+  const [displayPrompts, setDisplayPrompts] = useState([]);
+  const [width, setWidth] = useState('33%');
+  const [height, setHeight] = useState('83%');
 
-  
+  // Show all prompts on stage 1, and prior+current for stages 2+
   useEffect(() => {
-    const stageSelections = selections[stageNum] || []
-    const newPromptSet = [...stageSelections]
-    const ids = new Set(stageSelections.map(p => p.prompt))
+    if (stageNum === 1) {
+      setDisplayPrompts(prompts);
+    } else {
+      const stageSelections = prompts.filter(
+        (p) => p.stages.includes(stageNum) || p.stages.includes(stageNum - 1)
+      );
+      setDisplayPrompts(stageSelections);
+    }
+  }, [prompts, stageNum]);
 
-    prompts.forEach(p => {
-      if (p.color === prevColor && !ids.has(p.prompt)) {
-        newPromptSet.push({ ...p })
-      }
-    })
+  // How many are selected in the current stage
+  const selectCount = displayPrompts.filter((p) =>
+    p.stages.includes(stageNum)
+  ).length;
 
-    setDisplayPrompts(newPromptSet)
-  }, [prompts, selections, stageNum, prevColor])
-
-  const currentSelections = displayPrompts.filter(p => p.color === currentColor)
-  const selectCount = currentSelections.length
-
+  // Handle selection toggling
   const handleSelect = (_, index) => {
-    setDisplayPrompts((prev) =>
-      prev.map((p, i) => {
-        if (i !== index) return p
-        const isSelected = p.color === currentColor
-        if (isSelected) return { ...p, color: prevColor }
-        if (selectCount >= maxSelect) return p
-        return { ...p, color: currentColor }
-      })
-    )
-  }
+    const updated = displayPrompts.map((p, i) => {
+      if (i !== index) return p;
 
+      const isSelected = p.stages.includes(stageNum);
+      if (isSelected) {
+        // Deselect
+        return { ...p, stages: p.stages.filter((n) => n !== stageNum) };
+      }
+
+      if (selectCount >= maxSelect) return p; // maxed out
+
+      // Select
+      return { ...p, stages: [...p.stages, stageNum] };
+    });
+
+    setDisplayPrompts(updated);
+  };
+
+  // Commit current stage selection into master prompts array
   const handleNext = () => {
-    const selected = displayPrompts.filter(p => p.color === currentColor)
-    const retained = prompts.filter(p => ![prevColor, currentColor].includes(p.color))
+    const updated = prompts.map((p) => {
+      const match = displayPrompts.find((dp) => dp.prompt === p.prompt);
+      return match ? { ...match } : p;
+    });
 
-    setSelections(prev => ({
-      ...prev,
-      [stageNum]: selected
-    }))
-    setPrompts([...selected, ...retained])
-    setCurrentStage(nextStage)
-  }
+    setPrompts(updated);
+    setCurrentStage(nextStage);
+  };
 
-  const chunkArray = (arr, size) => {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+  // Split into rows of 3 prompts
+  const chunkArray = (arr, size) =>
+    Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
       arr.slice(i * size, i * size + size)
     );
-  };
-  
+
   const rows = chunkArray(displayPrompts, 3);
 
   return (
-    <Stack height={"100%"} width={'100%'} alignItems="center" sx={{overflow: 'hidden' }}>
-      <Stack height={"5%"} direction="row" spacing={2} mt={0} justifyContent="space-around" width="100%" alignItems="center">
-        <Stack userdata="stage wrapper" width="66%">
+    <Stack height="100%" width="95%" alignItems="center" sx={{ overflow: 'hidden' }}>
+      <Stack
+        height="5%"
+        direction="row"
+        spacing={2}
+        mt={0}
+        justifyContent="space-around"
+        width="100%"
+        alignItems="center"
+      >
+        <Stack width="66%">
           <Typography>
             Select {maxSelect}: {selectCount}/{maxSelect}
           </Typography>
         </Stack>
-        <Stack width="15%" >
-          <Button variant="contained" onClick={() => setCurrentStage(stageNum - 1)}>Back</Button>
-        </Stack>
-        <Stack width="15%">
-          {selectCount === maxSelect && <Button variant="contained" onClick={handleNext}>Next</Button>}
+
+        <Stack width="50%" direction={'row'} justifyContent={'space-evenly'}>
+          <Button
+            variant="contained"
+            onClick={() => setCurrentStage(stageNum - 1)}
+          >
+            Back
+          </Button>
+          {selectCount === maxSelect && (
+            <Button variant="contained" onClick={handleNext}>
+              Next
+            </Button>
+          )}
         </Stack>
       </Stack>
-      <TableContainer sx={{height: height}}>
-        <Table sx={{width: width, justifySelf: 'center'}}>
-          <TableBody>
-            {rows.map((row, rowIndex) => (
-              <TableRow key={rowIndex}>
-                {row.map((p, colIndex) => {
-                  const originalIndex = rowIndex * 3 + colIndex;
-                  return (
-                    <TableCell sx={{width: '33%', padding: 1, justifyItems: 'center'}} onClick={() => handleSelect(p, originalIndex)} key={colIndex}>
-                      <Prompt prompt={p.prompt} color={p.color} />
-                    </TableCell>
-                  );
-                })}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+      <Box
+  sx={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(3, 1fr)',
+    gap: 2,
+    width: '100%',
+    maxWidth: '600px',
+    maxHeight: '85%',
+    padding: 0.5,
+    margin: '0 auto',
+    overflow: 'auto'
+  }}
+>
+  {displayPrompts.map((p, i) => {
+    const color = p.stages.includes(stageNum)
+      ? currentColor
+      : p.stages.includes(stageNum - 1)
+      ? prevColor
+      : 'white';
+
+    return (
+      <Box
+        key={i}
+        onClick={() => handleSelect(p, i)}
+        sx={{
+          backgroundColor: color,
+          height: '80px',
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textAlign: 'center',
+          borderRadius: 2,
+          boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
+          cursor: 'pointer',
+          padding: 1,
+          fontSize: '0.70rem',
+          lineHeight: 1,
+        }}
+      >
+        {p.prompt}
+      </Box>
+    );
+  })}
+</Box>
+
     </Stack>
-  )
-}
+  );
+};
 
 export default Stage;

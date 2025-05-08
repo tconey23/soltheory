@@ -18,7 +18,19 @@ const Prompt = ({prompt, color}) => {
             <Stack
                 userdata='21things prompt' 
                 padding={1} 
-                sx={{width: '100%', transition: 'all 0.25s ease-in-out', '&:hover': {cursor: 'pointer', scale: 1.05}, marginTop: '4px', marginBottom: '5px', marginLeft: '5px', marginRight: '5px'}} 
+                sx={{    
+                    
+                    minHeight: '100%',
+                    minWidth: '100%',
+                    padding: 1,
+                    backgroundColor: color,
+                    borderRadius: 2,
+                    textAlign: 'center',
+                    boxShadow: '0px 2px 6px rgba(0,0,0,0.15)',
+                    fontSize: '0.9rem',
+                    lineHeight: 1,
+                    overflow: 'hidden',
+                }} 
                 alignItems={'center'} 
                 justifyContent={'center'} 
                 boxShadow={'1px 1px 7px 1px #0000007a'} 
@@ -27,7 +39,7 @@ const Prompt = ({prompt, color}) => {
                 maxWidth={'100%'}
                 backgroundColor={color}
             >
-                <Typography fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis'}} textAlign={'center'} fontSize={10}>{prompt}</Typography>
+                <Typography fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis'}} textAlign={'center'} fontSize={'0.9rem'}>{prompt}</Typography>
             </Stack>
     )
 }

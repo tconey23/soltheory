@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import RobotGLB from './RobotGLB'
+import useGlobalStore from '../../business/useGlobalStore'
 
 const NPRobot = ({pos, rot}) => {
     const groupRef = useRef()

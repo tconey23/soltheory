@@ -22,20 +22,24 @@ const green = '#45d500'
   
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
+
+
     
-    useEffect(() => {
-      const fetchPrompts = async () => {
-        const res = await get21Things(gameIndex)
-        if (res && res.date && res.prompts) {
-          const parsedPrompts = JSON.parse(res.prompts)
-          const initialized = parsedPrompts.map(p => ({
-            prompt: typeof p === 'string' ? p : p.prompt,
-            color: 'white'
-          }))
-          setPayload(res)
-          setPrompts(initialized)
-        }
+    const fetchPrompts = async (id) => {
+      const res = await get21Things(id || gameIndex)
+      if (res && res.date && res.prompts) {
+        const parsedPrompts = res.prompts
+
+        const initialized = parsedPrompts.map(p => ({
+          prompt: typeof p === 'string' ? p : p.prompt,
+          stages: [0]
+        }));
+
+        setPayload(res)
+        setPrompts(initialized)
       }
+    }
+    useEffect(() => {
     
       fetchPrompts()
     }, [gameIndex])
@@ -56,9 +60,29 @@ const green = '#45d500'
         case 3:
           return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:
-          return <FinalStage height={'100%'} user={user} date={payload.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} />
+          return <FinalStage height={'100%'} user={user} date={payload?.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} prompts={prompts}/>
         default:
-          return <Home onPlay={() => setCurrentStage(1)} payload={payload} setGameIndex={setGameIndex} gameIndex={gameIndex} />
+          return <Home
+          onPlay={() => {
+            // Clear all selections (reset stages to [0])
+            setPrompts((prev) =>
+              prev.map((p) => ({
+                ...p,
+                stages: [0], // or [] if you want to remove stage 0 as well
+              }))
+            );
+        
+            // Clear optional user selections/note (if still used)
+            setSelections({ 1: [], 2: [], 3: [], note: '' });
+        
+            // Reset to stage 1
+            setCurrentStage(1);
+          }}
+          payload={payload}
+          setGameIndex={setGameIndex}
+          gameIndex={gameIndex}
+          setSelections={setSelections}
+        />
       }
     }
   

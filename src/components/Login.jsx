@@ -41,16 +41,16 @@ const LoginForm = () => {
 
   return (
     <>
-    <Stack paddingY={5} height={'75%'}>
+    <Stack paddingY={7.5} height={'80%'}>
     <Stack paddingBottom={'1px'} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
       <FormControl>
-        <InputLabel>Email Address</InputLabel>
+        <InputLabel sx={{textAlign: 'flex-start'}}>Email Address</InputLabel>
         <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
       </FormControl>
     </Stack>
 
     <Stack direction={'column'} width={'100%'} justifyContent={'center'} alignItems={'center'} >
-        <Stack paddingY={1} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
             <InputLabel>Password</InputLabel>
             <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
@@ -64,7 +64,7 @@ const LoginForm = () => {
         </Stack>
 
         {newUser && 
-        <Stack paddingY={1} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+        <Stack paddingY={2.5} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
             <InputLabel>Confirm Password</InputLabel>
             <Input value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
