@@ -19,6 +19,7 @@ const GameWrapper = ({ pack }) => {
   const [refreshScore, setRefreshScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [showGiveUp, setShowGiveUp] = useState(false);
+  const [isWin, setIsWin] = useState(false)
 
   const sliderRef = useRef();
 
@@ -101,6 +102,9 @@ const GameWrapper = ({ pack }) => {
               {i === activeSlide && (
                 <Stack justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
                   <SixPicsVideoPlayer
+                    isWin={isWin}
+                    setIsWin={setIsWin}
+                    wins={wins}
                     level={level}
                     setWins={setWins}
                     next={next}
@@ -112,8 +116,11 @@ const GameWrapper = ({ pack }) => {
                     showGiveUp={showGiveUp}
                   />
                   <TextBoxes
+                    isWin={isWin}
+                    setIsWin={setIsWin}
                     answer={level.answer}
                     setWins={setWins}
+                    wins={wins}
                     next={next}
                     prev={prev}
                     levelScore={levelScore}

@@ -11,7 +11,7 @@ import AdminControls from './AdminControls';
 import { useNavigate } from 'react-router-dom';
 
 const Account = () => {
-  const MotionText = motion(Typography);
+  const MotionText = motion(Typography); 
   const MotionAvatar = motion(Avatar);
 
   const navTo = useNavigate()

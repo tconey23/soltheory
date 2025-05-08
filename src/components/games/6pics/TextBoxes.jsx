@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 const MotionStack = motion(Stack);
 
 
-const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp}) => {
+const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, wins}) => {
 
   const [inputLetters, setInputLetters] = useState([])
   const [letterCount, setLetterCount] = useState(0)
@@ -23,8 +23,8 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp}) =>
   }, [autoAnswer])
 
   useEffect(() => {
-    // console.log(levelScore[index]?.score > 0)
-  }, [levelScore, index])
+    console.log(levelScore)
+  }, [levelScore])
 
   useEffect(() => { 
     if(isWin) {setWins(prev => prev +1)}
@@ -109,25 +109,6 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp}) =>
     
     const isLocked = levelScore?.[index]?.score === 0;
 
-    // useEffect(() => {
-    //   console.log(inputRefs?.current.length)
-    //   let letterArray = answer.replaceAll(' ', '').split('')
-    //   let fieldArray = []
-
-    //   for(let i = 0; i < inputRefs?.current.length; i++){
-    //     inputRefs?.current[i].forEach((l) => {
-    //       fieldArray.push(l)
-    //     })
-    //   }
-      
-    //   fieldArray.forEach((f, i) => {
-    //     f.value = letterArray[i]
-    //   })
-
-
-
-    // }, [answer])
-
   return (
     <>
     <Stack direction={"row"} width={"100%"} justifyContent={"center"} flexWrap={'wrap'}>
@@ -139,7 +120,10 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp}) =>
          bgcolor={'#00000082'} width={'100%'} height={'25vh'} justifyContent={"center"} alignItems={'center'}>
           <Typography fontSize={25} fontFamily={'Fredoka Regular'}>{`Answer: ${answer}`}</Typography>
           <Typography fontSize={25} fontFamily={'Fredoka Regular'}>CORRECT!</Typography>
-          <Button onClick={() => next()} variant="contained">Continue</Button>
+          <Button onClick={() => {
+            // setIsWin(false)
+            next()
+            }} variant="contained">Continue</Button>
         </MotionStack>
       }
     {!isWin && answer?.split(" ").map((word, wordIndex) => {

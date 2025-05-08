@@ -135,19 +135,21 @@ const Stage = ({handleGoToSlide, level, setLevels, levels, setGameOver}) => {
         handleGoToSlide(dir, score)
       } else {
         console.log('end')
-        handleGoToSlide('end', score)
+        handleGoToSlide('end', score) 
       }
     }
   
+    console.log(setIsWin)
+
     return (
       <>
   
         <Stack>
-            <SixPicsVideoPlayer videoRef={videoRef} level={level} levelScore={levelScore} setLevelScore={setLevelScore}/>
+            <SixPicsVideoPlayer isWin={isWin} videoRef={videoRef} level={level} levelScore={levelScore} setLevelScore={setLevelScore}/>
         </Stack>
 
         <Stack>
-            <TextBoxes answer={answer}/>
+            <TextBoxes answer={answer} isWin={isWin} setIsWin={setIsWin}/>
         </Stack>
         
           {isWin && 

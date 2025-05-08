@@ -7,8 +7,10 @@ import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import { login, logout } from '../business/supabase_calls';
+import useBreakpoints from '../business/useBreakpoints';
 
 const Menu = ({renders, setRenders}) => {
+  const {xs} = useBreakpoints()
   const MotionStack = motion(Stack)
   const nav = useNavigate()
   const loc = useLocation()
@@ -138,7 +140,7 @@ const Menu = ({renders, setRenders}) => {
           <MotionStack
             title="motion_stack"
             bgcolor={'#474973'} 
-            width={width} 
+            width={xs ? '50%' : '25%'} 
             height={'85%'}
             initial={{ x: -200, y: 0 }}
             animate={{ x: 2, y: 0 }}

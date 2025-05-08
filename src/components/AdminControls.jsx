@@ -6,6 +6,7 @@ import MotionStack from '../ui_elements/MotionStack';
 import { useNavigate } from 'react-router-dom';
 import SPAdminWrapper from './games/6pics/admin/SPAdminWrapper';
 import SPAdminPacks from './games/6pics/admin/SPAdminPacks';
+import InProgress from '../ui_elements/InProgress';
 
 const AdminControls = () => {
   const MotionText = motion(Typography);
@@ -29,11 +30,11 @@ const AdminControls = () => {
 
     useEffect(() => {
           switch(selectedOption){
-              case '21things_prompts': setAccountObj(<></>);
+              case '21things_prompts': setAccountObj(<InProgress />);
               break;
               case '6pics_packs': setAccountObj(<SPAdminPacks setSelectedOption={setSelectedOption}/>);
               break;
-              case 'user_controls': setAccountObj(<></>);
+              case 'user_controls': setAccountObj(<InProgress />);
               break;
           }
       }, [selectedOption])

@@ -8,7 +8,8 @@ const SixPicsVideoPlayer = ({
   index,
   next,
   setShowGiveUp,
-  showGiveUp
+  showGiveUp,
+  isWin
 }) => {
 
   const videoRef = useRef(null);
@@ -149,6 +150,16 @@ const SixPicsVideoPlayer = ({
     }
   }, [showGiveUp]);
 
+  useEffect(() => {
+    console.log(isWin)
+    if(isWin){
+      setShowGiveUp(false)
+      setDisableNext(true)
+    } else {
+      setShowGiveUp(false)
+      setDisableNext(false)
+    }
+  }, [isWin])
 
 
   return (
@@ -184,7 +195,7 @@ const SixPicsVideoPlayer = ({
 
       <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center">
         {!start && (
-          <Button onClick={() => setStart(true)} variant="contained">
+          <Button disabled={!!isWin} onClick={() => setStart(true)} variant="contained">
             Start
           </Button>
         )}
@@ -196,7 +207,7 @@ const SixPicsVideoPlayer = ({
         )}
 
         {showGiveUp && !giveUp && (
-          <Button onClick={() => setGiveUp(true)} variant="outlined">
+          <Button  disabled={!!isWin} onClick={() => setGiveUp(true)} variant="outlined">
             Give Up
           </Button>
         )}
