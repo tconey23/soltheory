@@ -19,9 +19,11 @@ export default function useBreakpoints() {
   const downLg = useMediaQuery(theme.breakpoints.down('lg'));
   const downXl = useMediaQuery(theme.breakpoints.down('xl'));
 
-  return {
+  const screenSize = {
     xs, sm, md, lg, xl,
     upSm, upMd, upLg, upXl,
     downSm, downMd, downLg, downXl
-  };
+  }
+
+  return {screenSize};
 }

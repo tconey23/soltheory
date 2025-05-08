@@ -70,6 +70,28 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     const [targetPosition, setTargetPosition] = useState([-3, 7, -6])
     const [lookAt, setLookAt] = useState([2, 2, 9])
 
+    const screen = useGlobalStore((state) => state.screen)
+
+    useEffect(() => {
+      console.log(targetPosition)
+    }, [targetPosition])
+   
+    useEffect(() =>{
+     
+      switch(screen){
+        case 'xs':  setTargetPosition([0, 7, -2])
+                    setLookAt([1.6, 4, 9])
+        break
+        case 'sm':  setTargetPosition([0, 5.5, 0])
+                    setLookAt([1.6, 2, 9])
+        break
+        case 'md':  setTargetPosition([-3, 5, 0])
+                    setLookAt([1.6, 2, 9])
+        break
+      }
+     
+   }, [screen])
+
     useEffect(() => {
       if(animate && start){
         camera.position.set(...startPosition)
@@ -82,14 +104,14 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     // Animate camera toward target each frame
     useFrame(() => {
       if(allAssetsReady && !start){setStart(true)}
-      if(animate){
+      if(targetPosition){
         camera.position.lerp(new THREE.Vector3(...targetPosition), 0.009)
         camera.lookAt(new THREE.Vector3(...lookAt))
       }
       if(camera.position.x < -2.98 && !initialAnimation){
         setInitialAnimation(true)
       }
-    })
+    }, [targetPosition, screen])
   
     return null
   }
@@ -108,6 +130,7 @@ const HomePage = ({showBot = true}) => {
     const [incline, setIncline] = useState(false)
     const [decline, setDecline] = useState(false)
     const allAssetsReady = groundReady && lettersReady
+    
 
     useEffect(() =>{
       if(initialAnimation){

@@ -1,11 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button} from "@mui/material";
 import { motion } from "framer-motion";
+import useBreakpoints from "../../../business/useBreakpoints";
+import useGlobalStore from "../../../business/useGlobalStore";
 
 const MotionStack = motion(Stack);
 
 
 const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, wins}) => {
+
+  
 
   const [inputLetters, setInputLetters] = useState([])
   const [letterCount, setLetterCount] = useState(0)
@@ -13,8 +17,17 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
   const [isWin, setIsWin] = useState(false)
   const [autoAnswer, setAutoAnswer] = useState(false)
   const [autoGiveUp, setAutoGiveUp] = useState(true)
- 
-  const inputRefs = useRef([]);
+
+   const screen = useGlobalStore((state) => state.screen)
+   
+   useEffect(() =>{
+    console.log(screen)
+    
+  }, [screen])
+  
+   const inputRefs = useRef([]);
+   
+   
 
   useEffect(() => {
     if(autoAnswer){

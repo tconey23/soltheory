@@ -6,7 +6,7 @@ import {ButtonBase} from '@mui/material';
 import AddPackForm from '../../6pics/admin/AddPackForm'
 import VideoEditor from './VideoEditor';
 import ViewPack from '../ViewPack';
-import useBreakpoints from '../../../../business/useBreakpoints';
+import useGlobalStore from '../../../../business/useGlobalStore';
 
 // const packList = [
 //     {
@@ -25,9 +25,25 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
     const [selection, setSelection] = useState()
     const [expandAddNewPack, setExpandAddNewPack] = useState(false)
     const [resetForm, setResetForm] = useState(0)
+    const [mobile, setMobile] = useState(false)
 
-    const {xs} = useBreakpoints()
+    const {screen} = useGlobalStore()
+
+    useEffect(() => {
+        console.log(mobile)
+    }, [mobile])
     
+    useEffect(() => {
+        switch(screen){
+            case 'xs': setMobile(true)
+            break
+            case 'sm': setMobile(true)
+            break
+            case 'md': setMobile(false)
+            break
+            case 'lg': setMobile(false)
+        }
+    }, [screen])
 
     const packRef = useRef()
 
@@ -39,10 +55,6 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
             )))
         }
     }
-
-    useEffect(() => {
-        console.log(selection)
-    }, [selection, resetForm])
 
     useEffect(() => {
         if(resetForm > 1){
@@ -178,7 +190,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                 </Accordion>
                 </>
                 }
-            <Modal open={!!xs}>
+            <Modal open={!!mobile}>
                 <Stack width={'100%'} height={'100%'} alignItems={'center'} justifyContent={'center'}>
                     <Stack width={'50%'} height={'20%'} bgcolor={'white'} direction={'column'} alignItems={'center'} justifyContent={'center'} borderRadius={3}>
                         <Typography textAlign={'center'}>

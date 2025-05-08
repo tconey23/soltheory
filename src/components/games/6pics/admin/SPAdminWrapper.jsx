@@ -2,10 +2,15 @@ import { useEffect, useState } from 'react';
 import { Accordion, AccordionDetails, AccordionSummary, Button, Modal, Stack, Typography } from '@mui/material';
 import SPAdminPacks from './SPAdminPacks';
 import { useNavigate } from 'react-router-dom';
+import useGlobalStore from '../../../../business/useGlobalStore';
 
 const SPAdminWrapper = ({setSelectedOption}) => {
     const [forceRefresh, setForceRefresh] = useState(0)
     const nav = useNavigate()
+
+    const {screen} = useGlobalStore()
+
+    console.log(screen)
 
   return (
     <Stack direction={'column'} sx={{ height: '98vh', width: '100%' }} fontFamily={'Fredoka Regular'}> 

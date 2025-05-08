@@ -132,7 +132,7 @@ const Menu = ({renders, setRenders}) => {
         if(e.target.title === 'modal_inner_wrapper'){
           setToggleMenu(false)
         }
-      }} direction={'column'} width={'100%'} height={'100%'} justifyContent={'center'} title="modal_inner_wrapper" >
+      }} direction={'column'} width={'100%'} height={'100%'} justifyContent={'center'} title="modal_inner_wrapper" sx={{overflowY: 'auto'}} >
 
         <AnimatePresence>
           {isVisible 
@@ -151,6 +151,8 @@ const Menu = ({renders, setRenders}) => {
             paddingX={2}
             paddingY={3}
             borderRadius={1}
+            sx={{overflowY: 'auto'}}
+            justifyContent={'flex-start'}
           >
 
           <Typography sx={{textOverflow: 'ellipsis', whiteSpace: 'wrap'}} overflow={'hidden'} font={'Fredoka Regular'} textAlign={'center'} fontSize={12}>{`Welcome ${user ? user?.email : 'to SolTheory'}`}</Typography>

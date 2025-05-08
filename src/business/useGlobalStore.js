@@ -1,12 +1,13 @@
 import { create } from 'zustand'
+import useBreakpoints from './useBreakpoints'
+
 
 const useGlobalStore = create((set) => ({
-  // ✅ Global values
   user: null,
   session: null,
   userMeta: null,
   toggleMenu: false,
-  screen: window.innerWidth <= 430,
+  screen: '',
   font: '/fonts/Fredoka/Fredoka-VariableFont_wdth,wght.ttf',
   degrees: (deg) => deg * (Math.PI / 180),
   gameIndex: 0,
@@ -21,11 +22,7 @@ const useGlobalStore = create((set) => ({
   setToggleMenu: (val) => set({ toggleMenu: val }),
   setGameIndex: (val) => set({gameIndex: val}),
   setCurrentStage: (val) => set({currentStage: val}),
-  setAnimate: (val) => set({animate: val})
-
-
-
-
-  
+  setAnimate: (val) => set({animate: val}),
+  setScreen: (val) => set({screen: val})
 }))
 export default useGlobalStore

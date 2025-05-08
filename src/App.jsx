@@ -15,11 +15,13 @@ import TwentyOneThings from './components/games/21Things/TwentyOneThings';
 import SixPics from './assets/SixPics';
 import Pic6 from './components/games/6pics/Pic6';
 import AdminControls from './components/AdminControls';
+import useBreakpoints from './business/useBreakpoints';
 
 function App() {
   const navTo = useNavigate()
   // const location = useLocation()
-  // const screen = useGlobalStore((state) => state.screen)
+  const screen = useGlobalStore((state) => state.screen)
+  const setScreen = useGlobalStore((state) => state.setScreen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
   // const session = useGlobalStore((state) => state.session)
@@ -27,7 +29,18 @@ function App() {
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
 
+  const {screenSize} = useBreakpoints()
+
   const [appReady, setAppReady] = useState(false)
+
+  useEffect(() => {
+    const sz = Object.entries(screenSize).find((s) => !!s[1])
+    setScreen(sz[0])
+  }, [screenSize])
+
+  useEffect(() =>{
+    console.log(screen)
+  }, [screen])
 
   useEffect(() => {
           if (user) {
