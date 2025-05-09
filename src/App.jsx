@@ -70,7 +70,7 @@ function App() {
 
   useEffect(() =>{
     if(user){
-      navTo('/solmates')
+      navTo('/home')
     }
   }, [user])
   
