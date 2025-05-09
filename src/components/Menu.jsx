@@ -62,7 +62,11 @@ const Menu = ({renders, setRenders}) => {
     delayedNav('/games')
   }
 
-  //<i class="fi fi-sr-psychology"></i>
+  const handleSolmates = async () => {
+    delayedNav('/solmates')
+  }
+
+  //<i className="fi fi-sr-psychology"></i>
   
   const menuButtons = [
     {
@@ -81,7 +85,7 @@ const Menu = ({renders, setRenders}) => {
       display: true,
       tooltip: userMeta ? 'Modify account' : 'Login to SOLTheory',
       pathFilter: '/account',
-      icon: userMeta ? <i style={{marginRight: 8}} class="fi fi-ss-user-skill-gear"></i> : <i style={{marginRight: 8}} class="fi fi-rr-sign-in-alt"></i>
+      icon: userMeta ? <i style={{marginRight: 8}} className="fi fi-ss-user-skill-gear"></i> : <i style={{marginRight: 8}} className="fi fi-rr-sign-in-alt"></i>
     },
     {
       name: userMeta && 'SOLGames',
@@ -94,11 +98,11 @@ const Menu = ({renders, setRenders}) => {
     },
     {
       name: userMeta && 'SOLMates',
-      function: userMeta ? handleAccount : handleLogin,
+      function: handleSolmates,
       color: userMeta ? 'primary' : 'disabled',
       display: userMeta ? true : false,
       tooltip: userMeta ? 'See SOLMates' : 'Login to see SOLMates',
-      pathFilter: '/mates',
+      pathFilter: '/solmates',
       icon: <i style={{marginRight: 5}} className="fi fi-rr-following"></i>
     },
     {

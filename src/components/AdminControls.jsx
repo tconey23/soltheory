@@ -69,7 +69,7 @@ const AdminControls = () => {
         src={null}
         sx={{ border: '1px solid black', scale: 1.25 }}
       >
-        <i class="fi fi-rs-admin-alt"></i>
+        <i className="fi fi-rs-admin-alt"></i>
       </MotionAvatar>
     </Stack>
 

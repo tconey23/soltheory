@@ -35,7 +35,7 @@ const SPAdminWrapper = ({setSelectedOption}) => {
             <Stack width={'100%'} height={'100%'} alignItems={'center'} justifyContent={'center'}>
                 <Stack width={'50%'} height={'20%'} bgcolor={'white'} direction={'column'} alignItems={'center'} justifyContent={'center'}>
                     <Typography textAlign={'center'}>
-                        <i style={{color: 'red', fontSize: '20px', margin: 20}} class="fi fi-sr-exclamation"></i>
+                        <i style={{color: 'red', fontSize: '20px', margin: 20}} className="fi fi-sr-exclamation"></i>
                     </Typography>
                     <Typography textAlign={'center'}>This option must be viewed on a desktop device</Typography>
                     <Button onClick={() => setSelectedOption(null)} >Back</Button>

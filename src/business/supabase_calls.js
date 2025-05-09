@@ -85,3 +85,27 @@ export const logout = async () => {
     }, 100);
 }
 
+    export const getMessages = async (id) => {
+      let { data: messaging, error } = await supabase
+      .from('messaging')
+      .select("*")
+      .eq('to', id)
+
+      if(messaging){
+        return messaging
+      } else {
+        console.log(error)
+      }
+    }
+    
+    export const getAvatar = async (id) => {
+      let { data: avatar, error } = await supabase
+      .from('users')
+      .select("avatar")
+      .eq('primary_id', id)
+
+      if(avatar){
+        return avatar
+      }
+    }
+

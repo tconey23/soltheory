@@ -3,41 +3,19 @@ import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography 
 import { motion, AnimatePresence } from 'framer-motion';
 import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
-import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
-import SixPicsButton from './SixPicsButton';
+import ChatBox from './ChatBox';
 
 const HeaderImage = () => {
 
     const [imgIndex, setImgIndex] = useState(0)
-    const [headerImg, setHeaderImg] = useState(<img src={'/joystick.gif'} style={{height: '100%'}}/>)
-
-    const headerImages = [
-        <img src={'/joystick.gif'} style={{height: '100%'}}/>,
-        <img src={'/puzzle.gif'} style={{height: '100%'}}/>, 
-        <img src={'/game-controller.gif'} style={{height: '100%'}}/>
-    ]
-
-  useEffect(() => {
-    setHeaderImg(headerImages[imgIndex])
-  }, [imgIndex])
-
-  useEffect(() => {
-    setTimeout(() => {
-        if(imgIndex < 2){
-            setImgIndex(prev => prev +1)
-        } else {
-            setImgIndex(0)
-        }
-    }, 2000);
-  }, [headerImg])
+    const [headerImg, setHeaderImg] = useState(<img src={'/teamwork.gif'} style={{height: '100%'}}/>)
 
   return headerImg
 
 }
 
-const GamesWrapper = () => {
-
+const SolMates = () => {
     const MotionText = motion(Typography);
     const MotionAvatar = motion(Avatar);
     const navTo = useNavigate()
@@ -48,8 +26,8 @@ const GamesWrapper = () => {
     const user = useGlobalStore((state) => state.user)
   
 
-    const [selectedGame, setSelectedGame] = useState(null)
-    const [gameObj, setGameObj] = useState()
+    const [selectedOption, setSelectedOption] = useState('messages')
+    const [accountObj, setAccountObj] = useState()
     const [hasMounted, setHasMounted] = useState(false);
 
       useEffect(() => {
@@ -59,6 +37,15 @@ const GamesWrapper = () => {
       }, []);
   
   
+      useEffect(() => {
+        switch(selectedOption){
+            case 'messages': setAccountObj(<ChatBox />);
+            break;
+            case 'solmates': setAccountObj();
+            break;
+        }
+    }, [selectedOption])
+
 
   
     return (
@@ -78,19 +65,19 @@ const GamesWrapper = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          SOL Games
+          SOLMates
         </MotionText>
-  
+
         <Stack marginBottom={7}>
-          <MotionAvatar
+            <MotionAvatar
             initial={hasMounted ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 1, duration: 2 }}
             sx={{ border: '1px solid black', scale: 1.25 }}
-          >
+            >
             <HeaderImage />
-          </MotionAvatar>
+            </MotionAvatar>
         </Stack>
   
         <MotionStack
@@ -116,22 +103,46 @@ const GamesWrapper = () => {
           >
  
             <Select
-              value={selectedGame || ''}
-              onChange={(e) => setSelectedGame(e.target.value)}
+              value={selectedOption || ''}
+              onChange={(e) => setSelectedOption(e.target.value)}
             >
-              <MenuItem value="21things" onClick={() => navTo(`/games/21things`)}>
-                <TwentOneThingsButton />
+              <MenuItem value="messages">
+                <Stack direction={'row'} justifyContent={'center'}>
+                    <i style={{marginRight: 3, justifyItems: 'center'}} className="fi fi-rr-envelope"></i> Messages
+                </Stack> 
               </MenuItem>
 
-              <MenuItem value="6pics"  onClick={() => navTo(`/games/6pics`)}>
-                <SixPicsButton />
+              <MenuItem value="solmates">
+                <Stack direction={'row'} justifyContent={'center'}>
+                    <i style={{marginRight: 3, justifyItems: 'center'}} className="fi fi-sr-users-alt"></i> SOLMates
+                </Stack> 
               </MenuItem>
 
             </Select>
           </Stack>
         </MotionStack>
+        <AnimatePresence mode="wait">
+        {selectedOption && (
+          <MotionStack
+            key={selectedOption}
+            width="85%"
+            sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3}}
+            alignItems="center"
+            justifyContent="center"
+            direction="column"
+            paddingY={2}
+            borderRadius={1}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.5 }}
+          >
+            {accountObj}
+          </MotionStack>
+        )}
+      </AnimatePresence>
       </Stack>
     );
 };
 
-export default GamesWrapper;
+export default SolMates;

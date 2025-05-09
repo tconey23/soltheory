@@ -8,6 +8,8 @@ import { BrowserRouter } from 'react-router-dom';
 import theme from './business/theme.js';
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
+import 'react-chat-elements/dist/main.css';
+
 
 createRoot(document.getElementById('root')).render(
       <BrowserRouter>

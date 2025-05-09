@@ -16,6 +16,7 @@ import SixPics from './assets/SixPics';
 import Pic6 from './components/games/6pics/Pic6';
 import AdminControls from './components/AdminControls';
 import useBreakpoints from './business/useBreakpoints';
+import SolMates from './components/solmates/SolMates';
 
 function App() {
   const navTo = useNavigate()
@@ -69,7 +70,7 @@ function App() {
 
   useEffect(() =>{
     if(user){
-      navTo('/home')
+      navTo('/solmates')
     }
   }, [user])
   
@@ -84,7 +85,7 @@ function App() {
 
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>
-      {!user && <Route path={"/login"} element={<Modals needsLogin={true}/>} />}
+      {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
 
       <Route 
         path={"/account"}
@@ -122,7 +123,7 @@ function App() {
         } 
       />
 
-<Route 
+    <Route 
         path={"/account/admin"}
         element={
           <PrivateRoute userData={userMeta}>
@@ -131,9 +132,20 @@ function App() {
         } 
       />
 
+    <Route 
+        path={"/solmates"}
+        element={
+          <PrivateRoute userData={userMeta}>
+            <SolMates />
+          </PrivateRoute>
+        } 
+      />
+
     </Routes>
 
-    {appReady && <Modals />}
+    
+
+    {appReady && <Modals needsLogin={!userMeta}/>}
 
    </Stack>
   )
