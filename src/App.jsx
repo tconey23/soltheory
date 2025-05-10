@@ -85,6 +85,7 @@ function App() {
 
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>
+      <Route path={"/"} element={<HomePage />}/>
       {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
 
       <Route 
