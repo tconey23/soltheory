@@ -1,4 +1,3 @@
-// vite.config.js
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -11,7 +10,35 @@ export default defineConfig({
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        maximumFileSizeToCacheInBytes: 100 * 1024 * 1024 // 100MB
+        maximumFileSizeToCacheInBytes: 100 * 1024 * 1024, // 100MB
+        cleanupOutdatedCaches: true,
+        runtimeCaching: [
+          {
+            urlPattern: ({ request }) => request.destination === 'document',
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'html-cache-v1',
+            },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'static-resources-v1',
+            },
+          },
+          {
+            urlPattern: ({ request }) => request.destination === 'image',
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'image-cache-v2',
+              expiration: {
+                maxEntries: 100,
+                maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+              },
+            },
+          },
+        ],
       },
       manifest: {
         name: 'SOLTheory',
@@ -44,7 +71,7 @@ export default defineConfig({
     }),
   ],
   server: {
-    host: true, // or '0.0.0.0' (both are acceptable)
-    port: 5173  // optional: ensure it matches your expected port
-  }
+    host: true,
+    port: 5173,
+  },
 });
