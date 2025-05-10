@@ -109,3 +109,21 @@ export const logout = async () => {
       }
     }
 
+    export const deviceData = async (win_data, nav_data, user) => {
+
+      console.log(win_data, nav_data, user)
+
+      const { data, error } = await supabase
+      .from('device_details')
+      .insert([
+        { user: user, 
+          win_data: JSON.stringify(win_data), 
+          nav_data: JSON.stringify(nav_data)
+        },
+      ])
+      .select() 
+
+      console.log(data, error)
+        
+    }
+
