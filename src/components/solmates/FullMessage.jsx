@@ -3,26 +3,35 @@ import { Stack, Typography, Paper, Box } from '@mui/material';
 import { Button } from 'react-chat-elements';
 import useGlobalStore from '../../business/useGlobalStore';
 import { handleDecrypt } from './helpers/solmate_helpers';
-import { decryptWithKey } from './helpers/cryptoUtils';
+import { decryptWithKey, importKeyFromBase64 } from './helpers/cryptoUtils';
+import { getMeta } from '../../business/supabase_calls';
 
 const FullMessage = ({ msg, setFullMessage }) => {
   const { user, userMeta } = useGlobalStore();
   const [messages, setMessages] = useState([])
 
+
   const decrypt = async (m) => {
-    console.log(m)
-    const dec = await decryptWithKey(m.encr_text, m.iv, m.crypto_key)
-  }
+    try {
+      const importedKey = await importKeyFromBase64(m.crypto_key); // 🔑 Fix here
+      const dec = await decryptWithKey(m.encr_text, m.iv, importedKey);
+      const meta = await getMeta(m.sent_by)
+
+      m.sender = meta?.user_name
+      setMessages(prev => [...prev, { ...m, text: dec }]);
+    } catch (err) {
+      console.error('Decryption error:', err);
+    }
+  };
 
   useEffect(() => {
     if(msg?.message_content){
-    
         msg?.message_content.forEach((m) => decrypt(m))
     }
   }, [msg])
 
 
-  const isUserMessage = (m) => m.sent_by === user?.primary_id;
+  const isUserMessage = (m) => m.sent_by === userMeta?.primary_id;
 
   return (
     <Stack
@@ -31,16 +40,9 @@ const FullMessage = ({ msg, setFullMessage }) => {
       padding={2}
       sx={{ width: '100%', maxHeight: '90vh', overflowY: 'auto', bgcolor: '#f5f5f5' }}
     >
-      {/* <Typography variant="h6">{msg.title || 'Conversation'}</Typography> */}
-
-      {/* {msg?.message_content.map((m, i) => {
-        
-            console.log(m)
-
-        (
+      {messages.map((m, i) => (
         <Box
           key={i}
-          onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
           sx={{
             alignSelf: isUserMessage(m) ? 'flex-end' : 'flex-start',
             bgcolor: isUserMessage(m) ? '#cfe3ff' : '#ffffff',
@@ -53,15 +55,14 @@ const FullMessage = ({ msg, setFullMessage }) => {
             transition: 'all 0.2s ease-in-out',
           }}
         >
-            
           <Typography variant="body2" fontWeight="bold">
-            {isUserMessage(m) ? 'You' : 'Them'} – {m.date}
+            {isUserMessage(m) ? 'You' : 'Them'} – {m.date || 'Unknown date'}
           </Typography>
           <Typography variant="body1">
-            {expandedIndex === i ? m.text : m.text.slice(0, 60) + (m.text.length > 60 ? '…' : '')}
+            {m.text || 'Decryption failed or pending'}
           </Typography>
         </Box>
-      )})} */}
+      ))}
 
       <Button
         text="Close"

@@ -10,12 +10,13 @@ import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import 'react-chat-elements/dist/main.css';
 
-
 createRoot(document.getElementById('root')).render(
       <BrowserRouter>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <App />
+          <SpeedInsights/>
+          <Analytics />
           <SpeedInsights />
           <Analytics />
         </ThemeProvider>

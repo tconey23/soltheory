@@ -52,9 +52,10 @@ const SolMates = () => {
       <Stack
         direction="column"
         width="100%"
-        height="100%"
+        height="75%"
         alignItems="center"
         justifyContent="flex-start"
+
       >
         <MotionText
           paddingY={2}
@@ -126,7 +127,7 @@ const SolMates = () => {
           <MotionStack
             key={selectedOption}
             width="85%"
-            sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3}}
+            sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3, overflowY: 'auto'}}
             alignItems="center"
             justifyContent="center"
             direction="column"
