@@ -18,24 +18,39 @@ const LoginForm = () => {
   const [toggleShowPassword, setToggleShowPassword] = useState(false)
 
 
-  const handleLogin = async () => {
-    let { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password
-    })
+const handleLogin = async () => {
+  console.log('email', email)
+  console.log('password', password)
+  let { data, error } = await supabase.auth.signInWithPassword({
+    email: email.trim(),
+    password: password.trim()
+  });
 
-    if(data){
-      console.log(data)
-      setUser(data?.user)
-      setSession(data?.session)
-    }
+  if (error) {
+    console.error('Supabase login error:', error.message);
   }
+
+  if (data) {
+    console.log(data);
+    setUser(data?.user);
+    setSession(data?.session);
+  }
+}
 
   const handleSignUp = async () => {
     let { data, error } = await supabase.auth.signUp({
       email: email,
       password: password
     })
+
+      if (error) {
+    console.error('Supabase login error:', error.message);
+  }
+
+  if (data) {
+    console.log(data);
+  }
+
   }
 
 
