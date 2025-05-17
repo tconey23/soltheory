@@ -6,7 +6,8 @@ import useGlobalStore from '../../../business/useGlobalStore'
 import { supabase } from '../../../business/supabaseClient'
 import { useNavigate } from 'react-router-dom'
 
-const FinalStage = ({ prompts, setCurrentStage, date }) => {
+const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   if (!Array.isArray(prompts)) return null;
 
   const navTo = useNavigate()
@@ -53,10 +54,9 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
         
     if (data[0].primary_id) {
       navTo('/games')
-      setAlertProps({
+      setAlertContent({
         text: 'Successfully saved game data!',
-        severity: 'success',
-        display: true,
+        type: 'success',
       })
       setCurrentStage(0)
       setNote('')

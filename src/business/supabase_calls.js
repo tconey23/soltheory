@@ -1,6 +1,8 @@
 import { supabase } from "./supabaseClient";
 
+
 export const updatePassword = async (email, newPassword) => {
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
     const { data, error } = await supabase.auth.updateUser({
         email: email,
         password: newPassword,
@@ -9,9 +11,11 @@ export const updatePassword = async (email, newPassword) => {
 
       if(error){
         console.log(error)
+        setAlertContent({text: 'An error has occured', type:'error'})
       }
 
       if(data?.user){
+        setAlertContent({text: 'Password reset', type:'success'})
         return 'success'
       }
 }
@@ -35,6 +39,7 @@ export const getMeta = async (id) => {
 }
 
 export const updateUserName = async (id, name) => {
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
     const { data, error } = await supabase
         .from('users')
         .update({ user_name: name })
@@ -42,25 +47,31 @@ export const updateUserName = async (id, name) => {
         .select()
 
         if(data?.[0]){
+            setAlertContent({text: 'User name updated', type:'success'})
             return 'success'
+        } else {
+          setAlertContent({text: 'An error has occured', type:'error'})
         }
 }
 
 export const login = async (email, password) => {
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email,
     password: password
   })
 
   if(data){
+    setAlertContent({text: 'Login successful', type:'success'})
     return data
   } else if(error){
+    setAlertContent({text: 'An error has occured', type:'error'})
     console.log(error)
   }
 }
 
 export const logout = async () => {
-
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
     try {
       // Attempt Supabase logout but don't wait forever
       const timeout = new Promise((_, reject) =>
@@ -72,6 +83,7 @@ export const logout = async () => {
         timeout
       ]);
     } catch (err) {
+      setAlertContent({text: 'An error has occured', type:'error'})
       console.warn('SignOut failed or timed out:', err.message);
     }
   

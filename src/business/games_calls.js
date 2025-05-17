@@ -2,6 +2,8 @@ import { supabase } from "./supabaseClient"
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
+import useGlobalStore from "./useGlobalStore";
+
 
 export const listAllPacks = async () => {
   let { data: sixpicspacks, error } = await supabase
@@ -68,6 +70,7 @@ export const getGames = async () => {
   };
   
 export const addNewPrompts = async (prompts) => {
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   if(prompts) 
       {
         const { data, error } = await supabase
@@ -75,8 +78,10 @@ export const addNewPrompts = async (prompts) => {
         .insert([prompts])
         .select();
           if (error) {
+            setAlertContent({text: 'Upload failed', type:'error'})
               console.error('Error inserting:', error);
           } else {
+            setAlertContent({text: 'Prompt pack added', type:'success'})
               return 'success'
           }
       }
@@ -105,13 +110,15 @@ export const getGifs = async () => {
 }
 
 export const addGameToUser = async (user, newGameData) => {
-        const { data: foundUser, error: fetchError } = await supabase
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)     
+  const { data: foundUser, error: fetchError } = await supabase
           .from('users')
           .select('*')
           .eq('user_id', user.user.id)  // use UID from auth
           .single()
       
         if (fetchError) {
+          setAlertContent({text: 'An error has occured', type:'error'})
           console.error("Error fetching user:", fetchError)
           return
         }
@@ -126,11 +133,13 @@ export const addGameToUser = async (user, newGameData) => {
           .eq('user_id', user.user.id) // match on auth.uid()
       
         if (updateError) {
+          setAlertContent({text: 'An error has occured', type:'error'})
           return {
             disposition: 'error',
             message: 'There was an error adding the game to your profile'
           }
         } else {
+          setAlertContent({text: 'Prompt pack added', type:'success'})
           return {
             disposition: 'success',
             message: 'Game data added to your profile'

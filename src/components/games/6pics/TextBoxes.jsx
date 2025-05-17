@@ -17,44 +17,52 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
   const [isWin, setIsWin] = useState(false)
   const [autoAnswer, setAutoAnswer] = useState(false)
   const [autoGiveUp, setAutoGiveUp] = useState(true)
-
-   const screen = useGlobalStore((state) => state.screen)
+  const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false)
+  const [toggleNext, setToggleNext] = useState()
+ 
+  const screen = useGlobalStore((state) => state.screen)
+  const inputRefs = useRef([]);
    
    useEffect(() =>{
-    console.log(screen)
-    
+    // console.log(screen)
   }, [screen])
-  
-   const inputRefs = useRef([]);
    
-   
-
   useEffect(() => {
     if(autoAnswer){
       setIsWin(true)
     }
   }, [autoAnswer])
 
-  useEffect(() => {
-    console.log(levelScore)
-  }, [levelScore])
-
   useEffect(() => { 
     if(isWin) {setWins(prev => prev +1)}
   }, [isWin])
 
   useEffect(() => {
-  }, [inputLetters])
+    // console.log(levelScore[index])
+
+    if(levelScore?.[index]?.score == 0){
+      setToggleCheckAnswer(false)
+    } else {
+      setToggleCheckAnswer(false)
+    }
+  }, [levelScore, index])
+
+  useEffect(() => {
+    // console.log(letterCount, letterTarget)
+    // console.log(inputRefs?.current)
+    if(letterCount === letterTarget ){
+      setToggleCheckAnswer(true)
+    } else {
+      setToggleCheckAnswer(false)
+    }
+  }, [letterCount, letterTarget, inputRefs])
 
   useEffect(() => {
     setLetterTarget(0)
-    // console.log(letterTarget)
   }, [])
 
   useEffect(() => {
     inputRefs?.current.forEach((r) => {
-      let addAmount = r.length
-      // console.log(typeof addAmount)
       setLetterTarget(prev => prev + r.length)
     })
   }, [inputRefs])
@@ -78,7 +86,11 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
     const handleInputChange = (event, wordIndex, letterIndex) => {
         const { value } = event.target;
 
-        setLetterCount(prev => prev +1)
+        if(value !== ''){
+          setLetterCount(prev => prev +1)
+        } else{
+          setLetterCount(prev => prev -1)
+        }
     
         let letters = [];
         inputRefs.current.forEach((w) => {
@@ -124,7 +136,7 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
 
   return (
     <>
-    <Stack direction={"row"} width={"100%"} justifyContent={"center"} flexWrap={'wrap'}>
+    <Stack  id='letter_wrapper' direction={"row"} width={"100%"} justifyContent={"center"} flexWrap={'wrap'}>
       {isWin && 
         <MotionStack
         initial={{ opacity: 0 }}
@@ -134,7 +146,6 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
           <Typography fontSize={25} fontFamily={'Fredoka Regular'}>{`Answer: ${answer}`}</Typography>
           <Typography fontSize={25} fontFamily={'Fredoka Regular'}>CORRECT!</Typography>
           <Button onClick={() => {
-            // setIsWin(false)
             next()
             }} variant="contained">Continue</Button>
         </MotionStack>
@@ -143,11 +154,12 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
         inputRefs.current[wordIndex] = [];
         
         return (
+          <Stack userData='word_wrapper'>
             <Stack  key={wordIndex} justifyContent={"center"} alignItems={'center'} direction={"row"} marginLeft={0} marginBottom={0} padding={1}>
           {word.split("").map((letter, letterIndex) => {
-              
-              return (
-                  <Stack id='textbox-wrapper' key={letterIndex} marginLeft={0} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
+            
+            return (
+              <Stack id='textbox-wrapper' key={letterIndex} marginLeft={0} direction={"row"} justifyContent={"center"} alignItems={'center'}  flexWrap={'wrap'}>
                     <TextField
                       value={isLocked ? letter : undefined}
                       disabled={isLocked}
@@ -157,19 +169,18 @@ const TextBoxes = ({answer, setWins, next, levelScore, index, setShowGiveUp, win
                       onChange={(event) => handleInputChange(event, wordIndex, letterIndex)}
                       onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
                       inputProps={{
-                      maxLength: 1,
-                      style: { textAlign: "center", fontSize: 30, width: 40 }
+                        maxLength: 1,
+                        style: { textAlign: "center", fontSize: 30, width: 40 }
                       }}
-                    />
+                      />
                   </Stack>
               )})}
         </Stack>
+         </Stack>
       );
     })}
+    <Button disabled={!toggleCheckAnswer} sx={{margin: 4}} onClick={() => checkAnswer()} variant='contained'>Check Answer</Button>
   </Stack>
-    <Stack width={'100%'} justifyContent={'center'} alignItems={'center'}>
-        {inputLetters?.length === letterTarget && !isWin && !isLocked && <Button onClick={() => checkAnswer()} variant='contained'>Check Answer</Button>}
-    </Stack>
     </>
   );
 };

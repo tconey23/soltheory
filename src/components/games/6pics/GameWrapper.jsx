@@ -95,12 +95,12 @@ const GameWrapper = ({ pack }) => {
         <Typography key={refreshScore}>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
       )}
 
-      <Slider ref={sliderRef} {...settings} style={{width:'100%'}}>
+      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '100%'}}>
         {!gameOver &&
           levels.map((level, i) => (
-            <Stack key={i}>
+            <Stack userData='game_stage' key={i} height={'100%'}>
               {i === activeSlide && (
-                <Stack justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
+                <Stack  justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
                   <SixPicsVideoPlayer
                     isWin={isWin}
                     setIsWin={setIsWin}

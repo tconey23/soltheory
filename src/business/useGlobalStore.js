@@ -8,11 +8,13 @@ const useGlobalStore = create((set) => ({
   userMeta: null,
   toggleMenu: false,
   screen: '',
+  height: '',
   font: '/fonts/Fredoka/Fredoka-VariableFont_wdth,wght.ttf',
   degrees: (deg) => deg * (Math.PI / 180),
   gameIndex: 0,
   currentStage: null,
   animate: true,
+  alertContent: {text: '', type: ''},
 
 
   // ✅ Actions
@@ -23,6 +25,8 @@ const useGlobalStore = create((set) => ({
   setGameIndex: (val) => set({gameIndex: val}),
   setCurrentStage: (val) => set({currentStage: val}),
   setAnimate: (val) => set({animate: val}),
-  setScreen: (val) => set({screen: val})
+  setScreen: (val) => set({screen: val}),
+  setHeight: (val) => set({height: val}),
+  setAlertContent: (val) => set({alertContent: val})
 }))
 export default useGlobalStore

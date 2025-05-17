@@ -9,7 +9,8 @@ const SixPicsVideoPlayer = ({
   next,
   setShowGiveUp,
   showGiveUp,
-  isWin
+  isWin,
+  setAlertContent
 }) => {
 
   const videoRef = useRef(null);
@@ -165,8 +166,8 @@ const SixPicsVideoPlayer = ({
   return (
     <Stack backgroundColor="white" justifyContent="center" alignItems="center">
       <Stack
-        width={"45%"}
-        height="45%"
+        width={"100%"}
+        height="auto"
         justifyContent="center"
         alignItems="center"
         sx={{ opacity: isLoaded ? 1 : 1}}

@@ -1,38 +1,44 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import AppHeader from './components/AppHeader'
-import { Modal, Stack } from '@mui/material'
-import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
+import { Stack } from '@mui/material'
+import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from './views/homepage/HomePage';
 import PrivateRoute from './components/PrivateRoute';
 import Account from './components/Account';
 import useGlobalStore from './business/useGlobalStore';
 import Modals from './views/modals/Modals';
-import { checkSession, deviceData, getMeta } from './business/supabase_calls';
+import { checkSession, getMeta } from './business/supabase_calls';
 import Error from './views/Error';
 import GamesWrapper from './components/games/GamesWrapper';
 import TwentyOneThings from './components/games/21Things/TwentyOneThings';
-import SixPics from './assets/SixPics';
 import Pic6 from './components/games/6pics/Pic6';
 import AdminControls from './components/AdminControls';
 import useBreakpoints from './business/useBreakpoints';
 import SolMates from './components/solmates/SolMates';
+import UserAlert from './ui_elements/Alert';
+import { useWindowHeight } from './business/useWindowHeight';
 
 function App() {
   const navTo = useNavigate()
-  const location = useLocation()
-  const screen = useGlobalStore((state) => state.screen)
   const setScreen = useGlobalStore((state) => state.setScreen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
-  // const session = useGlobalStore((state) => state.session)
   const setSession = useGlobalStore((state) => state.setSession)
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
+  const setHeight = useGlobalStore((state) => state.setHeight)
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
 
   const {screenSize} = useBreakpoints()
 
   const [appReady, setAppReady] = useState(false)
+
+  const height = useWindowHeight() 
+
+ useEffect(() => {
+  setHeight(height)
+ }, [height])
 
   useEffect(() => {
     const sz = Object.entries(screenSize).find((s) => !!s[1])
@@ -69,6 +75,16 @@ function App() {
       navTo('/home')
     }
   }, [user])
+
+  useEffect(() => { 
+    if(userMeta?.user_name) {
+      console.log(userMeta?.user_name)
+      setAlertContent({
+        text: `Welcome ${userMeta?.user_name}`,
+        type: 'info'
+      })
+    }
+  }, [userMeta, user])
   
   // useEffect(() => {
   //   if(location.pathname === '/'){
@@ -153,7 +169,7 @@ function App() {
 
     </Routes>
 
-    
+    <UserAlert />
 
     {appReady && <Modals needsLogin={!userMeta}/>}
 
