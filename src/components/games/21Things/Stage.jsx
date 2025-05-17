@@ -83,7 +83,7 @@ const Stage = ({
   const rows = chunkArray(displayPrompts, 3);
 
   return (
-    <Stack height="100%" width="95%" alignItems="center" sx={{ overflow: 'hidden' }}>
+    <Stack height="100%" width="100%" alignItems="center" sx={{ overflow: 'hidden' }}>
       <Stack
         height="5%"
         direction="row"
@@ -117,9 +117,9 @@ const Stage = ({
       <Box
   sx={{
     display: 'grid',
-    gridTemplateColumns: 'repeat(3, 1fr)',
+    gridTemplateColumns: 'repeat(2, 1fr)',
     gap: 2,
-    width: '100%',
+    width: '75%',
     maxWidth: '600px',
     maxHeight: '85%',
     padding: 0.5,
@@ -150,7 +150,7 @@ const Stage = ({
           boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
           cursor: 'pointer',
           padding: 1,
-          fontSize: '0.70rem',
+          fontSize: '0.85rem',
           lineHeight: 1,
         }}
       >
