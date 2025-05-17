@@ -45,7 +45,9 @@ const Pic6 = () => {
         <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto'}}>
           <Typography fontFamily={'Fredoka regular'} fontSize={20}>Select Game Pack</Typography>
           <MenuList width={54}>
-            {packs?.map((p, i) => { 
+            {packs?.filter((p) => !p.marked_for_delete)
+            .map((p, i) => { 
+              console.log(p)
               return (
                   <PackButton key={i} pack={p} setGamePack={setGamePack}/>
               )})}

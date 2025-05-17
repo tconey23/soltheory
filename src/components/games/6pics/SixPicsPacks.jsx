@@ -70,6 +70,7 @@ useEffect(() => {
         <Stack userdata='list_container' sx={{overflow: 'auto'}} height={'100%'} width={'100%'}>
             <List userdata='pack_list' sx={{width: '100%'}}>
                 {packs && packs.map((p, i) => {
+                    console.log(p)
                     let fileType = p.graphic
                     return (
                         <ListItem
