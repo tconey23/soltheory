@@ -42,11 +42,9 @@ const Pic6 = () => {
       {gamePack ? 
         <GameWrapper pack={gamePack}/>
       :
-        <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto'}}>
+        <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto'}}> 
           <Typography fontFamily={'Fredoka regular'} fontSize={20}>Select Game Pack</Typography>
           <MenuList width={54}>
-            {packs?.filter((pk) => !pk.marked_for_delete)
-            .map((p, i) => { 
             {packs?.filter((p) => !p.marked_for_delete)
             .map((p, i) => { 
               console.log(p)

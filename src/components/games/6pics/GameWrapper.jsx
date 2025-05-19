@@ -10,7 +10,7 @@ import TextBoxes from './TextBoxes';
 import ResultsPage from './ResultsPage';
 import confetti from 'canvas-confetti';
 
-const GameWrapper = ({ pack }) => {
+const GameWrapper = ({ pack }) => { 
   const [levels, setLevels] = useState([]);
   const [levelScore, setLevelScore] = useState([]);
   const [wins, setWins] = useState(0);

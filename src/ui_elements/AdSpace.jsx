@@ -23,7 +23,7 @@ const AdSpace = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setAdIndex((prev) => (prev + 1) % ads.length);
+      setAdIndex((prev) => (prev + 1) % ads.length); 
     }, 8000);
 
     return () => clearTimeout(timeout);

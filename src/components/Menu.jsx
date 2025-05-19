@@ -86,7 +86,7 @@ const Menu = ({renders, setRenders}) => {
     },
     {
       name: userMeta ? 'mySOL' : "Login",
-      function: userMeta ? handleAccount : handleLogin,
+      function: userMeta ? handleAccount : handleLogin, 
       color: 'primary',
       display: true,
       tooltip: userMeta ? 'Modify account' : 'Login to SOLTheory',

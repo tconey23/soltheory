@@ -5,7 +5,7 @@ import useGlobalStore from '../../../business/useGlobalStore';
 
 const PackButton = ({pack, setGamePack}) => {
     
-    const [font, setFont] = useState('Fredoka')
+    const [font, setFont] = useState('Fredoka') 
     const videoRef = useRef()
     const [played, setPlayed] = useState(false)
     const [isHover, setIsHover] = useState(false)

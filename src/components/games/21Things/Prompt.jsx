@@ -4,7 +4,7 @@ import { ListItem, Typography } from "@mui/material"
 import { useEffect, useState } from "react"
 
 const Prompt = ({prompt, color}) => {
-    const user = useGlobalStore((state) => state.user)
+    const user = useGlobalStore((state) => state.user) 
     const setUser = useGlobalStore((state) => state.setUser)
     const session = useGlobalStore((state) => state.session)
     const setSession = useGlobalStore((state) => state.setSession)
