@@ -24,7 +24,7 @@ const green = '#45d500'
     const loc = useLocation()
     const {gameId} = useParams()
     const [viewOnly, setViewOnly] = useState(false)
-    console.log(gameId)
+    console.log(gameId, redirect)
   
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
@@ -48,21 +48,28 @@ const green = '#45d500'
       let { data: data, error } = await supabase
         .from('users')
         .select("*")
-        .eq('primary_id', userMeta?.primary_id)  
+ 
+        
         console.log(data)
-        if(data?.[0]){
-          let gameData = data?.[0]?.game_data
-          const foundGame = gameData.find((g) => g.id === gameId)
-          console.log(foundGame)
 
-          if(foundGame){
+        let existingGame
+
+        if(data){
+          data.forEach((d) => {
+            const foundGame = d?.game_data?.find((g) => g.id === gameId)
+            if(foundGame){
             setPrompts(foundGame?.stages)
             setSavegameNote(foundGame?.note)
             setCurrentStage(4)
             setViewOnly(true)
-          }
+              return
+            }
+          })
+        }
 
-      }
+
+
+
 
     }
 
