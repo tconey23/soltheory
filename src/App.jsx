@@ -19,6 +19,7 @@ import SolMates from './components/solmates/SolMates';
 import UserAlert from './ui_elements/Alert';
 import { useWindowHeight } from './business/useWindowHeight';
 import AdSpace from './ui_elements/AdSpace';
+import FinalStage from './components/games/21Things/FinalStage';
 
 function App() {
   const navTo = useNavigate()
@@ -36,6 +37,7 @@ function App() {
   const {screenSize} = useBreakpoints()
 
   const [appReady, setAppReady] = useState(false)
+  const [redirect, setRedirect] = useState(false)
 
   const height = useWindowHeight() 
 
@@ -68,11 +70,13 @@ function App() {
         }, [user]);
 
   useEffect(() => {
-    const redir = sessionStorage.getItem('returnPath')
+    const redir = sessionStorage.getItem('redirectAfterLogin')
+    console.log(redir)
     if(redir){
-      console.log('app redirect', redir)
-      navTo(`${redir}`)
-      sessionStorage.removeItem('returnPath')
+      setRedirect(true)
+      navTo(redir)
+    } else {
+      setRedirect(false)
     }
   }, [userMeta])
 
@@ -83,14 +87,14 @@ function App() {
   }, [])
 
   useEffect(() =>{
-    if(user){
+    if(user && !redirect){
       navTo('/home')
     }
-  }, [user])
+  }, [user, redirect])
 
   useEffect(() => { 
     if(userMeta?.user_name) {
-      console.log(userMeta?.user_name)
+      // console.log(userMeta?.user_name)
       setAlertContent({
         text: `Welcome ${userMeta?.user_name}`,
         type: 'info'
@@ -98,21 +102,7 @@ function App() {
     }
   }, [userMeta, user])
   
-  // useEffect(() => {
-  //   if(location.pathname === '/'){
-  //     navTo('/home')
-  //   }
-
-  //   const debugDevice = async () => {
-  //     const res = await deviceData(window, navigator, userMeta?.primary_id)
-  //   }
-
-  //   debugDevice()
-  // }, [])
-
-  // console.log(navigator)
   
-  console.log(height - 882)
 
   return (
    <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'} overflow={'hidden'}>
@@ -157,7 +147,7 @@ function App() {
         } 
       />
 
-      <Route path="/games/21things/:gameId" element={<TwentyOneThings />} />
+      <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={redirect} />} />
       <Route path="/games/6pics/:gameId" element={<Pic6 />} />
 
     <Route 

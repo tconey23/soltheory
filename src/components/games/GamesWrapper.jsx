@@ -6,6 +6,8 @@ import MotionStack from '../../ui_elements/MotionStack';
 import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
 import SixPicsButton from './SixPicsButton';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const HeaderImage = () => {
 
@@ -40,7 +42,7 @@ const GamesWrapper = () => {
 
     const MotionText = motion(Typography);
     const MotionAvatar = motion(Avatar);
-    const navTo = useNavigate()
+    const navigate = useNavigate()
   
     const font = useGlobalStore((state) => state.font);
     const screen = useGlobalStore((state) => state.screen);
@@ -65,7 +67,30 @@ const GamesWrapper = () => {
           }, 2000);
       }, []);
   
-  
+      const startGame = async (gameName, isLoggedIn) => {
+        let gameId;
+
+        if (userMeta) {
+          gameId = uuidv4(); // generate locally
+        } else {
+          // create a guest game row in Supabase and return the UUID
+          const { data, error } = await supabase
+            .from('guest_games')
+            .insert({ game_name: gameName })
+            .select('id')
+            .single();
+
+          if (error) {
+            console.error(error);
+            return;
+          }
+
+          gameId = data.id;
+        }
+
+        const path = `/games/${gameName}/${gameId}`;
+        navigate(path);
+      };
 
   
     return (
@@ -136,11 +161,11 @@ const GamesWrapper = () => {
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
-              <MenuItem sx={menuStyle} value="21things" onClick={() => navTo(`/games/21things`)}>
+              <MenuItem sx={menuStyle} value="21things" onClick={() => startGame(`21things`)}>
                 <TwentOneThingsButton />
               </MenuItem>
 
-              <MenuItem sx={menuStyle} value="6pics"  onClick={() => navTo(`/games/6pics`)}>
+              <MenuItem sx={menuStyle} value="6pics"  onClick={() => startGame(`6pics`)}>
                 <SixPicsButton />
               </MenuItem>
 

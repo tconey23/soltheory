@@ -6,24 +6,45 @@ import Stage from './Stage';
 import FinalStage from './FinalStage';
 import Home from './Home';
 import { useNavigate } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import useGlobalStore from '../../../business/useGlobalStore';
 
 const purple = '#c956ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
-  const TwentyOneThings = ({ user, currStage }) => {
+  const TwentyOneThings = ({ user, currStage, redirect }) => {
     const currentStage = useGlobalStore((state) => state.currentStage)
     const setCurrentStage = useGlobalStore((state) => state.setCurrentStage)
     const setGameIndex = useGlobalStore((state) => state.setGameIndex)
     const gameIndex = useGlobalStore((state) => state.gameIndex)
     const [selections, setSelections] = useState({ 1: [], 2: [], 3: [], note: '' })
     const navTo = useNavigate()
+    const loc = useLocation()
+    const {gameId} = useParams()
   
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
+    const [savegameNote, setSavegameNote] = useState()
 
+    const getSavedGame = async () => {
+      
+    let { data: guest_games, error } = await supabase
+      .from('guest_games')
+      .select("*")
+      .eq('id', gameId)   
 
+      if(guest_games?.[0]){
+        setPrompts(guest_games?.[0]?.game_content?.stages)
+        setSavegameNote(guest_games?.[0]?.game_content?.note)
+        setCurrentStage(4)
+      }
+
+    }
+
+    useEffect(() => {
+      console.log(prompts?.length)
+    }, [prompts])
     
     const fetchPrompts = async (id) => {
       const res = await get21Things(id || gameIndex)
@@ -37,21 +58,27 @@ const green = '#45d500'
 
         setPayload(res)
         setPrompts(initialized)
+        setCurrentStage(0)
       }
     }
     useEffect(() => {
-    
-      fetchPrompts()
-    }, [gameIndex])
+      console.log('redirect',redirect)
+      if(!redirect) {
+        fetchPrompts()
+      } else {
+        getSavedGame()
+      }
+    }, [gameIndex, redirect])
 
     useEffect(() => {
         if(currentStage > 0){
-            navTo('/games/21things')
+            navTo(loc.pathname)
         }
     }, [currentStage])
   
   
     const renderStage = () => {
+      console.log(currentStage)
       switch (currentStage) {
         case 1:
           return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />
@@ -60,7 +87,7 @@ const green = '#45d500'
         case 3:
           return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:
-          return <FinalStage height={'100%'} user={user} date={payload?.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} prompts={prompts}/>
+          return <FinalStage savegameNote={savegameNote} redirect={redirect} height={'100%'} user={user} date={payload?.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} prompts={prompts}/>
         default:
           return <Home
           onPlay={() => {
@@ -88,7 +115,7 @@ const green = '#45d500'
   
     return (
       <Stack alignItems="center" height="100%" width="100%">
-        {renderStage()}
+        {prompts?.length > 0 && renderStage()}
       </Stack>
     )
   }

@@ -4,22 +4,44 @@ import { useEffect, useState } from 'react'
 import Prompt from './Prompt'
 import useGlobalStore from '../../../business/useGlobalStore'
 import { supabase } from '../../../business/supabaseClient'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
-const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
+const FinalStage = ({ prompts, setCurrentStage, date, setSelections, redirect, savegameNote }) => {
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
   if (!Array.isArray(prompts)) return null;
 
   const navTo = useNavigate()
+  const loc = useLocation()
+  const { gameId } = useParams()
   const userMeta = useGlobalStore((state) => state.userMeta)
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
 
+const [stage1, setStage1] = useState([])
+const [stage2, setStage2] = useState([])
+const [stage3, setStage3] = useState([])
 
-  const stage1 = prompts.filter(p => p.stages.includes(1));
-const stage2 = prompts.filter(p => p.stages.includes(2));
-const stage3 = prompts.filter(p => p.stages.includes(3));
+  useEffect(() => {
+    console.log(prompts)
+    if(!redirect){
+      setStage1(prompts.filter(p => p.stages.includes(1)))
+      setStage2(prompts.filter(p => p.stages.includes(2)))
+      setStage3(prompts.filter(p => p.stages.includes(3)))
+    } else {
+      setStage1(prompts?.[0])
+      setStage2(prompts?.[1])
+      setStage3(prompts?.[2])
+      setNote(savegameNote)
+    }
+  }, [prompts, redirect])
+
+  
+  useEffect(() => {
+
+    console.log(stage1, stage2, stage3)
+
+  }, [stage1, stage2, stage3])
 
 
   const handleNoteChange = (val) => {
@@ -34,24 +56,19 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
   const handleSubmit = async () => {
     let currentGameData = userMeta?.game_data
     const gameData = {
-      id: Date.now(),
+      id: gameId || Date.now(),
       game: 'TwentyOneThings',
       stages: [stage1, stage2, stage3],
-      game_date: date,
+      game_date: date || Date.now(),
       note,
     }
 
-    currentGameData.push(gameData)
-    console.log(currentGameData)
-
-    
+    currentGameData.push(gameData)    
     const { data, error } = await supabase
     .from('users')
     .update({ game_data: currentGameData })
     .eq('primary_id', userMeta.primary_id)
     .select()
-
-    console.log(data)
         
     if (data[0].primary_id) {
       navTo('/games')
@@ -62,6 +79,13 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
       setCurrentStage(0)
       setNote('')
       setSelections({ 1: [], 2: [], 3: [], note: '' })
+      sessionStorage.removeItem('redirectAfterLogin')
+
+      
+      const { error } = await supabase
+        .from('guest_games')
+        .delete()
+        .eq('id', gameId)
     }
   }
 
@@ -79,7 +103,7 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
         overflow: 'auto',
       }}
     >
-      {list.map((p, i) => (
+      {list?.map((p, i) => (
         <Box
           key={i}
           sx={{
@@ -102,6 +126,31 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
       ))}
     </Box>
   );
+
+  const saveGuestGame = async () => {
+      sessionStorage.setItem('redirectAfterLogin', window.location.pathname)
+
+    const gameData = {
+      id: Date.now(),
+      game: 'TwentyOneThings',
+      stages: [stage1, stage2, stage3],
+      game_date: date,
+      note,
+    }
+
+    console.log(gameData)
+
+      const { data, error } = await supabase
+      .from('guest_games')
+      .update({ game_content: gameData })
+      .eq('id', gameId)
+      .select()
+
+      if(data){
+        setToggleLogin(true)
+      }
+
+  }
   
 
   return (
@@ -111,13 +160,15 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
       width="100%"
       alignItems="center"
     >
+
+{prompts && <>
       {renderStageList(stage1, '#c956ff')}
       {renderStageList(stage2, '#fff200')}
       {renderStageList(stage3, '#45d500')}
 
       <Stack width="100%" mt={4}>
         <Typography fontSize={'0.9rem'} fontFamily={'Fredoka Regular'}>
-          {`Why does "${stage3?.[0].prompt}" boost your mood the most?`}
+          {`Why does "${stage3?.[0]?.prompt}" boost your mood the most?`}
         </Typography>
 
         {warning && <Typography color="red">{warning}</Typography>}
@@ -128,14 +179,14 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
           rows={3}
           fullWidth
           margin="normal"
-        />
+          />
       </Stack>
 
     <Stack direction={'column'} justifyContent={'center'} alignItems={'center'}>
       {/* {!userMeta &&
       <>
-       <Typography color='red'>**You must be logged in to save game data**</Typography>
-       <Button onClick={() => setToggleLogin(true)} >Login</Button>
+      <Typography color='red'>**You must be logged in to save game data**</Typography>
+      <Button onClick={() => setToggleLogin(true)} >Login</Button>
       </>
       } */}
       <Stack direction="row" spacing={2} mt={2}>
@@ -144,14 +195,16 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
           if(!userMeta){
             setAlertContent({
               text: 'You must be logged in to save game data',
-              type: 'error',
+              type: 'warning',
             })
+            saveGuestGame()
           }
         }}>
           {note.length > 0 && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
         </Box>
       </Stack>
     </Stack>
+          </>}
     </Stack>
   )
 }
