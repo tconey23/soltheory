@@ -18,7 +18,7 @@ const useGlobalStore = create((set) => ({
   alertContent: {text: '', type: ''},
   toggleLogin: false,
   redirectUrl: '',
-  toggleAffiliates: false,
+  toggleAffiliates: false, 
   shareGame: false,
 
 

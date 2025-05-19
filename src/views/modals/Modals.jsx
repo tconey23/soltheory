@@ -3,7 +3,7 @@ import { Stack } from '@mui/material';
 import {Modal} from '@mui/material';
 import Login from '../../components/Login';
 import Menu from '../../components/Menu';
-import useGlobalStore from '../../business/useGlobalStore';
+import useGlobalStore from '../../business/useGlobalStore'; 
 import Affiliates from '../../components/Affiliates';
 
 const Modals = ({needsLogin}) => {

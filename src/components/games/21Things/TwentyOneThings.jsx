@@ -77,7 +77,7 @@ const green = '#45d500'
         const initialized = parsedPrompts.map(p => ({
           prompt: typeof p === 'string' ? p : p.prompt,
           stages: [0]
-        }));
+        })); 
 
         setPayload(res)
         setPrompts(initialized)

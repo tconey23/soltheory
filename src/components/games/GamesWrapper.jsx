@@ -121,7 +121,7 @@ const GamesWrapper = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 1, duration: 2 }}
-            sx={{ border: '1px solid black', scale: 1.25 }}
+            sx={{ border: '1px solid black', scale: 1.25 }} 
             >
             <HeaderImage />
           </MotionAvatar>

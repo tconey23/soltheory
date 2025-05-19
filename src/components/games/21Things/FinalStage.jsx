@@ -48,7 +48,7 @@ const [askToShare, setAskToShare] = useState(false)
 
   const handleNoteChange = (val) => {
     if (val.length <= 180) {
-      setNote(val)
+      setNote(val) 
       setWarning(null)
     } else {
       setWarning('You have reached the 180 character limit.')

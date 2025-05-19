@@ -119,7 +119,7 @@ function App() {
       <Route 
         path={"/account"}
         element={
-          <PrivateRoute userData={userMeta}>
+          <PrivateRoute userData={userMeta}> 
             <Account />
           </PrivateRoute>
         } 
