@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom'
 
 const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
+  const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
   if (!Array.isArray(prompts)) return null;
 
   const navTo = useNavigate()
@@ -130,10 +131,18 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
         />
       </Stack>
 
+    <Stack direction={'column'} justifyContent={'center'} alignItems={'center'}>
+      {!userMeta &&
+      <>
+       <Typography color='red'>**You must be logged in to save game data**</Typography>
+       <Button onClick={() => setToggleLogin(true)} >Login</Button>
+      </>
+      }
       <Stack direction="row" spacing={2} mt={2}>
         <Button onClick={() => setCurrentStage(3)}>Back</Button>
-        {note.length > 0 && <Button onClick={handleSubmit}>Submit</Button>}
+        {note.length > 0 && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
       </Stack>
+    </Stack>
     </Stack>
   )
 }

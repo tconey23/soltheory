@@ -8,6 +8,7 @@ import useGlobalStore from '../../business/useGlobalStore';
 const Modals = ({needsLogin}) => {
 
     const user = useGlobalStore((state) => state.user)
+    const toggleLogin = useGlobalStore((state) => state.toggleLogin)
     const toggleMenu = useGlobalStore((state) => state.toggleMenu)
     const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
     const screen = useGlobalStore((state) => state.screen)
@@ -17,7 +18,7 @@ const Modals = ({needsLogin}) => {
   return (
     <>
         {/* Login menu */}
-        <Modal open={!!needsLogin}>
+        <Modal open={!!needsLogin || !!toggleLogin}>
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
         <Stack bgcolor={'white'} width={screen ? '77%' : '50%'} height={'50%'} borderRadius={1} justifyContent={'center'} alignItems={'center'}>
           <Login />

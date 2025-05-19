@@ -71,7 +71,6 @@ export const login = async (email, password) => {
 }
 
 export const logout = async () => {
-  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
     try {
       // Attempt Supabase logout but don't wait forever
       const timeout = new Promise((_, reject) =>

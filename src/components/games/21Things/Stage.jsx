@@ -2,15 +2,30 @@ import {
   Stack,
   Button,
   Typography,
-  Table,
-  TableBody,
-  TableContainer,
-  TableRow,
-  TableCell,
   Box,
 } from '@mui/material';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Prompt from './Prompt';
+
+
+const SelectionHex = ({ selectCount, maxSelect, color }) => {
+  const empty = (
+    <i className="fi fi-rr-hexagon" style={{ margin: '0 5px', fontSize: '20px' }} />
+  );
+  const filled = (
+    <i className="fi fi-sr-hexagon" style={{ margin: '0 5px', color: color, fontSize: '20px' }} />
+  );
+
+  const hexagons = useMemo(() => {
+    const result = [];
+    for (let i = 0; i < maxSelect; i++) {
+      result.push(i < selectCount ? filled : empty);
+    }
+    return result;
+  }, [selectCount, maxSelect]);
+
+  return <>{hexagons}</>;
+};
 
 const Stage = ({
   stageNum,
@@ -95,7 +110,7 @@ const Stage = ({
       >
         <Stack width="66%">
           <Typography>
-            Select {maxSelect}: {selectCount}/{maxSelect}
+            Select {maxSelect}| {<SelectionHex color={currentColor} maxSelect={maxSelect} selectCount={selectCount}/>}
           </Typography>
         </Stack>
 
@@ -140,7 +155,7 @@ const Stage = ({
         onClick={() => handleSelect(p, i)}
         sx={{
           backgroundColor: color,
-          height: '80px',
+          height: '120px',
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
@@ -152,6 +167,7 @@ const Stage = ({
           padding: 1,
           fontSize: '0.85rem',
           lineHeight: 1,
+          paddingX: 4
         }}
       >
         {p.prompt}

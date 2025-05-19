@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import useBreakpoints from './useBreakpoints'
+import { redirectDocument } from 'react-router-dom'
 
 
 const useGlobalStore = create((set) => ({
@@ -15,6 +16,8 @@ const useGlobalStore = create((set) => ({
   currentStage: null,
   animate: true,
   alertContent: {text: '', type: ''},
+  toggleLogin: false,
+  redirectUrl: '',
 
 
   // ✅ Actions
@@ -27,6 +30,8 @@ const useGlobalStore = create((set) => ({
   setAnimate: (val) => set({animate: val}),
   setScreen: (val) => set({screen: val}),
   setHeight: (val) => set({height: val}),
-  setAlertContent: (val) => set({alertContent: val})
+  setAlertContent: (val) => set({alertContent: val}),
+  setToggleLogin: (val) => set({toggleLogin: val}),
+  setRedirectUrl: (val) => set({redirectUrl: val})
 }))
 export default useGlobalStore

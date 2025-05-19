@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 import { supabase } from '../business/supabaseClient';
+import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
 
@@ -9,7 +11,11 @@ const LoginForm = () => {
   const setUser = useGlobalStore((state) => state.setUser)
   const screen = useGlobalStore((state) => state.screen)
   const setSession = useGlobalStore((state) => state.setSession)
-  
+  const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
+  const toggleLogin = useGlobalStore((state) => state.toggleLogin)
+  const redirectUrl = useGlobalStore((state) => state.redirectUrl)
+  const setRedirectUrl = useGlobalStore((state) => state.setRedirectUrl)
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confPassword, setConfPassword] = useState()
@@ -17,10 +23,19 @@ const LoginForm = () => {
   const [userName, setUserName] = useState()
   const [toggleShowPassword, setToggleShowPassword] = useState(false)
 
+  const loc = useLocation()
+  const navTo = useNavigate()
+
+  useEffect(() => {
+    if(loc?.pathname){
+      console.log('setting loc', loc.pathname)
+      setRedirectUrl(loc?.pathname)
+    }
+  }, [loc?.pathname])
 
 const handleLogin = async () => {
-  console.log('email', email)
-  console.log('password', password)
+  // console.log('email', email)
+  // console.log('password', password)
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim(),
     password: password.trim()
@@ -28,10 +43,16 @@ const handleLogin = async () => {
 
   if (error) {
     console.error('Supabase login error:', error.message);
+  } else {
+    console.log(redirectUrl)
+    sessionStorage.setItem('returnPath', redirectUrl)
   }
 
   if (data) {
-    console.log(data);
+    // console.log(data);
+    if(toggleLogin){
+      setToggleLogin(false)
+    }
     setUser(data?.user);
     setSession(data?.session);
   }
