@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography } from '@mui/material';
+import { Avatar, Badge, Button, Input, InputLabel, List, Menu, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
@@ -46,11 +46,18 @@ const GamesWrapper = () => {
     const screen = useGlobalStore((state) => state.screen);
     const userMeta = useGlobalStore((state) => state.userMeta);
     const user = useGlobalStore((state) => state.user)
-  
+    const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
+    const toggleLogin = useGlobalStore((state) => state.toggleLogin)
 
     const [selectedGame, setSelectedGame] = useState(null)
     const [gameObj, setGameObj] = useState()
     const [hasMounted, setHasMounted] = useState(false);
+
+    const menuStyle = {
+      boxShadow : '1px 1px 5px 5px #66339933', 
+      marginY : 5, 
+      borderRadius: 2
+    }
 
       useEffect(() => {
           setTimeout(() => {
@@ -82,16 +89,25 @@ const GamesWrapper = () => {
         </MotionText>
   
         <Stack marginBottom={7}>
+          {/* <Badge badgeContent='*' color='primary' overlap="circular" fontSize='3rem'>
+            </Badge> */}
           <MotionAvatar
             initial={hasMounted ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 1, duration: 2 }}
             sx={{ border: '1px solid black', scale: 1.25 }}
-          >
+            >
             <HeaderImage />
           </MotionAvatar>
         </Stack>
+
+       {!userMeta && 
+       <Stack>
+        <Typography fontSize={20} color='red' fontStyle={'italic'}>**You are not currently logged in**</Typography>
+          <Typography fontSize={20} color='red' fontStyle={'italic'}>**You must be logged in to save game data**</Typography>
+          <Button onClick={() => setToggleLogin(true)}>Login</Button>
+        </Stack>}
   
         <MotionStack
           key="account_select"
@@ -111,23 +127,24 @@ const GamesWrapper = () => {
               bgcolor: '#f4f6f8',
               height: 'fit-content',
               width: '100%',
+              height: '100%',
               borderRadius: 1,
             }}
           >
  
-            <Select
+            <List
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
-              <MenuItem value="21things" onClick={() => navTo(`/games/21things`)}>
+              <MenuItem sx={menuStyle} value="21things" onClick={() => navTo(`/games/21things`)}>
                 <TwentOneThingsButton />
               </MenuItem>
 
-              <MenuItem value="6pics"  onClick={() => navTo(`/games/6pics`)}>
+              <MenuItem sx={menuStyle} value="6pics"  onClick={() => navTo(`/games/6pics`)}>
                 <SixPicsButton />
               </MenuItem>
 
-            </Select>
+            </List>
           </Stack>
         </MotionStack>
       </Stack>

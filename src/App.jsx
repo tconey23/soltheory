@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import AppHeader from './components/AppHeader'
 import { Stack } from '@mui/material'
-import { Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate, redirect } from 'react-router-dom';
 import HomePage from './views/homepage/HomePage';
 import PrivateRoute from './components/PrivateRoute';
 import Account from './components/Account';
@@ -18,6 +18,7 @@ import useBreakpoints from './business/useBreakpoints';
 import SolMates from './components/solmates/SolMates';
 import UserAlert from './ui_elements/Alert';
 import { useWindowHeight } from './business/useWindowHeight';
+import AdSpace from './ui_elements/AdSpace';
 
 function App() {
   const navTo = useNavigate()
@@ -29,6 +30,8 @@ function App() {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
   const setHeight = useGlobalStore((state) => state.setHeight)
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
+  const redirectUrl = useGlobalStore((state) => state.redirectUrl)
+  const setRedirectUrl = useGlobalStore((state) => state.setRedirectUrl)
 
   const {screenSize} = useBreakpoints()
 
@@ -65,6 +68,15 @@ function App() {
         }, [user]);
 
   useEffect(() => {
+    const redir = sessionStorage.getItem('returnPath')
+    if(redir){
+      console.log('app redirect', redir)
+      navTo(`${redir}`)
+      sessionStorage.removeItem('returnPath')
+    }
+  }, [userMeta])
+
+  useEffect(() => {
     setTimeout(() => {
       setAppReady(true)
     }, 1000);
@@ -98,7 +110,9 @@ function App() {
   //   debugDevice()
   // }, [])
 
-  // console.log(navigator) 
+  // console.log(navigator)
+  
+  console.log(height - 882)
 
   return (
    <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'} overflow={'hidden'}>
@@ -125,27 +139,21 @@ function App() {
       <Route 
         path={"/games"}
         element={
-          <PrivateRoute userData={userMeta}>
             <GamesWrapper />
-          </PrivateRoute>
         } 
       />
 
       <Route 
         path={"/games/21things"}
         element={
-          <PrivateRoute userData={userMeta}>
             <TwentyOneThings />
-          </PrivateRoute>
         } 
       />
 
       <Route 
         path={"/games/6pics"}
         element={
-          <PrivateRoute userData={userMeta}>
             <Pic6/>
-          </PrivateRoute>
         } 
       />
 
@@ -171,7 +179,11 @@ function App() {
 
     <UserAlert />
 
-    {appReady && <Modals needsLogin={!userMeta}/>}
+    {appReady && <Modals needsLogin={false}/>}
+
+    <Stack position={'fixed'} sx={{transform: `translateY(${height-60}px)`, height: '100%', width: '100%'}}>
+      <AdSpace />
+    </Stack> 
 
    </Stack>
   )

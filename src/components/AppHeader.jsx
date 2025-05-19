@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Avatar, Button, Stack } from '@mui/material';
+import { Avatar, Badge, Button, Stack } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 
 const AppHeader = () => {
@@ -13,14 +13,11 @@ const AppHeader = () => {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
   const toggleMenu = useGlobalStore((state) => state.toggleMenu)
   const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
-
-
   const [avatar, setAvatar] = useState(null)
 
   useEffect(() => {
     if(userMeta){
       setAvatar(userMeta.avatar)
-      
     }
   }, [userMeta])
 
@@ -32,7 +29,9 @@ const AppHeader = () => {
         </Button>
       </Stack>
       <Stack width={'90%'}  alignItems={'flex-end'} paddingX={3}>
-        <Avatar src={avatar}/>
+        <Badge badgeContent={<i class="fi fi-sr-circle-star"></i>} color='error'>
+          <Avatar src={avatar}/>
+        </Badge>
       </Stack>
     </Stack>
   );

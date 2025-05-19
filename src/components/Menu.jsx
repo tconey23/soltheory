@@ -21,6 +21,8 @@ const Menu = ({renders, setRenders}) => {
   const user = useGlobalStore((state) => state.user)
   const userMeta = useGlobalStore((state) => state.userMeta)
   const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
+  const setTogglelogin = useGlobalStore((state) => state.setToggleLogin)
+  const toggleLogin = useGlobalStore((state) => state.toggleLogin)
   const [buttons, setButtons] = useState([])
   const [curLoc, setCurLoc] = useState()
 
@@ -47,7 +49,11 @@ const Menu = ({renders, setRenders}) => {
   }
 
   const handleLogin = async () =>{
-    delayedNav('/login')
+        setIsVisible(false)
+    setTimeout(() => {
+      setTogglelogin(true)
+      setToggleMenu(false)
+    }, 200);
   }
 
   const handleAccount = () => {
@@ -74,7 +80,7 @@ const Menu = ({renders, setRenders}) => {
       function: handleHome,
       color: 'primary',
       display: true,
-      tooltip: userMeta ? 'Modify account' : 'Login to SOLTheory',
+      tooltip: 'Go home',
       pathFilter: '/home',
       icon: <i style={{marginRight: 10}} className="fi fi-rr-house-chimney"></i>
     },
@@ -88,18 +94,18 @@ const Menu = ({renders, setRenders}) => {
       icon: userMeta ? <i style={{marginRight: 8}} className="fi fi-ss-user-skill-gear"></i> : <i style={{marginRight: 8}} className="fi fi-rr-sign-in-alt"></i>
     },
     {
-      name: userMeta && 'SOLGames',
-      function: userMeta ? handleGames : handleLogin,
-      color: userMeta ? 'primary' : 'disabled',
-      display: userMeta ? true : false,
-      tooltip: userMeta ? 'Play SOLGames' : 'Login to play SOLGames',
+      name: 'SOLGames',
+      function: handleGames,
+      color: 'primary',
+      display: true,
+      tooltip: 'Play SOLGames',
       pathFilter: '/games',
       icon: <i style={{marginRight: 5}} className="fi fi-rs-gamepad"></i>
     },
     {
-      name: userMeta && 'SOLMates',
+      name: 'SOLMates',
       function: handleSolmates,
-      color: userMeta ? 'primary' : 'disabled',
+      color: 'primary',
       display: userMeta ? true : false,
       tooltip: userMeta ? 'See SOLMates' : 'Login to see SOLMates',
       pathFilter: '/solmates',
@@ -119,24 +125,23 @@ const Menu = ({renders, setRenders}) => {
     
       setButtons(
         menuButtons.map((b, i) => {
-          if(loc.pathname !== b.pathFilter){
+          if(loc.pathname !== b.pathFilter && b?.display){
             return (
                 <Tooltip key={i} title={b.tooltip} followCursor>
                   <Stack paddingY={2} paddingX={5} alignItems={'center'}>
-                    {user ?
+
                       <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
                         <Typography fontSize={15}>{b?.icon}</Typography>
                         <Typography fontSize={15}>{b.name}</Typography>
                       </Button>
-                    :
-                      <>
+                  
+                      {/* <>
                         {!user && b.name === 'Login' &&                       
                         <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
                         <Typography fontSize={15}>{b?.icon}</Typography>
                         <Typography fontSize={15}>{b.name}</Typography>
                       </Button>}
-                      </>
-                    }
+                      </> */}
                   </Stack>
                 </Tooltip>
               )
