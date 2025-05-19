@@ -147,6 +147,7 @@ function App() {
       />
 
       <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={redirect} />} />
+      <Route path="/games/21things/:userId/:gameId" element={<TwentyOneThings redirect={false} />} />
       <Route path="/games/6pics/:gameId" element={<Pic6 />} />
 
     <Route 

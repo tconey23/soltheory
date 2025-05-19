@@ -22,13 +22,14 @@ const green = '#45d500'
     const [selections, setSelections] = useState({ 1: [], 2: [], 3: [], note: '' })
     const navTo = useNavigate()
     const loc = useLocation()
-    const {gameId} = useParams()
+    const {userId, gameId} = useParams()
     const [viewOnly, setViewOnly] = useState(false)
-    console.log(gameId, redirect)
-  
+    
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
     const [savegameNote, setSavegameNote] = useState()
+    const [newGame, setNewGame] = useState(false)
+    console.log(userId, redirect, newGame)
 
       const getGuestGame = async () => {
     let { data: guest_games, error } = await supabase
@@ -48,34 +49,25 @@ const green = '#45d500'
       let { data: data, error } = await supabase
         .from('users')
         .select("*")
- 
-        
+        .eq('primary_id', userId)
         console.log(data)
-
-        let existingGame
 
         if(data){
           data.forEach((d) => {
             const foundGame = d?.game_data?.find((g) => g.id === gameId)
+            console.log(foundGame)
             if(foundGame){
-            setPrompts(foundGame?.stages)
-            setSavegameNote(foundGame?.note)
-            setCurrentStage(4)
-            setViewOnly(true)
+                setPrompts(foundGame?.stages)
+                setSavegameNote(foundGame?.note)
+                setCurrentStage(4)
+                setViewOnly(true)
               return
+            } else {
+              setNewGame(true)
             }
           })
         }
-
-
-
-
-
     }
-
-    useEffect(() => {
-      console.log(prompts?.length)
-    }, [prompts])
     
     const fetchPrompts = async (id) => {
       const res = await get21Things(id || gameIndex)
@@ -92,20 +84,26 @@ const green = '#45d500'
         setCurrentStage(0)
       }
     }
-    useEffect(() => {
-      console.log('redirect',redirect)
-      if(!redirect && !gameId) {
-        fetchPrompts()
-      }
-      
-      if(gameId){
-        getSavedGame()
-      }
 
-      if(redirect){
-        getGuestGame()
-      }
-    }, [gameIndex, redirect, gameId])
+useEffect(() => {
+  const loadGame = async () => {
+    if (redirect) {
+      await getGuestGame();
+    } else if (gameId && userId) {
+      await getSavedGame(); // will set newGame = true if nothing found
+    } else {
+      setNewGame(true);
+    }
+  };
+
+  loadGame();
+}, [redirect, gameId, userId]);
+
+useEffect(() => {
+  if (newGame) {
+    fetchPrompts();
+  }
+}, [newGame, gameIndex]);
 
     useEffect(() => {
         if(currentStage > 0){
