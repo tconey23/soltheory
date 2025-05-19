@@ -20,6 +20,7 @@ import UserAlert from './ui_elements/Alert';
 import { useWindowHeight } from './business/useWindowHeight';
 import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
+import { useParams } from 'react-router-dom';
 
 function App() {
   const navTo = useNavigate()
@@ -31,8 +32,6 @@ function App() {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
   const setHeight = useGlobalStore((state) => state.setHeight)
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
-  const redirectUrl = useGlobalStore((state) => state.redirectUrl)
-  const setRedirectUrl = useGlobalStore((state) => state.setRedirectUrl)
 
   const {screenSize} = useBreakpoints()
 
@@ -88,7 +87,7 @@ function App() {
 
   useEffect(() =>{
     if(user && !redirect){
-      navTo('/home')
+      // navTo('/home')
     }
   }, [user, redirect])
 

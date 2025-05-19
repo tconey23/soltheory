@@ -14,6 +14,7 @@ const yellow = '#fff200'
 const green = '#45d500'
 
   const TwentyOneThings = ({ user, currStage, redirect }) => {
+    const userMeta = useGlobalStore((state) => state.userMeta)
     const currentStage = useGlobalStore((state) => state.currentStage)
     const setCurrentStage = useGlobalStore((state) => state.setCurrentStage)
     const setGameIndex = useGlobalStore((state) => state.setGameIndex)
@@ -22,22 +23,45 @@ const green = '#45d500'
     const navTo = useNavigate()
     const loc = useLocation()
     const {gameId} = useParams()
+    const [viewOnly, setViewOnly] = useState(false)
+    console.log(gameId)
   
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
     const [savegameNote, setSavegameNote] = useState()
 
-    const getSavedGame = async () => {
-      
+      const getGuestGame = async () => {
     let { data: guest_games, error } = await supabase
       .from('guest_games')
       .select("*")
       .eq('id', gameId)   
 
       if(guest_games?.[0]){
-        setPrompts(guest_games?.[0]?.game_content?.stages)
+        setPrompts(guest_games?.[0]?.game_content?.stages)  
         setSavegameNote(guest_games?.[0]?.game_content?.note)
         setCurrentStage(4)
+      }
+
+    }
+
+    const getSavedGame = async () => {
+      let { data: data, error } = await supabase
+        .from('users')
+        .select("*")
+        .eq('primary_id', userMeta?.primary_id)  
+        console.log(data)
+        if(data?.[0]){
+          let gameData = data?.[0]?.game_data
+          const foundGame = gameData.find((g) => g.id === gameId)
+          console.log(foundGame)
+
+          if(foundGame){
+            setPrompts(foundGame?.stages)
+            setSavegameNote(foundGame?.note)
+            setCurrentStage(4)
+            setViewOnly(true)
+          }
+
       }
 
     }
@@ -63,12 +87,18 @@ const green = '#45d500'
     }
     useEffect(() => {
       console.log('redirect',redirect)
-      if(!redirect) {
+      if(!redirect && !gameId) {
         fetchPrompts()
-      } else {
+      }
+      
+      if(gameId){
         getSavedGame()
       }
-    }, [gameIndex, redirect])
+
+      if(redirect){
+        getGuestGame()
+      }
+    }, [gameIndex, redirect, gameId])
 
     useEffect(() => {
         if(currentStage > 0){
@@ -87,7 +117,7 @@ const green = '#45d500'
         case 3:
           return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:
-          return <FinalStage savegameNote={savegameNote} redirect={redirect} height={'100%'} user={user} date={payload?.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} prompts={prompts}/>
+          return <FinalStage viewOnly={viewOnly} savegameNote={savegameNote} redirect={redirect} height={'100%'} user={user} date={payload?.date} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} prompts={prompts}/>
         default:
           return <Home
           onPlay={() => {

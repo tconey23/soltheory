@@ -6,7 +6,7 @@ import useGlobalStore from '../../../business/useGlobalStore'
 import { supabase } from '../../../business/supabaseClient'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
-const FinalStage = ({ prompts, setCurrentStage, date, setSelections, redirect, savegameNote }) => {
+const FinalStage = ({ prompts, setCurrentStage, date, setSelections, redirect, savegameNote, viewOnly  }) => {
   const toggleShareGame = useGlobalStore((state => state.toggleShareGame))
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
@@ -26,7 +26,7 @@ const [askToShare, setAskToShare] = useState(false)
 
   useEffect(() => {
     console.log(prompts)
-    if(!redirect){
+    if(!redirect && !savegameNote){
       setStage1(prompts.filter(p => p.stages.includes(1)))
       setStage2(prompts.filter(p => p.stages.includes(2)))
       setStage3(prompts.filter(p => p.stages.includes(3)))
@@ -190,6 +190,7 @@ const [askToShare, setAskToShare] = useState(false)
         <TextField
           onChange={(e) => handleNoteChange(e.target.value)}
           value={note}
+          disabled={viewOnly}
           multiline
           rows={3}
           fullWidth
@@ -205,17 +206,24 @@ const [askToShare, setAskToShare] = useState(false)
       </>
       } */}
       <Stack direction="row" spacing={2} mt={2}>
-        <Button onClick={() => setCurrentStage(3)}>Back</Button>
+        <Button onClick={() =>{
+          if(viewOnly) {
+            navTo('/games')
+          } else {
+            setCurrentStage(3)
+          }
+          
+          }}>Back</Button>
         <Box onClick={() => {
           if(!userMeta){
             setAlertContent({
               text: 'You must be logged in to save game data',
-              type: 'warning',
+              type: 'warning', 
             })
             saveGuestGame()
           }
         }}>
-          {note.length > 0 && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
+          {note.length > 0 && !viewOnly && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
         </Box>
       </Stack>
     </Stack>
