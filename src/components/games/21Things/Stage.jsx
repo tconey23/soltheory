@@ -98,7 +98,7 @@ const Stage = ({
   const rows = chunkArray(displayPrompts, 3);
 
   return (
-    <Stack height="100%" width="100%" alignItems="center" sx={{ overflow: 'hidden' }}>
+    <Stack height="90%" width="100%" paddingTop={3} alignItems="center" sx={{ overflow: 'hidden' }}>
       <Stack
         height="5%"
         direction="row"
@@ -107,6 +107,7 @@ const Stage = ({
         justifyContent="space-around"
         width="100%"
         alignItems="center"
+        paddingBottom={2}
       >
         <Stack width="66%">
           <Typography>
@@ -134,7 +135,7 @@ const Stage = ({
     display: 'grid',
     gridTemplateColumns: 'repeat(2, 1fr)',
     gap: 2,
-    width: '75%',
+    width: '90%',
     maxWidth: '600px',
     maxHeight: '85%',
     padding: 0.5,
@@ -155,7 +156,7 @@ const Stage = ({
         onClick={() => handleSelect(p, i)}
         sx={{
           backgroundColor: color,
-          height: '120px',
+          height: '140px',
           width: '100%',
           display: 'flex',
           justifyContent: 'center',
@@ -165,9 +166,9 @@ const Stage = ({
           boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
           cursor: 'pointer',
           padding: 1,
-          fontSize: '0.85rem',
+          fontSize: '1.1rem',
           lineHeight: 1,
-          paddingX: 4
+          paddingX: 2
         }}
       >
         {p.prompt}

@@ -157,6 +157,9 @@ function App() {
         } 
       />
 
+      <Route path="/games/21things/:gameId" element={<TwentyOneThings />} />
+      <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+
     <Route 
         path={"/account/admin"}
         element={
@@ -181,7 +184,7 @@ function App() {
 
     {appReady && <Modals needsLogin={false}/>}
 
-    <Stack position={'fixed'} sx={{transform: `translateY(${height-60}px)`, height: '100%', width: '100%'}}>
+    <Stack position={'fixed'} sx={{transform: `translateY(${height-75}px)`, height: '100%', width: '100%'}}>
       <AdSpace />
     </Stack> 
 

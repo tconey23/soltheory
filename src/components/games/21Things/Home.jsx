@@ -17,7 +17,7 @@ const Home = ({ onPlay, payload }) => {
     }, [clicked])
   
     return (
-      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 0.8 : 1 }}>
+      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 1 : 1 }} marginTop={5}>
         <Stack>
           <Hexagon dims={100}/>
         </Stack>

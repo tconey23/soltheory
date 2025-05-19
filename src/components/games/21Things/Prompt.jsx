@@ -19,10 +19,8 @@ const Prompt = ({prompt, color}) => {
                 userdata='21things prompt' 
                 padding={1} 
                 sx={{    
-                    
                     minHeight: '100%',
                     minWidth: '100%',
-                    padding: 1,
                     backgroundColor: color,
                     borderRadius: 2,
                     textAlign: 'center',

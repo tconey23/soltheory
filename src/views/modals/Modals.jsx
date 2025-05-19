@@ -4,6 +4,7 @@ import {Modal} from '@mui/material';
 import Login from '../../components/Login';
 import Menu from '../../components/Menu';
 import useGlobalStore from '../../business/useGlobalStore';
+import Affiliates from '../../components/Affiliates';
 
 const Modals = ({needsLogin}) => {
 
@@ -12,6 +13,8 @@ const Modals = ({needsLogin}) => {
     const toggleMenu = useGlobalStore((state) => state.toggleMenu)
     const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
     const screen = useGlobalStore((state) => state.screen)
+    const setToggleAffiliates = useGlobalStore((state) => state.setToggleAffiliates)
+    const toggleAffiliates = useGlobalStore((state) => state.toggleAffiliates)
 
     const [renders, setRenders] = useState(0)
 
@@ -30,6 +33,12 @@ const Modals = ({needsLogin}) => {
     <Modal open={!!toggleMenu} sx={{height: '94dvh', alignSelf: 'flex-end'}} >
       <Stack width="100%" height="100%">
         <Menu renders={renders} setRenders={setRenders}/>
+      </Stack>
+    </Modal>
+
+    <Modal open={!!toggleAffiliates} sx={{height: '94dvh', alignSelf: 'flex-end'}} >
+      <Stack width="100%" height="100%" justifyContent={'center'} alignItems={'center'}>
+        <Affiliates setToggleAffiliates={setToggleAffiliates}/>
       </Stack>
     </Modal>
     </>

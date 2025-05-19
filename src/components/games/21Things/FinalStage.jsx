@@ -73,7 +73,7 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
         gap: 2,
         width: '100%',
         maxWidth: '600px',
-        maxHeight: '85%',
+        maxHeight: '90%',
         padding: 1,
         margin: '0 auto',
         overflow: 'auto',
@@ -93,7 +93,7 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
             padding: 1,
             cursor: 'default',
             minHeight: '80px', // make rows even
-            fontSize: '0.7rem',
+            fontSize: '1rem',
             lineHeight: 1.2,
           }}
         >
@@ -107,7 +107,7 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
   return (
     <Stack
       userdata="21things final stage"
-      height="100%"
+      height="90%"
       width="100%"
       alignItems="center"
     >
@@ -125,22 +125,31 @@ const stage3 = prompts.filter(p => p.stages.includes(3));
           onChange={(e) => handleNoteChange(e.target.value)}
           value={note}
           multiline
-          rows={4}
+          rows={3}
           fullWidth
           margin="normal"
         />
       </Stack>
 
     <Stack direction={'column'} justifyContent={'center'} alignItems={'center'}>
-      {!userMeta &&
+      {/* {!userMeta &&
       <>
        <Typography color='red'>**You must be logged in to save game data**</Typography>
        <Button onClick={() => setToggleLogin(true)} >Login</Button>
       </>
-      }
+      } */}
       <Stack direction="row" spacing={2} mt={2}>
         <Button onClick={() => setCurrentStage(3)}>Back</Button>
-        {note.length > 0 && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
+        <Box onClick={() => {
+          if(!userMeta){
+            setAlertContent({
+              text: 'You must be logged in to save game data',
+              type: 'error',
+            })
+          }
+        }}>
+          {note.length > 0 && <Button sx={{bgcolor: !userMeta && 'grey'}} disabled={!userMeta} onClick={handleSubmit}>Submit</Button>}
+        </Box>
       </Stack>
     </Stack>
     </Stack>

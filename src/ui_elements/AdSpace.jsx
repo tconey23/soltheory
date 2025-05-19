@@ -2,38 +2,61 @@ import { Stack } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import useGlobalStore from '../business/useGlobalStore';
 
 const AdSpace = () => {
   const [adIndex, setAdIndex] = useState(0);
+  const [isMobile, setIsMobile] = useState(true)
+  const screen = useGlobalStore((state) => state.screen)
 
-  const ads = [
+  
+  useEffect(() =>{
+    console.log(screen)
+    
+    if(screen === 'xs'){
+      setIsMobile(true)
+    } else {
+      setIsMobile(false)
+    }
+  }, [screen])
+
+
+  const mobileAds = [
     {
-      name: 'personos_mobile',
-      type: 'mobile',
-      image: '/personos_ad_mobile.jpeg',
-      url: 'https://www.personos.ai/'
+      name: isMobile ? 'personos_mobile' : 'personos_desktop',
+      type: isMobile ? 'mobile' : 'desktop',
+      image: isMobile ? '/personos_ad_mobile.jpeg' : '/personos_ad_desktop.png',
+      url: 'https://www.personos.ai/',
+      dims: {
+        width: isMobile ? '100%' : '728px', 
+        height: isMobile ? '60px' : '169px'
+      }
     },
     {
-      name: 'mom_mobile',
-      type: 'mobile',
-      image: '/mom_ad_mobile.jpeg',
-      url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/'
+      name: isMobile ? 'mom_mobile' : 'mom_desktop',
+      type: isMobile ? 'mobile' : 'desktop',
+      image: isMobile ? '/mom_ad_mobile.jpeg' : '/mom_ad_desktop.png',
+      url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
+      dims: {
+        width: isMobile ? '100%' : '728px', 
+        height: isMobile ? '60px' : '169px'
+      }
     }
   ];
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setAdIndex((prev) => (prev + 1) % ads.length); 
+      setAdIndex((prev) => (prev + 1) % mobileAds.length); 
     }, 8000);
 
     return () => clearTimeout(timeout);
   }, [adIndex]);
 
   return (
-    <Stack sx={{cursor: 'pointer'}} height={'60px'} width={'100%'} overflow="hidden" position="fixed">
+    <Stack sx={{cursor: 'pointer'}} height={mobileAds[adIndex]?.dims?.height} width={'100%'} overflow="hidden" position="fixed" justifyContent={'center'} alignItems={'center'}>
       <AnimatePresence mode="wait">
         <motion.div
-          key={ads[adIndex].name + adIndex}
+          key={mobileAds[adIndex].name + adIndex}
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
@@ -44,11 +67,11 @@ const AdSpace = () => {
             height: '100%',
           }}
         >
-          <Link to={ads[adIndex].url} target="_blank" rel="noopener noreferrer">
+          <Link to={mobileAds[adIndex].url} target="_blank" rel="noopener noreferrer">
             <img
-              src={ads[adIndex].image}
-              alt={ads[adIndex].name}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              src={mobileAds[adIndex].image}
+              alt={mobileAds[adIndex].name}
+              style={{ width: mobileAds[adIndex]?.dims?.width, height: 'auto', objectFit: 'cover' }}
             />
           </Link>
         </motion.div>

@@ -23,6 +23,8 @@ const Menu = ({renders, setRenders}) => {
   const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
   const setTogglelogin = useGlobalStore((state) => state.setToggleLogin)
   const toggleLogin = useGlobalStore((state) => state.toggleLogin)
+  const setToggleAffiliates = useGlobalStore((state) => state.setToggleAffiliates)
+  const toggleAffiliates = useGlobalStore((state) => state.toggleAffiliates)
   const [buttons, setButtons] = useState([])
   const [curLoc, setCurLoc] = useState()
 
@@ -49,7 +51,7 @@ const Menu = ({renders, setRenders}) => {
   }
 
   const handleLogin = async () =>{
-        setIsVisible(false)
+    setIsVisible(false)
     setTimeout(() => {
       setTogglelogin(true)
       setToggleMenu(false)
@@ -70,6 +72,14 @@ const Menu = ({renders, setRenders}) => {
 
   const handleSolmates = async () => {
     delayedNav('/solmates')
+  }
+
+  const handlePartners = async () => {
+    setIsVisible(false)
+    setTimeout(() => {
+      setToggleAffiliates(true)
+      setToggleMenu(false)
+    }, 200);
   }
 
   //<i className="fi fi-sr-psychology"></i>
@@ -118,6 +128,14 @@ const Menu = ({renders, setRenders}) => {
       display: userMeta ? true : false,
       tooltip: 'Log out of SOLTheory',
       icon: <i style={{marginRight: 5}} className="fi fi-rr-leave"></i>
+    },
+    {
+      name: 'Our Partners',
+      function: handlePartners,
+      color: 'primary',
+      display: true,
+      tooltip: 'View our partners',
+      icon: <i style={{marginRight: 5}} className="fi fi-rs-heart-partner-handshake"></i>
     }
   ]
 
