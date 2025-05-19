@@ -19,6 +19,7 @@ const useGlobalStore = create((set) => ({
   toggleLogin: false,
   redirectUrl: '',
   toggleAffiliates: false,
+  shareGame: false,
 
 
   // ✅ Actions
@@ -34,6 +35,7 @@ const useGlobalStore = create((set) => ({
   setAlertContent: (val) => set({alertContent: val}),
   setToggleLogin: (val) => set({toggleLogin: val}),
   setRedirectUrl: (val) => set({redirectUrl: val}),
-  setToggleAffiliates: (val) => set({toggleAffiliates: val})
+  setToggleAffiliates: (val) => set({toggleAffiliates: val}),
+  toggleShareGame: (val) => set({shareGame: val})
 }))
 export default useGlobalStore

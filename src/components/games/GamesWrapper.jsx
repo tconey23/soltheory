@@ -127,12 +127,12 @@ const GamesWrapper = () => {
           </MotionAvatar>
         </Stack>
 
-       {!userMeta && 
+       {/* {!userMeta && 
        <Stack>
         <Typography fontSize={20} color='red' fontStyle={'italic'}>**You are not currently logged in**</Typography>
           <Typography fontSize={20} color='red' fontStyle={'italic'}>**You must be logged in to save game data**</Typography>
           <Button onClick={() => setToggleLogin(true)}>Login</Button>
-        </Stack>}
+        </Stack>} */}
   
         <MotionStack
           key="account_select"

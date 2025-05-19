@@ -29,7 +29,7 @@ const AppHeader = () => {
         </Button>
       </Stack>
       <Stack width={'90%'}  alignItems={'flex-end'} paddingX={3}>
-        <Badge badgeContent={<i class="fi fi-sr-circle-star"></i>} color='error'>
+        <Badge badgeContent={<i className="fi fi-sr-circle-star"></i>} color='error'>
           <Avatar src={avatar}/>
         </Badge>
       </Stack>

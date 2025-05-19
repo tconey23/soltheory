@@ -1,5 +1,5 @@
 // FinalStage.js
-import { Stack, Button, Typography, ImageList, TextField, Box } from '@mui/material' 
+import { Stack, Button, Typography, ImageList, TextField, Box, Modal } from '@mui/material' 
 import { useEffect, useState } from 'react'
 import Prompt from './Prompt'
 import useGlobalStore from '../../../business/useGlobalStore'
@@ -7,6 +7,7 @@ import { supabase } from '../../../business/supabaseClient'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 
 const FinalStage = ({ prompts, setCurrentStage, date, setSelections, redirect, savegameNote }) => {
+  const toggleShareGame = useGlobalStore((state => state.toggleShareGame))
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
   if (!Array.isArray(prompts)) return null;
@@ -21,6 +22,7 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections, redirect, s
 const [stage1, setStage1] = useState([])
 const [stage2, setStage2] = useState([])
 const [stage3, setStage3] = useState([])
+const [askToShare, setAskToShare] = useState(false)
 
   useEffect(() => {
     console.log(prompts)
@@ -53,6 +55,23 @@ const [stage3, setStage3] = useState([])
     }
   }
 
+  const handleShare = async (share) => {
+
+    if(share){
+       navigator.share({
+        title: 'Check out my 21 Things for today',
+        text: 'Come play with me at https://soltheory.com/games',
+        url: `https://soltheory.com/games/21things/${gameId}`
+      })
+    } else {
+      setCurrentStage(0)
+      setNote('')
+      setSelections({ 1: [], 2: [], 3: [], note: '' })
+      sessionStorage.removeItem('redirectAfterLogin')
+      setAskToShare(false)
+    }
+  }
+
   const handleSubmit = async () => {
     let currentGameData = userMeta?.game_data
     const gameData = {
@@ -71,16 +90,12 @@ const [stage3, setStage3] = useState([])
     .select()
         
     if (data[0].primary_id) {
-      navTo('/games')
+      // navTo('/games')
       setAlertContent({
         text: 'Successfully saved game data!',
         type: 'success',
       })
-      setCurrentStage(0)
-      setNote('')
-      setSelections({ 1: [], 2: [], 3: [], note: '' })
-      sessionStorage.removeItem('redirectAfterLogin')
-
+      setAskToShare(true)
       
       const { error } = await supabase
         .from('guest_games')
@@ -205,6 +220,17 @@ const [stage3, setStage3] = useState([])
       </Stack>
     </Stack>
           </>}
+          <Modal open={askToShare}>
+            <Stack justifyContent={'center'} alignItems={'center'} height={'100%'} width={'100%'}>
+              <Stack justifyContent={'center'} alignItems={'center'} bgcolor={'white'} height={'10%'} width={'75%'}>
+              <Typography>Would you like to share this game?</Typography>
+              <Stack direction={'row'}>
+                <Button onClick={() => handleShare(true)}>YES</Button>
+                <Button onClick={() => handleShare(false)}>NO</Button>
+              </Stack>
+              </Stack>
+            </Stack>
+          </Modal>
     </Stack>
   )
 }
