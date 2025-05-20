@@ -41,7 +41,6 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
     if(share){
        await navigator.share({
         title: 'Check out my 21 Things for today',
-        text: 'Come play with me at https://soltheory.com/games',
         url: `https://soltheory.com/games/21things/shared/${userMeta?.primary_id || guestUser?.id}/${gameId}`
       })
       setAskToShare(false)
