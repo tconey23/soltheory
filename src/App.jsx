@@ -35,6 +35,15 @@ function App() {
   const setHeight = useGlobalStore((state) => state.setHeight)
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
 
+  const originalConsoleError = console.error;
+  console.error = (...args) => {
+    if (args[0]?.includes?.('`value` prop on `input` should not be null')) {
+      console.log('⛔ BAD INPUT:', args);
+      debugger; // open DevTools to pause here
+    }
+    originalConsoleError(...args);
+  };
+
   const {screenSize} = useBreakpoints()
 
   const [appReady, setAppReady] = useState(false)
@@ -112,7 +121,7 @@ function App() {
       <AppHeader />
     </Stack>
 
-<Stack height={screen === 'xs' ? '88%' : '78%'} width={'100%'}>
+<Stack height={screen === 'xs' ? '88%' : '78%'} width={'100%'} alignItems={'center'}>
     <Routes>
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>

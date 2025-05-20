@@ -10,9 +10,10 @@ import Affiliates from '../components/Affiliates';
 
 const MotionStack = motion(Stack);
 
-const MenuGridItem = ({ delay = 0, content}) => {
+const MenuGridItem = ({ delay = 0, content, index}) => {
   return (
     <MotionStack
+      key={index}
       justifyContent={'center'}
       alignItems={'center'}
       overflow={'hidden'}
@@ -34,7 +35,6 @@ const MenuGridItem = ({ delay = 0, content}) => {
 };
 
 const HomePageMenu = () => {
-    console.clear()
   const screen = useGlobalStore((state) => state.screen)
    const userMeta = useGlobalStore((state) => state.userMeta)
   const [columnCount, setColumnCount] = useState()
@@ -64,7 +64,7 @@ const HomePageMenu = () => {
         }}
       >
         {menuItems?.map((m, i) => 
-        <MenuGridItem delay={i*0.5} content={m}/>
+        <MenuGridItem key={i} index={i} delay={i*0.5} content={m}/>
     )}
       </Stack>
     </Stack>

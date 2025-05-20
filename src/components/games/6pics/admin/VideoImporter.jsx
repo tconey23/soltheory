@@ -6,9 +6,9 @@ import { supabase } from '../../../business/supabaseClient';
 import {CircularProgress} from '@mui/material';
 
 const NewVideo = ({file, pack, index, setRefreshKey, setUploaded, uploaded}) => {
-    const [name, setName] = useState()
+    const [name, setName] = useState('')
     const [type, setType] = useState('')
-    const [pubURL, setPubURL] = useState()
+    const [pubURL, setPubURL] = useState('')
     const [uploading, setUploading] = useState(false)
 
     const uploadVideo = async () => {
@@ -154,7 +154,7 @@ const VideoImporter = ({pack, getVids, type, getGraphic, setRefreshKey}) => {
     const [dropBoxURL, setDropBoxURL] = useState(null)
     const [file, setFile] = useState(null)
     const [osFileKey, setOsFileKey] = useState(0)
-    const [graphicURL, setGraphicURL] = useState()
+    const [graphicURL, setGraphicURL] = useState('')
     const [videoObjects, setVideoObjects] = useState([])
     const [uploaded, setUploaded] = useState([])
 

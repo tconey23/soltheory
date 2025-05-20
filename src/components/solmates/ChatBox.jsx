@@ -12,17 +12,17 @@ const ChatBox = () => {
   const [fullMessage, setFullMessage] = useState(null);
 
   const fetchMessages = async () => {
-    const res = await getMessages(userMeta?.primary_id);
+    // const res = await getMessages(userMeta?.primary_id);
     // const avatars = await getAvatar(userMeta?.primary_id);
-    if (!res || !user) return;
+    // if (!res || !user) return;
 
-    for(let i=0; i<res.length; i++){ 
-      let user = await getMeta(res[i].from)
-      res[i].sender = user.user_name
-      res[i].avatar = user.avatar
-    }
+    // for(let i=0; i<res.length; i++){ 
+    //   let user = await getMeta(res[i].from)
+    //   res[i].sender = user.user_name
+    //   res[i].avatar = user.avatar
+    // }
 
-    setConversations(res)
+    // setConversations(res)
   };
 
   const handleMessageClick = (msg) => {
@@ -31,6 +31,7 @@ const ChatBox = () => {
 
   useEffect(() => {
     fetchMessages();
+    console.log('chat mounted')
   }, []);
 
   return ( 

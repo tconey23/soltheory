@@ -27,7 +27,7 @@ const green = '#45d500'
     
     const [prompts, setPrompts] = useState([])
     const [payload, setPayload] = useState(null)
-    const [savegameNote, setSavegameNote] = useState()
+    const [savegameNote, setSavegameNote] = useState('')
     const [newGame, setNewGame] = useState(false)
     // console.log('userId', userId, 'redirect', redirect, 'newgame', newGame)
 

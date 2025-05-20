@@ -39,7 +39,7 @@ const SolMates = () => {
   
       useEffect(() => {
         switch(selectedOption){
-            case 'messages': setAccountObj(<ChatBox />);
+            case 'messages': setAccountObj();
             break;
             case 'solmates': setAccountObj();
             break;
@@ -88,7 +88,7 @@ const SolMates = () => {
           width="85%"
           sx={{ height: '10%' }}
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
           direction="column"
           paddingY={2}
           initial={hasMounted ? false : { opacity: 0, y: 50 }}
@@ -101,7 +101,7 @@ const SolMates = () => {
           alignItems={'center'}
             sx={{
               width: '100%',
-              marginTop: 20,
+              marginTop: 5,
               borderRadius: 1,
             }}
           >

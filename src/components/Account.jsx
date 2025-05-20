@@ -21,7 +21,7 @@ const Account = () => {
   const userMeta = useGlobalStore((state) => state.userMeta);
   const user = useGlobalStore((state) => state.user)
 
-  const [selectedAccountOption, setSelectedAccountOption] = useState(null);
+  const [selectedAccountOption, setSelectedAccountOption] = useState('');
   const [accountObj, setAccountObj] = useState()
   const [hasMounted, setHasMounted] = useState(false);
 

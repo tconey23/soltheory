@@ -4,7 +4,7 @@ import { updateUserName } from '../business/supabase_calls';
 import useGlobalStore from '../business/useGlobalStore';
 
 const Username = () => {
-        const [newUserName, setNewUserName] = useState()
+        const [newUserName, setNewUserName] = useState('')
         const userMeta = useGlobalStore((state) => state.userMeta);
 
         const handleUpdate = async () => {

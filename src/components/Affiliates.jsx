@@ -59,8 +59,8 @@ const Affiliates = () => {
         </Stack>
       <Stack height={'80%'}>
         <List sx={{overflowY: 'scroll', height: '100%'}}>
-            {ads.map((s) => (
-                <MenuItem sx={{width: '100%', padding: 3, justifyContent:'center', alignItems:'center'}}>
+            {ads.map((s, i) => (
+                <MenuItem key={i} sx={{width: '100%', padding: 3, justifyContent:'center', alignItems:'center'}}>
                     <Link to={s?.url} target="_blank" rel="noopener noreferrer">
                     <Box>
                         <img width={'100%'} height={'auto'} src={s?.image} sx={{margin: 3}}/>

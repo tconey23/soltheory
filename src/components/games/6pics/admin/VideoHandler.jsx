@@ -308,7 +308,7 @@ const deleteFileByPublicUrl = async (publicUrl) => {
         
         const [packs, setPacks] = useState([])
         const [addNewPack, setAddNewPack] = useState(false)
-        const [newPackName, setNewPackName] = useState()
+        const [newPackName, setNewPackName] = useState('')
         const [pendingDelete, setPendingDelete] = useState(false)
     const [packToDelete, setPackToDelete] = useState()
     const [videoToEdit, setVideoToEdit] = useState()

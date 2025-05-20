@@ -18,9 +18,9 @@ const LoginForm = () => {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [confPassword, setConfPassword] = useState()
+  const [confPassword, setConfPassword] = useState('')
   const [newUser, setNewUser] = useState(false)
-  const [userName, setUserName] = useState()
+  const [userName, setUserName] = useState('')
   const [toggleShowPassword, setToggleShowPassword] = useState(false)
 
   const loc = useLocation()

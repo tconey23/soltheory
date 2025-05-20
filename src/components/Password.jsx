@@ -4,8 +4,8 @@ import { updatePassword, updateUserName } from '../business/supabase_calls';
 import useGlobalStore from '../business/useGlobalStore';
 
 const Password = () => {
-    const [newPassword, setNewPassword] = useState()
-    const [confPassword, setConfPassword] = useState()
+    const [newPassword, setNewPassword] = useState('')
+    const [confPassword, setConfPassword] = useState('')
     const [match, setMatch] = useState(false)
     const [toggleShowPassword, setToggleShowPassword] = useState(false)
 
