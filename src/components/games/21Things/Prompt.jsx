@@ -20,7 +20,7 @@ const Prompt = ({prompt, color}) => {
                 padding={1} 
                 sx={{    
                     minHeight: '100%',
-                    minWidth: '100%',
+                    maxWidth: '100%',
                     backgroundColor: color, 
                     borderRadius: 2,
                     textAlign: 'center',

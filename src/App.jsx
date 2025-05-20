@@ -79,6 +79,7 @@ function App() {
     } else {
       setRedirect(false)
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }, [userMeta])
 
   useEffect(() => {
@@ -106,7 +107,7 @@ function App() {
   
 
   return (
-   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'} overflow={'hidden'}>
+   <Stack direction={'column'} height={'98dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
     <Stack width={'100%'} height={'10%'}>
       <AppHeader />
     </Stack>

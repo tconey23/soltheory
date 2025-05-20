@@ -71,71 +71,73 @@ const SharedGame = () => {
     }, [userId, gameId])
 
   return (
-    <Stack direction={'column'} width={'100%'} height={'80%'} justifyContent={'space-evenly'} alignItems={'center'}>
+    <Stack direction={'column'} width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
 
-        <Stack width={'100%'} alignItems={'flex-start'} marginLeft={'30px'}>
+        <Stack width={'100%'} alignItems={'flex-start'} marginLeft={'30px'} marginTop={2}>
             <Button onClick={() => navto('/games')} sx={{maxWidth: '10px'}}><i className="fi fi-rr-arrow-small-left"></i></Button>
         </Stack>
 
         <Stack direction={'row'}>
             <Typography fontFamily={'Fredoka Regular'} fontSize={20}>{`${userName.includes('guest') ? 'Guest' : userName}'s game on ${date}`}</Typography>
         </Stack>
-      
+      <Stack>
+
       <Box
         sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-            gap: 2,
-            width: '100%',
-            maxHeight: '90%',
-            padding: 1,
-            margin: '0 auto',
-            overflow: 'hidden',
-            alignContent: 'center'
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+          gap: 2,
+          width: '100%',
+          maxHeight: '90%',
+          padding: 1,
+          margin: '0 auto',
+          overflow: 'hidden',
+          alignContent: 'center'
         }}
-      >
+        >
         {stage1.map((p) => (
-            <Prompt prompt={p.prompt} color={purple}/>
+          <Prompt prompt={p.prompt} color={purple}/>
         ))}
       </Box>
 
       <Box
         sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-            gap: 2,
-            width: '100%',
-            maxWidth: '600px',
-            maxHeight: '90%',
-            padding: 1,
-            margin: '0 auto',
-            overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+          gap: 2,
+          width: '100%',
+          maxWidth: '600px',
+          maxHeight: '90%',
+          padding: 1,
+          margin: '0 auto',
+          overflow: 'hidden',
         }}
-      >
+        >
         {stage2.map((p) => (
-            <Prompt prompt={p.prompt} color={yellow}/>
+          <Prompt prompt={p.prompt} color={yellow}/>
         ))}
       </Box>
 
       <Box
         sx={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
-            gap: 2,
-            width: '33%',
-            maxWidth: '600px',
-            maxHeight: '90%',
-            padding: 1,
-            margin: '0 auto',
-            overflow: 'hidden',
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
+          gap: 2,
+          width: '33%',
+          maxWidth: '600px',
+          maxHeight: '90%',
+          padding: 1,
+          margin: '0 auto',
+          overflow: 'hidden',
         }}
-      >
+        >
         {stage3.map((p) => (
-            <Prompt prompt={p.prompt} color={green}/>
+          <Prompt prompt={p.prompt} color={green}/>
         ))}
       </Box>
+        </Stack>
 
-        <Stack sx={{boxShadow: `0px 0px 11px 3px #c956ff85`, borderRadius: 3}} paddingY={10} width={'90%'} maxHeight={'100px'} justifyContent={'flex-start'}>
+        <Stack sx={{boxShadow: `0px 0px 11px 3px #c956ff85`, borderRadius: 3}} paddingY={5} marginTop={2} width={'90%'} maxHeight={'50px'} justifyContent={'flex-start'}>
             <Typography height={'100%'} fontFamily={'Fredoka Regular'} fontSize={15}>{note}</Typography>
         </Stack>
 
