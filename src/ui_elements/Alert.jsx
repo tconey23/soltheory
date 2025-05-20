@@ -39,7 +39,7 @@ const UserAlert = ({type}) => {
     }, [alertContent])
 
   return (
-    <Stack position={'fixed'} width={'80%'} sx={{transform: `translateY(${height - 208}px)`}}>
+    <Stack position={'fixed'} width={'80%'} sx={{transform: `translateY(${height - 208}px)`}} zIndex={100}>
         {show && 
             <Alert variant='filled' severity={alertContent?.type}>
                 <AlertTitle>{title}</AlertTitle> 

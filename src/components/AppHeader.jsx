@@ -29,9 +29,13 @@ const AppHeader = () => {
         </Button>
       </Stack>
       <Stack width={'90%'}  alignItems={'flex-end'} paddingX={3}>
-        <Badge badgeContent={<i className="fi fi-sr-circle-star"></i>} color='error'>
-          <Avatar src={avatar}/>
+        {!userMeta ?
+        <Badge badgeContent={!userMeta && <i className="fi fi-sr-circle-star"></i>} color='error'>
+          <Avatar />
         </Badge>
+        :
+        <Avatar src={avatar}/>  
+      }
       </Stack>
     </Stack>
   );

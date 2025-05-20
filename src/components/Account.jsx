@@ -9,6 +9,7 @@ import Username from './Username';
 import Password from './Password';
 import AdminControls from './AdminControls';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../business/supabase_calls';
 
 const Account = () => {
   const MotionText = motion(Typography); 
@@ -60,7 +61,7 @@ const Account = () => {
         borderRadius={5}
         overflow={'auto'}
     >
-      <Stack width={'90%'} height={'90%'} overflow={'auto'} marginTop={5} alignItems="center"
+      <Stack width={'90%'} height={'80%'} overflow={'auto'} marginTop={5} alignItems="center"
       justifyContent="flex-start">
 
       <MotionText
@@ -141,6 +142,9 @@ const Account = () => {
           </MotionStack>
         )}
       </AnimatePresence>
+        </Stack>
+        <Stack >
+          <Button onClick={() => logout()} color='primary'>Logout</Button>
         </Stack>
     </Stack>
   );
