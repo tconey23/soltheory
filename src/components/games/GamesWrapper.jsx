@@ -7,6 +7,9 @@ import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
 import SixPicsButton from './SixPicsButton';
 import { v4 as uuidv4 } from 'uuid';
+import dayjs from "dayjs"
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+dayjs.extend(customParseFormat)
 
 
 const HeaderImage = () => {
@@ -50,6 +53,8 @@ const GamesWrapper = () => {
     const user = useGlobalStore((state) => state.user)
     const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
     const toggleLogin = useGlobalStore((state) => state.toggleLogin)
+    const guestUser = useGlobalStore((state) => state.guestUser)
+    const setGuestUser = useGlobalStore((state) => state.setGuestUser)
 
     const [selectedGame, setSelectedGame] = useState(null)
     const [gameObj, setGameObj] = useState()
@@ -64,7 +69,7 @@ const GamesWrapper = () => {
       useEffect(() => {
           setTimeout(() => {
               setHasMounted(true);
-          }, 2000);
+          }, 2000); 
       }, []);
   
       const startGame = async (gameName, isLoggedIn) => {
@@ -74,9 +79,26 @@ const GamesWrapper = () => {
           gameId = uuidv4(); // generate locally
         } else {
           // create a guest game row in Supabase and return the UUID
+          let formatDate = dayjs(Date.now()).format('YYYY-MM-DD')
+          let userId = uuidv4()
+          
+          const { data: guest, error: guesterror } = await supabase
+            .from('users')
+            .insert([{ user_name: `guest-${userId}`, primary_id: userId, email: `${userId}@example.com`}])
+            .select('*');
+            
+            if(guesterror) {
+              console.error(guesterror)
+              return
+            } else {
+
+              console.log(guest?.[0])
+              setGuestUser({id: userId})
+            }
+
           const { data, error } = await supabase
-            .from('guest_games')
-            .insert({ game_name: gameName })
+            .from('twentyone_things_data')
+            .insert({ game_name: 'TwentyOneThings', user_id: guest?.[0]?.primary_id})
             .select('id')
             .single();
 
@@ -114,25 +136,16 @@ const GamesWrapper = () => {
         </MotionText>
   
         <Stack marginBottom={7}>
-          {/* <Badge badgeContent='*' color='primary' overlap="circular" fontSize='3rem'>
-            </Badge> */}
           <MotionAvatar
             initial={hasMounted ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ delay: 1, duration: 2 }}
-            sx={{ border: '1px solid black', scale: 1.25 }} 
+            sx={{ border: '1px solid black', scale: 1.25 }}
             >
             <HeaderImage />
           </MotionAvatar>
         </Stack>
-
-       {/* {!userMeta && 
-       <Stack>
-        <Typography fontSize={20} color='red' fontStyle={'italic'}>**You are not currently logged in**</Typography>
-          <Typography fontSize={20} color='red' fontStyle={'italic'}>**You must be logged in to save game data**</Typography>
-          <Button onClick={() => setToggleLogin(true)}>Login</Button>
-        </Stack>} */}
   
         <MotionStack
           key="account_select"

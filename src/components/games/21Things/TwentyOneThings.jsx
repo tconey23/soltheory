@@ -13,7 +13,7 @@ const purple = '#c956ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
-  const TwentyOneThings = ({ user, currStage, redirect }) => {
+  const TwentyOneThings = ({ user, currStage, redirect=false }) => {
     const userMeta = useGlobalStore((state) => state.userMeta)
     const currentStage = useGlobalStore((state) => state.currentStage)
     const setCurrentStage = useGlobalStore((state) => state.setCurrentStage)
@@ -29,7 +29,7 @@ const green = '#45d500'
     const [payload, setPayload] = useState(null)
     const [savegameNote, setSavegameNote] = useState()
     const [newGame, setNewGame] = useState(false)
-    console.log(userId, redirect, newGame)
+    // console.log('userId', userId, 'redirect', redirect, 'newgame', newGame)
 
       const getGuestGame = async () => {
     let { data: guest_games, error } = await supabase
@@ -86,22 +86,22 @@ const green = '#45d500'
     }
 
 useEffect(() => {
-  const loadGame = async () => {
-    if (redirect) {
-      await getGuestGame();
-    } else if (gameId && userId) {
-      await getSavedGame(); // will set newGame = true if nothing found
-    } else {
-      setNewGame(true);
-    }
-  };
+  // const loadGame = async () => {
+  //   if (redirect) {
+  //     await getGuestGame();
+  //   } else if (gameId && userId) {
+  //     await getSavedGame(); // will set newGame = true if nothing found
+  //   } else {
+  //     setNewGame(true);
+  //   }
+  // };
 
-  loadGame();
+  // loadGame();
 }, [redirect, gameId, userId]);
 
 useEffect(() => {
+  fetchPrompts();
   if (newGame) {
-    fetchPrompts();
   }
 }, [newGame, gameIndex]);
 
@@ -113,7 +113,7 @@ useEffect(() => {
   
   
     const renderStage = () => {
-      console.log(currentStage)
+      // console.log(currentStage)
       switch (currentStage) {
         case 1:
           return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />

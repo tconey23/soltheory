@@ -33,11 +33,11 @@ const Prompt = ({prompt, color}) => {
                 justifyContent={'center'} 
                 boxShadow={'1px 1px 7px 1px #0000007a'} 
                 borderRadius={2} 
-                height={'80px'} 
+                height={'90px'} 
                 maxWidth={'100%'}
                 backgroundColor={color}
             >
-                <Typography fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis'}} textAlign={'center'} fontSize={'0.9rem'}>{prompt}</Typography>
+                <Typography fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis'}} textAlign={'center'} fontSize={'0.8rem'}>{prompt}</Typography>
             </Stack>
     )
 }

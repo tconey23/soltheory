@@ -21,6 +21,7 @@ import { useWindowHeight } from './business/useWindowHeight';
 import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
+import SharedGame from './components/games/21Things/SharedGame';
 
 function App() {
   const navTo = useNavigate()
@@ -146,9 +147,10 @@ function App() {
         } 
       />
 
-      <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={redirect} />} />
-      <Route path="/games/21things/:userId/:gameId" element={<TwentyOneThings redirect={false} />} />
+      <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
       <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+
+      <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
     <Route 
         path={"/account/admin"}
