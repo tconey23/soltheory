@@ -63,7 +63,7 @@ const green = '#45d500'
                 setViewOnly(true)
               return
             } else {
-              setNewGame(true)
+              setNewGame(true) 
             }
           })
         }

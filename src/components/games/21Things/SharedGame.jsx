@@ -63,7 +63,7 @@ const SharedGame = () => {
         }
 
 
-       if(userId && gameId){
+       if(userId && gameId){ 
             getGame()
        }
 

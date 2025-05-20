@@ -10,7 +10,7 @@ const Modals = ({needsLogin}) => {
 
     const user = useGlobalStore((state) => state.user)
     const toggleLogin = useGlobalStore((state) => state.toggleLogin)
-    const toggleMenu = useGlobalStore((state) => state.toggleMenu)
+    const toggleMenu = useGlobalStore((state) => state.toggleMenu) 
     const setToggleMenu = useGlobalStore((state) => state.setToggleMenu)
     const screen = useGlobalStore((state) => state.screen)
     const setToggleAffiliates = useGlobalStore((state) => state.setToggleAffiliates)

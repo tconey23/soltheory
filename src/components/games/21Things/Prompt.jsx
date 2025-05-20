@@ -21,7 +21,7 @@ const Prompt = ({prompt, color}) => {
                 sx={{    
                     minHeight: '100%',
                     minWidth: '100%',
-                    backgroundColor: color,
+                    backgroundColor: color, 
                     borderRadius: 2,
                     textAlign: 'center',
                     boxShadow: '0px 2px 6px rgba(0,0,0,0.15)',

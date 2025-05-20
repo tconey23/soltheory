@@ -27,7 +27,7 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   console.log(guestUser)
 
 
-  const handleNoteChange = (val) => {
+  const handleNoteChange = (val) => { 
     if (val.length <= 180) {
       setNote(val)
       setWarning(null)

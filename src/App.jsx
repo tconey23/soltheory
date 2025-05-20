@@ -136,7 +136,7 @@ function App() {
       <Route 
         path={"/games/21things"}
         element={
-            <TwentyOneThings />
+            <TwentyOneThings /> 
         } 
       />
 

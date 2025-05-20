@@ -72,7 +72,7 @@ const GamesWrapper = () => {
           }, 2000); 
       }, []);
   
-      const startGame = async (gameName, isLoggedIn) => {
+      const startGame = async (gameName, isLoggedIn) => { 
         let gameId;
 
         if (userMeta) {

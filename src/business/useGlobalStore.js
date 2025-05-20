@@ -28,7 +28,7 @@ const useGlobalStore = create((set) => ({
   setSession: (session) => set({ session }),
   setUserMeta: (meta) => set({ userMeta: meta }),
   setToggleMenu: (val) => set({ toggleMenu: val }),
-  setGameIndex: (val) => set({gameIndex: val}),
+  setGameIndex: (val) => set({gameIndex: val}), 
   setCurrentStage: (val) => set({currentStage: val}),
   setAnimate: (val) => set({animate: val}),
   setScreen: (val) => set({screen: val}),
