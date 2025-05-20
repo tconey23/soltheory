@@ -51,11 +51,13 @@ const SolMates = () => {
     return (
       <Stack
         direction="column"
-        width="100%"
-        height="75%"
+        width="90%"
+        height="95%"
         alignItems="center"
         justifyContent="flex-start"
-
+        bgcolor={'#ffffffbd'}
+        borderRadius={5}
+        overflow={'auto'}
       >
         <MotionText
           paddingY={2}
@@ -94,11 +96,12 @@ const SolMates = () => {
           exit={{ opacity: 0, y: 50 }}
           transition={{ duration: 0.5, delay: 1.5}}
         >
-          <Stack
+          {userMeta ? <Stack
+          justifyContent={'center'}
+          alignItems={'center'}
             sx={{
-              bgcolor: '#f4f6f8',
-              height: 'fit-content',
               width: '100%',
+              marginTop: 20,
               borderRadius: 1,
             }}
           >
@@ -120,28 +123,33 @@ const SolMates = () => {
               </MenuItem>
 
             </Select>
+              <AnimatePresence mode="wait">
+              {selectedOption && (
+                <MotionStack
+                  key={selectedOption}
+                  width="85%"
+                  sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3, overflowY: 'auto'}}
+                  alignItems="center"
+                  justifyContent="center"
+                  direction="column"
+                  paddingY={2}
+                  borderRadius={1}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 30 }}
+                  transition={{ duration: 0.5 }}
+                >
+                  {accountObj}
+                </MotionStack>
+              )}
+            </AnimatePresence>
           </Stack>
+        :
+        <Stack>
+          <Typography>You must log in to access this feature</Typography>
+        </Stack>  
+        }
         </MotionStack>
-        <AnimatePresence mode="wait">
-        {selectedOption && (
-          <MotionStack
-            key={selectedOption}
-            width="85%"
-            sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3, overflowY: 'auto'}}
-            alignItems="center"
-            justifyContent="center"
-            direction="column"
-            paddingY={2}
-            borderRadius={1}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.5 }}
-          >
-            {accountObj}
-          </MotionStack>
-        )}
-      </AnimatePresence>
       </Stack>
     );
 };

@@ -14,6 +14,8 @@ import { PerformanceMonitor } from '@react-three/drei'
 import { AdaptiveEvents } from '@react-three/drei'
 import { usePerf } from 'r3f-perf'
 import { PerfHeadless } from 'r3f-perf'
+import HomePageMenu from '../../ui_elements/HomePageMenu'
+import { Button, Stack } from '@mui/material'
 
 const PerfHook = () => {
   const perf = usePerf()
@@ -132,6 +134,7 @@ const HomePage = ({showBot = true}) => {
     const [dpr, setDpr] = useState(0.5)
     const [incline, setIncline] = useState(false)
     const [decline, setDecline] = useState(false)
+    const [menuVisible, toggleMenuVisible] = useState(true)
     const allAssetsReady = groundReady && lettersReady
     
 
@@ -154,6 +157,12 @@ const HomePage = ({showBot = true}) => {
 
     return (
     <div style={{height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
+
+        <Stack width={'99%'} position={'absolute'} zIndex={2} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+          <Button onClick={() => toggleMenuVisible(prev => !prev)}>Toggle Menu</Button>
+        </Stack>
+
+        {menuVisible && <HomePageMenu />}
   
         <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr}>
 

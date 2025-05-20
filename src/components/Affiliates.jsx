@@ -44,7 +44,16 @@ const Affiliates = () => {
 
 
   return (
-    <Stack direction={'column'} width={'75%'} height={'75%'} bgcolor={'white'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
+    <Stack 
+      direction={'column'} 
+      width="90%"
+      height="95%"
+      borderRadius={5}
+      justifyContent={'center'} 
+      alignItems={'center'} 
+      overflow={'auto'} 
+      bgcolor={'#ffffffbd'}
+    >
         <Stack marginTop={1}>
             <Typography fontFamily={'Fredoka Regular'} fontSize={20}>SolTheory Affiliates</Typography>
         </Stack>
@@ -62,9 +71,9 @@ const Affiliates = () => {
         </List>
       </Stack>
       
-      <Stack width={'10%'} marginTop={1}>
+      {/* <Stack width={'10%'} marginTop={1}>
         <Button onClick={() => setToggleAffiliates(false)} >Back</Button>
-      </Stack>
+      </Stack> */}
     </Stack>
   );
 };

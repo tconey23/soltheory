@@ -118,10 +118,13 @@ const GamesWrapper = () => {
     return (
       <Stack
         direction="column"
-        width="100%"
-        height="100%"
+        width="90%"
+        height="95%"
         alignItems="center"
         justifyContent="flex-start"
+        bgcolor={'#ffffffbd'}
+        borderRadius={5}
+        overflow={'auto'}
       >
         <MotionText
           paddingY={2}
@@ -162,14 +165,11 @@ const GamesWrapper = () => {
         >
           <Stack
             sx={{
-              bgcolor: '#f4f6f8',
-              height: 'fit-content',
               width: '100%',
-              height: '100%',
+              marginTop: 20,
               borderRadius: 1,
             }}
           >
- 
             <List
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}

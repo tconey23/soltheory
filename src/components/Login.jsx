@@ -76,8 +76,7 @@ const handleLogin = async () => {
 
 
   return (
-    <>
-    <Stack paddingY={7.5} height={'80%'}>
+    <Stack paddingY={0} height={'75%'} width={'100%'}>
     <Stack paddingBottom={'1px'} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
       <FormControl>
         <InputLabel sx={{textAlign: 'flex-start'}}>Email Address</InputLabel>
@@ -134,9 +133,7 @@ const handleLogin = async () => {
         <Button onClick={() => setNewUser(prev => !prev)} style={{bgcolor:'#372248'}}>{newUser ? 'Back to login' : 'New user'}</Button>
       </Stack>
     </Stack>
-
     </Stack>
-    </>
   )
 }
 
@@ -146,8 +143,8 @@ const Login = () => {
   const setUser = useGlobalStore((state) => state.setUser)
   const screen = useGlobalStore((state) => state.screen)
   return (
-    <Stack direction={'column'} width={'98%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={1} overflow={'auto'}>
-      <Stack paddingY={1} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
+    <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
+      <Stack paddingY={5} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
         <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
         <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
       </Stack>

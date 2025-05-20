@@ -26,6 +26,7 @@ import SharedGame from './components/games/21Things/SharedGame';
 function App() {
   const navTo = useNavigate()
   const setScreen = useGlobalStore((state) => state.setScreen)
+  const screen = useGlobalStore((state) => state.screen)
   const user = useGlobalStore((state) => state.user)
   const setUser = useGlobalStore((state) => state.setUser)
   const setSession = useGlobalStore((state) => state.setSession)
@@ -110,8 +111,8 @@ function App() {
       <AppHeader />
     </Stack>
 
+<Stack height={screen === 'xs' ? '88%' : '78%'} width={'100%'}>
     <Routes>
-
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>
       <Route path={"/"} element={<HomePage />}/>
@@ -124,28 +125,28 @@ function App() {
             <Account />
           </PrivateRoute>
         } 
-      />
+        />
 
       <Route 
         path={"/games"}
         element={
-            <GamesWrapper />
+          <GamesWrapper />
         } 
-      />
+        />
 
       <Route 
         path={"/games/21things"}
         element={
-            <TwentyOneThings /> 
+          <TwentyOneThings /> 
         } 
-      />
+        />
 
       <Route 
         path={"/games/6pics"}
         element={
-            <Pic6/>
+          <Pic6/>
         } 
-      />
+        />
 
       <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
       <Route path="/games/6pics/:gameId" element={<Pic6 />} />
@@ -159,7 +160,7 @@ function App() {
             <AdminControls />
           </PrivateRoute>
         } 
-      />
+        />
 
     <Route 
         path={"/solmates"}
@@ -168,15 +169,16 @@ function App() {
             <SolMates />
           </PrivateRoute>
         } 
-      />
+        />
 
     </Routes>
+  </Stack>
 
     <UserAlert />
 
     {appReady && <Modals needsLogin={false}/>}
 
-    <Stack position={'fixed'} sx={{transform: `translateY(${height-75}px)`, height: '100%', width: '100%'}}>
+    <Stack sx={{height: '7%', width: '100%'}}>
       <AdSpace />
     </Stack> 
 

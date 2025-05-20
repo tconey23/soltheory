@@ -52,12 +52,17 @@ const Account = () => {
 
   return (
     <Stack
-      direction="column"
-      width="100%"
-      height="100%"
-      alignItems="center"
-      justifyContent="flex-start"
+        width="90%"
+        height="95%"
+        alignItems="center"
+        justifyContent="flex-start"
+        bgcolor={'#ffffffbd'}
+        borderRadius={5}
+        overflow={'auto'}
     >
+      <Stack width={'90%'} height={'90%'} overflow={'auto'} marginTop={5} alignItems="center"
+      justifyContent="flex-start">
+
       <MotionText
         paddingY={2}
         fontFamily="Fredoka Regular"
@@ -66,11 +71,11 @@ const Account = () => {
         animate={{ y: 0, opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 1 }}
-      >
+        >
         {`Welcome ${userMeta?.user_name || userMeta?.email}`}
       </MotionText>
 
-      <Stack padding={3}>
+      <Stack padding={0}>
         <MotionAvatar
           initial={hasMounted ? false : { opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -78,7 +83,7 @@ const Account = () => {
           transition={{ delay: 1, duration: 2 }}
           src={userMeta?.avatar || null}
           sx={{ border: '1px solid black', scale: 1.25 }}
-        />
+          />
       </Stack>
 
       <MotionStack
@@ -88,25 +93,26 @@ const Account = () => {
         alignItems="center"
         justifyContent="center"
         direction="column"
-        paddingY={2}
+        paddingY={5}
         initial={hasMounted ? false : { opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 50 }}
         transition={{ duration: 0.5, delay: 1.5 }}
-      >
+        >
         <Stack
           sx={{
             bgcolor: '#f4f6f8',
             height: 'fit-content',
             width: '100%',
             borderRadius: 1,
+            marginTop: 20
           }}
-        >
+          >
             <Typography sx={{bgcolor: '#f4f6f8', marginY: 2}}>Account Options</Typography>
           <Select
             value={selectedAccountOption}
             onChange={(e) => setSelectedAccountOption(e.target.value)}
-          >
+            >
             <MenuItem value="change_avatar">Change Avatar</MenuItem>
             <MenuItem value="change_username">Change Username</MenuItem>
             <MenuItem value="update_password">Update Password</MenuItem>
@@ -118,23 +124,24 @@ const Account = () => {
       <AnimatePresence mode="wait">
         {selectedAccountOption && (
           <MotionStack
-            key={selectedAccountOption}
-            width="85%"
-            sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 3}}
-            alignItems="center"
-            justifyContent="center"
-            direction="column"
-            paddingY={2}
-            borderRadius={1}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 30 }}
-            transition={{ duration: 0.5 }}
+          key={selectedAccountOption}
+          width="85%"
+          sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 15}}
+          alignItems="center"
+          justifyContent="center"
+          direction="column"
+          paddingY={2}
+          borderRadius={1}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 30 }}
+          transition={{ duration: 0.5 }}
           >
             {accountObj}
           </MotionStack>
         )}
       </AnimatePresence>
+        </Stack>
     </Stack>
   );
 };
