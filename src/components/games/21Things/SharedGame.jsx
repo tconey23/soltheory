@@ -84,13 +84,13 @@ const SharedGame = () => {
       <Box
         sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
             gap: 2,
             width: '100%',
             maxHeight: '90%',
             padding: 1,
             margin: '0 auto',
-            overflow: 'auto',
+            overflow: 'hidden',
             alignContent: 'center'
         }}
       >
@@ -102,14 +102,14 @@ const SharedGame = () => {
       <Box
         sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
             gap: 2,
             width: '100%',
             maxWidth: '600px',
             maxHeight: '90%',
             padding: 1,
             margin: '0 auto',
-            overflow: 'auto',
+            overflow: 'hidden',
         }}
       >
         {stage2.map((p) => (
@@ -120,14 +120,14 @@ const SharedGame = () => {
       <Box
         sx={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(1, 1fr)',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))',
             gap: 2,
             width: '33%',
             maxWidth: '600px',
             maxHeight: '90%',
             padding: 1,
             margin: '0 auto',
-            overflow: 'auto',
+            overflow: 'hidden',
         }}
       >
         {stage3.map((p) => (
