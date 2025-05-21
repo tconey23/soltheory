@@ -50,14 +50,14 @@ const HomePageMenu = () => {
   }, [screen])
 
   return (
-    <Stack direction={'column'} width={'100%'} height={'90%'} position={'absolute'} zIndex={1} alignItems={'center'}>
+    <Stack direction={'column'} width={'100%'} height={'89%'} alignItems={'center'} position={'absolute'} zIndex={2}>
       <Stack
         sx={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
             gap: 2,
             width: '90%',
-            height: '80%',
+            height: '100%',
             overflow: 'auto',
             justifyItems:'center',
             margin: 10

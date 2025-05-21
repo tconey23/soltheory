@@ -98,7 +98,7 @@ const Stage = ({
   const rows = chunkArray(displayPrompts, 3);
 
   return (
-    <Stack height="90%" width="100%" paddingTop={3} alignItems="center" sx={{ overflow: 'hidden' }}>
+    <Stack height="100%" width="100%" paddingTop={3} alignItems="center" sx={{ overflow: 'hidden' }}>
       <Stack
         height="5%"
         direction="row"

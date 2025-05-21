@@ -112,16 +112,36 @@ function App() {
       })
     }
   }, [userMeta, user])
+
+const [dims, setDims] = useState(
+  {
+    width: '100%',
+    height: '90%'
+  }
+)
+
+useEffect(() => {
+  console.log(dims)
+}, [dims])
   
+  useEffect(() => {
+    switch(screen){
+      case 'xs': setDims({width: '100%', height: '88%'})
+      break;
+      case 'md': setDims({width: '100%', height: '100%'})
+      break;
+      default: setDims({width: '100%', height: '90%'})
+    }
+  }, [screen])
   
 
   return (
-   <Stack direction={'column'} height={'98dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
+   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
     <Stack width={'100%'} height={'10%'}>
       <AppHeader />
     </Stack>
 
-<Stack height={screen === 'xs' ? '88%' : '78%'} width={'100%'} alignItems={'center'}>
+<Stack height={dims?.height} width={dims?.width} alignItems={'center'} zIndex={1}>
     <Routes>
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>
@@ -188,7 +208,7 @@ function App() {
 
     {appReady && <Modals needsLogin={false}/>}
 
-    <Stack sx={{height: '7%', width: '100%'}}>
+    <Stack sx={{height: 'auto', width: '100%'}}>
       <AdSpace />
     </Stack> 
 

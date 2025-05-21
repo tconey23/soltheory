@@ -162,9 +162,10 @@ const HomePage = ({showBot = true}) => {
           <Button onClick={() => toggleMenuVisible(prev => !prev)}>Toggle Menu</Button>
         </Stack>
 
-        {menuVisible && <HomePageMenu />}
   
-        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr}>
+        {menuVisible && <HomePageMenu />}
+        <Stack position={'fixed'} width={'100%'} height={'81%'} zIndex={1}>
+        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '100%'}}>
 
           {/* <PerfHook /> */}
         <AdaptiveEvents />
@@ -179,6 +180,7 @@ const HomePage = ({showBot = true}) => {
           {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
 
       </Canvas>
+        </Stack>
             
     </div>
     )

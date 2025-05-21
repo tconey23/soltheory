@@ -53,7 +53,7 @@ const AdSpace = () => {
   }, [adIndex]);
 
   return (
-    <Stack sx={{cursor: 'pointer'}} height={mobileAds[adIndex]?.dims?.height} width={'100%'} overflow="hidden" position="fixed" justifyContent={'center'} alignItems={'center'}>
+    <Stack sx={{cursor: 'pointer'}} height={'100%'} width={'100%'} overflow="hidden" justifyContent={'center'} alignItems={'center'}>
       <AnimatePresence mode="wait">
         <motion.div
           key={mobileAds[adIndex].name + adIndex}
@@ -62,16 +62,18 @@ const AdSpace = () => {
           exit={{ y: 50, opacity: 0 }}
           transition={{ duration: 0.5 }}
           style={{
-            position: 'absolute',
+            display: 'flex',
+            alignItem: 'center',
+            justifyContent: 'center',
             width: '100%',
             height: '100%',
           }}
         >
-          <Link to={mobileAds[adIndex].url} target="_blank" rel="noopener noreferrer">
+          <Link to={mobileAds[adIndex].url} target="_blank" rel="noopener noreferrer" style={{maxHeight: '115px', display:'flex', alignItems: 'flex-start'}}>
             <img
               src={mobileAds[adIndex].image}
               alt={mobileAds[adIndex].name}
-              style={{ width: mobileAds[adIndex]?.dims?.width, height: 'auto', objectFit: 'cover' }}
+              style={{ width: mobileAds[adIndex]?.dims?.width, height: 'auto', objectFit: 'contain' }}
             />
           </Link>
         </motion.div>
