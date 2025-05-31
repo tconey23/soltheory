@@ -19,6 +19,7 @@ const AddPrompts = () => {
     const [readyToSubmit, setReadyToSubmit] = useState(false);
     const {user, screen, userMeta} = useGlobalStore()
     const theme = useTheme()
+    const [promptCount, setPromptCount] = useState(0)
 
     const nav = useNavigate()
   
@@ -44,6 +45,7 @@ const AddPrompts = () => {
       };
   
       const res = await addNewPrompts(payload);
+      console.log(res)
       if (res === 'success') {
         setDate('');
         setData([]);
@@ -70,6 +72,7 @@ const AddPrompts = () => {
       if (newPrompt) {
         setPrompts(prev => [...prev, newPrompt]);
         setNewPrompt('');
+        setPromptCount(prev => prev +1)
       }
     };
   
@@ -94,9 +97,9 @@ const AddPrompts = () => {
     };
   
     return (
-      <Stack alignItems='center' height={'100%'} width={'100%'}>
-        <Typography variant='h6'>Add Prompts</Typography>
-        <Stack width={'85%'} marginY={3} >
+      <Stack alignItems='center' height={'98%'} width={'98%'}>
+        <Typography variant='h6' color='white'>Add Prompts</Typography>
+        <Stack width={'98%'} height={'90%'} marginY={3} >
           <Accordion
             onChange={() => {
               if(userMeta?.user_name){
@@ -109,21 +112,22 @@ const AddPrompts = () => {
             <AccordionDetails sx={{bgcolor: theme.palette.secondary.main, justifyItems:'center'}}>
 
 
-        <Stack  marginY={1} bgcolor={'white'} width={'50%'} padding={2} alignItems={'center'} borderRadius={2}>
+        <Stack  marginY={1} bgcolor={'white'} width={'98%'} padding={2} alignItems={'center'} borderRadius={2}>
           <PromptCalendar setDate={setDate}/>
     
           <TextField
             value={author}
             onChange={(e) => setAuthor(e.target.value)}
             label="Author"
-            sx={{ marginTop: 2 }}
+            sx={{ marginTop: 1, width: '50%'}}
             />
         </Stack>
 
 
-              <Stack bgcolor={'white'} width={'50%'} padding={2} alignItems={'center'} borderRadius={2}>
+              <Stack bgcolor={'white'} width={'98%'} padding={2} alignItems={'center'} borderRadius={2}>
 
               <Typography>{!toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Typography>
+              <Typography>{promptCount}</Typography>
               <Switch checked={!toggleMulti} onChange={() => setToggleMulti(prev => !prev)}/>              
 
               {toggleMulti ? (
@@ -139,7 +143,7 @@ const AddPrompts = () => {
                     label="New Prompt"
                     sx={{ marginTop: 2, marginLeft: 3}}
                     />
-                  <Button sx={{marginX: 3, marginY: 2}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
+                  <Button sx={{marginX: 3, marginY: 2, color: 'white'}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
                 </Stack>
               )}
 
@@ -147,10 +151,6 @@ const AddPrompts = () => {
 
               </Stack>
               
-              </AccordionDetails>
-            </Accordion>
-          </Stack>
-
         <List sx={{ width: screen === 'xs' ? '98%' : '75%', overflowY: 'auto', justifySelf: 'center', boxShadow: 'inset 0px 0px 13px 1px #00000021'}}>
           {(toggleMulti ? data : prompts).map((item, i) => (
             <EditablePromptItem
@@ -168,6 +168,10 @@ const AddPrompts = () => {
           <Button onClick={() => nav('/account')}>Back</Button>
           {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
         </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Stack>
+
       </Stack>
     );
   };

@@ -10,9 +10,7 @@ const AdSpace = () => {
   const screen = useGlobalStore((state) => state.screen)
 
   
-  useEffect(() =>{
-    console.log(screen)
-    
+  useEffect(() =>{ 
     if(screen === 'xs'){
       setIsMobile(true)
     } else {

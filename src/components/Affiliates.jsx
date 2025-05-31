@@ -55,7 +55,7 @@ const Affiliates = () => {
       bgcolor={'#ffffffbd'}
     >
         <Stack marginTop={1}>
-            <Typography fontFamily={'Fredoka Regular'} fontSize={20}>SolTheory Affiliates</Typography>
+            <Typography fontFamily={'Fredoka Regular'} fontSize={20}>SOL Theory Affiliates</Typography>
         </Stack>
       <Stack height={'80%'}>
         <List sx={{overflowY: 'scroll', height: '100%'}}>

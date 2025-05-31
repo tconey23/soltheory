@@ -76,7 +76,7 @@ const AdminControls = () => {
     <MotionStack
       key="account_select"
       width="85%"
-      sx={{ height: '10%' }}
+      sx={{ height: '10%'}}
       alignItems="center"
       justifyContent="center"
       direction="column"
@@ -111,7 +111,7 @@ const AdminControls = () => {
           <MotionStack
             key={selectedOption}
             width="85%"
-            sx={{ height: selectedOption? '64%': '20%', bgcolor: '#414770', marginY: 3}}
+            sx={{ height: selectedOption? '60%': '20%', bgcolor: '#414770', marginY: 3, overflow: 'scroll'}}
             alignItems="center"
             justifyContent="center"
             direction="column"
