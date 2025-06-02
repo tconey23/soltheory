@@ -156,7 +156,7 @@ const HomePage = ({showBot = true}) => {
     }, [groundReady, backdropReady, lettersReady, lightingReady, allAssetsReady])
 
     return (
-    <div style={{height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
+    <div style={{height: '90%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
 
         <Stack width={'99%'} position={'absolute'} zIndex={2} justifyContent={'center'} alignItems={'center'} marginTop={1}>
           <Button onClick={() => toggleMenuVisible(prev => !prev)}>Toggle Menu</Button>
@@ -165,7 +165,7 @@ const HomePage = ({showBot = true}) => {
   
         {menuVisible && <HomePageMenu />}
         <Stack position={'fixed'} width={'100%'} height={'81%'} zIndex={1}>
-        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '100%'}}>
+        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '90%'}}>
 
           {/* <PerfHook /> */}
         <AdaptiveEvents />

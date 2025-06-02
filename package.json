@@ -34,6 +34,7 @@
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.17.0",
     "react-slick": "^0.30.3",
+    "recharts": "^2.15.3",
     "slick-carousel": "^1.8.1",
     "three": "^0.175.0",
     "uuid": "^11.1.0",

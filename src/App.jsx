@@ -116,7 +116,7 @@ function App() {
 const [dims, setDims] = useState(
   {
     width: '100%',
-    height: '90%'
+    height: '80%'
   }
 )
 

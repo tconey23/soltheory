@@ -7,6 +7,7 @@ import GamesWrapper from '../components/games/GamesWrapper';
 import SolMates from '../components/solmates/SolMates';
 import Login from '../components/Login';
 import Affiliates from '../components/Affiliates';
+import GameData from '../components/game_data/GameData';
 
 const MotionStack = motion(Stack);
 
@@ -41,7 +42,7 @@ const HomePageMenu = () => {
   const menuItems = [
     userMeta ? <Account/> : <Login />,
     <GamesWrapper />,
-    <SolMates/>,
+    <GameData />,
     <Affiliates />
   ]
 
