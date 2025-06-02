@@ -39,7 +39,7 @@ export const getMeta = async (id) => {
 }
 
 export const updateUserName = async (id, name) => {
-  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
+
     const { data, error } = await supabase
         .from('users')
         .update({ user_name: name })
@@ -47,10 +47,9 @@ export const updateUserName = async (id, name) => {
         .select()
 
         if(data?.[0]){
-            setAlertContent({text: 'User name updated', type:'success'})
-            return 'success'
+          return data?.[0]
         } else {
-          setAlertContent({text: 'An error has occured', type:'error'})
+          return error
         }
 }
 

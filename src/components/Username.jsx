@@ -6,11 +6,19 @@ import useGlobalStore from '../business/useGlobalStore';
 const Username = () => {
         const [newUserName, setNewUserName] = useState('')
         const userMeta = useGlobalStore((state) => state.userMeta);
+        const setAlertContent = useGlobalStore((state) => state.setAlertContent)
 
         const handleUpdate = async () => {
         const res = await updateUserName(userMeta?.primary_id, newUserName)
-            if(res === 'success'){
-                setNewUserName(null)
+        console.log(res)
+            if(res){
+                if(res?.user_name === newUserName){
+                    setNewUserName('')
+                    setAlertContent({
+                        text: `User name changed!`,
+                        type: 'success'
+                    })
+                }
             }
         }
 

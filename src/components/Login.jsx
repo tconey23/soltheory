@@ -15,6 +15,7 @@ const LoginForm = () => {
   const toggleLogin = useGlobalStore((state) => state.toggleLogin)
   const redirectUrl = useGlobalStore((state) => state.redirectUrl)
   const setRedirectUrl = useGlobalStore((state) => state.setRedirectUrl)
+  const setAlertContent = useGlobalStore((state) => state.setAlertContent)
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -22,9 +23,21 @@ const LoginForm = () => {
   const [newUser, setNewUser] = useState(false)
   const [userName, setUserName] = useState('')
   const [toggleShowPassword, setToggleShowPassword] = useState(false)
+  const [toggleShowPasswordConf, setToggleShowPasswordConf] = useState(false)
+  const [passMatch, setPassMatch] = useState(false)
 
   const loc = useLocation()
   const navTo = useNavigate()
+
+  useEffect(() => {
+
+    if(password === confPassword){
+      setPassMatch(true)
+    } else {
+      setPassMatch(false)
+    }
+
+  }, [password, confPassword, email, userName])
 
   useEffect(() => {
     if(loc?.pathname){
@@ -65,11 +78,22 @@ const handleLogin = async () => {
     })
 
       if (error) {
-    console.error('Supabase login error:', error.message);
+    if(error?.message === "User already registered"){
+      setAlertContent({
+        text: 'A user with this email address already exists',
+        type: 'error'
+      })
+    } else {
+            setAlertContent({
+        text: `${error?.message}`,
+        type: 'error'
+      })
+    }
   }
 
   if (data) {
-    console.log(data);
+    setUser(data?.user);
+    setSession(data?.session);
   }
 
   }
@@ -99,11 +123,17 @@ const handleLogin = async () => {
         </Stack>
 
         {newUser && 
-        <Stack paddingY={2.5} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
             <InputLabel>Confirm Password</InputLabel>
-            <Input value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
+            <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
           </FormControl>
+          {
+            toggleShowPasswordConf ? 
+            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
+            :
+            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
+          }
         </Stack>}
 
     </Stack>
@@ -118,13 +148,27 @@ const handleLogin = async () => {
 
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
-        <Button color='primary' onClick={() => {
-          if(newUser){
-            handleSignUp()
-          } else {
-            handleLogin()
-          }
-        }} variant='contained' style={{bgcolor:'#372248'}}>{newUser ? 'Sign Up' : 'Login'}</Button>
+        {
+          newUser && passMatch && email && userName &&
+          <Button onClick={() => {
+            if(newUser){
+              handleSignUp()
+            } else {
+              handleLogin()
+            }
+          }}>Sign Up</Button>
+        }
+        {
+          !newUser && 
+          <Button onClick={() => {
+            if(newUser){
+              handleSignUp()
+            } else {
+              handleLogin()
+            }
+          }}>Login</Button>
+        }
+
       </Stack>
     </Stack>
 
