@@ -21,16 +21,25 @@ const PromptCalendar = ({setDate}) => {
     .select('date')
 
     if(prompts){
+      // console.log(prompts)
         prompts.forEach((p) => {
             let formDate = dayjs(p.date, "MM/DD/YYYY").format("YYYY-MM-DD")
+            let finalDate
+            if(formDate === 'Invalid Date'){
+              finalDate = p.date 
+            } else {
+              finalDate = formDate
+            }
+            console.log(finalDate)
             setDisabledDates(prev => ([
                 ...prev, 
-                formDate
+                finalDate
             ]))
         })
     }
             
   }
+
   useEffect(() => {
     if(selectedDate){
         setDate(selectedDate.format("MM/DD/YYYY"))
@@ -58,9 +67,6 @@ const PromptCalendar = ({setDate}) => {
         sx={{
           backgroundColor: isHighlighted ? 'black' : undefined,
           color: isHighlighted ? 'white' : undefined,
-          '&:hover': {
-            backgroundColor: isHighlighted ? '#1565c0' : undefined,
-          },
         }}
       />
     );

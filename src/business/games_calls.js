@@ -71,21 +71,17 @@ export const getGames = async () => {
   
 export const addNewPrompts = async (prompts) => {
   console.log(prompts)
-  // const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   if(prompts) 
       {
         const { data, error } = await supabase
         .from('21thingsprompts')
         .insert([prompts])
         .select();
-        console.log(data, error)
-          // if (error) {
-          //   setAlertContent({text: 'Upload failed', type:'error'})
-          //     console.error('Error inserting:', error);
-          // } else {
-          //   setAlertContent({text: 'Prompt pack added', type:'success'})
-          //     return 'success'
-          // }
+        if(data?.[0]){
+          return 'success'
+        } else {
+          return error
+        }
       }
 };
 

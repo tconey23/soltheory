@@ -10,6 +10,7 @@ import { useTheme } from '@mui/material/styles'
 import { getPrompts } from '../../../../business/games_calls';
 
 const AddPrompts = () => {
+    const setAlertContent = useGlobalStore((state) => state.setAlertContent)
     const [date, setDate] = useState('');
     const [author, setAuthor] = useState('');
     const [prompts, setPrompts] = useState([]);
@@ -25,14 +26,31 @@ const AddPrompts = () => {
   
     useEffect(() => {
       if (userMeta) setAuthor(userMeta.user_name);
-
     }, [userMeta]);
   
     useEffect(() => {
-      // console.log(date)
       const valid = date && author && ((prompts.length === 21) || (data.length === 21));
       setReadyToSubmit(valid);
+      
+      if(data?.length){
+        setPromptCount(data.length)
+      } else if (prompts?.length){
+        setPromptCount(prompts?.length)
+      } else if(data?.length == 0 && prompts?.length == 0){
+        setPromptCount(0)
+      }
+      // console.log(data?.length, prompts?.length)
     }, [data, prompts, date, author]);
+
+    useEffect(() => {
+      handleClear()
+    }, [toggleMulti])
+
+    const handleClear = () => {
+      setData([])
+      setPrompts([])
+      setPromptCount(0)
+    }
   
     const handlePost = async () => {
       const formatted = new Date(date).toLocaleDateString("en-US");
@@ -45,12 +63,21 @@ const AddPrompts = () => {
       };
   
       const res = await addNewPrompts(payload);
-      console.log(res)
+      // console.log(res)
       if (res === 'success') {
         setDate('');
         setData([]);
         setPrompts([]);
         setAuthor('');
+        setAlertContent({
+          text: `Prompts uploaded successfully`,
+          type: 'success'
+        })
+      } else {
+        setAlertContent({
+          text: `An error occurred while uploading content`,
+          type: 'error'
+        })
       }
     };
   
@@ -88,7 +115,7 @@ const AddPrompts = () => {
     };
   
     const handleSaveEdit = (index, updatedText, type) => {
-      console.log(updatedText)
+      // console.log(updatedText)
       if (type === 'data') {
         setData(prev => prev.map((item, i) => i === index ? { ...item, prompt: updatedText } : item));
       } else if (type === 'prompts') {
@@ -126,16 +153,16 @@ const AddPrompts = () => {
 
               <Stack bgcolor={'white'} width={'98%'} padding={2} alignItems={'center'} borderRadius={2}>
 
-              <Typography>{!toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Typography>
-              <Typography>{promptCount}</Typography>
+              <Typography fontWeight={'bolder'}>{!toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Typography>
               <Switch checked={!toggleMulti} onChange={() => setToggleMulti(prev => !prev)}/>              
+              <Typography marginTop={2} marginBottom={-4}>{`Prompt count ${promptCount}`}</Typography>
 
               {toggleMulti ? (
-                <Stack marginY={3}>
+                <Stack marginY={1}>
                   <input type="file" accept=".csv" onChange={handleFileUpload} />
                 </Stack>
               ) : (
-                <Stack direction={'row'} justifyContent={'center'} marginY={3}>
+                <Stack direction={'row'} justifyContent={'center'} marginTop={2}>
                   <TextField
                     value={newPrompt}
                     onChange={(e) => setNewPrompt(e.target.value)}
@@ -143,7 +170,7 @@ const AddPrompts = () => {
                     label="New Prompt"
                     sx={{ marginTop: 2, marginLeft: 3}}
                     />
-                  <Button sx={{marginX: 3, marginY: 2, color: 'white'}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
+                  <Button sx={{marginX: 3, marginY: 3, color: 'white'}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
                 </Stack>
               )}
 
@@ -165,6 +192,7 @@ const AddPrompts = () => {
           ))}
         </List>
         <Stack direction={'row'} width={'25%'} justifyContent={'space-evenly'}>
+          <Button onClick={() => handleClear()}>Clear</Button>
           <Button onClick={() => nav('/account')}>Back</Button>
           {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
         </Stack>
