@@ -29,6 +29,7 @@ const TwentyOneCalendar = ({setDayGame, dayGame}) => {
     }
 
   const getPromptDates = async (dt) => {
+    console.log(dt)
         let { data, error } = await supabase
             .from('twentyone_things_data')
             .select("*")
@@ -50,8 +51,10 @@ const TwentyOneCalendar = ({setDayGame, dayGame}) => {
     if(date && !dayGame){
         getValidDates()
         getPromptDates(date)
+    } else if (date && dayGame){
+      getPromptDates(date)
     }
-  }, [date, dayGame])
+  }, [date])
 
   return (
     <Stack direction="column" width="100%" height="100%" alignItems="center" justifyContent="center" p={1}>

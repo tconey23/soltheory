@@ -14,12 +14,12 @@ const TwentyOneThingsDisp = ({gameData}) => {
     useEffect(() => {
         
         if(favs?.length > 0){
-            const counts = favs.reduce((acc, str) => {
-            const normalized = str.trim();
+            const counts = favs?.reduce((acc, str) => {
+            const normalized = str?.trim();
             acc[normalized] = (acc[normalized] || 0) + 1;
             return acc;
         }, {});
-        const chartData = Object.entries(counts).map(([label, value]) => ({
+        const chartData = Object.entries(counts)?.map(([label, value]) => ({
             label, 
             value
         }))
