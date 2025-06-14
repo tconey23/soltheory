@@ -33,7 +33,7 @@ const AdSpace = () => {
     {
       name: isMobile ? 'mom_mobile' : 'mom_desktop',
       type: isMobile ? 'mobile' : 'desktop',
-      image: isMobile ? '/mom_ad_mobile.jpeg' : '/mom_ad_desktop.png',
+      image: isMobile ? '/mom_ad_desktop.png' : '/mom_ad_desktop.png',
       url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
       dims: {
         width: isMobile ? '100%' : '728px', 
