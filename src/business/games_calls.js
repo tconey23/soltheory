@@ -90,7 +90,7 @@ export const get21Things = async (index) =>{
         const { data: reqEntry, error } = await supabase
             .from('21thingsprompts')
             .select('*')
-            .order('id', { ascending: false })
+            .order('date', { ascending: false })
             .range(index, index) // Offset by 1, return 1 record
 
             // console.log(index, reqEntry)
