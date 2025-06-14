@@ -24,7 +24,7 @@ const AdSpace = () => {
       name: isMobile ? 'personos_mobile' : 'personos_desktop',
       type: isMobile ? 'mobile' : 'desktop',
       image: isMobile ? '/personos_ad_mobile.png' : '/personos_ad_mobile.png',
-      url: 'https://www.personos.ai/',
+      url: 'https://www.personos.ai/', 
       dims: {
         width: isMobile ? '100%' : '728px', 
         height: isMobile ? '60px' : '169px'

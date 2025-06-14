@@ -85,7 +85,7 @@ export const addNewPrompts = async (prompts) => {
       }
 };
 
-export const get21Things = async (index) =>{
+export const get21Things = async (index) =>{ 
         
         const { data: reqEntry, error } = await supabase
             .from('21thingsprompts')

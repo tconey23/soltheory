@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Stack, Typography } from '@mui/material';
 import TwentyOneCalendar from './TwentyOneCalendar';
-import TwentyOneThingsDisp from './TwentyOneThingsDisp';
+import TwentyOneThingsDisp from './TwentyOneThingsDisp'; 
 
 const TwentyOneThingsData = () => {
 
