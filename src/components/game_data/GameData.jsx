@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import TwentyOneThingsData from './TwentyOneThingsData';
 
 const GameData = () => {
-    const MotionText = motion(Typography);
+    const MotionText = motion(Typography); 
     const MotionAvatar = motion(Avatar);
     const [hasMounted, setHasMounted] = useState(false);
     const [renderObj, setRenderObj] = useState(<></>)

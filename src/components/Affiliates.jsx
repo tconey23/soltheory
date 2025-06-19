@@ -66,7 +66,7 @@ const Affiliates = () => {
                         <img width={'100%'} height={'auto'} src={s?.image} sx={{margin: 3}}/>
                     </Box>
                     </Link>
-                </MenuItem>
+                </MenuItem> 
             ))}
         </List>
       </Stack>
