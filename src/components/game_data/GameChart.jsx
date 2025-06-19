@@ -27,7 +27,7 @@ const GameChart = ({data, userFav}) => {
 }));
 
   return (
-    <Stack ref={parentContainer} direction={'column'} height='100%' width='100%' justifyContent='center' alignItems="center" sx={{scale: 0.90}} bgcolor={'white'}>
+    <Stack ref={parentContainer} direction={'column'} height='100%' width='100%' justifyContent='center' alignItems="center" sx={{scale: 0.90}} bgcolor={'white'} borderRadius={2}>
       {data?.length && 
       <ResponsiveContainer width={width} height={chartHeight}>
         <BarChart
