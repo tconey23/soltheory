@@ -10,6 +10,9 @@ const Home = ({ onPlay, payload }) => {
 
     const [clicked, setClicked] = useState(1)
 
+    const today = new Date().toISOString().split('T')[0];
+    console.log(today == payload.date)
+
     useEffect(() => {
         setTimeout(() => {
             setClicked(0)
@@ -37,7 +40,7 @@ const Home = ({ onPlay, payload }) => {
                     setClicked(1)
                 }}></i>
               <Typography>{payload?.date}</Typography>
-                <i style={{ marginLeft: 10, fontSize: 20, color: clicked === 2 ? 'white' : 'black' }} className="fi fi-sr-angle-circle-right" onClick={() => {
+                {today !== payload.date && <i style={{ marginLeft: 10, fontSize: 20, color: clicked === 2 ? 'white' : 'black' }} className="fi fi-sr-angle-circle-right" onClick={() => {
 
                     if(gameIndex > 0){
                         useGlobalStore.setState((state) => ({
@@ -46,7 +49,7 @@ const Home = ({ onPlay, payload }) => {
                     }
 
                     setClicked(2)
-                }}></i>
+                }}></i>}
             </Stack>
           </Stack>
   

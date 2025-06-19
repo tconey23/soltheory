@@ -31,6 +31,8 @@ const green = '#45d500'
     const [newGame, setNewGame] = useState(false)
     // console.log('userId', userId, 'redirect', redirect, 'newgame', newGame)
 
+    
+
       const getGuestGame = async () => {
     let { data: guest_games, error } = await supabase
       .from('guest_games')

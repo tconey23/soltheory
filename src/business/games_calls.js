@@ -87,19 +87,20 @@ export const addNewPrompts = async (prompts) => {
 
 export const get21Things = async (index) =>{ 
         
+        const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
         const { data: reqEntry, error } = await supabase
             .from('21thingsprompts')
             .select('*')
+            .lte('date', today) // Only include dates less than or equal to today
             .order('date', { ascending: false })
-            .range(index, index) // Offset by 1, return 1 record
+            .range(index, index); // Offset by index, return 1 record
 
-            // console.log(index, reqEntry)
-        
-        if(reqEntry){
-            return reqEntry[0]
+        if (reqEntry) {
+            return reqEntry[0];
         }
 
-        return error 
+        return error;
 
     }
 
