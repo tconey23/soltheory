@@ -29,17 +29,22 @@ const TwentyOneCalendar = ({setDayGame, dayGame}) => {
     }
 
   const getPromptDates = async (dt) => {
-    console.log(dt)
-        let { data, error } = await supabase
-            .from('twentyone_things_data')
-            .select("*")
-            .eq('game_date', dt)
-            if(data?.length){
-                    setDayGame(data)
-                } else {
-                    setDayGame([])
-                }
-  }
+    console.log(dt);
+    let { data, error } = await supabase
+        .from('twentyone_things_data')
+        .select("*")
+        .eq('game_date', dt);
+
+    if (data?.length) {
+        // Filter out entries where all four fields are null
+        const filtered = data.filter(entry =>
+            !(entry.note == null && entry.stage1 == null && entry.stage2 == null && entry.stage3 == null)
+        );
+        setDayGame(filtered);
+    } else {
+        setDayGame([]);
+    }
+};
 
   useEffect(() => {
     if(selectedDate){

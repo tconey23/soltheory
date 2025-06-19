@@ -9,7 +9,7 @@ const GameChart = ({data, userFav}) => {
   const [height, setHeight] = useState(400)
   const parentContainer = useRef()
 
-  console.log(data)
+  // console.log(data)
 
   const barHeight = 40;
   const chartHeight = Math.min(Math.max(data.length * barHeight, 150), 600)
