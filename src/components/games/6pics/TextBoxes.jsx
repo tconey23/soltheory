@@ -2,16 +2,17 @@ import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button } from "@mui/material";
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
+import { Link } from "react-router-dom";
 
 const MotionStack = motion(Stack);
 
-const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins }) => {
+const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore }) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
-  const [isWin, setIsWin] = useState(false);
   const [autoAnswer, setAutoAnswer] = useState(false);
   const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
+  const [hintIndex, setHintIndex] = useState(0);
 
   const screen = useGlobalStore((state) => state.screen);
   const inputRefs = useRef([]);
@@ -37,12 +38,45 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
 
   // Toggle "Check Answer" button
   useEffect(() => {
+    console.log(letterCount, letterTarget)
     setToggleCheckAnswer(letterCount === letterTarget);
   }, [letterCount, letterTarget]);
+
+  const getHint = () => {
+  if (hintIndex >= letterTarget) return; // no more hints available
+
+  let count = 0;
+  for (let w = 0; w < words.length; w++) {
+    for (let l = 0; l < words[w].length; l++) {
+      if (count === hintIndex) {
+        const correctLetter = words[w][l];
+        const input = inputRefs.current[w][l];
+
+        if (input) {
+          input.value = correctLetter;
+
+          // Trigger input change manually to update state
+          handleInputChange({ target: { value: correctLetter } }, w, l);
+
+          setHintIndex(prev => prev + 1);
+          setLevelScore(prev => {
+            const updated = [...prev];
+            updated[index].score = Math.max(0, updated[index].score - 5);
+            return updated;
+          });
+        }
+        return;
+      }
+      count++;
+    }
+  }
+};
+
 
   const handleRightAnswer = () => {
     setIsWin(true);
     setShowGiveUp(false);
+    setToggleCheckAnswer(false)
   };
 
   const handleWrongAnswer = () => {
@@ -56,36 +90,38 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     check === ans ? handleRightAnswer() : handleWrongAnswer();
   };
 
-  const handleInputChange = (event, wordIndex, letterIndex) => {
-    const { value } = event.target;
+const handleInputChange = (event, wordIndex, letterIndex) => {
+  const { value } = event.target;
+  const val = value.slice(0, 1); // Only allow 1 character
+  event.target.value = val;
 
-    setLetterCount(prev => {
-      const current = inputRefs.current[wordIndex][letterIndex]?.value || "";
-      if (current === "" && value !== "") return prev + 1;
-      if (current !== "" && value === "") return prev - 1;
-      return prev;
-    });
+  // Update refs directly
+  inputRefs.current[wordIndex][letterIndex].value = val;
 
-    // Rebuild full input string
-    const letters = [];
-    inputRefs.current.forEach((w) => {
-      letters.push(...w.map((t) => t?.value || ""));
-    });
-    setInputLetters(letters.join("").replaceAll(",", ""));
+  // Build updated inputLetters flat array
+  const letters = inputRefs.current.flatMap((wordRefs) =>
+    wordRefs.map((ref) => ref?.value || "")
+  );
 
-    // Auto-advance focus
-    if (value.length === 1 || value === " ") {
-      const nextIndex = letterIndex + 1;
-      if (
-        nextIndex < inputRefs.current[wordIndex].length &&
-        inputRefs.current[wordIndex][nextIndex]
-      ) {
-        inputRefs.current[wordIndex][nextIndex].focus();
-      } else if (wordIndex + 1 < inputRefs.current.length) {
-        inputRefs.current[wordIndex + 1][0]?.focus();
-      }
+  // Count non-empty letters
+  const filledCount = letters.filter((c) => c !== "").length;
+
+  setInputLetters(letters.join(""));
+  setLetterCount(filledCount);
+
+  // Auto-focus to next box
+  if (val.length === 1) {
+    const nextIndex = letterIndex + 1;
+    if (
+      nextIndex < inputRefs.current[wordIndex].length &&
+      inputRefs.current[wordIndex][nextIndex]
+    ) {
+      inputRefs.current[wordIndex][nextIndex].focus();
+    } else if (wordIndex + 1 < inputRefs.current.length) {
+      inputRefs.current[wordIndex + 1][0]?.focus();
     }
-  };
+  }
+};
 
   const handleKeyDown = (e, wordIndex, letterIndex) => {
     const key = e.key;
@@ -152,14 +188,24 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
                     <TextField
                       value={isLocked ? letter : undefined}
                       disabled={isLocked}
+                      slotProps={{
+                        input: {
+                          maxLength: 1,
+                          style: { textAlign: "center", fontSize: 30, width: 50 },
+                        }
+                      }}
                       sx={{ opacity: 1, transition: "all 1s ease-in" }}
                       autoComplete="off"
                       inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
-                      onChange={(e) => handleInputChange(e, wordIndex, letterIndex)}
+                      onChange={(e) => {
+                        const val = e.target.value.slice(0, 1); // Only allow 1 character
+                        e.target.value = val;
+                        handleInputChange(e, wordIndex, letterIndex);
+                      }}
                       onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
                       inputProps={{
                         maxLength: 1,
-                        style: { textAlign: "center", fontSize: 30, width: 40 },
+                        style: { textAlign: "center", fontSize: 30, width: 30 },
                       }}
                     />
                   </Stack>
@@ -169,14 +215,18 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
           );
         })}
 
-      <Button
-        disabled={!toggleCheckAnswer}
-        sx={{ margin: 4 }}
-        onClick={checkAnswer}
-        variant="contained"
-      >
-        Check Answer
-      </Button>
+      <Stack>
+        <Link onClick={getHint} disabled={hintIndex >= letterTarget}>Hint</Link>
+
+        <Button
+          disabled={!toggleCheckAnswer}
+          sx={{ margin: 4 }}
+          onClick={checkAnswer}
+          variant="contained"
+          >
+          Check Answer
+        </Button>
+      </Stack>
     </Stack>
   );
 };

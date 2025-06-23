@@ -23,7 +23,12 @@ const GameWrapper = ({ pack }) => {
 
   const sliderRef = useRef();
 
-  const next = () => sliderRef.current?.slickNext();
+  const next = () => {
+  setIsWin(false);                 // reset win state BEFORE slide changes
+  setTimeout(() => {
+    sliderRef.current?.slickNext();
+  }, 100);                         // slight delay gives React time to re-render with isWin === false
+};
   const prev = () => sliderRef.current?.slickPrev();
 
   const settings = {
@@ -124,6 +129,7 @@ const GameWrapper = ({ pack }) => {
                     next={next}
                     prev={prev}
                     levelScore={levelScore}
+                    setLevelScore={setLevelScore}
                     index={i}
                     setShowGiveUp={setShowGiveUp}
                   />

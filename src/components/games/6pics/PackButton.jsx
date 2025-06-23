@@ -49,18 +49,18 @@ const PackButton = ({pack, setGamePack}) => {
                     scale: 1.05
                 },
                 flexWrap: 'nowrap',
-                maxHeight: '160px',
-                minWidth: '95%',
+                maxHeight: '155px',
+                minWidth: '90%',
                 height: 'fit-content',
-                width: '100%',
+                width: '95%',
                 flexDirection: 'column',
                 backgroundColor: 'white',
                 marginY: 2
             }}>
 
-                    <Stack width={'100%'} height={'100%'} alignItems={'center'} >
+                    <Stack width={'90%'} height={'100%'} alignItems={'center'}>
 
-                        <Stack width={'40%'} height={'50px'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
+                        <Stack width={'63%'} height={'150px'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
                             <video 
                             playsInline
                             onLoadedMetadata={(e) => {
@@ -72,16 +72,17 @@ const PackButton = ({pack, setGamePack}) => {
                             }}
                             ref={videoRef} 
                             style={{
-                                width: '50%',
+                                width: '100%',
                                 height: 'auto',
+                                paddingY: 30
                             }} muted autoPlay={false} loop={false}>
                                 <source src={pack?.graphic} type="video/mp4"/>
                             </video>
                         </Stack>
 
-                        <Stack width={'50%'} height={'35%'} justifyContent={'center'} alignItems={'center'}>
+                        {/* <Stack width={'50%'} height={'35%'} justifyContent={'center'} alignItems={'center'}>
                             <Typography sx={{padding: '10px'}} fontSize={'clamp(11px, 2vw, 20px)'} fontFamily={'Fredoka Regular'}>{pack?.pack_name.toUpperCase()}</Typography>
-                        </Stack>
+                        </Stack> */}
 
                         <Stack width={'70%'} minHeight={'24px'} height={'30%'} alignItems={'flex-start'}>
                             {played && 

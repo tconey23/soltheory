@@ -25,6 +25,10 @@ const SixPicsVideoPlayer = ({
   // console.log('level', level)
   // console.log('level stops', level.stops)
   // console.log('level loops', level.loops)
+
+  useEffect(() =>{
+    console.log(isWin)
+  }, [isWin])
  
   const stages = useMemo(() => {
     if (!level?.stops?.length || !level?.loops?.length) return [];
