@@ -18,13 +18,14 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   const [note, setNote] = useState('')
   const [warning, setWarning] = useState(null)
   const [askToShare, setAskToShare] = useState(false)
+  const [showSubmit, setShowSubmit] = useState(true)
 
 
   const stage1 = prompts.filter(p => p.stages.includes(1));
   const stage2 = prompts.filter(p => p.stages.includes(2));
   const stage3 = prompts.filter(p => p.stages.includes(3));
 
-  console.log(guestUser)
+  // console.log(guestUser)
 
 
   const handleNoteChange = (val) => { 
@@ -49,7 +50,8 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
         text: 'Game saved/shared successfully',
         type: 'success', 
       })
-      navTo('/games')
+      // navTo('/games')
+      setShowSubmit(false)
     } else {
       setCurrentStage(0)
       setNote('')
@@ -72,18 +74,17 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       game_date: date || Date.now(),
     }
 
-console.log(gameData)
-    
-const { data, error } = await supabase
-  .from('twentyone_things_data')
-  .insert([
-    gameData,
-  ])
-  .select()
+    console.log(gameData)
+        
+        const { data, error } = await supabase
+      .from('twentyone_things_data')
+      .upsert([gameData])  // replaces insert()
+      .select();
 
-    if(data){
-      setAskToShare(true)
-    }
+        console.log(data, error)
+        if(data){
+          setAskToShare(true)
+        }
           
   }
 
@@ -161,16 +162,37 @@ const { data, error } = await supabase
       </>
       } */}
       <Stack direction="row" spacing={2} mt={2}>
-        <Button onClick={() => setCurrentStage(3)}>Back</Button>
-        <Box onClick={() => {
-          if(!userMeta && !guestUser?.id){
-            setAlertContent({
-              text: 'You must be logged in to save game data',
-              type: 'error',
-            })
-          }
-        }}>
-          {note.length > 0 && <Button sx={{bgcolor: !userMeta && !guestUser?.id && 'grey'}} disabled={!userMeta && !guestUser?.id} onClick={handleSubmit}>Submit</Button>}
+        <Button 
+          onClick={() => {
+            console.log(showSubmit)
+            if(showSubmit){
+              setCurrentStage(3)
+            } else {
+              setCurrentStage(0)
+            }
+
+          }}>
+            {showSubmit ? 'Back' : 'Done'}
+        </Button>
+        <Box 
+          // onClick={() => {
+          //   if(!userMeta && !guestUser?.id){
+          //     setAlertContent({
+          //       text: 'You must be logged in to save game data',
+          //       type: 'error',
+          //     })
+          //   }
+          // }}
+        >
+          {note.length > 0 && showSubmit &&
+          <Button 
+            sx={{
+              bgcolor: !userMeta 
+              && 
+              !guestUser?.id 
+              && 'grey'
+              }} 
+            disabled={!userMeta && !guestUser?.id} onClick={handleSubmit}>Submit</Button>}
         </Box>
       </Stack>
     </Stack>

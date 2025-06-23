@@ -158,7 +158,7 @@ const HomePage = ({showBot = true}) => {
     return (
     <div style={{height: '90%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
 
-        <Stack width={'99%'} position={'absolute'} zIndex={2} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+        <Stack width={'99%'} position={'absolute'} zIndex={200} justifyContent={'center'} alignItems={'center'} marginTop={1}>
           <Button onClick={() => toggleMenuVisible(prev => !prev)}>Toggle Menu</Button>
         </Stack>
 

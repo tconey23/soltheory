@@ -137,8 +137,10 @@ const SharedGame = () => {
       </Box>
         </Stack>
 
-        <Stack sx={{boxShadow: `0px 0px 11px 3px #c956ff85`, borderRadius: 3}} paddingY={5} marginTop={2} width={'90%'} maxHeight={'50px'} justifyContent={'flex-start'}>
-            <Typography height={'100%'} fontFamily={'Fredoka Regular'} fontSize={15}>{note}</Typography>
+        <Stack userData="text_stack" sx={{boxShadow: `0px 0px 11px 3px #c956ff85`, borderRadius: 1}} alignItems={'center'} paddingY={1} marginTop={2} width={'95%'} maxHeight={'200px'} minHeight={'100px'} justifyContent={'flex-start'}>
+          
+            <Typography sx={{whiteSpace: 'pre-line', overflowWrap:'break-word', overflow:'auto'}} align='left' userData="text_typography" height={'100%'} width={'98%'} fontFamily={'Fredoka Regular'} fontSize={15}>{note}</Typography>
+         
         </Stack>
 
     </Stack>

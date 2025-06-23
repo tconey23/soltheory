@@ -34,18 +34,17 @@ const green = '#45d500'
     
 
       const getGuestGame = async () => {
-    let { data: guest_games, error } = await supabase
-      .from('guest_games')
-      .select("*")
-      .eq('id', gameId)   
+        let { data: guest_games, error } = await supabase
+          .from('guest_games')
+          .select("*")
+          .eq('id', gameId)   
 
-      if(guest_games?.[0]){
-        setPrompts(guest_games?.[0]?.game_content?.stages)  
-        setSavegameNote(guest_games?.[0]?.game_content?.note)
-        setCurrentStage(4)
+          if(guest_games?.[0]){
+            setPrompts(guest_games?.[0]?.game_content?.stages)  
+            setSavegameNote(guest_games?.[0]?.game_content?.note)
+            setCurrentStage(4)
+          }
       }
-
-    }
 
     const getSavedGame = async () => {
       let { data: data, error } = await supabase
@@ -115,7 +114,7 @@ useEffect(() => {
   
   
     const renderStage = () => {
-      // console.log(currentStage)
+      console.log(currentStage)
       switch (currentStage) {
         case 1:
           return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />

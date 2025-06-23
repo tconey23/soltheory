@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography, Box } from '@mui/material';
 import useGlobalStore from '../../../business/useGlobalStore';
 import Hexagon from '../Hexagon';
+import MyGames from '../../game_data/MyGames';
 
 
 const Home = ({ onPlay, payload }) => {
@@ -61,6 +62,10 @@ const Home = ({ onPlay, payload }) => {
           <Stack mb={2}>
             <Button variant="contained" onClick={onPlay}>PLAY!</Button>
           </Stack>
+        </Stack>
+        <Stack borderTop={'1px solid grey'} width={'95%'} height={'50%'} overflow={'auto'}>
+          <Typography fontSize={20} fontWeight={'bold'} fontFamily={'Fredoka Regular'}>Your games</Typography>
+          <MyGames displayGame={'twentyonethings'}/>
         </Stack>
       </Stack>
     )
