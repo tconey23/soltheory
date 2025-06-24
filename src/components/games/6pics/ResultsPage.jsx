@@ -11,7 +11,7 @@ import { supabase } from "../../../business/supabaseClient";
 import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
 
-const ResultsPage = ({score, gamePack}) => {
+const ResultsPage = ({score, gamePack, width, height}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
@@ -112,12 +112,10 @@ const ResultsPage = ({score, gamePack}) => {
     return (
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
         <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-          <Stack width={'3%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+          <Stack width={'50%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
             <video
-              width="80%"
-              height="80%"
               preload="metadata"
-              style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10}}
+              style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
               muted
               autoPlay = {false}
               onLoadedMetadata={(e) => {

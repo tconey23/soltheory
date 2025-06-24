@@ -23,6 +23,27 @@ import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
 
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return screenSize;
+};
+
 function App() {
   const navTo = useNavigate()
   const setScreen = useGlobalStore((state) => state.setScreen)
@@ -34,22 +55,14 @@ function App() {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
   const setHeight = useGlobalStore((state) => state.setHeight)
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
-
-  // const originalConsoleError = console.error;
-  // console.error = (...args) => {
-  //   if (args[0]?.includes?.('`value` prop on `input` should not be null')) {
-  //     console.log('⛔ BAD INPUT:', args);
-  //     debugger; // open DevTools to pause here
-  //   }
-  //   originalConsoleError(...args);
-  // };
-
+  const inGame = useGlobalStore((state) => state.inGame)
+  const setInGame = useGlobalStore((state) => state.setInGame)
+  const { width, height } = useScreenSize();
   const {screenSize} = useBreakpoints()
-
   const [appReady, setAppReady] = useState(false)
   const [redirect, setRedirect] = useState(false)
 
-  const height = useWindowHeight() 
+  // const height = useWindowHeight() 
 
  useEffect(() => {
   setHeight(height)
@@ -81,7 +94,7 @@ function App() {
 
   useEffect(() => {
     const redir = sessionStorage.getItem('redirectAfterLogin')
-    console.log(redir)
+    // console.log(redir)
     if(redir){
       setRedirect(true)
       navTo(redir)
@@ -95,6 +108,7 @@ function App() {
     setTimeout(() => {
       setAppReady(true)
     }, 1000);
+    setInGame(false)
   }, [])
 
   useEffect(() =>{
@@ -121,7 +135,7 @@ const [dims, setDims] = useState(
 )
 
 useEffect(() => {
-  console.log(dims)
+  // console.log(dims)
 }, [dims])
   
   useEffect(() => {
@@ -133,6 +147,26 @@ useEffect(() => {
       default: setDims({width: '100%', height: '90%'})
     }
   }, [screen])
+
+    useEffect(() => {
+    let lastHeight = window.innerHeight;
+  
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+  
+      if (currentHeight > lastHeight) {
+        // Keyboard is likely dismissed
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 50);
+      }
+  
+      lastHeight = currentHeight;
+    };
+  
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
 
   return (
@@ -141,7 +175,7 @@ useEffect(() => {
       <AppHeader />
     </Stack>
 
-<Stack height={dims?.height} width={dims?.width} alignItems={'center'} zIndex={1}>
+<Stack height={dims?.height} width={dims?.width} alignItems={'center'} zIndex={1} id='main'>
     <Routes>
       <Route path='*' element={<Error/>} />
       <Route path={"/home"} element={<HomePage />}/>
@@ -208,9 +242,10 @@ useEffect(() => {
 
     {appReady && <Modals needsLogin={false}/>}
 
-    <Stack sx={{height: 'auto', width: '100%'}}>
+    {!inGame && 
+    <Stack sx={{height: '67px', width: '100%'}}>
       <AdSpace />
-    </Stack> 
+    </Stack> }
 
    </Stack>
   )

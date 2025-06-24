@@ -15,7 +15,7 @@ const Pic6 = () => {
     hasFetched.current = true;
   
     const getPacks = async () => {
-      console.log('fetching packs');
+      // console.log('fetching packs');
       try {
         const res = await fetchPacks();
         if (res) setPacks(res);
@@ -27,9 +27,9 @@ const Pic6 = () => {
     getPacks();
   }, []);
 
-  useEffect(() => {
-    console.log("Pic6 mounted");
-  }, []);
+  // useEffect(() => {
+  //   console.log("Pic6 mounted");
+  // }, []);
 
   return (
     <Stack
@@ -44,10 +44,10 @@ const Pic6 = () => {
       :
         <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto'}}> 
           <Typography fontFamily={'Fredoka regular'} fontSize={20}>Select Game Pack</Typography>
-          <MenuList width={54}>
+          <MenuList sx={{width: '100%', height: '100%'}}>
             {packs?.filter((p) => !p.marked_for_delete)
             .map((p, i) => { 
-              console.log(p)
+              // console.log(p)
               return (
                   <PackButton key={i} pack={p} setGamePack={setGamePack}/>
               )})}

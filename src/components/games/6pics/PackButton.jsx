@@ -10,6 +10,7 @@ const PackButton = ({pack, setGamePack}) => {
     const [played, setPlayed] = useState(false)
     const [isHover, setIsHover] = useState(false)
     const user = useGlobalStore((state) => state.user)
+    const screen = useGlobalStore((state) => state.screen)
 
     const getPlayedPacks = async () => {
         const isPlayed = user?.game_data?.filter((g) => g?.pack?.id === pack.id)
@@ -18,6 +19,8 @@ const PackButton = ({pack, setGamePack}) => {
             setPlayed(true)
         }
     }
+
+    // console.log(screen)
 
     useEffect(() => {
         getPlayedPacks()
@@ -50,33 +53,33 @@ const PackButton = ({pack, setGamePack}) => {
                 },
                 flexWrap: 'nowrap',
                 maxHeight: '155px',
-                minWidth: '90%',
+                minWidth: screen === 'xs' ? '90%' : '60%',
                 height: 'fit-content',
-                width: '95%',
+                width: screen === 'xs' ? '90%' : '30%',
                 flexDirection: 'column',
                 backgroundColor: 'white',
-                marginY: 2
+                marginY: 2,
+                justifySelf: 'center',
             }}>
 
                     <Stack width={'90%'} height={'100%'} alignItems={'center'}>
-
-                        <Stack width={'63%'} height={'150px'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
+                        <Stack width={screen === 'xs' ? '90%' : '60%'} height={screen === 'xs' ? '150px' : '155px'} justifyContent={'center'} alignItems={'flex-start'} direction={'row'}>
                             <video 
-                            playsInline
-                            onLoadedMetadata={(e) => {
-                                e.target.currentTime = e.target.duration;
-                                e.target.playbackRate = 2
-                                setTimeout(() => {
-                                    e.target.play()
-                                }, 1000);
-                            }}
-                            ref={videoRef} 
-                            style={{
-                                width: '100%',
-                                height: 'auto',
-                                paddingY: 30
-                            }} muted autoPlay={false} loop={false}>
-                                <source src={pack?.graphic} type="video/mp4"/>
+                                playsInline
+                                onLoadedMetadata={(e) => {
+                                    e.target.currentTime = e.target.duration;
+                                    e.target.playbackRate = 2
+                                    setTimeout(() => {
+                                        e.target.play()
+                                    }, 1000);
+                                }}
+                                ref={videoRef} 
+                                style={{
+                                    width: 'auto',
+                                    height: '95%',
+                                    paddingY: 30
+                                }} muted autoPlay={false} loop={false}>
+                                    <source src={pack?.graphic} type="video/mp4"/>
                             </video>
                         </Stack>
 

@@ -51,11 +51,12 @@ html, body {
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   overscroll-behavior-x: none;
-  /* height: 100%; */
+  height: 100dvh;
   margin: 0;
   padding: 0;
   overflow: hidden;
-  touch-action: none;
+  touch-action: pan-y;
+  display: flex;
 }
 
 #root, .App{
