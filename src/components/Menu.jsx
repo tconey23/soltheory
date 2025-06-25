@@ -147,19 +147,10 @@ const Menu = ({renders, setRenders}) => {
             return (
                 <Tooltip key={i} title={b.tooltip} followCursor>
                   <Stack paddingY={2} paddingX={5} alignItems={'center'}>
-
                       <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
                         <Typography fontSize={15}>{b?.icon}</Typography>
                         <Typography fontSize={15}>{b.name}</Typography>
                       </Button>
-                  
-                      {/* <>
-                        {!user && b.name === 'Login' &&                       
-                        <Button sx={{textAlign: 'center', width: 'fit-content', paddingX: 2}} title="button" disabled={!b.display} color={b.color} onClick={b.function}>
-                        <Typography fontSize={15}>{b?.icon}</Typography>
-                        <Typography fontSize={15}>{b.name}</Typography>
-                      </Button>}
-                      </> */}
                   </Stack>
                 </Tooltip>
               )

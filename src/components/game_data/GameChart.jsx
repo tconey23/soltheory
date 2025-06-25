@@ -6,13 +6,25 @@ import { AxisLeft, AxisBottom } from '@visx/axis';
 import { ParentSize } from '@visx/responsive';
 import { Stack, Typography } from '@mui/material';
 
-const margin = { top: 20, right: 80, bottom: 40, left: 120 };
 
 const GameChart = ({ data, userFav }) => {
-  const barHeight = 50;
+  const [chartType, setChartType] = useState()
+
+
+  const margin = { top: 20, right: 10, bottom: 40, left: chartType === '6pics' ? 10 : 120 };
+  const barHeight = chartType === '6pics' ? 10 : 60;
   const maxChartHeight = 700;
 
-console.log(data)
+
+  // console.log(data)
+
+  useEffect(() => {
+    if(isNaN(data?.[0]?.label)){
+      setChartType('21things')
+    } else {
+      setChartType('6pics')
+    }
+  }, [data])
 
   const coloredData = data.map((item) => ({
     ...item,
@@ -21,9 +33,15 @@ console.log(data)
 
   return (
     <Stack width="100%" height="100%" justifyContent="center" alignItems="center" bgcolor="white" borderRadius={2}>
+      {chartType === '6pics' && 
+      <>
+        <Typography>Top Scores</Typography>
+        <Typography>⭐ = your score</Typography>
+      </>
+      }
       <ParentSize>
         {({ width, height }) => {
-          const chartHeight = Math.min(Math.max(coloredData.length * barHeight, 500), maxChartHeight);
+          const chartHeight = Math.min(Math.max(coloredData.length * barHeight, 300), maxChartHeight);
 
           // Scales
           const yScale = scaleBand({
@@ -76,10 +94,10 @@ console.log(data)
               </Group>
 
               {/* Axes */}
-              <AxisLeft
+              {chartType === '21things' && <AxisLeft
                 left={margin.left}
                 scale={yScale}
-                hideAxisLine
+                // hideAxisLine
                 tickComponent={({ formattedValue, ...tickProps }) => {
                   const wrapText = (text, maxCharsPerLine = 18) => {
                     const words = text.split(' ');
@@ -116,7 +134,7 @@ console.log(data)
                     </text>
                   );
                 }}
-              />
+              />}
               <AxisBottom
                 top={chartHeight - margin.bottom}
                 scale={xScale}

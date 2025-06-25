@@ -16,10 +16,13 @@ const SixPicsData = () => {
         hasFetched.current = true;
       
         const getPacks = async () => {
-          // console.log('fetching packs');
           try {
             const res = await fetchPacks();
-            if (res) setPacks(res);
+            if (res) {
+                setPacks(res)
+            } else {
+                setPacks([])
+            }
           } catch (err) {
             console.error(err);
           }
@@ -29,15 +32,21 @@ const SixPicsData = () => {
       }, []);
 
       useEffect(() => {
-        // console.log(packs)
-      }, [packs])
+        if (!selectedGame && packs.length) {
+          const firstPack = packs.find((p) => !p.marked_for_delete);
+          if (firstPack) setSelectedGame(firstPack.pack_name);
+        }
+      }, [packs, selectedGame]);
 
 
+      const selectGame = (pack) => {
+        setSelectedGame(pack)
+      }
 
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'} bgcolor={''}>
         <Stack>
-            <Select value={selectedGame} onChange={(e) => setSelectedGame(e.target.value)}>
+            <Select value={selectedGame || ''} onChange={(e) => selectGame(e.target.value)}>
                 {
                     packs?.map((p) => {
                         if(!p.marked_for_delete){

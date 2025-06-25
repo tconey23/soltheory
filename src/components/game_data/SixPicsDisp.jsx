@@ -6,13 +6,11 @@ import GameChart from './GameChart';
 
 const SixPicsDisp = ({gameData}) => {
     const [displayData, setDisplayData] = useState()
+    const [userData, setUserData] = useState()
 
     const userMeta = useGlobalStore((state) => state.userMeta) 
 
     useEffect(() => {
-        
-       
-
     }, [])
 
     useEffect(() => {
@@ -24,16 +22,22 @@ const SixPicsDisp = ({gameData}) => {
             .eq('pack_name', pack)
 
             let dataArray
-
+            // console.log(pack_data)
             if(pack_data?.length > 0){
-                dataArray = pack_data.map((d, i) => {
-                    return {
+                dataArray = pack_data.map((d, i) => { 
+                    if(d.user_id === userMeta.primary_id){
+                        setUserData(i)
+                    }
+                    return { 
                         label: i,
                         value: d.score
                     }
                 })
 
                 setDisplayData(dataArray)
+
+            } else {
+                setDisplayData()
             }
         }
 
@@ -45,7 +49,7 @@ const SixPicsDisp = ({gameData}) => {
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'}>
       {displayData ? 
-        <GameChart data={displayData} userFav={null}/>
+        <GameChart data={displayData} userFav={userData}/>
         :
         <Typography>No data for this pack</Typography>
       }

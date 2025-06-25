@@ -8,6 +8,7 @@ import SolMates from '../components/solmates/SolMates';
 import Login from '../components/Login';
 import Affiliates from '../components/Affiliates';
 import GameData from '../components/game_data/GameData';
+import ThriveParenting from '../components/ThriveParenting';
 
 const MotionStack = motion(Stack);
 
@@ -41,6 +42,7 @@ const HomePageMenu = () => {
   const [columnCount, setColumnCount] = useState()
   const menuItems = [
     userMeta ? <Account/> : <Login />,
+    <ThriveParenting />,
     <GamesWrapper />,
     <GameData />,
     <Affiliates />

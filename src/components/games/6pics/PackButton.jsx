@@ -1,30 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import { List, ListItem, MenuItem, Stack, Typography } from '@mui/material';
+import { Box, List, ListItem, MenuItem, Stack, Typography } from '@mui/material';
 import { supabase } from '../../../business/supabaseClient';
 import useGlobalStore from '../../../business/useGlobalStore';
 
-const PackButton = ({pack, setGamePack}) => {
+const PackButton = ({pack, setGamePack, disable, playedDate}) => {
     
     const [font, setFont] = useState('Fredoka') 
     const videoRef = useRef()
-    const [played, setPlayed] = useState(false)
+    const [played, setPlayed] = useState()
     const [isHover, setIsHover] = useState(false)
     const user = useGlobalStore((state) => state.user)
     const screen = useGlobalStore((state) => state.screen)
 
-    const getPlayedPacks = async () => {
-        const isPlayed = user?.game_data?.filter((g) => g?.pack?.id === pack.id)
+    const formatDate = (unix) => {
+        if (!unix) return
 
-        if(isPlayed?.length > 0){
-            setPlayed(true)
-        }
-    }
+        const date = new Date(Number(unix)); // Ensure it's a number
+        if (isNaN(date.getTime())) return "Invalid date"; // handle bad value
 
-    // console.log(screen)
+        setPlayed(date.toISOString().split('T')[0])
+    };
 
     useEffect(() => {
-        getPlayedPacks()
-    }, [])
+        console.log(formatDate(playedDate))
+    }, [playedDate])
 
     const getFileType = (filename) => {
         const ext = filename.split('.').pop().toLowerCase();
@@ -35,9 +34,12 @@ const PackButton = ({pack, setGamePack}) => {
 
     return (
         <MenuItem
+        // disabled={disable}
         userdata='pack_button'
         onClick={(e) => {
             // console.log(pack.id)
+            if(played) return;
+            
             setGamePack(pack)
         }}
             sx={{
@@ -64,6 +66,11 @@ const PackButton = ({pack, setGamePack}) => {
 
                     <Stack width={'90%'} height={'100%'} alignItems={'center'}>
                         <Stack width={screen === 'xs' ? '90%' : '60%'} height={screen === 'xs' ? '150px' : '155px'} justifyContent={'center'} alignItems={'flex-start'} direction={'row'}>
+                            {disable && 
+                                <Box sx={{position: 'absolute', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#00000045'}}>
+                                    <Typography sx={{bgcolor:'#000000d4', padding: 1, color: 'white'}}>{`Played on: ${played}`}</Typography>
+                                </Box>
+                            }
                             <video 
                                 playsInline
                                 onLoadedMetadata={(e) => {
@@ -87,7 +94,7 @@ const PackButton = ({pack, setGamePack}) => {
                             <Typography sx={{padding: '10px'}} fontSize={'clamp(11px, 2vw, 20px)'} fontFamily={'Fredoka Regular'}>{pack?.pack_name.toUpperCase()}</Typography>
                         </Stack> */}
 
-                        <Stack width={'70%'} minHeight={'24px'} height={'30%'} alignItems={'flex-start'}>
+                        {/* <Stack width={'70%'} minHeight={'24px'} height={'30%'} alignItems={'flex-start'}>
                             {played && 
                                 <Stack direction={'row'} alignItems={'center'} justifyContent={'center'}>
                                     <Stack marginX={3} alignItems={'center'} justifyContent={'center'}>
@@ -99,7 +106,7 @@ const PackButton = ({pack, setGamePack}) => {
                                     </Stack>
                                 </Stack>  
                             }
-                        </Stack>
+                        </Stack> */}
                     
                     </Stack>
         </MenuItem>
