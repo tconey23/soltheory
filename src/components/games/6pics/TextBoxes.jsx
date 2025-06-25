@@ -161,28 +161,25 @@ const handleInputChange = (event, wordIndex, letterIndex) => {
     }
   };
 
-  const [isLocked, setIsLocked] = useState(false)
+useEffect(() => {
+  if (!giveUp && !isWin) return;
 
-  useEffect(() => {
-    setIsLocked(false)
-  }, [])
+  let count = 0;
+  for (let w = 0; w < words.length; w++) {
+    for (let l = 0; l < words[w].length; l++) {
+      const correctLetter = words[w][l];
+      const input = inputRefs.current[w]?.[l];
 
-   useEffect(() => {
-    if(isWin){
-      setIsLocked(true)
-      return
-    } else {
-      setIsLocked(false)
+      if (input) {
+        input.value = correctLetter;
+      }
+
+      count++;
     }
+  }
 
-    if(giveUp){
-      setIsLocked(true)
-      return
-    } else {
-      setIsLocked(false)
-    }
-
-   }, [isWin, giveUp])
+  setLetterCount(words.join("").length);
+}, [giveUp, isWin, words]);
 
   const [longestWord, setLongestWord] = useState(0)
   const [textBoxWidth, setTextBoxWidth] = useState(0)
@@ -236,6 +233,22 @@ const handleInputChange = (event, wordIndex, letterIndex) => {
 
   }, [windowVPH, dev])
 
+  useEffect(() => {
+    // Clear previous inputRefs and text box values
+    inputRefs.current.forEach((row) =>
+      row.forEach((input) => {
+        if (input) input.value = '';
+      })
+    );
+    inputRefs.current = [];
+    setLetterCount(0);
+    setInputLetters('');
+    setHintIndex(0);
+    setWrongAnswer(false);
+    setIsWin(false);
+    setToggleCheckAnswer(false);
+  }, [answer, index]);
+
   return (
     <Stack direction="column" width="100%" justifyContent="center" alignItems={'center'}>
     <Stack direction="row" width="98%" justifyContent="center" alignItems={'center'} flexWrap="wrap" id="letter_wrapper" height={height * 0.33} overflow={'auto'} boxShadow={'inset 0px 0px 5px 3px #0000001a'}>
@@ -267,8 +280,7 @@ const handleInputChange = (event, wordIndex, letterIndex) => {
                   flexWrap="wrap"
                   >
                     <TextField
-                      value={isLocked ? letter : undefined}
-                      disabled={isLocked}
+                      disabled={false}
                       slotProps={{
                         input: {
                           maxLength: 1,
@@ -277,17 +289,18 @@ const handleInputChange = (event, wordIndex, letterIndex) => {
                       }}
                       sx={{ opacity: 1, transition: "all 1s ease-in" }}
                       autoComplete="off"
-                      inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
+                      inputRef={(el) => {
+                        if (!inputRefs.current[wordIndex]) {
+                          inputRefs.current[wordIndex] = []; // Initialize the row array if it doesn't exist
+                        }
+                        inputRefs.current[wordIndex][letterIndex] = el;
+                      }}
                       onChange={(e) => {
                         const val = e.target.value.slice(0, 1); // Only allow 1 character
                         e.target.value = val;
                         handleInputChange(e, wordIndex, letterIndex);
                       }}
                       onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
-                      inputProps={{
-                        maxLength: 1,
-                        style: { textAlign: "center", fontSize: 30, width: 30 },
-                      }}
                       />
                   </Stack>
                 ))}

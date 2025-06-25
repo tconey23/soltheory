@@ -26,6 +26,7 @@ const SixPicsVideoPlayer = ({
   const [start, setStart] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [disableNext, setDisableNext] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false)
   const [vidStyle, setVidStyle] = useState(
     {
       boxShadow: "4px 2px 10px 1px #00000038", 
@@ -116,7 +117,7 @@ const SixPicsVideoPlayer = ({
   useEffect(() => {
     // console.log('start', start, 'videoref.current', videoRef.current, 'stages', stages)  
     if (!start || !videoRef.current || !stages.length || !stages[stage]) return;
-    console.log(stage, stages)
+    
     const { from } = stages[stage];
     videoRef.current.currentTime = from; 
 
@@ -124,46 +125,61 @@ const SixPicsVideoPlayer = ({
       console.warn("Autoplay failed:", err);
     });
 
-const check = () => {
-  if (!videoRef.current) return;
-  const current = videoRef.current.currentTime;
+  const check = () => {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime;
 
-  const { type, from, to } = stages[stage];
+    const { type, from, to } = stages[stage];
 
-  if (type === "play") {
-    if (current >= to) {
-      const nextStage = stage + 1;
-      if (nextStage >= stages.length) {
-        videoRef.current.pause();
-        setShowGiveUp(true);
-        setDisableNext(true);
-      } else {
-        setStage(nextStage);
+    // console.log(stage+1, stages?.length)
+    // console.log('isPaused', videoRef?.current.paused)
+    setIsPlaying(true)
+
+    if(stage +1 === stages?.length){
+      // videoRef.current.pause();
+      setShowGiveUp(true)
+      setDisableNext(true)
+      setIsPlaying(false);
+      return
+    }
+
+    if (type === "play") {
+      if (current >= to) {
+        const nextStage = stage + 1;
+        if (nextStage >= stages.length) {
+          videoRef.current.pause();
+          setShowGiveUp(true);
+          setDisableNext(true);
+          setIsPlaying(false);
+        } else {
+          setStage(nextStage);
+        }
+        return;
       }
-      return;
-    }
-  } else if (type === "loop") {
-    if (from === to) {
-      // Degenerate loop: pause and wait for player to click "Next"
-      videoRef.current.pause();
-      videoRef.current.currentTime = from;
-      setDisableNext(false); // allow user to continue
-      return; // stop frame loop
+    } else if (type === "loop") {
+      if (from === to) {
+        // Degenerate loop: pause and wait for player to click "Next"
+        videoRef.current.pause();
+        videoRef.current.currentTime = from;
+        setDisableNext(false); // allow user to continue
+        setIsPlaying(false);
+        return; // stop frame loop
+      }
+
+      if (current >= to) {
+        videoRef.current.currentTime = from;
+      }
     }
 
-    if (current >= to) {
-      videoRef.current.currentTime = from;
-    }
-  }
-
-  frameRef.current = requestAnimationFrame(check);
-};
+    frameRef.current = requestAnimationFrame(check);
+  };
 
 
 
     frameRef.current = requestAnimationFrame(check);
 
     return () => {
+      setIsPlaying(false)
       cancelAnimationFrame(frameRef.current);
     };
   }, [start, stage, stages, setShowGiveUp]);
@@ -240,13 +256,13 @@ const check = () => {
 
       <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'}>
         {!start && (
-          <Button disabled={!!isWin} onClick={() => setStart(true)} variant="contained">
+          <Button disabled={!!isWin || isPlaying} onClick={() => setStart(true)} variant="contained">
             <i className="fi fi-sr-play-pause"></i>
           </Button>
         )}
 
         {start && !giveUp && !showGiveUp && (
-          <Button disabled={disableNext} onClick={handleNext} variant="contained">
+          <Button disabled={disableNext || isPlaying} onClick={handleNext} variant="contained">
             <i className="fi fi-sr-play-pause"></i>
           </Button>
         )}
