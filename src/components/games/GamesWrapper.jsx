@@ -119,7 +119,7 @@ const GamesWrapper = () => {
       <Stack
         direction="column"
         width="90%"
-        height="95%"
+        height="100%"
         alignItems="center"
         justifyContent="flex-start"
         bgcolor={'#ffffffbd'}

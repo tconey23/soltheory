@@ -64,35 +64,41 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
 
   }, [hintIndex, letterTarget, isWin, giveUp])
 
-  const getHint = () => {
-  if (hintIndex >= letterTarget) return;
+    const getHint = () => {
+      if (isWin || giveUp) return;
 
-  let count = 0;
-  for (let w = 0; w < words.length; w++) {
-    for (let l = 0; l < words[w].length; l++) {
-      if (count === hintIndex) {
-        const correctLetter = words[w][l];
-        const input = inputRefs.current[w][l];
+      let globalIndex = 0;
 
-        if (input) {
-          input.value = correctLetter;
+      for (let w = 0; w < words.length; w++) {
+        for (let l = 0; l < words[w].length; l++) {
+          const input = inputRefs.current[w]?.[l];
 
-          // Trigger input change manually to update state
-          handleInputChange({ target: { value: correctLetter } }, w, l);
+          // If this is the first empty box, give hint here
+          if (input && input.value === "") {
+            const correctLetter = words[w][l];
+            input.value = correctLetter;
 
-          setHintIndex(letterCount);
-          setLevelScore(prev => {
-            const updated = [...prev];
-            updated[index].score = Math.max(0, updated[index].score - 5);
-            return updated;
-          });
+            handleInputChange({ target: { value: correctLetter } }, w, l);
+
+            // Deduct points once
+            setLevelScore(prev => {
+              const updated = [...prev];
+              updated[index].score = Math.max(0, updated[index].score - 5);
+              return updated;
+            });
+
+            // Update hintIndex to next global index
+            setHintIndex(globalIndex + 1);
+            return;
+          }
+
+          globalIndex++;
         }
-        return;
       }
-      count++;
-    }
-  }
-};
+      // No hintable letters left
+      setToggleHint(false);
+    };
+
 
 
   const handleRightAnswer = () => {
@@ -287,7 +293,7 @@ useEffect(() => {
                           style: { textAlign: "center", fontSize: 30, width: textBoxWidth },
                         }
                       }}
-                      sx={{ opacity: 1, transition: "all 1s ease-in" }}
+                      sx={{textAlignLast: "center", opacity: 1, transition: "all 1s ease-in" }}
                       autoComplete="off"
                       inputRef={(el) => {
                         if (!inputRefs.current[wordIndex]) {
@@ -314,7 +320,7 @@ useEffect(() => {
       <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} marginTop={3} width={'75%'}>
         {toggleHint && <Link onClick={getHint} disabled={hintIndex >= letterTarget}>Hint</Link>}
 
-        {!isWin &&
+        {!isWin && !giveUp &&
         <Button
         disabled={!toggleCheckAnswer}
         sx={{ margin: 2 }}

@@ -13,12 +13,12 @@ const MyGames = ({displayGame}) => {
     const userMeta = useGlobalStore((state) => state.userMeta);
     const green = '#45d500'
 
-    // console.log(displayGame)
-
     const getGames = async (game) => {
 
+        console.log(game)
+
         let { data: game_data, error } = await supabase
-        .from('twentyone_things_data')
+        .from(game === 'twentyonethings' ? 'twentyone_things_data' : 'six_pics_data')
         .select('*')
         .eq('user_id', userMeta.primary_id)
         .order('game_date', { ascending: false });
@@ -39,6 +39,7 @@ const MyGames = ({displayGame}) => {
     useEffect(() => {
         if(!selectedGame) return
         getGames(selectedGame)
+        console.log(selectedGame)
     }, [selectedGame])
 
     useEffect(() => {
@@ -47,10 +48,18 @@ const MyGames = ({displayGame}) => {
         }
     }, [displayGame])
 
+    const formatDate = (unix) => {
+    if (!unix) return "Unknown date"; // guard clause
+
+    const date = new Date(Number(unix)); // Ensure it's a number
+    if (isNaN(date.getTime())) return "Invalid date"; // handle bad value
+
+    return date.toISOString().split('T')[0];
+    };
 
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'}>
-        {!displayGame && 
+        {!displayGame &&
         <Stack maxHeight={'50px'} sx={{marginX: 5}}>
             <Select sx={{maxHeight: '50px'}} value={selectedGame} onChange={(e) => setSelectedGame(e.target.value)}>
                 <MenuItem sx={{scale: 1}} value='twentyonethings'>      
@@ -61,6 +70,8 @@ const MyGames = ({displayGame}) => {
                 </MenuItem>
             </Select>
         </Stack>}
+
+        {selectedGame === 'twentyonethings' && 
         <Stack direction={'column'} alignItems={'center'}>
             <List sx={{background: 'white', overflow: displayGame ? 'inherit' : 'auto', height: '50%'}}>
                 {gameArray?.map((g) => {
@@ -77,7 +88,28 @@ const MyGames = ({displayGame}) => {
 
                 }
             </List>
-        </Stack>
+        </Stack>}
+
+        {selectedGame === 'sixpics' && 
+        <Stack direction={'column'} alignItems={'center'}>
+            <List sx={{background: 'white', overflow: displayGame ? 'inherit' : 'auto', height: '80%'}}>
+                {gameArray?.map((g) => {
+                    // console.log(g)
+                    return (
+                        <ListItem onClick={() => handleClick(g?.user_id, g?.id)} sx={{border: '0px solid black', paddingY: 2, marginY: 0.25}}>
+                            <Stack padding={1} borderRadius={1} boxShadow={'0px 0px 10px 1px #7911bd75;'} width={'100%'}>
+                                <Typography sx={{fontWeight: 'bold', fontSize: 12}}>Played on: {formatDate(g.game_date)}</Typography>
+                                <Typography sx={{fontWeight: 'bold', fontSize: 12}}>Pack name: {g.pack_name}</Typography>
+                                <Typography sx={{fontWeight: 'bold', fontSize: 12}}>Score: {`${g.score} / 600`}</Typography>
+                            </Stack>
+                        </ListItem>
+                    )
+                })
+
+                }
+            </List>
+        </Stack>}
+
     </Stack>
   );
 };

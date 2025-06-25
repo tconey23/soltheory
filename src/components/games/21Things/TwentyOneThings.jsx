@@ -19,6 +19,9 @@ const green = '#45d500'
     const setCurrentStage = useGlobalStore((state) => state.setCurrentStage)
     const setGameIndex = useGlobalStore((state) => state.setGameIndex)
     const gameIndex = useGlobalStore((state) => state.gameIndex)
+    const inGame = useGlobalStore((state) => state.inGame)
+    const setInGame = useGlobalStore((state) => state.setInGame)
+
     const [selections, setSelections] = useState({ 1: [], 2: [], 3: [], note: '' })
     const navTo = useNavigate()
     const loc = useLocation()
@@ -111,6 +114,10 @@ useEffect(() => {
             navTo(loc.pathname)
         }
     }, [currentStage])
+
+    useEffect(() => {
+      setInGame(false)
+    }, [])
   
   
     const renderStage = () => {
@@ -140,6 +147,7 @@ useEffect(() => {
         
             // Reset to stage 1
             setCurrentStage(1);
+            setInGame(true)
           }}
           payload={payload}
           setGameIndex={setGameIndex}

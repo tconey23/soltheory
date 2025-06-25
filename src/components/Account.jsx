@@ -115,7 +115,7 @@ const Account = () => {
             marginTop: 20
           }}
           >
-            <Typography sx={{bgcolor: backCol, marginY: 2}}>Account Options</Typography>
+            <Typography sx={{bgcolor: backCol, marginY: 2, color: 'white'}}>Account Options</Typography>
           <Select
             value={selectedAccountOption}
             onChange={(e) => setSelectedAccountOption(e.target.value)}

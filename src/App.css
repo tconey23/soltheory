@@ -21,6 +21,8 @@
   font-style: normal;
 }
 
+@import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap');
+
 #letter_wrapper{
   padding-top: 30px !important;
 }
@@ -51,21 +53,23 @@ html, body {
   overscroll-behavior: none;
   overscroll-behavior-y: none;
   overscroll-behavior-x: none;
-  height: 100dvh;
+  height: 100%;
   margin: 0;
   padding: 0;
   overflow: hidden;
   touch-action: pan-y;
   display: flex;
+  box-sizing: border-box;
 }
 
 #root, .App{
   overflow: hidden;
   max-width: 100dvw;
-  height: 100vh;
-  margin: 0 auto;
-  padding: 0rem;
+  height: 100%;
+  margin: 0;
+  padding: 0;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .logo {

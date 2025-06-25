@@ -170,82 +170,84 @@ useEffect(() => {
   
 
   return (
-   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
-    <Stack width={'100%'} height={'10%'}>
+   <Stack direction={'column'} height={'100svh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
+
+    <Stack flex="0 0 10%" width="100%">
       <AppHeader />
     </Stack>
 
-<Stack height={dims?.height} width={dims?.width} alignItems={'center'} zIndex={1} id='main'>
-    <Routes>
-      <Route path='*' element={<Error/>} />
-      <Route path={"/home"} element={<HomePage />}/>
-      <Route path={"/"} element={<HomePage />}/>
-      {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
+    <Stack flex="1" width="100%" id="main">
+        <Routes>
+          <Route path='*' element={<Error/>} />
+          <Route path={"/home"} element={<HomePage />}/>
+          <Route path={"/"} element={<HomePage />}/>
+          {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
 
-      <Route 
-        path={"/account"}
-        element={
-          <PrivateRoute userData={userMeta}> 
-            <Account />
-          </PrivateRoute>
-        } 
-        />
+          <Route 
+            path={"/account"}
+            element={
+              <PrivateRoute userData={userMeta}> 
+                <Account />
+              </PrivateRoute>
+            } 
+            />
 
-      <Route 
-        path={"/games"}
-        element={
-          <GamesWrapper />
-        } 
-        />
+          <Route 
+            path={"/games"}
+            element={
+              <GamesWrapper />
+            } 
+            />
 
-      <Route 
-        path={"/games/21things"}
-        element={
-          <TwentyOneThings /> 
-        } 
-        />
+          <Route 
+            path={"/games/21things"}
+            element={
+              <TwentyOneThings /> 
+            } 
+            />
 
-      <Route 
-        path={"/games/6pics"}
-        element={
-          <Pic6/>
-        } 
-        />
+          <Route 
+            path={"/games/6pics"}
+            element={
+              <Pic6/>
+            } 
+            />
 
-      <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
-      <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+          <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
+          <Route path="/games/6pics/:gameId" element={<Pic6 />} />
 
-      <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
+          <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
-    <Route 
-        path={"/account/admin"}
-        element={
-          <PrivateRoute userData={userMeta}>
-            <AdminControls />
-          </PrivateRoute>
-        } 
-        />
+        <Route 
+            path={"/account/admin"}
+            element={
+              <PrivateRoute userData={userMeta}>
+                <AdminControls />
+              </PrivateRoute>
+            } 
+            />
 
-    <Route 
-        path={"/solmates"}
-        element={
-          <PrivateRoute userData={userMeta}>
-            <SolMates />
-          </PrivateRoute>
-        } 
-        />
+        <Route 
+            path={"/solmates"}
+            element={
+              <PrivateRoute userData={userMeta}>
+                <SolMates />
+              </PrivateRoute>
+            } 
+            />
 
-    </Routes>
-  </Stack>
+        </Routes>
+      </Stack>
+
+    
+      {!inGame && 
+      <Stack flex="0 0 7%" width="100%">
+        <AdSpace />
+      </Stack> }
 
     <UserAlert />
-
     {appReady && <Modals needsLogin={false}/>}
 
-    {!inGame && 
-    <Stack sx={{height: '67px', width: '100%'}}>
-      <AdSpace />
-    </Stack> }
 
    </Stack>
   )

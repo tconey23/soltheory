@@ -5,11 +5,16 @@ import Prompt from './Prompt'
 import useGlobalStore from '../../../business/useGlobalStore'
 import { supabase } from '../../../business/supabaseClient'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
+import "@fontsource-variable/sofia-sans"
 
 const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   const guestUser = useGlobalStore((state) => state.guestUser)
   const setToggleLogin = useGlobalStore((state) => state.setToggleLogin)
+
+  const inGame = useGlobalStore((state) => state.inGame)
+  const setInGame = useGlobalStore((state) => state.setInGame)
+
   if (!Array.isArray(prompts)) return null;
   const {gameId} = useParams()
 
@@ -24,9 +29,6 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   const stage1 = prompts.filter(p => p.stages.includes(1));
   const stage2 = prompts.filter(p => p.stages.includes(2));
   const stage3 = prompts.filter(p => p.stages.includes(3));
-
-  // console.log(guestUser)
-
 
   const handleNoteChange = (val) => { 
     if (val.length <= 180) {
@@ -58,11 +60,11 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       setSelections({ 1: [], 2: [], 3: [], note: '' })
       sessionStorage.removeItem('redirectAfterLogin')
       setAskToShare(false)
+      setInGame(false)
     }
   }
 
   const handleSubmit = async () => {
-    // let currentGameData = userMeta?.game_data
     const gameData = {
       id: gameId || Date.now(),
       user_id: userMeta?.primary_id || guestUser?.id,
@@ -74,7 +76,7 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       game_date: date || Date.now(),
     }
 
-    console.log(gameData)
+    // console.log(gameData)
         
         const { data, error } = await supabase
       .from('twentyone_things_data')
@@ -88,11 +90,11 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
           
   }
 
-  const renderStageList = (list, color) => (
+  const renderStageList = (list, color, listIndex) => (
     <Box
       sx={{
         display: 'grid',
-        gridTemplateColumns: 'repeat(3, 1fr)',
+        gridTemplateColumns: listIndex === 3 ? 'repeat(1, 1fr)' : 'repeat(3, 1fr)',
         gap: 2,
         width: '100%',
         maxWidth: '600px',
@@ -100,10 +102,11 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
         padding: 1,
         margin: '0 auto',
         overflow: 'auto',
+        minHeight: 'fit-content'
       }}
     >
       {list.map((p, i) => (
-        <Box
+        <Typography
           key={i}
           sx={{
             backgroundColor: color,
@@ -114,14 +117,23 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
             borderRadius: 2,
             boxShadow: '0 2px 6px rgba(0,0,0,0.15)',
             padding: 1,
-            cursor: 'default',
-            minHeight: '80px', // make rows even
-            fontSize: '1rem',
+            minHeight: '80px',
+            width: '100%',
+            fontSize: {
+              xs: '3.5vw',   // Mobile
+              sm: '2vw',   // Tablet
+              md: '1.5vw', // Desktop
+            },
             lineHeight: 1.2,
+            whiteSpace: 'pre-wrap',
+            overflowWrap: 'break-word',
+            wordBreak: 'break-word',
+            fontFamily: "Fredoka Regular",
+            justifySelf: 'center'
           }}
         >
           {p.prompt}
-        </Box>
+        </Typography>
       ))}
     </Box>
   );
@@ -134,9 +146,9 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       width="100%"
       alignItems="center"
     >
-      {renderStageList(stage1, '#c956ff')}
-      {renderStageList(stage2, '#fff200')}
-      {renderStageList(stage3, '#45d500')}
+      {renderStageList(stage1, '#c956ff', 1)}
+      {renderStageList(stage2, '#fff200', 2)}
+      {renderStageList(stage3, '#45d500', 3)}
 
       <Stack width="100%" mt={4}>
         <Typography fontSize={'0.9rem'} fontFamily={'Fredoka Regular'}>
@@ -155,16 +167,10 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       </Stack>
 
     <Stack direction={'column'} justifyContent={'center'} alignItems={'center'}>
-      {/* {!userMeta &&
-      <>
-       <Typography color='red'>**You must be logged in to save game data**</Typography>
-       <Button onClick={() => setToggleLogin(true)} >Login</Button>
-      </>
-      } */}
       <Stack direction="row" spacing={2} mt={2}>
         <Button 
           onClick={() => {
-            console.log(showSubmit)
+            // console.log(showSubmit)
             if(showSubmit){
               setCurrentStage(3)
             } else {
@@ -175,14 +181,6 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
             {showSubmit ? 'Back' : 'Done'}
         </Button>
         <Box 
-          // onClick={() => {
-          //   if(!userMeta && !guestUser?.id){
-          //     setAlertContent({
-          //       text: 'You must be logged in to save game data',
-          //       type: 'error',
-          //     })
-          //   }
-          // }}
         >
           {note.length > 0 && showSubmit &&
           <Button 

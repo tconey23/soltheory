@@ -5,6 +5,7 @@ import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
 import { useNavigate } from 'react-router-dom';
 import TwentyOneThingsData from './TwentyOneThingsData';
+import SixPicsData from './SixPicsData';
 
 const GameData = () => {
     const MotionText = motion(Typography); 
@@ -17,7 +18,7 @@ const GameData = () => {
       switch(selection){
         case '21 Things': setRenderObj(<TwentyOneThingsData />);
         break;
-        case '6 Pics': setRenderObj(<></>);
+        case '6 Pics': setRenderObj(<SixPicsData />);
         break;
       }
     }, [selection])

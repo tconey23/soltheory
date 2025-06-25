@@ -41,8 +41,7 @@ const SixPicsVideoPlayer = ({
   // console.log('level stops', level.stops)
   // console.log('level loops', level.loops)
   // console.log(width, height)
-
-  console.log('giveup', giveUp)
+  // console.log('giveup', giveUp)
 
   useEffect(() =>{
     // console.log(isWin)
@@ -75,6 +74,7 @@ const SixPicsVideoPlayer = ({
       }
     }
   
+    // console.log(levelScore)
     return stages;
   }, [level]);
   
@@ -163,6 +163,9 @@ const SixPicsVideoPlayer = ({
         videoRef.current.currentTime = from;
         setDisableNext(false); // allow user to continue
         setIsPlaying(false);
+        // setTimeout(() => {
+        //   setShowGiveUp(true);
+        // }, 2000);
         return; // stop frame loop
       }
 
@@ -268,7 +271,7 @@ const SixPicsVideoPlayer = ({
         )}
 
         {showGiveUp && !giveUp && (
-          <Button  disabled={!!isWin} onClick={() => setGiveUp(true)} variant="outlined">
+          <Button  disabled={!!isWin} onClick={() => setGiveUp(true)} variant="outlined" sx={{backgroundColor: '#880202'}}>
             Give Up
           </Button>
         )}

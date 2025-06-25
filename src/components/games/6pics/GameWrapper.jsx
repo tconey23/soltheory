@@ -138,7 +138,7 @@ const GameWrapper = ({ pack }) => {
   }, [activeSlide, levels.length]);
 
   useEffect(() => {
-    console.log('isWin',isWin)
+    // console.log('isWin',isWin)
   }, [isWin])
 
   return (
