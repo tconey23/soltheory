@@ -107,6 +107,38 @@ export const getGifs = async () => {
 
 }
 
+    const formatSelectedSongs = (songs) =>
+      songs.map((s) => ({
+        id: s.id,
+        name: s.name,
+        artist: s.artists.map((a) => a.name).join(', '),
+        albumArt: s.album.images[1]?.url || null,
+        preview_url: s.preview_url,
+      }));
+
+export const saveThreeSongs = async (selectedSongs, userId) => {
+
+  console.log(selectedSongs, userId)
+
+const formattedSongs = formatSelectedSongs(selectedSongs);
+
+  const { data, error } = await supabase
+    .from('three_songs_data')
+    .insert([
+      {
+        user_id: userId,
+        song_list: formattedSongs, // This gets stored as JSONB
+      },
+    ]);
+
+  if (error) {
+    return('Error inserting songs:', error);
+  } else {
+    return 'success'
+  }
+  
+}
+
 export const addGameToUser = async (user, newGameData) => {
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)     
   const { data: foundUser, error: fetchError } = await supabase

@@ -9,6 +9,7 @@ import SixPicsButton from './SixPicsButton';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
+import MyThreeSongsButton from './MyThreeSongsButton';
 dayjs.extend(customParseFormat)
 
 
@@ -124,7 +125,6 @@ const GamesWrapper = () => {
         justifyContent="flex-start"
         bgcolor={'#ffffffbd'}
         borderRadius={5}
-        overflow={'auto'}
       >
         <MotionText
           paddingY={2}
@@ -153,15 +153,17 @@ const GamesWrapper = () => {
         <MotionStack
           key="account_select"
           width="85%"
-          sx={{ height: '10%' }}
+          sx={{ height: '100%' }}
           alignItems="center"
           justifyContent="center"
           direction="column"
           paddingY={2}
+          paddingX={2}
           initial={hasMounted ? false : { opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
           transition={{ duration: 0.5, delay: 1.5}}
+          overflow={'auto'}
         >
           <Stack
             sx={{
@@ -180,6 +182,10 @@ const GamesWrapper = () => {
 
               <MenuItem sx={menuStyle} value="6pics"  onClick={() => startGame(`6pics`)}>
                 <SixPicsButton />
+              </MenuItem>
+
+              <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
+                <MyThreeSongsButton />
               </MenuItem>
 
             </List>

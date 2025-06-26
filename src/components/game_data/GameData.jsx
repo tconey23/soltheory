@@ -5,6 +5,7 @@ import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
 import { useNavigate } from 'react-router-dom';
 import TwentyOneThingsData from './TwentyOneThingsData';
+import ThreeSongsData from './ThreeSongsData';
 
 const GameData = () => {
     const MotionText = motion(Typography);
@@ -18,6 +19,8 @@ const GameData = () => {
         case '21 Things': setRenderObj(<TwentyOneThingsData />);
         break;
         case '6 Pics': setRenderObj(<></>);
+        break;
+        case '3 Songs': setRenderObj(<ThreeSongsData/>);
         break;
       }
     }, [selection])
@@ -48,6 +51,7 @@ const GameData = () => {
       <Select value={selection} onChange={(e) => setSelection(e.target.value)}>
         <MenuItem value={'21 Things'}>21 Things</MenuItem>
         <MenuItem value={'6 Pics'}>6 Pics</MenuItem>
+        <MenuItem value={'3 Songs'}>3 Songs</MenuItem>
       </Select>
 
         <MotionStack

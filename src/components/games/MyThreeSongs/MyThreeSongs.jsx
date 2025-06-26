@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { redirectToSpotifyLogin } from '../../../business/spotifyAuth'; // adjust import
 import SongSelector from './SongSelector';
-import { Stack } from '@mui/material';
+import { Stack, Button, Typography, Box } from '@mui/material';
 
 const MyThreeSongs = () => {
 
@@ -31,7 +31,7 @@ const MyThreeSongs = () => {
         .then(data => {
             if (data.access_token) {
                 localStorage.setItem('spotify_token', data.access_token);
-                setToken(data.access_token); // 👈 THIS LINE IS MISSING
+                setToken(data.access_token);
                 window.history.replaceState({}, document.title, '/mythreesongs');
             }
         });
@@ -41,16 +41,20 @@ const MyThreeSongs = () => {
 
   if (!token) {
     return (
-        <div>
-        <h1>Login with Spotify</h1>
-        <button onClick={redirectToSpotifyLogin}>Connect to Spotify</button>
-        </div>
+        <Stack>
+          <Typography fontSize={10}>Login with Spotify</Typography>
+          <Button onClick={redirectToSpotifyLogin}>Connect to Spotify</Button>
+        </Stack>
     );
   }
 
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'}>
-      <h1>Pick 3 Songs with Meaning</h1>
+      <Stack sx={{width: '100%', alignItems: 'center'}} >
+        <Box sx={{width: '75%'}}>
+          <Typography fontSize={22}>Pick the 3 Songs that mean the most to you</Typography>
+        </Box>
+      </Stack>
       <SongSelector token={token} />
     </Stack>
   );
