@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { ImageListItem, ImageListItemBar, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../../business/useGlobalStore';
 import { motion } from 'framer-motion';
 
@@ -23,19 +23,30 @@ const SongListObject = ({list, date, toggleExpand}) => {
             // console.log(list)
             setSongs(
                 list?.map((s) => (
-                    <Stack>
-                        {/* <Stack bgcolor={''}>
-                            <Typography color='white' fontSize={10}>{s.artist}</Typography>
-                        </Stack> */}
+                    <ImageListItem>
+
+                        <img style={{width: `${albumSize}px`, height: 'auto'}} src={s.albumArt}/>
+                        <ImageListItemBar 
+                            fontFamily={'Fredoka Regular'} 
+                            title={
+                                <Typography fontSize={15}>{s.name}</Typography>
+                            } 
+                            subtitle={
+                                <Typography fontSize={10}>{s.artist}</Typography>
+                            }     
+                        />
+
+                    {/* <Stack position={'relative'}>
+                        <Stack width={'90%'} position={'absolute'} bgcolor={''} sx={{transform: 'translate(0px, 50px)'}}>
+                            <Typography color='white' fontSize={10}>{s.name}</Typography>
+                        </Stack>
 
                         <Stack>
                             <img style={{width: `${albumSize}px`, height: 'auto'}} src={s.albumArt}/>
                         </Stack>
+                    </Stack> */}
 
-                        {/* <Stack bgcolor={''}>
-                            <Typography color='white' fontSize={10}>{s.name}</Typography>
-                        </Stack> */}
-                    </Stack>
+                </ImageListItem>
                 ))
             )
         }
