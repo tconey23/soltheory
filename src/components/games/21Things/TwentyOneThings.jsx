@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 import useGlobalStore from '../../../business/useGlobalStore';
 
-const purple = '#c956ff'
+const purple = '#dd95ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
@@ -19,6 +19,9 @@ const green = '#45d500'
     const setCurrentStage = useGlobalStore((state) => state.setCurrentStage)
     const setGameIndex = useGlobalStore((state) => state.setGameIndex)
     const gameIndex = useGlobalStore((state) => state.gameIndex)
+    const inGame = useGlobalStore((state) => state.inGame)
+    const setInGame = useGlobalStore((state) => state.setInGame)
+
     const [selections, setSelections] = useState({ 1: [], 2: [], 3: [], note: '' })
     const navTo = useNavigate()
     const loc = useLocation()
@@ -31,19 +34,20 @@ const green = '#45d500'
     const [newGame, setNewGame] = useState(false)
     // console.log('userId', userId, 'redirect', redirect, 'newgame', newGame)
 
+    
+
       const getGuestGame = async () => {
-    let { data: guest_games, error } = await supabase
-      .from('guest_games')
-      .select("*")
-      .eq('id', gameId)   
+        let { data: guest_games, error } = await supabase
+          .from('guest_games')
+          .select("*")
+          .eq('id', gameId)   
 
-      if(guest_games?.[0]){
-        setPrompts(guest_games?.[0]?.game_content?.stages)  
-        setSavegameNote(guest_games?.[0]?.game_content?.note)
-        setCurrentStage(4)
+          if(guest_games?.[0]){
+            setPrompts(guest_games?.[0]?.game_content?.stages)  
+            setSavegameNote(guest_games?.[0]?.game_content?.note)
+            setCurrentStage(4)
+          }
       }
-
-    }
 
     const getSavedGame = async () => {
       let { data: data, error } = await supabase
@@ -110,15 +114,19 @@ useEffect(() => {
             navTo(loc.pathname)
         }
     }, [currentStage])
+
+    useEffect(() => {
+      setInGame(false)
+    }, [])
   
   
     const renderStage = () => {
-      // console.log(currentStage)
+      console.log(currentStage)
       switch (currentStage) {
         case 1:
-          return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />
+          return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#dd95ff" prevColor="white" />
         case 2:
-          return <Stage height={'100%'} stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#c956ff" />
+          return <Stage height={'100%'} stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#dd95ff" />
         case 3:
           return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:
@@ -139,6 +147,7 @@ useEffect(() => {
         
             // Reset to stage 1
             setCurrentStage(1);
+            setInGame(true)
           }}
           payload={payload}
           setGameIndex={setGameIndex}

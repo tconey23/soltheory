@@ -1,17 +1,20 @@
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button } from "@mui/material";
+import { Stack, Typography, TextField, Button, Modal } from "@mui/material";
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
+import { Link } from "react-router-dom";
 
 const MotionStack = motion(Stack);
 
-const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins }) => {
+const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp }) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
-  const [isWin, setIsWin] = useState(false);
   const [autoAnswer, setAutoAnswer] = useState(false);
   const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
+  const [hintIndex, setHintIndex] = useState(0);
+  const [toggleHint, setToggleHint] = useState(true)
+  const [wrongAnswer, setWrongAnswer] = useState(false)
 
   const screen = useGlobalStore((state) => state.screen);
   const inputRefs = useRef([]);
@@ -35,19 +38,70 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     }
   }, [isWin]);
 
-  // Toggle "Check Answer" button
   useEffect(() => {
     setToggleCheckAnswer(letterCount === letterTarget);
   }, [letterCount, letterTarget]);
+  
+  useEffect(() => {
+
+    let calculatedScore = levelScore?.[index]?.score -5 
+
+    if (calculatedScore > 0){
+      setToggleHint(true)
+    } else {
+      setToggleHint(false)
+    }
+
+    if(isWin || giveUp){
+      setToggleHint(false)    
+    }
+
+  }, [hintIndex, letterTarget, isWin, giveUp])
+
+    const getHint = () => {
+      if (isWin || giveUp) return;
+
+      let globalIndex = 0;
+
+      for (let w = 0; w < words.length; w++) {
+        for (let l = 0; l < words[w].length; l++) {
+          const input = inputRefs.current[w]?.[l];
+
+          if (input && input.value === "") {
+            const correctLetter = words[w][l];
+            input.value = correctLetter;
+
+            handleInputChange({ target: { value: correctLetter } }, w, l);
+
+            setLevelScore(prev => {
+              const updated = [...prev];
+              updated[index].score = Math.max(0, updated[index].score - 5);
+              return updated;
+            });
+
+            setHintIndex(globalIndex + 1);
+            return;
+          }
+
+          globalIndex++;
+        }
+      }
+      // No hintable letters left
+      setToggleHint(false);
+    };
+
+
 
   const handleRightAnswer = () => {
     setIsWin(true);
     setShowGiveUp(false);
+    setToggleCheckAnswer(false)
   };
 
   const handleWrongAnswer = () => {
     setIsWin(false);
     setShowGiveUp(true);
+    setWrongAnswer(true)
   };
 
   const checkAnswer = () => {
@@ -56,36 +110,50 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     check === ans ? handleRightAnswer() : handleWrongAnswer();
   };
 
-  const handleInputChange = (event, wordIndex, letterIndex) => {
-    const { value } = event.target;
+const handleInputChange = (event, wordIndex, letterIndex) => {
+  const { value } = event.target;
+  const val = value.slice(0, 1);
+  event.target.value = val;
 
-    setLetterCount(prev => {
-      const current = inputRefs.current[wordIndex][letterIndex]?.value || "";
-      if (current === "" && value !== "") return prev + 1;
-      if (current !== "" && value === "") return prev - 1;
-      return prev;
-    });
+  inputRefs.current[wordIndex][letterIndex].value = val;
 
-    // Rebuild full input string
-    const letters = [];
-    inputRefs.current.forEach((w) => {
-      letters.push(...w.map((t) => t?.value || ""));
-    });
-    setInputLetters(letters.join("").replaceAll(",", ""));
+  const letters = inputRefs.current.flatMap((wordRefs) =>
+    wordRefs.map((ref) => ref?.value || "")
+  );
 
-    // Auto-advance focus
-    if (value.length === 1 || value === " ") {
-      const nextIndex = letterIndex + 1;
-      if (
-        nextIndex < inputRefs.current[wordIndex].length &&
-        inputRefs.current[wordIndex][nextIndex]
-      ) {
-        inputRefs.current[wordIndex][nextIndex].focus();
-      } else if (wordIndex + 1 < inputRefs.current.length) {
-        inputRefs.current[wordIndex + 1][0]?.focus();
-      }
+  const filledCount = letters.filter((c) => c !== "").length;
+
+  setInputLetters(letters.join(""));
+  setLetterCount(filledCount);
+
+  if (val.length === 1) {
+    const nextIndex = letterIndex + 1;
+    if (
+      nextIndex < inputRefs.current[wordIndex].length &&
+      inputRefs.current[wordIndex][nextIndex]
+    ) {
+      inputRefs.current[wordIndex][nextIndex].focus();
+    } else if (wordIndex + 1 < inputRefs.current.length) {
+      inputRefs.current[wordIndex + 1][0]?.focus();
     }
-  };
+  }
+};
+
+const handleClear = () => {
+  inputRefs.current.forEach((row) =>
+    row.forEach((input) => {
+      if (input) input.value = '';
+    })
+  );
+
+  setInputLetters('');
+  setLetterCount(0);
+  setHintIndex(0);
+  setWrongAnswer(false);
+  setToggleCheckAnswer(false);
+
+  inputRefs.current[0]?.[0]?.focus();
+};
 
   const handleKeyDown = (e, wordIndex, letterIndex) => {
     const key = e.key;
@@ -102,35 +170,115 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     }
   };
 
-  const isLocked = levelScore?.[index]?.score === 0;
+useEffect(() => {
+  if (!giveUp && !isWin) return;
+
+  let count = 0;
+  for (let w = 0; w < words.length; w++) {
+    for (let l = 0; l < words[w].length; l++) {
+      const correctLetter = words[w][l];
+      const input = inputRefs.current[w]?.[l];
+
+      if (input) {
+        input.value = correctLetter;
+      }
+
+      count++;
+    }
+  }
+
+  setLetterCount(words.join("").length);
+}, [giveUp, isWin, words]);
+
+  const [longestWord, setLongestWord] = useState(0)
+  const [textBoxWidth, setTextBoxWidth] = useState(0)
+
+  const getCharCount = (chars) => {
+    if(chars > longestWord){
+      setLongestWord(chars)
+    } else { 
+      return
+    }
+  }
+
+  const [textBoxScale, setTextBoxScale] = useState(1)
+
+  useEffect(() =>{
+    let styledWidth = width * 0.80
+    let calculatedTextBoxWidth = styledWidth / longestWord
+
+
+    if(styledWidth > 277){
+      setTextBoxWidth(Math.min(50, Math.max(40, calculatedTextBoxWidth)));
+      setTextBoxScale(1)
+    } else {
+      let widthDiff = 277 - styledWidth
+      let calcWidthDiff = widthDiff * 0.01
+      console.log(1 - calcWidthDiff)
+      setTextBoxScale(1 - calcWidthDiff)
+    }
+    
+  }, [longestWord, width])
+    
+  const [dev, setDev] = useState('')
+  const [windowVPH, setWindowVPH] = useState(0)
+  const [initialVPH, setInitialVPH] = useState(0)
+
+  useEffect(() => {
+    const onResize = () => {
+      setDev(window.visualViewport.height);
+    };
+
+    window.visualViewport?.addEventListener('resize', onResize);
+    return () => {
+      window.visualViewport?.removeEventListener('resize', onResize)
+      setWindowVPH(document?.getElementById('game_stage')?.offsetHeight)
+    }
+  }, []);
+
+  useEffect(() => {
+    setInitialVPH(window.visualViewport.height)
+  }, [])
+
+  useEffect(() => {
+
+    if(windowVPH === 0){
+      setInitialVPH(document.getElementById('game_stage').offsetHeight)
+    }
+
+    if(dev > initialVPH){
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+  }, [windowVPH, dev])
+
+  useEffect(() => {
+    inputRefs.current.forEach((row) =>
+      row.forEach((input) => {
+        if (input) input.value = '';
+      })
+    );
+    inputRefs.current = [];
+    setLetterCount(0);
+    setInputLetters('');
+    setHintIndex(0);
+    setWrongAnswer(false);
+    setIsWin(false);
+    setToggleCheckAnswer(false);
+  }, [answer, index]);
 
   return (
-    <Stack direction="row" width="100%" justifyContent="center" flexWrap="wrap" id="letter_wrapper">
-      {isWin && (
-        <MotionStack
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2 }}
-          bgcolor="#00000082"
-          width="100%"
-          height="25vh"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Typography fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
-          <Typography fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
-          <Button onClick={next} variant="contained">Continue</Button>
-        </MotionStack>
-      )}
-
+    <Stack direction="column" width="100%" justifyContent="center" alignItems={'center'}>
+    <Stack direction="row" width="98%" justifyContent="center" alignItems={'center'} flexWrap="wrap" id="letter_wrapper" height={height * 0.33} overflow={'auto'} boxShadow={'inset 0px 0px 5px 3px #0000001a'}>
       {!isWin &&
         words.map((word, wordIndex) => {
+          getCharCount(word?.length)
           if (!inputRefs.current[wordIndex]) {
             inputRefs.current[wordIndex] = [];
           }
-
+          
           return (
-            <Stack key={`word-${wordIndex}`} userData="word_wrapper">
+            <Stack key={`word-${wordIndex}`}>
               <Stack
                 direction="row"
                 justifyContent="center"
@@ -138,30 +286,41 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
                 marginLeft={0}
                 marginBottom={0}
                 padding={1}
-              >
+                sx={{scale: textBoxScale}}
+                >
                 {word.split("").map((letter, letterIndex) => (
                   <Stack
-                    key={`letter-${wordIndex}-${letterIndex}`}
-                    id="textbox-wrapper"
-                    marginLeft={0}
-                    direction="row"
-                    justifyContent="center"
-                    alignItems="center"
-                    flexWrap="wrap"
+                  key={`letter-${wordIndex}-${letterIndex}`}
+                  id="textbox-wrapper"
+                  marginLeft={0}
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  flexWrap="wrap"
                   >
                     <TextField
-                      value={isLocked ? letter : undefined}
-                      disabled={isLocked}
-                      sx={{ opacity: 1, transition: "all 1s ease-in" }}
-                      autoComplete="off"
-                      inputRef={(el) => (inputRefs.current[wordIndex][letterIndex] = el)}
-                      onChange={(e) => handleInputChange(e, wordIndex, letterIndex)}
-                      onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
-                      inputProps={{
-                        maxLength: 1,
-                        style: { textAlign: "center", fontSize: 30, width: 40 },
+                      disabled={false}
+                      slotProps={{
+                        input: {
+                          maxLength: 1,
+                          style: { textAlign: "center", fontSize: '1rem', width: textBoxWidth},
+                        }
                       }}
-                    />
+                      sx={{textAlignLast: "center", opacity: 1, transition: "all 1s ease-in", paddingRight: 0, paddingLeft: 0 }}
+                      autoComplete="off"
+                      inputRef={(el) => {
+                        if (!inputRefs.current[wordIndex]) {
+                          inputRefs.current[wordIndex] = []; // Initialize the row array if it doesn't exist
+                        }
+                        inputRefs.current[wordIndex][letterIndex] = el;
+                      }}
+                      onChange={(e) => {
+                        const val = e.target.value.slice(0, 1); // Only allow 1 character
+                        e.target.value = val;
+                        handleInputChange(e, wordIndex, letterIndex);
+                      }}
+                      onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
+                      />
                   </Stack>
                 ))}
               </Stack>
@@ -169,14 +328,65 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
           );
         })}
 
-      <Button
+      </Stack>
+
+      <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} marginTop={3} width={'75%'}>
+        {toggleHint && <Link onClick={getHint} disabled={hintIndex >= letterTarget}>Hint</Link>}
+
+        {!isWin && !giveUp &&
+        <Button
         disabled={!toggleCheckAnswer}
-        sx={{ margin: 4 }}
+        sx={{ margin: 2 }}
         onClick={checkAnswer}
         variant="contained"
-      >
-        Check Answer
-      </Button>
+        >
+          Check Answer
+        </Button>}
+        <Link onClick={() => handleClear()}>Clear</Link>
+      </Stack>
+      <Modal
+        open={!!isWin}
+        >
+        <Stack height={'100%'} bgcolor={'#00000063'} justifyContent={'center'}>
+            <MotionStack
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1.2 }}
+            bgcolor="#ffffffe0"
+            width="100%"
+            height="25vh"
+            justifyContent="center"
+            alignItems="center"
+            >
+            <Typography color="green" fontSize={30}><i className="fi fi-rr-laugh-beam"></i></Typography>
+            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
+            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
+            <Button onClick={next} variant="contained">Continue</Button>
+            </MotionStack>
+        </Stack>
+      </Modal>
+      <Modal
+        open={!!wrongAnswer}
+        >
+        <Stack height={'100%'} bgcolor={'#00000063'} justifyContent={'center'}>
+            <MotionStack
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2 }}
+              bgcolor="#ffffffe0"
+              width="100%"
+              height="33vh"
+              justifyContent="center"
+              alignItems="center"
+            >
+            <Typography color="blue" fontSize={30}><i className="fi fi-rs-face-sad-sweat"></i></Typography>
+            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Sorry! Your answer:`}</Typography>
+            {inputLetters?.length && <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`"${inputLetters.toLowerCase()}"`}</Typography>}
+            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">Is incorrect!</Typography>
+            <Button onClick={() => setWrongAnswer(false)} variant="contained">Try again</Button>
+            </MotionStack>
+        </Stack>
+      </Modal>
     </Stack>
   );
 };

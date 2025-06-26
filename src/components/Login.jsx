@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
+import { Box, Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 import { supabase } from '../business/supabaseClient';
 import { useLocation } from 'react-router-dom';
@@ -108,8 +108,8 @@ const handleLogin = async () => {
       </FormControl>
     </Stack>
 
-    <Stack direction={'column'} width={'100%'} justifyContent={'center'} alignItems={'center'} >
-        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+    <Stack direction={'column'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} >
+        <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
             <InputLabel>Password</InputLabel>
             <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
@@ -121,30 +121,30 @@ const handleLogin = async () => {
             <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
           }
         </Stack>
-
         {newUser && 
-        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-          <FormControl>
-            <InputLabel>Confirm Password</InputLabel>
-            <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
-          </FormControl>
-          {
-            toggleShowPasswordConf ? 
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
-            :
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
-          }
-        </Stack>}
+        <>
+          <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+            <FormControl>
+              <InputLabel>Confirm Password</InputLabel>
+              <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
+            </FormControl>
+            {
+              toggleShowPasswordConf ? 
+              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
+              :
+              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
+            }
+          </Stack>
+          <Stack direction={'column'} width={'100%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+            <FormControl>
+              <InputLabel>User name</InputLabel>
+              <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
+            </FormControl>
+          </Stack>
+        </>
+        }
 
     </Stack>
-
-    {newUser && 
-    <Stack paddingY={1} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-      <FormControl>
-        <InputLabel>User name</InputLabel>
-        <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
-      </FormControl>
-    </Stack>}
 
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
@@ -188,9 +188,12 @@ const Login = () => {
   const screen = useGlobalStore((state) => state.screen)
   return (
     <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
-      <Stack paddingY={5} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
+      <Stack paddingY={3} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
         <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
-        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
+        <Box>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={13}>You can explore our site without creating an account, but creating an account allows more functionality such as saving gameplay and preferences.</Typography>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Variable'} fontSize={14} >Follow your bliss</Typography>
+        </Box>
       </Stack>
       <Stack width={'90%'}>
         <LoginForm />

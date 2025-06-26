@@ -3,19 +3,57 @@ import { Stack, Typography, TextField, Button, MenuList, MenuItem} from "@mui/ma
 import { fetchPacks } from "./helpers/functions";
 import PackButton from "./PackButton";
 import GameWrapper from './GameWrapper';
+import useGlobalStore from "../../../business/useGlobalStore";
 
 const Pic6 = () => {
   const [gamePack, setGamePack] = useState(null)
   const [packs, setPacks] = useState([])
+  const [playedGames, setPlayedGames] = useState([])
+
+  const userMeta = useGlobalStore((state) => state.userMeta) 
 
   const hasFetched = useRef(false);
 
+  const checkIfPlayed = async (pack) => {
+    let { data: pack_data, error } = await supabase
+            .from('six_pics_data')
+            .select("*")
+            .eq('pack_name', pack)
+
+            let foundPlayed = pack_data?.find((p) => p.user_id === userMeta.primary_id)
+
+            if(foundPlayed){
+              setPlayedGames(prev => ([
+                ...prev, 
+                {
+                  pack_name: foundPlayed?.pack_name,
+                  played: foundPlayed?.game_date
+                }
+              ]))
+            }
+  }
+
   useEffect(() => {
-    if (hasFetched.current) return;
+
+    setPlayedGames([])
+
+    packs?.forEach((p) =>{
+      if(!p.marked_for_delete){
+        checkIfPlayed(p.pack_name)
+      }
+    })
+
+  }, [packs])
+
+  useEffect(() => {
+    console.log(playedGames) 
+  }, [playedGames])
+
+  useEffect(() => {
+    if (hasFetched.current) return; 
     hasFetched.current = true;
   
     const getPacks = async () => {
-      console.log('fetching packs');
       try {
         const res = await fetchPacks();
         if (res) setPacks(res);
@@ -27,9 +65,9 @@ const Pic6 = () => {
     getPacks();
   }, []);
 
-  useEffect(() => {
-    console.log("Pic6 mounted");
-  }, []);
+  // useEffect(() => {
+  //   console.log("Pic6 mounted");
+  // }, []);
 
   return (
     <Stack
@@ -44,12 +82,22 @@ const Pic6 = () => {
       :
         <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto'}}> 
           <Typography fontFamily={'Fredoka regular'} fontSize={20}>Select Game Pack</Typography>
-          <MenuList width={54}>
+          <MenuList sx={{width: '100%', height: '100%'}}>
             {packs?.filter((p) => !p.marked_for_delete)
             .map((p, i) => { 
-              console.log(p)
+
+              let disable = false
+              let played
+              
+              let findPlayedGame = playedGames?.find((g) => g.pack_name === p.pack_name)
+
+              if(findPlayedGame){
+                disable = true
+                played = findPlayedGame?.played
+              }
+
               return (
-                  <PackButton key={i} pack={p} setGamePack={setGamePack}/>
+                  <PackButton key={i} pack={p} setGamePack={setGamePack} disable={disable} playedDate={played}/>
               )})}
           </MenuList>
         </Stack>

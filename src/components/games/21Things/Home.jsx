@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography, Box } from '@mui/material';
 import useGlobalStore from '../../../business/useGlobalStore';
 import Hexagon from '../Hexagon';
+import MyGames from '../../game_data/MyGames';
 
 
 const Home = ({ onPlay, payload }) => {
@@ -9,6 +10,9 @@ const Home = ({ onPlay, payload }) => {
     const gameIndex = useGlobalStore((state) => state.gameIndex)
 
     const [clicked, setClicked] = useState(1)
+
+    const today = new Date().toISOString().split('T')[0];
+    console.log(today == payload.date)
 
     useEffect(() => {
         setTimeout(() => {
@@ -37,7 +41,7 @@ const Home = ({ onPlay, payload }) => {
                     setClicked(1)
                 }}></i>
               <Typography>{payload?.date}</Typography>
-                <i style={{ marginLeft: 10, fontSize: 20, color: clicked === 2 ? 'white' : 'black' }} className="fi fi-sr-angle-circle-right" onClick={() => {
+                {today !== payload.date && <i style={{ marginLeft: 10, fontSize: 20, color: clicked === 2 ? 'white' : 'black' }} className="fi fi-sr-angle-circle-right" onClick={() => {
 
                     if(gameIndex > 0){
                         useGlobalStore.setState((state) => ({
@@ -46,7 +50,7 @@ const Home = ({ onPlay, payload }) => {
                     }
 
                     setClicked(2)
-                }}></i>
+                }}></i>}
             </Stack>
           </Stack>
   
@@ -58,6 +62,10 @@ const Home = ({ onPlay, payload }) => {
           <Stack mb={2}>
             <Button variant="contained" onClick={onPlay}>PLAY!</Button>
           </Stack>
+        </Stack>
+        <Stack borderTop={'1px solid grey'} width={'95%'} height={'50%'} overflow={'auto'}>
+          <Typography fontSize={20} fontWeight={'bold'} fontFamily={'Fredoka Regular'}>Your games</Typography>
+          <MyGames displayGame={'twentyonethings'}/>
         </Stack>
       </Stack>
     )

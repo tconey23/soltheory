@@ -10,6 +10,7 @@ import Password from './Password';
 import AdminControls from './AdminControls';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../business/supabase_calls';
+import MyGames from './game_data/MyGames';
 
 const Account = () => {
   const MotionText = motion(Typography); 
@@ -24,6 +25,7 @@ const Account = () => {
   const [selectedAccountOption, setSelectedAccountOption] = useState('');
   const [accountObj, setAccountObj] = useState()
   const [hasMounted, setHasMounted] = useState(false);
+  const [backCol, setBackCol] = useState('#414770')
 
 //   console.log(userMeta)
 
@@ -47,6 +49,10 @@ const Account = () => {
             case 'update_password': setAccountObj(<Password />);
             break;
             case 'admin_controls': navTo('/account/admin');
+            break;
+            case 'my_games': setAccountObj(<MyGames />)
+                             setBackCol('white');
+                              
             break;
         }
     }, [selectedAccountOption])
@@ -102,14 +108,14 @@ const Account = () => {
         >
         <Stack
           sx={{
-            bgcolor: '#f4f6f8',
+            bgcolor: backCol,
             height: 'fit-content',
             width: '100%',
             borderRadius: 1,
             marginTop: 20
           }}
           >
-            <Typography sx={{bgcolor: '#f4f6f8', marginY: 2}}>Account Options</Typography>
+            <Typography sx={{bgcolor: backCol, marginY: 2, color: 'white'}}>Account Options</Typography>
           <Select
             value={selectedAccountOption}
             onChange={(e) => setSelectedAccountOption(e.target.value)}
@@ -117,6 +123,7 @@ const Account = () => {
             <MenuItem value="change_avatar">Change Avatar</MenuItem>
             <MenuItem value="change_username">Change Username</MenuItem>
             <MenuItem value="update_password">Update Password</MenuItem>
+            <MenuItem value="my_games">My Games</MenuItem>
             {userMeta?.is_admin && <MenuItem value="admin_controls">Admin Controls</MenuItem>}
           </Select>
         </Stack>
@@ -127,7 +134,7 @@ const Account = () => {
           <MotionStack
           key={selectedAccountOption}
           width="85%"
-          sx={{ height: 'fit-content', bgcolor: '#414770', marginY: 15}}
+          sx={{ height: 'fit-content', bgcolor: backCol, marginY: 15}}
           alignItems="center"
           justifyContent="center"
           direction="column"

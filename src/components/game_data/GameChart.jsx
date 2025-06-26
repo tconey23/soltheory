@@ -1,84 +1,155 @@
-import { useEffect, useState, useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
+import { Group } from '@visx/group';
+import { Bar } from '@visx/shape';
+import { scaleBand, scaleLinear } from '@visx/scale';
+import { AxisLeft, AxisBottom } from '@visx/axis';
+import { ParentSize } from '@visx/responsive';
 import { Stack, Typography } from '@mui/material';
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
-} from 'recharts';
 
-const GameChart = ({data, userFav}) => {
-  const [width, setWidth] = useState(500)
-  const [height, setHeight] = useState(400)
-  const parentContainer = useRef()
 
-  console.log(data)
+const GameChart = ({ data, userFav }) => {
+  const [chartType, setChartType] = useState()
 
-  const barHeight = 40;
-  const chartHeight = Math.min(Math.max(data.length * barHeight, 150), 600)
+
+  const margin = { top: 20, right: 10, bottom: 40, left: chartType === '6pics' ? 10 : 120 };
+  const barHeight = chartType === '6pics' ? 10 : 60;
+  const maxChartHeight = 700;
+
+
+  // console.log(data)
 
   useEffect(() => {
-    if(parentContainer?.current){
-      setWidth(parentContainer?.current?.clientWidth)
-      setHeight(parentContainer?.current?.clientHeight)
+    if(isNaN(data?.[0]?.label)){
+      setChartType('21things')
+    } else {
+      setChartType('6pics')
     }
-  }, [parentContainer])
+  }, [data])
 
   const coloredData = data.map((item) => ({
-  ...item,
-  fill: item.label === userFav ? '#ff4081' : 'blue'
-}));
+    ...item,
+    fill: item.label === userFav ? '#ff4081' : 'blue',
+  }));
 
   return (
-    <Stack ref={parentContainer} direction={'column'} height='100%' width='100%' justifyContent='center' alignItems="center" sx={{scale: 0.90}} bgcolor={'white'} borderRadius={2}>
-      {data?.length && 
-      <ResponsiveContainer width={width} height={chartHeight}>
-        <BarChart
-          data={coloredData}
-          layout="vertical"
-          margin={{ top: 20, right: 25, left: 0, bottom: 5 }}
-          barSize={10}
-        >
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis 
-            type="number" 
-            domain={[0, (dataMax) => dataMax + 3]}
-            tickCount={10}
-            allowDecimals={false}
-            tickFormatter={(value) => value}
-          />
-          <YAxis dataKey="label" type="category" width={width/2} tick={{ fontSize: 12 }}/>
-          <Bar
-            dataKey="value"
-            isAnimationActive={false}
-            shape={(props) => {
-              const { x, y, width, height, payload } = props;
-              const isFav = payload.label === userFav;
-              return (
-                <g>
-                  <rect
-                    x={x}
-                    y={y}
-                    width={width}
-                    height={height}
-                    fill={payload.fill}
-                    rx={2}
-                  />
-                  {isFav && (
+    <Stack width="100%" height="100%" justifyContent="center" alignItems="center" bgcolor="white" borderRadius={2}>
+      {chartType === '6pics' && 
+      <>
+        <Typography>Top Scores</Typography>
+        <Typography>⭐ = your score</Typography>
+      </>
+      }
+      <ParentSize>
+        {({ width, height }) => {
+          const chartHeight = Math.min(Math.max(coloredData.length * barHeight, 300), maxChartHeight);
+
+          // Scales
+          const yScale = scaleBand({
+            domain: coloredData.map((d) => d.label),
+            range: [margin.top, chartHeight - margin.bottom],
+            padding: 0.2,
+          });
+
+          const xMax = Math.max(...coloredData.map((d) => d.value));
+          const roundedMax = Math.ceil(xMax * 1.1);
+          const xScale = scaleLinear({
+            domain: [0, roundedMax],
+            range: [margin.left, width - margin.right],
+          });
+
+          return (
+            <svg width={width} height={chartHeight}>
+              <Group>
+                {coloredData.map((d, i) => {
+                  const barY = yScale(d.label);
+                  const barX = xScale(0);
+                  const barWidth = xScale(d.value) - barX;
+                  const isFav = d.label === userFav;
+
+                  return (
+                    <Group key={`bar-${i}`}>
+                      <Bar
+                        x={barX}
+                        y={barY}
+                        width={barWidth}
+                        height={yScale.bandwidth()}
+                        fill={d.fill}
+                        rx={4}
+                      />
+                      {isFav && (
+                        <text
+                          x={barX + barWidth + 10}
+                          y={barY + yScale.bandwidth() / 2}
+                          dy={4}
+                          fontSize={14}
+                          fontWeight="bold"
+                          fill="#ff4081"
+                        >
+                          ⭐
+                        </text>
+                      )}
+                    </Group>
+                  );
+                })}
+              </Group>
+
+              {/* Axes */}
+              {chartType === '21things' && <AxisLeft
+                left={margin.left}
+                scale={yScale}
+                // hideAxisLine
+                tickComponent={({ formattedValue, ...tickProps }) => {
+                  const wrapText = (text, maxCharsPerLine = 18) => {
+                    const words = text.split(' ');
+                    const lines = [];
+                    let line = '';
+
+                    for (const word of words) {
+                      if ((line + ' ' + word).trim().length > maxCharsPerLine) {
+                        lines.push(line.trim());
+                        line = word;
+                      } else {
+                        line += ' ' + word;
+                      }
+                    }
+                    lines.push(line.trim());
+                    return lines;
+                  };
+
+                  const lines = wrapText(formattedValue);
+
+                  return (
                     <text
-                      x={x + width + 10}
-                      y={y + height / 2}
-                      dy={4}
-                      fontSize={14}
-                      fontWeight={'bolder'}
-                      fill="#ff4081"
+                      {...tickProps}
+                      fontSize={12}
+                      fill="#333"
+                      textAnchor="end"
+                      dy="0.32em"
                     >
-                     ⭐ This is you!!
+                      {lines.map((line, i) => (
+                        <tspan key={i} x={tickProps.x} dy={i === 0 ? 0 : '1.2em'}>
+                          {line}
+                        </tspan>
+                      ))}
                     </text>
-                  )}
-                </g>
-              );
-            }}
-          />
-        </BarChart>
-      </ResponsiveContainer>}
+                  );
+                }}
+              />}
+              <AxisBottom
+                top={chartHeight - margin.bottom}
+                scale={xScale}
+                numTicks={5} // ← Key fix: limits to 5 ticks
+                tickFormat={(v) => v}
+                tickLabelProps={() => ({
+                  fontSize: 12,
+                  fill: '#333',
+                  textAnchor: 'middle',
+                })}
+              />
+            </svg>
+          );
+        }}
+      </ParentSize>
     </Stack>
   );
 };

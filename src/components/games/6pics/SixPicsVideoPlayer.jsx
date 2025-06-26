@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, useMemo } from "react";
 import { Stack, Typography, Button, CircularProgress } from "@mui/material";
+import useGlobalStore from "../../../business/useGlobalStore";
 
 const SixPicsVideoPlayer = ({
   level,
@@ -10,21 +11,41 @@ const SixPicsVideoPlayer = ({
   setShowGiveUp,
   showGiveUp,
   isWin,
-  setAlertContent
+  setAlertContent,
+  width,
+  height, 
+  giveUp, 
+  setGiveUp
 }) => {
 
   const videoRef = useRef(null);
   const frameRef = useRef(null);
+  const screen = useGlobalStore((state) => state.screen)
 
   const [stage, setStage] = useState(0);
   const [start, setStart] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [disableNext, setDisableNext] = useState(true);
-  const [giveUp, setGiveUp] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [vidStyle, setVidStyle] = useState(
+    {
+      boxShadow: "4px 2px 10px 1px #00000038", 
+      padding: 1, 
+      marginBlock: 10,
+      width: '80%',
+      height: '70%',
+    }
+  )
 
   // console.log('level', level)
   // console.log('level stops', level.stops)
   // console.log('level loops', level.loops)
+  // console.log(width, height)
+  // console.log('giveup', giveUp)
+
+  useEffect(() =>{
+    // console.log(isWin)
+  }, [isWin])
  
   const stages = useMemo(() => {
     if (!level?.stops?.length || !level?.loops?.length) return [];
@@ -53,6 +74,7 @@ const SixPicsVideoPlayer = ({
       }
     }
   
+    // console.log(levelScore)
     return stages;
   }, [level]);
   
@@ -74,7 +96,10 @@ const SixPicsVideoPlayer = ({
     );
 
     videoRef.current?.pause();
-    setStage((prev) => prev + 1);
+    setStage(prev => {
+      const nextStage = prev + 1;
+      return nextStage < stages.length ? nextStage : prev;
+    });;
   };
 
   // Trigger Give Up effect
@@ -91,8 +116,8 @@ const SixPicsVideoPlayer = ({
   // Handle start of playback
   useEffect(() => {
     // console.log('start', start, 'videoref.current', videoRef.current, 'stages', stages)  
-    if (!start || !videoRef.current || !stages.length) return
-
+    if (!start || !videoRef.current || !stages.length || !stages[stage]) return;
+    
     const { from } = stages[stage];
     videoRef.current.currentTime = from; 
 
@@ -100,36 +125,71 @@ const SixPicsVideoPlayer = ({
       console.warn("Autoplay failed:", err);
     });
 
-    const check = () => {
-      if (!videoRef.current) return;
-      const current = videoRef.current.currentTime;
-      const { type, from, to } = stages[stage];
+  const check = () => {
+    if (!videoRef.current) return;
+    const current = videoRef.current.currentTime;
 
-      if (type === "play" && current >= to) {
-        if (stage === 0) setStage(1);
-        else if (stage === 2) setStage(3);
-        else if (stage === 4) {
+    const { type, from, to } = stages[stage];
+
+    // console.log(stage+1, stages?.length)
+    // console.log('isPaused', videoRef?.current.paused)
+    setIsPlaying(true)
+
+    if(stage +1 === stages?.length){
+      // videoRef.current.pause();
+      setShowGiveUp(true)
+      setDisableNext(true)
+      setIsPlaying(false);
+      return
+    }
+
+    if (type === "play") {
+      if (current >= to) {
+        const nextStage = stage + 1;
+        if (nextStage >= stages.length) {
           videoRef.current.pause();
           setShowGiveUp(true);
           setDisableNext(true);
+          setIsPlaying(false);
+        } else {
+          setStage(nextStage);
         }
-      } else if (type === "loop" && current >= to) {
+        return;
+      }
+    } else if (type === "loop") {
+      if (from === to) {
+        // Degenerate loop: pause and wait for player to click "Next"
+        videoRef.current.pause();
         videoRef.current.currentTime = from;
+        setDisableNext(false); // allow user to continue
+        setIsPlaying(false);
+        // setTimeout(() => {
+        //   setShowGiveUp(true);
+        // }, 2000);
+        return; // stop frame loop
       }
 
-      frameRef.current = requestAnimationFrame(check);
-    };
+      if (current >= to) {
+        videoRef.current.currentTime = from;
+      }
+    }
+
+    frameRef.current = requestAnimationFrame(check);
+  };
+
+
 
     frameRef.current = requestAnimationFrame(check);
 
     return () => {
+      setIsPlaying(false)
       cancelAnimationFrame(frameRef.current);
     };
   }, [start, stage, stages, setShowGiveUp]);
 
   // Enable Next button for loops only
   useEffect(() => {
-    const currentStage = stages[stage];
+      const currentStage = stages[stage];
     if (!currentStage) return;
 
     if (currentStage.type === "loop") {
@@ -152,7 +212,7 @@ const SixPicsVideoPlayer = ({
   }, [showGiveUp]);
 
   useEffect(() => {
-    console.log(isWin)
+    // console.log(isWin)
     if(isWin){
       setShowGiveUp(false)
       setDisableNext(true)
@@ -162,24 +222,32 @@ const SixPicsVideoPlayer = ({
     }
   }, [isWin])
 
+  useEffect(()=>{
+    if(screen === 'xl'){
+      setVidStyle(prev => ({
+        ...prev, 
+        width: 'auto', 
+        height: '75%',
+      }))
+    }
+  }, [screen])
+
 
   return (
-    <Stack backgroundColor="white" justifyContent="center" alignItems="center">
+    <Stack backgroundColor="white" justifyContent="center" alignItems="center" height={height * .33} width={screen === 'xs' ? width * 0.95 : '50%'}>
       <Stack
         width={"100%"}
-        height="auto"
+        height="100%"
         justifyContent="center"
         alignItems="center"
         sx={{ opacity: isLoaded ? 1 : 1}}
       >
         <video
           ref={videoRef}
-          width="80%"
-          height="80%"
           preload="metadata"
           muted
           playsInline
-          style={{ boxShadow: "4px 2px 10px 1px #00000038", padding: 1, marginBlock: 10 }} 
+          style={vidStyle} 
           onLoadedMetadata={(e) => {
             e.target.currentTime = 0;
           }}
@@ -188,27 +256,22 @@ const SixPicsVideoPlayer = ({
         >
           <source src={level?.public_url} type="video/mp4" />
         </video>
-      </Stack>
 
-      <Stack width="100%" height="100%" justifyContent="center" alignItems="center" position="absolute">
-        {!isLoaded && <CircularProgress size={24} />}
-      </Stack>
-
-      <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center">
+      <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'}>
         {!start && (
-          <Button disabled={!!isWin} onClick={() => setStart(true)} variant="contained">
-            Start
+          <Button disabled={!!isWin || isPlaying} onClick={() => setStart(true)} variant="contained">
+            <i className="fi fi-sr-play-pause"></i>
           </Button>
         )}
 
         {start && !giveUp && !showGiveUp && (
-          <Button disabled={disableNext} onClick={handleNext} variant="contained">
-            Next
+          <Button disabled={disableNext || isPlaying} onClick={handleNext} variant="contained">
+            <i className="fi fi-sr-play-pause"></i>
           </Button>
         )}
 
         {showGiveUp && !giveUp && (
-          <Button  disabled={!!isWin} onClick={() => setGiveUp(true)} variant="outlined">
+          <Button  disabled={!!isWin} onClick={() => setGiveUp(true)} variant="outlined" sx={{backgroundColor: '#880202'}}>
             Give Up
           </Button>
         )}
@@ -225,6 +288,16 @@ const SixPicsVideoPlayer = ({
           </Button>
         )}
       </Stack>
+
+
+      </Stack>
+
+
+
+
+      {!isLoaded &&<Stack width="100%" height="100%" justifyContent="center" alignItems="center" position="absolute">
+        <CircularProgress size={24} />
+      </Stack>}
     </Stack>
   );
 };

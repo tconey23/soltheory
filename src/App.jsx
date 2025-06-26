@@ -24,6 +24,27 @@ import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
 import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
 
+const useScreenSize = () => {
+  const [screenSize, setScreenSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setScreenSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  return screenSize;
+};
+
 function App() {
   const navTo = useNavigate()
   const setScreen = useGlobalStore((state) => state.setScreen)
@@ -35,13 +56,15 @@ function App() {
   const setUserMeta = useGlobalStore((state) => state.setUserMeta)
   const setHeight = useGlobalStore((state) => state.setHeight)
   const setAlertContent = useGlobalStore((state) => state.setAlertContent)
+  const inGame = useGlobalStore((state) => state.inGame)
+  const setInGame = useGlobalStore((state) => state.setInGame)
+  const { width, height } = useScreenSize();
 
   const {screenSize} = useBreakpoints()
-
   const [appReady, setAppReady] = useState(false)
   const [redirect, setRedirect] = useState(false)
 
-  const height = useWindowHeight() 
+  // const height = useWindowHeight() 
 
  useEffect(() => {
   setHeight(height)
@@ -73,7 +96,7 @@ function App() {
 
   useEffect(() => {
     const redir = sessionStorage.getItem('redirectAfterLogin')
-    console.log(redir)
+    // console.log(redir)
     if(redir){
       setRedirect(true)
       navTo(redir)
@@ -87,6 +110,7 @@ function App() {
     setTimeout(() => {
       setAppReady(true)
     }, 1000);
+    setInGame(false)
   }, [])
 
   useEffect(() =>{
@@ -113,7 +137,7 @@ const [dims, setDims] = useState(
 )
 
 useEffect(() => {
-  console.log(dims)
+  // console.log(dims)
 }, [dims])
   
   useEffect(() => {
@@ -125,11 +149,32 @@ useEffect(() => {
       default: setDims({width: '100%', height: '90%'})
     }
   }, [screen])
+
+    useEffect(() => {
+    let lastHeight = window.innerHeight;
+  
+    const handleResize = () => {
+      const currentHeight = window.innerHeight;
+  
+      if (currentHeight > lastHeight) {
+        // Keyboard is likely dismissed
+        setTimeout(() => {
+          window.scrollTo({ top: 0, behavior: 'auto' });
+        }, 50);
+      }
+  
+      lastHeight = currentHeight;
+    };
+  
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
 
   return (
-   <Stack direction={'column'} height={'100dvh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
-    <Stack width={'100%'} height={'10%'}>
+   <Stack direction={'column'} height={'100svh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
+
+    <Stack flex="0 0 10%" width="100%">
       <AppHeader />
     </Stack>
 
@@ -203,13 +248,15 @@ useEffect(() => {
     </Routes>
   </Stack>
 
-    <UserAlert />
+    
+      {!inGame && 
+      <Stack flex="0 0 7%" width="100%">
+        <AdSpace />
+      </Stack> }
 
+    <UserAlert />
     {appReady && <Modals needsLogin={false}/>}
 
-    <Stack sx={{height: 'auto', width: '100%'}}>
-      <AdSpace />
-    </Stack> 
 
    </Stack>
   )

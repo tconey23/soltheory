@@ -11,7 +11,7 @@ import { supabase } from "../../../business/supabaseClient";
 import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
 
-const ResultsPage = ({score, gamePack}) => {
+const ResultsPage = ({score, gamePack, width, height}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
@@ -60,7 +60,7 @@ const ResultsPage = ({score, gamePack}) => {
 
 
       if(shotCount < (score / 100)){
-
+        // console.log(score)
       const confettiInterval = setInterval(() => {
         shootConfetti(shotCount * 500)
       }, 400);
@@ -72,52 +72,34 @@ const ResultsPage = ({score, gamePack}) => {
     }, [shotCount])
   
     const handleSaveGame = async () => {
-  
       const gameDataObject = {
-        game: 'SixPics',
-        pack: gamePack,
+        user_id: user.id,
+        pack_name: gamePack?.pack_name,
         score: score,
-        date_played: Date.now()
+        game_date: Date.now()
+      };
+
+      const { data, error } = await supabase
+      .from('six_pics_data')
+      .upsert(gameDataObject)
+      .select();
+
+      if (error) {
+        console.error("Failed to save game:", error);
+        return; // Optional: stop navigation if there's an error
       }
 
-      let originalGameData
-      
-      let { data: users, error } = await supabase
-      .from('users')
-      .select("*")
-      .eq('primary_id', user.id)
-
-      if(users?.[0]){
-        originalGameData = users?.[0].game_data
-      }
-
-      originalGameData.push(gameDataObject)
-
-
-      const { data, error: err } = await supabase
-      .from('users')
-      .update({ game_data: originalGameData})
-      .eq('primary_id', user.id)
-      .select()
-
-      if(!err){
-        console.log(err)
-      }
-        
-      // console.log(data, err)
-      
-      nav('/games')
-    }
+      console.log("Game saved:", data);
+      nav('/games');
+    };
   
     return (
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
         <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-          <Stack width={'3%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+          <Stack width={'50%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
             <video
-              width="80%"
-              height="80%"
               preload="metadata"
-              style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10}}
+              style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
               muted
               autoPlay = {false}
               onLoadedMetadata={(e) => {
