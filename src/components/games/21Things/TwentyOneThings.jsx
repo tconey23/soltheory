@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useLocation, useParams } from 'react-router-dom';
 import useGlobalStore from '../../../business/useGlobalStore';
 
-const purple = '#c956ff'
+const purple = '#dd95ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
@@ -124,9 +124,9 @@ useEffect(() => {
       console.log(currentStage)
       switch (currentStage) {
         case 1:
-          return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#c956ff" prevColor="white" />
+          return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#dd95ff" prevColor="white" />
         case 2:
-          return <Stage height={'100%'} stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#c956ff" />
+          return <Stage height={'100%'} stageNum={2} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={3} maxSelect={3} currentColor="#fff200" prevColor="#dd95ff" />
         case 3:
           return <Stage height={'100%'} stageNum={3} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={4} maxSelect={1} currentColor="#45d500" prevColor="#fff200" />
         case 4:

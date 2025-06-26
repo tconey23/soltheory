@@ -27,27 +27,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -81,27 +81,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -135,27 +135,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -189,27 +189,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -243,27 +243,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -297,27 +297,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -351,27 +351,27 @@ export const userObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -461,27 +461,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -515,27 +515,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -569,27 +569,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -623,27 +623,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Infant onesies "
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Retail therapy"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A clean kitchen after a big meal"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Scissors as a kitchen utensil"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ancient wisdom literature"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Ice skating on a frozen pond"
                             }
                         ],
@@ -677,27 +677,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -731,27 +731,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -785,27 +785,27 @@ export const sessionObj = {
                     "stages": [
                         [
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Up before the crack of dawn"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Realizing everything is just fine"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Snow day!"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Collaborating with friends"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "Old humans holding hands"
                             },
                             {
-                                "color": "#c956ff",
+                                "color": "#dd95ff",
                                 "prompt": "A work space covered in plants "
                             }
                         ],
@@ -887,27 +887,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Infant onesies "
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Retail therapy"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A clean kitchen after a big meal"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Scissors as a kitchen utensil"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ancient wisdom literature"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ice skating on a frozen pond"
                     }
                 ],
@@ -941,27 +941,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Infant onesies "
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Retail therapy"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A clean kitchen after a big meal"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Scissors as a kitchen utensil"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ancient wisdom literature"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ice skating on a frozen pond"
                     }
                 ],
@@ -995,27 +995,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Infant onesies "
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Retail therapy"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A clean kitchen after a big meal"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Scissors as a kitchen utensil"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ancient wisdom literature"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ice skating on a frozen pond"
                     }
                 ],
@@ -1049,27 +1049,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Infant onesies "
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Retail therapy"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A clean kitchen after a big meal"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Scissors as a kitchen utensil"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ancient wisdom literature"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Ice skating on a frozen pond"
                     }
                 ],
@@ -1103,27 +1103,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Up before the crack of dawn"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Realizing everything is just fine"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Snow day!"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Collaborating with friends"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Old humans holding hands"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A work space covered in plants "
                     }
                 ],
@@ -1157,27 +1157,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Up before the crack of dawn"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Realizing everything is just fine"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Snow day!"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Collaborating with friends"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Old humans holding hands"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A work space covered in plants "
                     }
                 ],
@@ -1211,27 +1211,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Up before the crack of dawn"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Realizing everything is just fine"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Snow day!"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Collaborating with friends"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "Old humans holding hands"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "A work space covered in plants "
                     }
                 ],
@@ -1877,27 +1877,27 @@ export const metaObj = {
             "stages": [
                 [
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "music, message and fans of the Avett Brothers"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "acronyms that reveal"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "helping humans unstuck ourselves"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "being (relatively) in charge of my inner world"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "creating meaningful experiences"
                     },
                     {
-                        "color": "#c956ff",
+                        "color": "#dd95ff",
                         "prompt": "reMarkable tablets"
                     }
                 ],

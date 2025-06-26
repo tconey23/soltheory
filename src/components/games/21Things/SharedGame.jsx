@@ -4,7 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Prompt from './Prompt';
 import Username from '../../Username';
 
-const purple = '#c956ff'
+const purple = '#dd95ff'
 const yellow = '#fff200'
 const green = '#45d500'
 
@@ -137,7 +137,7 @@ const SharedGame = () => {
       </Box>
         </Stack>
 
-        <Stack userData="text_stack" sx={{boxShadow: `0px 0px 11px 3px #c956ff85`, borderRadius: 1}} alignItems={'center'} paddingY={1} marginTop={2} width={'95%'} maxHeight={'200px'} minHeight={'100px'} justifyContent={'flex-start'}>
+        <Stack userData="text_stack" sx={{boxShadow: `0px 0px 11px 3px #dd95ff85`, borderRadius: 1}} alignItems={'center'} paddingY={1} marginTop={2} width={'95%'} maxHeight={'200px'} minHeight={'100px'} justifyContent={'flex-start'}>
           
             <Typography sx={{whiteSpace: 'pre-line', overflowWrap:'break-word', overflow:'auto'}} align='left' userData="text_typography" height={'100%'} width={'98%'} fontFamily={'Fredoka Regular'} fontSize={15}>{note}</Typography>
          

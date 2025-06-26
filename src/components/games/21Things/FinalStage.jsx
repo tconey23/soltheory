@@ -142,11 +142,12 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
   return (
     <Stack
       userdata="21things final stage"
-      height="90%"
+      height="89svh"
       width="100%"
       alignItems="center"
+      overflow={'auto'}
     >
-      {renderStageList(stage1, '#c956ff', 1)}
+      {renderStageList(stage1, '#dd95ff', 1)}
       {renderStageList(stage2, '#fff200', 2)}
       {renderStageList(stage3, '#45d500', 3)}
 

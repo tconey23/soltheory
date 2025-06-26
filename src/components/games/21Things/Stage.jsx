@@ -137,7 +137,7 @@ const Stage = ({
     gap: 2,
     width: '90%',
     maxWidth: '600px',
-    maxHeight: '100%',
+    maxHeight: '80svh',
     padding: 0.5,
     margin: '0 auto',
     overflow: 'auto'
