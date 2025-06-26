@@ -38,19 +38,13 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     }
   }, [isWin]);
 
-  // Toggle "Check Answer" button
   useEffect(() => {
-    // console.log(letterCount, letterTarget)
     setToggleCheckAnswer(letterCount === letterTarget);
   }, [letterCount, letterTarget]);
   
   useEffect(() => {
 
     let calculatedScore = levelScore?.[index]?.score -5 
-    // console.log(levelScore?.[index]?.score)
-    // console.log(calculatedScore, calculatedScore > 0)
-    // console.log(hintIndex, letterTarget)
-    // console.log(hintIndex, letterCount)
 
     if (calculatedScore > 0){
       setToggleHint(true)
@@ -73,21 +67,18 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
         for (let l = 0; l < words[w].length; l++) {
           const input = inputRefs.current[w]?.[l];
 
-          // If this is the first empty box, give hint here
           if (input && input.value === "") {
             const correctLetter = words[w][l];
             input.value = correctLetter;
 
             handleInputChange({ target: { value: correctLetter } }, w, l);
 
-            // Deduct points once
             setLevelScore(prev => {
               const updated = [...prev];
               updated[index].score = Math.max(0, updated[index].score - 5);
               return updated;
             });
 
-            // Update hintIndex to next global index
             setHintIndex(globalIndex + 1);
             return;
           }
@@ -121,24 +112,20 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
 
 const handleInputChange = (event, wordIndex, letterIndex) => {
   const { value } = event.target;
-  const val = value.slice(0, 1); // Only allow 1 character
+  const val = value.slice(0, 1);
   event.target.value = val;
 
-  // Update refs directly
   inputRefs.current[wordIndex][letterIndex].value = val;
 
-  // Build updated inputLetters flat array
   const letters = inputRefs.current.flatMap((wordRefs) =>
     wordRefs.map((ref) => ref?.value || "")
   );
 
-  // Count non-empty letters
   const filledCount = letters.filter((c) => c !== "").length;
 
   setInputLetters(letters.join(""));
   setLetterCount(filledCount);
 
-  // Auto-focus to next box
   if (val.length === 1) {
     const nextIndex = letterIndex + 1;
     if (
@@ -150,6 +137,22 @@ const handleInputChange = (event, wordIndex, letterIndex) => {
       inputRefs.current[wordIndex + 1][0]?.focus();
     }
   }
+};
+
+const handleClear = () => {
+  inputRefs.current.forEach((row) =>
+    row.forEach((input) => {
+      if (input) input.value = '';
+    })
+  );
+
+  setInputLetters('');
+  setLetterCount(0);
+  setHintIndex(0);
+  setWrongAnswer(false);
+  setToggleCheckAnswer(false);
+
+  inputRefs.current[0]?.[0]?.focus();
 };
 
   const handleKeyDown = (e, wordIndex, letterIndex) => {
@@ -198,12 +201,22 @@ useEffect(() => {
     }
   }
 
+  const [textBoxScale, setTextBoxScale] = useState(1)
+
   useEffect(() =>{
     let styledWidth = width * 0.80
     let calculatedTextBoxWidth = styledWidth / longestWord
-    // console.log(calculatedTextBoxWidth)
 
-    setTextBoxWidth(Math.min(50, Math.max(10, calculatedTextBoxWidth)));
+
+    if(styledWidth > 277){
+      setTextBoxWidth(Math.min(50, Math.max(40, calculatedTextBoxWidth)));
+      setTextBoxScale(1)
+    } else {
+      let widthDiff = 277 - styledWidth
+      let calcWidthDiff = widthDiff * 0.01
+      console.log(1 - calcWidthDiff)
+      setTextBoxScale(1 - calcWidthDiff)
+    }
     
   }, [longestWord, width])
     
@@ -240,7 +253,6 @@ useEffect(() => {
   }, [windowVPH, dev])
 
   useEffect(() => {
-    // Clear previous inputRefs and text box values
     inputRefs.current.forEach((row) =>
       row.forEach((input) => {
         if (input) input.value = '';
@@ -274,6 +286,7 @@ useEffect(() => {
                 marginLeft={0}
                 marginBottom={0}
                 padding={1}
+                sx={{scale: textBoxScale}}
                 >
                 {word.split("").map((letter, letterIndex) => (
                   <Stack
@@ -290,10 +303,10 @@ useEffect(() => {
                       slotProps={{
                         input: {
                           maxLength: 1,
-                          style: { textAlign: "center", fontSize: 30, width: textBoxWidth },
+                          style: { textAlign: "center", fontSize: '1rem', width: textBoxWidth},
                         }
                       }}
-                      sx={{textAlignLast: "center", opacity: 1, transition: "all 1s ease-in" }}
+                      sx={{textAlignLast: "center", opacity: 1, transition: "all 1s ease-in", paddingRight: 0, paddingLeft: 0 }}
                       autoComplete="off"
                       inputRef={(el) => {
                         if (!inputRefs.current[wordIndex]) {
@@ -329,6 +342,7 @@ useEffect(() => {
         >
           Check Answer
         </Button>}
+        <Link onClick={() => handleClear()}>Clear</Link>
       </Stack>
       <Modal
         open={!!isWin}
