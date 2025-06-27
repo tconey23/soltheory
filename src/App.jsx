@@ -22,6 +22,7 @@ import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
+import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -212,6 +213,13 @@ useEffect(() => {
               <Pic6/>
             } 
             />
+
+          <Route 
+            path={"/mythreesongs"}
+            element={
+              <MyThreeSongs />
+            } 
+          />
 
           <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
           <Route path="/games/6pics/:gameId" element={<Pic6 />} />
