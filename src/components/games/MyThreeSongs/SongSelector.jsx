@@ -41,6 +41,7 @@ const SongSelector = ({ token }) => {
   }, [selected])
 
   const searchSongs = async () => {
+    console.log("Spotify token:", token)
     if (!query || !token) return;
     const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
       headers: {
@@ -122,8 +123,8 @@ const SongSelector = ({ token }) => {
                           </Stack>
 
                         <Stack justifyContent={'center'}>
-                          <Button onClick={() => setTrackToPlay(song.id)}><i className="fi fi-sr-play-circle"></i></Button>
-                          <Button onClick={() => removeSong(song.id)}><i className="fi fi-rr-cross-circle"></i></Button>
+                          <Button sx={{fontSize: 18, border: '1px solid white', scale: 0.9}} onClick={() => setTrackToPlay(song.id)}><i className="fi fi-sr-play-circle"></i></Button>
+                          <Button sx={{fontSize: 18, border: '1px solid white', scale: 0.9}} onClick={() => removeSong(song.id)}><i className="fi fi-rr-cross-circle"></i></Button>
                         </Stack>
 
                       </Stack>
