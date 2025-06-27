@@ -1,3 +1,5 @@
+const loc = window.location.origin
+
 export function generateCodeVerifier(length = 128) {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
   let result = '';
@@ -16,7 +18,7 @@ export async function generateCodeChallenge(verifier) {
 
 export async function redirectToSpotifyLogin() {
   const clientId = 'c9e747591c344d3b9f47fae550e56531';
-  const redirectUri = 'http://127.0.0.1:3000/mythreesongs';
+  const redirectUri = `${loc}/mythreesongs`;
   const scopes = 'user-read-private user-read-email';
 
   const verifier = generateCodeVerifier();

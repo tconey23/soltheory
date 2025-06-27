@@ -4,6 +4,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 import useGlobalStore from "./useGlobalStore";
 
+const loc = window.location.origin
 
 export const listAllPacks = async () => {
   let { data: sixpicspacks, error } = await supabase

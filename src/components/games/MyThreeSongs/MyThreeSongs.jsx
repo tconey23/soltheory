@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { redirectToSpotifyLogin } from '../../../business/spotifyAuth'; // adjust import
 import SongSelector from './SongSelector';
 import { Stack, Button, Typography, Box } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 const MyThreeSongs = () => {
 
     const [token, setToken] = useState(null);
+    const loc = window.location.origin
 
     useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
@@ -14,7 +16,7 @@ const MyThreeSongs = () => {
     if (code) {
         const verifier = localStorage.getItem('verifier');
         const clientId = 'c9e747591c344d3b9f47fae550e56531';
-        const redirectUri = 'http://127.0.0.1:3000/mythreesongs';
+        const redirectUri = `${loc}/mythreesongs`;
 
         fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
