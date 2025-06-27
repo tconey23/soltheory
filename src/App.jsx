@@ -22,7 +22,6 @@ import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
-import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -59,7 +58,6 @@ function App() {
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
   const { width, height } = useScreenSize();
-
   const {screenSize} = useBreakpoints()
   const [appReady, setAppReady] = useState(false)
   const [redirect, setRedirect] = useState(false)
@@ -178,75 +176,68 @@ useEffect(() => {
       <AppHeader />
     </Stack>
 
-<Stack height={dims?.height} width={dims?.width} alignItems={'center'} zIndex={1}>
-    <Routes>
-      <Route path='*' element={<Error/>} />
-      <Route path={"/home"} element={<HomePage />}/>
-      <Route path={"/"} element={<HomePage />}/>
-      {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
+    <Stack flex="1" width="100%" id="main">
+        <Routes>
+          <Route path='*' element={<Error/>} />
+          <Route path={"/home"} element={<HomePage />}/>
+          <Route path={"/"} element={<HomePage />}/>
+          {!user && <Route path={"/login"} element={<HomePage needsLogin={true}/>} />}
 
-      <Route 
-        path={"/account"}
-        element={
-          <PrivateRoute userData={userMeta}> 
-            <Account />
-          </PrivateRoute>
-        } 
-        />
+          <Route 
+            path={"/account"}
+            element={
+              <PrivateRoute userData={userMeta}> 
+                <Account />
+              </PrivateRoute>
+            } 
+            />
 
-      <Route 
-        path={"/games"}
-        element={
-          <GamesWrapper />
-        } 
-        />
+          <Route 
+            path={"/games"}
+            element={
+              <GamesWrapper />
+            } 
+            />
 
-      <Route 
-        path={"/games/21things"}
-        element={
-          <TwentyOneThings /> 
-        } 
-        />
+          <Route 
+            path={"/games/21things"}
+            element={
+              <TwentyOneThings /> 
+            } 
+            />
 
-      <Route 
-        path={"/games/6pics"}
-        element={
-          <Pic6/>
-        } 
-      />
+          <Route 
+            path={"/games/6pics"}
+            element={
+              <Pic6/>
+            } 
+            />
 
-      <Route 
-        path={"/mythreesongs"}
-        element={
-          <MyThreeSongs />
-        } 
-      />
+          <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
+          <Route path="/games/6pics/:gameId" element={<Pic6 />} />
 
-      <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
-      <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+          <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
-      <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
+        <Route 
+            path={"/account/admin"}
+            element={
+              <PrivateRoute userData={userMeta}>
+                <AdminControls />
+              </PrivateRoute>
+            } 
+            />
 
-    <Route 
-        path={"/account/admin"}
-        element={
-          <PrivateRoute userData={userMeta}>
-            <AdminControls />
-          </PrivateRoute>
-        } 
-        />
+        <Route 
+            path={"/solmates"}
+            element={
+              <PrivateRoute userData={userMeta}>
+                <SolMates />
+              </PrivateRoute>
+            } 
+            />
 
-    <Route 
-        path={"/solmates"}
-        element={
-          <PrivateRoute userData={userMeta}>
-            <SolMates />
-          </PrivateRoute>
-        } 
-        />
-
-    </Routes>
-  </Stack>
+        </Routes>
+      </Stack>
 
     
       {!inGame && 
