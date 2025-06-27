@@ -6,7 +6,7 @@ import { useLocation } from 'react-router-dom';
 
 const MyThreeSongs = () => {
   const [token, setToken] = useState(null);
-  const location = useLocation(); // ✅ Use this instead of window.location.search
+  const location = useLocation();
 
 useEffect(() => {
   const urlParams = new URLSearchParams(location.search);
@@ -32,7 +32,7 @@ useEffect(() => {
     setToken(stored);
   } else if (!stored && !code && !token) {
     // FORCE login if no token or code — run redirectToSpotifyLogin
-    redirectToSpotifyLogin();
+    // redirectToSpotifyLogin();
   }
 }, []);
 

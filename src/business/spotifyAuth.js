@@ -51,8 +51,13 @@ export async function generateCodeChallenge(verifier) {
 export async function redirectToSpotifyLogin() {
   const clientId = 'c9e747591c344d3b9f47fae550e56531';
   const redirectUri = `${loc}/mythreesongs`;
-  console.log(redirectUri)
-  const scopes = '';
+  const scopes = [
+  'user-read-private',
+  'user-read-email',
+  'streaming',
+  'user-library-read',
+  'user-library-modify'
+].join(' ');
 
   const verifier = generateCodeVerifier();
   const challenge = await generateCodeChallenge(verifier);

@@ -40,17 +40,29 @@ const SongSelector = ({ token }) => {
     console.log(selected)
   }, [selected])
 
-  const searchSongs = async () => {
-    console.log("Spotify token:", token)
-    if (!query || !token) return;
-    const res = await fetch(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`, {
+const searchSongs = async () => {
+  console.log("Spotify token:", token);
+  if (!query || !token) return;
+
+  const res = await fetch(
+    `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+    {
       headers: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-    const data = await res.json();
-    setResults(data.tracks?.items || []);
-  };
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  if (!res.ok) {
+    const text = await res.text(); // Safely read raw body
+    console.error("Spotify Search Error", res.status, text);
+    return;
+  }
+
+  const data = await res.json();
+  setResults(data.tracks?.items || []);
+};
+
 
   const selectSong = (song) => {
     if (selected.length >= 3 || selected.some(s => s.id === song.id)) return;
