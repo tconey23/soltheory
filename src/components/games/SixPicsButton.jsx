@@ -10,7 +10,7 @@ const SixPicsButton = ({admin, scl}) => {
         sx={{scale: scl || 0.5}}
         > 
         <Box sx={{padding: 2}}>
-          <SixPics dims={100}/>
+          <img style={{width: '170px'}} src={'/sixpics.gif'}/>
         </Box>
         <Typography fontSize={50} fontFamily={'Fredoka Regular'}>6 Pics</Typography>
     </Stack>

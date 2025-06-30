@@ -64,7 +64,8 @@ const GamesWrapper = () => {
     const menuStyle = {
       boxShadow : '1px 1px 5px 5px #66339933', 
       marginY : 5, 
-      borderRadius: 2
+      borderRadius: 2,
+      bgcolor: 'white'
     }
 
       useEffect(() => {
@@ -168,7 +169,7 @@ const GamesWrapper = () => {
           <Stack
             sx={{
               width: '100%',
-              marginTop: 20,
+              marginTop: 5,
               borderRadius: 1,
             }}
           >
@@ -184,9 +185,9 @@ const GamesWrapper = () => {
                 <SixPicsButton />
               </MenuItem>
 
-              <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
+              {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
                 <MyThreeSongsButton />
-              </MenuItem>
+              </MenuItem> */}
 
             </List>
           </Stack>

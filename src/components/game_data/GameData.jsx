@@ -52,7 +52,7 @@ const GameData = () => {
       <Select value={selection} onChange={(e) => setSelection(e.target.value)}>
         <MenuItem value={'21 Things'}>21 Things</MenuItem>
         <MenuItem value={'6 Pics'}>6 Pics</MenuItem>
-        <MenuItem value={'3 Songs'}>3 Songs</MenuItem>
+        {/* <MenuItem value={'3 Songs'}>3 Songs</MenuItem> */}
       </Select>
 
         <MotionStack

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Box, Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 import { supabase } from '../business/supabaseClient';
-import { useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
 const LoginForm = () => {
@@ -189,15 +189,22 @@ const Login = () => {
   return (
     <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
       <Stack paddingY={3} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
-        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
-        <Box>
-          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={13}>You can explore our site without creating an account, but creating an account allows more functionality such as saving gameplay and preferences.</Typography>
-          <Typography textAlign={'center'} fontFamily={'Fredoka Variable'} fontSize={14} >Follow your bliss</Typography>
+        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={20}>Welcome to SOLTheory</Typography>
+        <Box sx={{width: '90%'}}>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>You can explore our site without creating an account, but signing up unlocks additional features such as saving your gameplay and following your bliss.</Typography>
         </Box>
       </Stack>
       <Stack width={'90%'}>
         <LoginForm />
       </Stack>
+        <Box>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>For more information about SOL Theory, reach out to 
+
+            <Typography sx={{fontSize: '21px'}}>
+              <Link href="mailto:info@soltheory.com">info@soltheory.com</Link>
+            </Typography>
+          </Typography>
+        </Box>
     </Stack>
   );
 };

@@ -42,7 +42,7 @@ const HomePageMenu = () => {
   const [columnCount, setColumnCount] = useState()
   const menuItems = [
     userMeta ? <Account/> : <Login />,
-    <ThriveParenting />,
+    // <ThriveParenting />,
     <GamesWrapper />,
     <GameData />,
     <Affiliates />
