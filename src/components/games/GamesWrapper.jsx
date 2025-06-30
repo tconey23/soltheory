@@ -160,6 +160,7 @@ const GamesWrapper = () => {
           direction="column"
           paddingY={2}
           paddingX={2}
+          marginBottom={3}
           initial={hasMounted ? false : { opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
@@ -169,7 +170,7 @@ const GamesWrapper = () => {
           <Stack
             sx={{
               width: '100%',
-              marginTop: 5,
+              marginTop: 2,
               borderRadius: 1,
             }}
           >

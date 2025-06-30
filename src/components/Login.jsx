@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { Box, Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 import { supabase } from '../business/supabaseClient';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Link } from '@mui/material';
 
 const LoginForm = () => {
 
@@ -201,7 +202,7 @@ const Login = () => {
           <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>For more information about SOL Theory, reach out to 
 
             <Typography sx={{fontSize: '21px'}}>
-              <Link href="mailto:info@soltheory.com">info@soltheory.com</Link>
+              <Link href="mailto:steve@soltheory.com?subject=Info%20Request" target="_blank" rel="noopener noreferrer">steve@soltheory.com</Link>
             </Typography>
           </Typography>
         </Box>
