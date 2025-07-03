@@ -22,6 +22,7 @@ import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
+import Sandbox from './components/games/Sandbox/Sandbox';
 
 function App() {
   const navTo = useNavigate()
@@ -161,6 +162,13 @@ useEffect(() => {
         path={"/games"}
         element={
           <GamesWrapper />
+        } 
+        />
+
+        <Route 
+        path={"/games/sandbox"}
+        element={
+          <Sandbox />
         } 
         />
 

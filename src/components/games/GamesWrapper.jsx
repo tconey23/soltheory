@@ -6,6 +6,7 @@ import MotionStack from '../../ui_elements/MotionStack';
 import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
 import SixPicsButton from './SixPicsButton';
+import SandboxButton from './SandboxButton'
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -73,6 +74,12 @@ const GamesWrapper = () => {
       }, []);
   
       const startGame = async (gameName, isLoggedIn) => { 
+       
+        if (gameName ===  'sandbox') {
+          navigate('/games/sandbox')
+          return
+        }
+       
         let gameId;
 
         if (userMeta) {
@@ -180,6 +187,10 @@ const GamesWrapper = () => {
 
               <MenuItem sx={menuStyle} value="6pics"  onClick={() => startGame(`6pics`)}>
                 <SixPicsButton />
+              </MenuItem>
+
+              <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+                <SandboxButton />
               </MenuItem>
 
             </List>
