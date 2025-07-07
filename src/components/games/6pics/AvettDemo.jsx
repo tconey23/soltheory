@@ -94,7 +94,7 @@ const AvettDemo = ({demo}) => {
                     </Typography>
 
                     <Typography marginTop={2} textAlign={'left'} fontFamily={'fredoka regular'} fontSize={15}>
-                        •	But beware: every extra stage costs you points.
+                        •	But beware: every extra stage costs you 33 points, and hints cost 1 point.
                     </Typography>
 
                     <Typography marginTop={2} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={17}>
