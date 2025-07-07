@@ -14,7 +14,7 @@ import { render } from "@react-three/fiber";
 import { motion } from 'framer-motion'
 import { Helmet } from "react-helmet";
 
-  const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
+  const ResultsPage = ({score, gamePack, demo=true, levels, levelScore}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
@@ -22,7 +22,8 @@ import { Helmet } from "react-helmet";
     const [showMsg, setShowMsg] = useState(true)
     const MotionStack = motion(Stack)
 
-    const isDemo = useGlobalStore((state) => state.isDemo)
+    // const isDemo = useGlobalStore((state) => state.isDemo)
+    let isDemo = true
   
     useEffect(() => {
       setShotCount(0)
@@ -119,9 +120,11 @@ import { Helmet } from "react-helmet";
         url: `https://soltheory.com/avett`
       })
     }
+
+    console.log(gamePack)
   
     return (
-      <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+      <Stack width={'100%'} height={'80dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
       <Helmet>
         <title>6 Pics – Avett Bros Demo</title>
         <link rel="icon" type="image/png" href="https://soltheory.com/AvettBros.png" />
@@ -132,7 +135,7 @@ import { Helmet } from "react-helmet";
       {!demo ?
           <>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-              <Stack width={'30%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+              <Stack width={'30%'} height={'25%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
                 <video
                   preload="metadata"
                   style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
@@ -229,7 +232,7 @@ import { Helmet } from "react-helmet";
           alignItems={'center'}
           >
             <MotionStack
-              justifyContent={'center'}
+              justifyContent={'center'} 
               alignItems={'center'}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -244,7 +247,11 @@ import { Helmet } from "react-helmet";
               zIndex={10000}
               >
               <Typography textAlign={'center'} fontSize={30} fontFamily={'fredoka regular'}>Thank you for playing 6 Pics!</Typography>
-              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Dismiss this window, take a screenshot of your scores and send it to 720-588-2002 to be entered to win a SOL Theory t-shirt!</Typography>
+              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Dismiss this window, take a screenshot of your scores and send it to </Typography>
+              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>
+                <Link onClick={() => window.location.href = `sms:+18326910649?&body=I just played 6 Pics ${gamePack?.pack_name} by SOL Theory%0AMy score was ${score} / ${gamePack?.videos?.length *100}`}>720.588.2002</Link>
+              </Typography>
+              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>to be entered to win a SOL Theory t-shirt</Typography>
 
               <Box sx={{marginTop: 5}}>
                 <Button

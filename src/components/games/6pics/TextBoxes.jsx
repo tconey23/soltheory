@@ -514,7 +514,7 @@ useEffect(() => {
                 <Typography marginTop={'10px'} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={15}>{`Are you sure you want to get ${reloadHints} more hints?`}</Typography>
                 <Box sx={{width: '75%', display: 'flex', flexDirection: 'column'}}>
                   <Slider min={1} max={Math.floor(longestWord /2)} step={1} valueLabelDisplay={true} value={reloadHints} onChange={(e) => setReloadHints(e.target.value)}/>
-                  <Button onClick={() => getMoreHints(reloadHints)}>Reload!</Button>
+                  <Button disabled={reloadHints > 0} onClick={() => getMoreHints(reloadHints)}>Reload!</Button>
                 </Box>
               </>
             }
