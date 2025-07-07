@@ -1,8 +1,8 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, List, ListItem} from "@mui/material";
+import { Stack, Typography, TextField, Button, List, ListItem, Box, Modal} from "@mui/material";
 import { addGameToUser, getGifs } from "../../../business/games_calls";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
@@ -12,13 +12,17 @@ import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
 import { render } from "@react-three/fiber";
 import { motion } from 'framer-motion'
+import { Helmet } from "react-helmet";
 
-const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
+  const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
     const [renderScores, setRenderScores] = useState(false)
+    const [showMsg, setShowMsg] = useState(true)
     const MotionStack = motion(Stack)
+
+    const isDemo = useGlobalStore((state) => state.isDemo)
   
     useEffect(() => {
       setShotCount(0)
@@ -26,9 +30,11 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
     }, [])
 
     useEffect(() => {
-      // console.log('demo', demo)
-      // console.log(gamePack)
-    }, [demo, gamePack])
+      console.log('demo', isDemo)
+      if(isDemo) {
+        setShowMsg(true)
+      }
+    }, [isDemo])
 
     const shootConfetti = (count) => {
      
@@ -105,9 +111,24 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
       console.log("Game saved:", data);
       nav('/games');
     };
+
+    const shareGame = async () => {
+      await navigator.share({
+        text: 'Think you can beat my scores?', 
+        title: 'I just played this fun new game', 
+        url: `https://soltheory.com/avett`
+      })
+    }
   
     return (
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+      <Helmet>
+        <title>6 Pics – Avett Bros Demo</title>
+        <link rel="icon" type="image/png" href="https://soltheory.com/AvettBros.png" />
+        <meta property="og:image" content="https://soltheory.com/AvettBros.png" />
+        <meta property="og:url" content="https://soltheory.com/avett" />
+        <meta name="twitter:card" content="summary_large_image" />
+      </Helmet>
       {!demo ?
           <>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
@@ -176,7 +197,7 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
                             <MotionStack
                               initial={{ opacity: 0 }}
                               animate={{ opacity: 1 }}
-                              transition={{ duration: 2, delay: 0 }}
+                              transition={{ duration: 1, delay: 0 }}
                             >
                               <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hints`}</Typography>
                             </MotionStack>
@@ -188,8 +209,54 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
                 </List>
               </Stack>
             </Stack>
+            <Link onClick={() => shareGame()}>Share</Link>
           </>
         }
+        {renderScores && showMsg &&
+        <Modal
+        open={showMsg}
+        >
+
+        <MotionStack 
+          position={'absolute'} 
+          height={'100%'} 
+          width={'100%'} 
+          bgcolor={'#0000008c'}
+          initial={{opacity: 0 }}
+          animate={{opacity: 1 }}
+          transition={{ duration: 1, delay: 1 }}
+          justifyContent={'center'}
+          alignItems={'center'}
+          >
+            <MotionStack
+              justifyContent={'center'}
+              alignItems={'center'}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 1.2 }}
+              position={'absolute'}
+              boxShadow={'1px 1px 1px 1px #0000002e'}
+              borderRadius={2}
+              height={'60%'}
+              width={'75dvw'}
+              bgcolor={'white'}
+              padding={2}
+              zIndex={10000}
+              >
+              <Typography textAlign={'center'} fontSize={30} fontFamily={'fredoka regular'}>Thank you for playing 6 Pics!</Typography>
+              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Dismiss this window, take a screenshot of your scores and send it to 720-588-2002 to be entered to win a SOL Theory t-shirt!</Typography>
+
+              <Box sx={{marginTop: 5}}>
+                <Button
+                  onClick={() => setShowMsg(false)}
+                  >
+                  Dismiss
+                </Button>
+              </Box>
+            </MotionStack>
+            </MotionStack>
+            </Modal>
+          }
       </Stack>
     )
   }

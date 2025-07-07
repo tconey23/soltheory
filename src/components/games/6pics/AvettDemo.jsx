@@ -81,7 +81,7 @@ const AvettDemo = ({demo}) => {
                 transition={{ duration: 2, delay: 1.1 }}
             >
                 <Typography fontFamily={'fredoka regular'} fontSize={16}>
-                    In this game, you’ll see six images clips, each one slowly revealing an Avett-inspired image across three stages.
+                    In this game, you’ll see six images, each one slowly revealing an Avett-inspired image across three stages.
                 </Typography>
 
                 <Stack height={'90%'} width={'92%'} marginTop={'10px'} alignItems={'flex-start'} overflow={'auto'}>

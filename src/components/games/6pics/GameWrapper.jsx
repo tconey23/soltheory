@@ -10,7 +10,7 @@ import TextBoxes from './TextBoxes';
 import ResultsPage from './ResultsPage';
 import confetti from 'canvas-confetti';
 import useGlobalStore from '../../../business/useGlobalStore';
-
+import { motion } from 'framer-motion';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -51,6 +51,10 @@ const GameWrapper = ({ pack, setPack }) => {
   const inGame = useGlobalStore((state) => state.inGame)
   const isDemo = useGlobalStore((state) => state.isDemo)
   const setInGame = useGlobalStore((state) => state.setInGame)
+  const userMeta = useGlobalStore((state) => state.userMeta)
+
+  const MotionStack = motion(Stack)
+
   const sliderRef = useRef();
 
   const navTo = useNavigate()

@@ -22,6 +22,7 @@ const SixPicsVideoPlayer = ({
 }) => {
   const videoRef = useRef(null);
   const screen = useGlobalStore((state) => state.screen);
+  const userMeta = useGlobalStore((state) => state.userMeta)
 
   const [stage, setStage] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);

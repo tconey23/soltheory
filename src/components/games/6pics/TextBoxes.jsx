@@ -20,6 +20,7 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
 
 
   const screen = useGlobalStore((state) => state.screen);
+  const userMeta = useGlobalStore((state) => state.userMeta)
   const inputRefs = useRef([]);
 
   const parsedAnswer = answer.split("");
@@ -342,6 +343,8 @@ useEffect(() => {
 
   let cleanedIndex = 0;
 
+  console.log(userMeta)
+
   return (
     <Stack direction="column" width="90%" justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
     <Stack 
@@ -422,7 +425,7 @@ useEffect(() => {
         >
           Check Answer
         </Button>}
-        {!giveUp && <Link onClick={() => setIsWin(true)}>Skip</Link>}
+        {!giveUp && userMeta?.is_admin && <Link onClick={() => setIsWin(true)}>Skip</Link>}
         {/* {!giveUp && <Link onClick={() => handleClear()}>Clear</Link>} */}
       </Stack>
       <Modal
