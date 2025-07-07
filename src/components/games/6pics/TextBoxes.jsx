@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const MotionStack = motion(Stack);
 
-const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp }) => {
+const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp, forceRefresh}) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
@@ -15,17 +15,23 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const [hintIndex, setHintIndex] = useState(0);
   const [toggleHint, setToggleHint] = useState(true)
   const [wrongAnswer, setWrongAnswer] = useState(false)
+  const [nextFocusIndex, setNextFocusIndex] = useState(null);
+
 
   const screen = useGlobalStore((state) => state.screen);
   const inputRefs = useRef([]);
 
-  const words = answer.split(" ");
+  const parsedAnswer = answer.split("");
+  const wordChunks = answer.match(/[\w']+|[^\w\s]/g);
 
-  // Calculate expected letter count once on mount
-  useEffect(() => {
-    const target = words.reduce((acc, word) => acc + word.length, 0);
-    setLetterTarget(target);
-  }, [answer]);
+  const cleanedChars = answer
+  .split("")
+  .filter((char) => /[a-z0-9]/i.test(char));
+
+useEffect(() => {
+  const cleaned = answer.replace(/[^\w]|_/g, ""); // remove punctuation and spaces
+  setLetterTarget(cleaned.length);
+}, [answer]);
 
   // Auto win logic
   useEffect(() => {
@@ -41,58 +47,100 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   }, [isWin]);
 
   useEffect(() => {
+    // console.log(
+    //   `
+    //   letterCount = ${letterCount}
+    //   letterTarget = ${letterTarget}
+    //   `
+    // )
     setToggleCheckAnswer(letterCount === letterTarget);
   }, [letterCount, letterTarget]);
-  
-  useEffect(() => {
 
-    let calculatedScore = levelScore?.[index]?.score -5 
+useEffect(() => {
+  if (isWin || giveUp) {
+    setToggleHint(false);
+    return;
+  }
 
-    if (calculatedScore > 0){
-      setToggleHint(true)
-    } else {
-      setToggleHint(false)
+  const score = levelScore?.[index]?.score;
+  if (typeof score === "number" && score > 5) {
+    setToggleHint(true);
+  } else {
+    setToggleHint(false);
+  }
+}, [hintIndex, letterTarget, isWin, giveUp, index, levelScore, answer]);
+
+
+const getHint = () => {
+
+  let currentStep
+
+  console.clear()
+
+  // console.log('hint button clicked!')
+
+  currentStep = 'getHint() function init'
+  // console.log('start getHint()')
+
+  if (isWin || giveUp) return;
+
+  currentStep = 'checking for isWin or giveUp'
+  // console.log('not isWin or giveUp')
+
+  currentStep = 'checking inputLetters.length'
+  // console.log(`input letters length ${inputLetters?.length}`)
+
+  for (let i = 0; i < inputLetters.length; i++) {
+    currentStep = 'checking that index is valid'
+    // console.log(`index is ${i}`)
+
+    if (!inputLetters[i]) {
+      currentStep = 'getting the correctLetter'
+      const correctLetter = cleanedChars[i];
+
+
+      currentStep = 'checking for valid cleaned letter at index'
+      // console.log(`Cleaned letter at ${i} is ${cleanedChars[i]}`)
+
+      currentStep = 'checking for valid correctLetter'
+      // console.log(`Correct letter is ${correctLetter}`)
+
+      if (!correctLetter) return;
+
+      // console.log('no valid correctLetter!')
+
+      const updatedLetters = [...inputLetters];
+      updatedLetters[i] = correctLetter;
+      setInputLetters(updatedLetters);
+      setLetterCount(prev => prev +1)
+
+      setLevelScore((prev) => {
+        const updated = [...prev];
+        updated[index].score = Math.max(0, updated[index].score - 5);
+        return updated;
+      });
+
+      setHintIndex(i + 1);
+
+      // Focus next empty input
+      setTimeout(() => {
+        const nextRef = inputRefs.current[i + 1];
+        if (nextRef) nextRef.focus();
+      }, 0);
+
+      // console.log('Setting hint at index', i, 'to', correctLetter);
+
+      return;
     }
+  }
 
-    if(isWin || giveUp){
-      setToggleHint(false)    
-    }
+  // console.log(`Something went wrong and the function returned early while **${currentStep.toUpperCase()}**`)
 
-  }, [hintIndex, letterTarget, isWin, giveUp])
-
-    const getHint = () => {
-      if (isWin || giveUp) return;
-
-      let globalIndex = 0;
-
-      for (let w = 0; w < words.length; w++) {
-        for (let l = 0; l < words[w].length; l++) {
-          const input = inputRefs.current[w]?.[l];
-
-          if (input && input.value === "") {
-            const correctLetter = words[w][l];
-            input.value = correctLetter;
-
-            handleInputChange({ target: { value: correctLetter } }, w, l);
-
-            setLevelScore(prev => {
-              const updated = [...prev];
-              updated[index].score = Math.max(0, updated[index].score - 5);
-              return updated;
-            });
-
-            setHintIndex(globalIndex + 1);
-            return;
-          }
-
-          globalIndex++;
-        }
-      }
-      // No hintable letters left
-      setToggleHint(false);
-    };
-
-
+  const allFilled = cleanedChars.every((_, i) => inputLetters[i]);
+  if (allFilled) {
+    setToggleHint(false);
+  }
+};
 
   const handleRightAnswer = () => {
     setIsWin(true);
@@ -106,102 +154,87 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
     setWrongAnswer(true)
   };
 
-  const checkAnswer = () => {
-    const ans = answer.replaceAll(" ", "").toLowerCase();
-    const check = inputLetters.toLowerCase();
-    check === ans ? handleRightAnswer() : handleWrongAnswer();
-  };
+const stripPunctuation = (text) => text.replace(/[^\w]|_/g, "");
 
-const handleInputChange = (event, wordIndex, letterIndex) => {
-  const { value } = event.target;
-  const val = value.slice(0, 1);
-  event.target.value = val;
+const checkAnswer = () => {
+  const ans = stripPunctuation(answer).toLowerCase();
+  const check = inputLetters.join('').toLowerCase(); // ✅ FIXED
+  check === ans ? handleRightAnswer() : handleWrongAnswer();
+};
 
-  inputRefs.current[wordIndex][letterIndex].value = val;
+const handleCharInput = (e, index) => {
+  const val = e.target.value.toLowerCase().slice(0, 1);
+  if (!val.match(/[a-z0-9]/i)) return;
 
-  const letters = inputRefs.current.flatMap((wordRefs) =>
-    wordRefs.map((ref) => ref?.value || "")
-  );
+  const newLetters = [...inputLetters];
+  newLetters[index] = val;
+  setInputLetters(newLetters);
 
-  const filledCount = letters.filter((c) => c !== "").length;
-
-  setInputLetters(letters.join(""));
+  const filledCount = newLetters.filter(Boolean).length;
   setLetterCount(filledCount);
 
-  if (val.length === 1) {
-    const nextIndex = letterIndex + 1;
-    if (
-      nextIndex < inputRefs.current[wordIndex].length &&
-      inputRefs.current[wordIndex][nextIndex]
-    ) {
-      inputRefs.current[wordIndex][nextIndex].focus();
-    } else if (wordIndex + 1 < inputRefs.current.length) {
-      inputRefs.current[wordIndex + 1][0]?.focus();
-    }
+  // Move to next input
+  if (val) {
+    setNextFocusIndex(index + 1);
   }
 };
 
-const handleClear = () => {
-  inputRefs.current.forEach((row) =>
-    row.forEach((input) => {
-      if (input) input.value = '';
-    })
-  );
+useEffect(() => {
+  if (nextFocusIndex !== null) {
+    const nextRef = inputRefs.current[nextFocusIndex];
+    if (nextRef) nextRef.focus();
+    setNextFocusIndex(null);
+  }
+}, [inputLetters, nextFocusIndex]);
 
-  setInputLetters('');
+
+const handleClear = () => {
+  setInputLetters([]);
   setLetterCount(0);
   setHintIndex(0);
   setWrongAnswer(false);
   setToggleCheckAnswer(false);
 
-  inputRefs.current[0]?.[0]?.focus();
+  inputRefs.current[0]?.focus();
 };
 
-  const handleKeyDown = (e, wordIndex, letterIndex) => {
-    const key = e.key;
-    if (key === "Backspace") {
-      const currentInput = inputRefs.current[wordIndex][letterIndex];
-      if (currentInput?.value === "") {
-        if (letterIndex > 0) {
-          inputRefs.current[wordIndex][letterIndex - 1]?.focus();
-        } else if (wordIndex > 0) {
-          const prevWord = inputRefs.current[wordIndex - 1];
-          prevWord[prevWord.length - 1]?.focus();
-        }
+
+const handleCharBackspace = (e, index) => {
+  if (e.key === "Backspace") {
+    // If current box has a letter, just clear it
+    if (inputLetters[index]) {
+      const newLetters = [...inputLetters];
+      newLetters[index] = "";
+      setInputLetters(newLetters);
+      setLetterCount(newLetters.filter(Boolean).length);
+    }
+    // If current box is empty, move focus and clear previous box
+    else if (inputRefs.current[index]?.value === "") {
+      const prev = inputRefs.current[index - 1];
+      if (prev) prev.focus();
+      if (index > 0) {
+        const newLetters = [...inputLetters];
+        newLetters[index - 1] = "";
+        setInputLetters(newLetters);
+        setLetterCount(newLetters.filter(Boolean).length);
       }
     }
-  };
+  }
+};
+
 
 useEffect(() => {
   if (!giveUp && !isWin) return;
 
-  let count = 0;
-  for (let w = 0; w < words.length; w++) {
-    for (let l = 0; l < words[w].length; l++) {
-      const correctLetter = words[w][l];
-      const input = inputRefs.current[w]?.[l];
+  const cleanedAnswer = answer.replace(/[^\w]|_/g, "").toLowerCase();
+  const letters = cleanedAnswer.split("");
+  setInputLetters(letters);
+  setLetterCount(letters.length);
+}, [giveUp, isWin, answer]);
 
-      if (input) {
-        input.value = correctLetter;
-      }
-
-      count++;
-    }
-  }
-
-  setLetterCount(words.join("").length);
-}, [giveUp, isWin, words]);
 
   const [longestWord, setLongestWord] = useState(0)
   const [textBoxWidth, setTextBoxWidth] = useState(0)
-
-  const getCharCount = (chars) => {
-    if(chars > longestWord){
-      setLongestWord(chars)
-    } else { 
-      return
-    }
-  }
 
   const [textBoxScale, setTextBoxScale] = useState(1)
 
@@ -255,82 +288,87 @@ useEffect(() => {
   }, [windowVPH, dev])
 
   useEffect(() => {
-    inputRefs.current.forEach((row) =>
-      row.forEach((input) => {
-        if (input) input.value = '';
-      })
-    );
-    inputRefs.current = [];
-    setLetterCount(0);
-    setInputLetters('');
-    setHintIndex(0);
-    setWrongAnswer(false);
-    setIsWin(false);
-    setToggleCheckAnswer(false);
-  }, [answer, index]);
+  const cleaned = answer.replace(/[^\w]|_/g, "");
+  setLetterTarget(cleaned.length);
+  setInputLetters(new Array(cleaned.length).fill(""));
+  setHintIndex(0);
+  setWrongAnswer(false);
+  setIsWin(false);
+  setToggleCheckAnswer(false);
+  setToggleHint(true);
+  setLetterCount(0);
+  inputRefs.current = [];
+}, [answer, index]);
+
+  let cleanedIndex = 0;
 
   return (
     <Stack direction="column" width="100%" justifyContent="center" alignItems={'center'}>
-    <Stack direction="row" width="98%" justifyContent="center" alignItems={'center'} flexWrap="wrap" id="letter_wrapper" height={height * 0.33} overflow={'auto'} boxShadow={'inset 0px 0px 5px 3px #0000001a'}>
-      {!isWin &&
-        words.map((word, wordIndex) => {
-          getCharCount(word?.length)
-          if (!inputRefs.current[wordIndex]) {
-            inputRefs.current[wordIndex] = [];
-          }
-          
-          return (
-            <Stack key={`word-${wordIndex}`}>
-              <Stack
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                marginLeft={0}
-                marginBottom={0}
-                padding={1}
-                sx={{scale: textBoxScale}}
-                >
-                {word.split("").map((letter, letterIndex) => (
-                  <Stack
-                  key={`letter-${wordIndex}-${letterIndex}`}
-                  id="textbox-wrapper"
-                  marginLeft={0}
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                  flexWrap="wrap"
-                  >
-                    <TextField
-                      disabled={false}
-                      slotProps={{
-                        input: {
-                          maxLength: 1,
-                          style: { textAlign: "center", fontSize: '1rem', width: textBoxWidth},
-                        }
-                      }}
-                      sx={{textAlignLast: "center", opacity: 1, transition: "all 1s ease-in", paddingRight: 0, paddingLeft: 0 }}
-                      autoComplete="off"
-                      inputRef={(el) => {
-                        if (!inputRefs.current[wordIndex]) {
-                          inputRefs.current[wordIndex] = []; // Initialize the row array if it doesn't exist
-                        }
-                        inputRefs.current[wordIndex][letterIndex] = el;
-                      }}
-                      onChange={(e) => {
-                        const val = e.target.value.slice(0, 1); // Only allow 1 character
-                        e.target.value = val;
-                        handleInputChange(e, wordIndex, letterIndex);
-                      }}
-                      onKeyDown={(e) => handleKeyDown(e, wordIndex, letterIndex)}
-                      />
-                  </Stack>
-                ))}
-              </Stack>
-            </Stack>
-          );
-        })}
+    <Stack 
+      direction="row"
+      flexWrap="wrap"
+      justifyContent="center"
+      alignItems="center"
+      padding={1}
+      id="letter_wrapper"
+      height={height * 0.33}
+      overflow="auto"
+      sx={{
+        gap: 1,
+        rowGap: 1.5,
+        wordBreak: "keep-all",  // optional
+      }}
+      >
+      {wordChunks.map((word, wordIndex) => (
+        <Stack
+          key={`word-${wordIndex}`}
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          margin={0.5}
+          flexWrap="nowrap"
+          sx={{ whiteSpace: 'nowrap' }} // prevent internal wrap
+        >
+          {word.split("").map((char, charIndex) => {
+      const isAlphaNum = /[a-z0-9]/i.test(char);
 
-      </Stack>
+      if (isAlphaNum) {
+        const currentIndex = cleanedIndex++;
+        return (
+            <TextField
+              key={`char-${wordIndex}-${charIndex}`}
+              value={inputLetters[currentIndex] || ""}
+              inputRef={(el) => (inputRefs.current[currentIndex] = el)}
+              onChange={(e) => handleCharInput(e, currentIndex)}
+              onKeyDown={(e) => handleCharBackspace(e, currentIndex)}
+              slotProps={{
+                input: {
+                  maxLength: 1,
+                  style: { textAlign: "center", fontSize: "1rem", width: textBoxWidth },
+                },
+              }}
+              sx={{ marginX: 0.25, transition: "all 0.3s" }}
+              autoComplete="off"
+            />
+              );
+            } else {
+              return (
+                <Typography
+                  key={`punct-${wordIndex}-${charIndex}`}
+                  variant="h5"
+                  component="span"
+                  mx={0.5}
+                  fontFamily="Fredoka"
+                >
+                  {char}
+                </Typography>
+              );
+            }
+          })}
+        </Stack>
+      ))}
+
+    </Stack>
 
       <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} marginTop={3} width={'75%'}>
         {toggleHint && <Link onClick={getHint} disabled={hintIndex >= letterTarget}>Hint</Link>}
@@ -383,7 +421,11 @@ useEffect(() => {
             >
             <Typography color="blue" fontSize={30}><i className="fi fi-rs-face-sad-sweat"></i></Typography>
             <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Sorry! Your answer:`}</Typography>
-            {inputLetters?.length && <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`"${inputLetters.toLowerCase()}"`}</Typography>}
+            {inputLetters?.length > 0 && (
+              <Typography>
+                {`"${inputLetters.join('').toLowerCase()}"`}
+              </Typography>
+            )}
             <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">Is incorrect!</Typography>
             <Button onClick={() => setWrongAnswer(false)} variant="contained">Try again</Button>
             </MotionStack>

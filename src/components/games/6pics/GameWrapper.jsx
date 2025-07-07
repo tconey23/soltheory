@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-
+import { useNavigate } from 'react-router-dom';
 import { fetchVideos } from './helpers/functions';
 import SixPicsVideoPlayer from './SixPicsVideoPlayer';
 import TextBoxes from './TextBoxes';
@@ -33,7 +33,7 @@ const useScreenSize = () => {
   return screenSize;
 };
 
-const GameWrapper = ({ pack }) => { 
+const GameWrapper = ({ pack, setPack }) => { 
   const [levels, setLevels] = useState([]);
   const [levelScore, setLevelScore] = useState([]);
   const [wins, setWins] = useState(0);
@@ -44,11 +44,14 @@ const GameWrapper = ({ pack }) => {
   const [showGiveUp, setShowGiveUp] = useState(false);
   const [giveUp, setGiveUp] = useState(false)
   const [isWin, setIsWin] = useState(false)
-  const { width, height } = useScreenSize()
+  const { width, height } = useScreenSize();
+  const [forceRefresh, setForceRefresh] = useState(0)
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
   const sliderRef = useRef();
+
+  const navTo = useNavigate()
 
   const next = () => {
   setIsWin(false);                 // reset win state BEFORE slide changes
@@ -141,11 +144,50 @@ const GameWrapper = ({ pack }) => {
     // console.log('isWin',isWin)
   }, [isWin])
 
+  const startOver = () => {
+    setWins(0);
+    setTotalScore(0);
+    setRefreshScore(0);
+    setGameOver(false);
+    setShowGiveUp(false);
+    setGiveUp(false);
+    setIsWin(false);
+    setLevelScore([]);        // Re-initialize once levels are fetched again
+    setActiveSlide(0);
+    sliderRef.current?.slickGoTo(0);  // Reset the slider to first slide
+
+    // Optionally refetch videos (if you want a full reset of content)
+    (async () => {
+      try {
+        const res = await fetchVideos(pack?.id);
+        if (res) {
+          setLevels(res);
+        }
+      } catch (error) {
+        console.error('Error fetching videos on restart:', error);
+      }
+    })();
+    setForceRefresh(prev => prev +1)
+  };
+
   return (
     <Stack direction="column" sx={{ height: height, width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
-      {!gameOver && levelScore[activeSlide] && (
-        <Typography key={refreshScore}>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
-      )}
+      <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
+        <Box sx={{width: '33%'}}>
+          <Button onClick={() => {
+            navTo('/games/6pics')
+            setPack('')
+            }}>Start over</Button>
+        </Box>
+        <Box sx={{width: '33%'}}>
+          {!gameOver && levelScore[activeSlide] && (
+            <Typography key={refreshScore}>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
+          )}
+        </Box>
+        <Box sx={{width: '33%'}}>
+          <Typography>{`Pic# ${activeSlide +1}`}</Typography>
+        </Box>
+      </Stack>
 
       <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '100%'}}>
         {!gameOver &&
@@ -172,8 +214,10 @@ const GameWrapper = ({ pack }) => {
                     height={height}
                     giveUp={giveUp}
                     setGiveUp={setGiveUp}
+                    forceRefresh={forceRefresh}
                   />
                   <TextBoxes
+                    forceRefresh={forceRefresh}
                     isWin={isWin}
                     setIsWin={setIsWin}
                     answer={level.answer}
