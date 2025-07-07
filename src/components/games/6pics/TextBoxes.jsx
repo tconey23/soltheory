@@ -10,7 +10,7 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
-  const [autoAnswer, setAutoAnswer] = useState(false);
+  const [autoAnswer, setAutoAnswer] = useState(true);
   const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
   const [hintIndex, setHintIndex] = useState(0);
   const [toggleHint, setToggleHint] = useState(true)
@@ -35,8 +35,10 @@ useEffect(() => {
 
   // Auto win logic
   useEffect(() => {
-    if (autoAnswer) setIsWin(true);
-  }, [autoAnswer]);
+    if (autoAnswer){
+      setIsWin(true)
+    };
+  }, [autoAnswer, answer, inputLetters]);
 
   useEffect(() => {
     if (isWin) {

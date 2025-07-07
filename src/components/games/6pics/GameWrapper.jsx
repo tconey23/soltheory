@@ -191,7 +191,9 @@ const GameWrapper = ({ pack, setPack }) => {
 
       <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '100%'}}>
         {!gameOver &&
-          levels.map((level, i) => (
+          levels.map((level, i) => {
+            // console.log(i)
+            return (
             <Stack id='game_stage' key={i} height={'100%'}>
               {i === activeSlide && (
                 <Stack  justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
@@ -235,9 +237,10 @@ const GameWrapper = ({ pack, setPack }) => {
                 </Stack>
               )}
             </Stack>
-          ))}
+          )}
+          )}
 
-        {gameOver && <ResultsPage score={totalScore} gamePack={pack} width={width} height={height} />}
+        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={true} score={totalScore} gamePack={pack} width={width} height={height} />}
       </Slider>
     </Stack>
   );
