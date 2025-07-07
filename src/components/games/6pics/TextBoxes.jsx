@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, Modal } from "@mui/material";
+import { Stack, Typography, TextField, Button, Modal, Slider, Box } from "@mui/material";
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
 import { Link } from "react-router-dom";
@@ -17,6 +17,8 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const [wrongAnswer, setWrongAnswer] = useState(false)
   const [nextFocusIndex, setNextFocusIndex] = useState(null);
   const [hintsUsed, setHintsUsed] = useState(0)
+  const [moreHints, setMoreHints] = useState(false)
+  const [reloadHints, setReloadHints] = useState(0)
 
 
   const screen = useGlobalStore((state) => state.screen);
@@ -76,6 +78,8 @@ useEffect(() => {
   } else {
     setToggleHint(false);
   }
+
+  console.log(levelScore)
 
 }, [hintIndex, letterTarget, isWin, giveUp, index, levelScore, answer]);
 
@@ -165,6 +169,20 @@ const getHint = () => {
     setToggleHint(false);
   }
 };
+
+const getMoreHints = () => {
+let currentHints = levelScore[index]?.hints
+
+  setLevelScore(prev =>
+          prev.map((obj, idx) =>
+              idx === index
+            ? { ...obj, hints: currentHints + reloadHints, reloadedHints: true}
+            : obj
+        )
+      );
+
+  setMoreHints(false)
+}
 
   const handleRightAnswer = () => {
     setIsWin(true);
@@ -414,14 +432,20 @@ useEffect(() => {
     </Stack>
 
       <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} marginTop={3} width={'75%'}>
-        {toggleHint && <Link onClick={getHint} disabled={hintIndex >= letterTarget}>Hint</Link>}
+        {<Link onClick={() => {
+          if(levelScore[index]?.hints > 0){
+            getHint()
+          } else {
+            setMoreHints(true)
+          }
+        }} disabled={hintIndex >= letterTarget}>{levelScore[index]?.hints > 0 ? `Hint (${levelScore[index]?.hints})` : 'Get more hints'}</Link>}
 
         {!isWin && !giveUp &&
         <Button
-        disabled={!toggleCheckAnswer}
-        sx={{ margin: 2 }}
-        onClick={checkAnswer}
-        variant="contained"
+          disabled={!toggleCheckAnswer}
+          sx={{ margin: 2 }}
+          onClick={checkAnswer}
+          variant="contained"
         >
           Check Answer
         </Button>}
@@ -476,6 +500,34 @@ useEffect(() => {
             <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">Is incorrect!</Typography>
             <Button onClick={() => setWrongAnswer(false)} variant="contained">Try again</Button>
             </MotionStack>
+        </Stack>
+      </Modal>
+      <Modal 
+        open={!!moreHints}
+      >
+        <Stack height={'100%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
+          <Stack height={'30%'} width={'75%'} bgcolor={'white'} justifyContent={'center'} alignItems={'center'} borderRadius={2}>
+            {levelScore[index]?.score > longestWord && !levelScore[index]?.reloadedHints &&
+              <>              
+                <Typography textAlign={'center'} fontFamily={'fredoka regular'} fontSize={18}>{levelScore[index]?.score > longestWord ? `You can reload a maximum of ${Math.floor(longestWord /2)} hints.`: 'You cannot afford to reload points for this level'}</Typography>
+                <Typography textAlign={'center'} fontFamily={'fredoka regular'} fontSize={15}>{`Additional hints will count against your total score`}</Typography>
+                <Typography marginTop={'10px'} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={15}>{`Are you sure you want to get ${reloadHints} more hints?`}</Typography>
+                <Box sx={{width: '75%', display: 'flex', flexDirection: 'column'}}>
+                  <Slider min={1} max={Math.floor(longestWord /2)} step={1} valueLabelDisplay={true} value={reloadHints} onChange={(e) => setReloadHints(e.target.value)}/>
+                  <Button onClick={() => getMoreHints(reloadHints)}>Reload!</Button>
+                </Box>
+              </>
+            }
+
+            {levelScore[index]?.reloadedHints &&
+            <>
+              <Typography marginX={2} marginY={'10px'} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={18}>{`You can only reload hints once per level`}</Typography>
+              <Box sx={{width: '75%', display: 'flex', flexDirection: 'column'}}>
+                <Button onClick={() => setMoreHints(false)}>Ok</Button>
+              </Box>
+            </>
+            }
+          </Stack>
         </Stack>
       </Modal>
     </Stack>

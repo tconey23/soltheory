@@ -156,7 +156,7 @@ import { Helmet } from "react-helmet";
                       }
                       return (
                         <ListItem>
-                          <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts`}</Typography>
+                          <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hint(s)`}</Typography>
                         </ListItem>
                       )
                     })
@@ -199,7 +199,7 @@ import { Helmet } from "react-helmet";
                               animate={{ opacity: 1 }}
                               transition={{ duration: 1, delay: 0 }}
                             >
-                              <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hints`}</Typography>
+                              <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hint(s)`}</Typography>
                             </MotionStack>
                           </ListItem>
                       )
@@ -212,7 +212,7 @@ import { Helmet } from "react-helmet";
             <Link onClick={() => shareGame()}>Share</Link>
           </>
         }
-        {renderScores && showMsg &&
+        {renderScores && showMsg && isDemo &&
         <Modal
         open={showMsg}
         >

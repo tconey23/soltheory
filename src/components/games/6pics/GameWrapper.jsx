@@ -113,7 +113,8 @@ const GameWrapper = ({ pack, setPack }) => {
           level: i, 
           score: 100, 
           hints: getHintAllowance(levels[i].answer), 
-          hintsUsed: 0
+          hintsUsed: 0,
+          reloadedHints: false
         }));
       setLevelScore(newScores);
       setInGame(true)
@@ -212,7 +213,7 @@ const GameWrapper = ({ pack, setPack }) => {
           {!gameOver && levelScore[activeSlide] && (
             <>
               <Typography>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
-              <Typography>{`Hints ${levelScore[activeSlide]?.hints}`}</Typography>
+              {/* <Typography>{`Hints ${levelScore[activeSlide]?.hints}`}</Typography> */}
             </>
           )}
         </Stack>
