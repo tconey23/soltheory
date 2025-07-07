@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 
 const MotionStack = motion(Stack);
 
-const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp, forceRefresh}) => {
+const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp, forceRefresh, setLevelsPlayed, isDemo}) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
@@ -16,6 +16,7 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const [toggleHint, setToggleHint] = useState(true)
   const [wrongAnswer, setWrongAnswer] = useState(false)
   const [nextFocusIndex, setNextFocusIndex] = useState(null);
+  const [hintsUsed, setHintsUsed] = useState(0)
 
 
   const screen = useGlobalStore((state) => state.screen);
@@ -40,6 +41,12 @@ useEffect(() => {
     };
   }, [autoAnswer, answer, inputLetters]);
 
+  useEffect(() =>{
+    if(isDemo){
+      setAutoAnswer(false)
+    }
+  }, [isDemo])
+
   useEffect(() => {
     if (isWin) {
       setWins(prev => prev + 1);
@@ -63,13 +70,27 @@ useEffect(() => {
   }
 
   const score = levelScore?.[index]?.score;
-  if (typeof score === "number" && score > 5) {
+  if (levelScore[index]?.hints > 0) {
     setToggleHint(true);
   } else {
     setToggleHint(false);
   }
+
 }, [hintIndex, letterTarget, isWin, giveUp, index, levelScore, answer]);
 
+
+useEffect(()=>{
+  let currentHints = levelScore[index]?.hints - 1
+  if(hintsUsed > 0){
+    setLevelScore(prev =>
+          prev.map((obj, idx) =>
+              idx === index
+            ? { ...obj, hints: currentHints, hintsUsed: hintsUsed }
+            : obj
+        )
+      );
+  }
+}, [hintsUsed, index])
 
 const getHint = () => {
 
@@ -116,7 +137,7 @@ const getHint = () => {
 
       setLevelScore((prev) => {
         const updated = [...prev];
-        updated[index].score = Math.max(0, updated[index].score - 5);
+        updated[index].score = Math.max(0, updated[index].score - 1);
         return updated;
       });
 
@@ -129,6 +150,8 @@ const getHint = () => {
       }, 0);
 
       // console.log('Setting hint at index', i, 'to', correctLetter);
+
+      setHintsUsed(prev => prev +1)
 
       return;
     }
@@ -234,25 +257,42 @@ useEffect(() => {
 
 
   const [longestWord, setLongestWord] = useState(0)
-  const [textBoxWidth, setTextBoxWidth] = useState(0)
+  const [textBoxWidth, setTextBoxWidth] = useState(50)
 
   const [textBoxScale, setTextBoxScale] = useState(1)
 
   useEffect(() =>{
-    let styledWidth = width * 0.80
-    let calculatedTextBoxWidth = styledWidth / longestWord
+    let ansArray = answer?.split(' ')
+    let longest = 0
 
+    ansArray.forEach((a) => {
+      if(a.length > longest) {
+        longest = a.length
+      }
+      setLongestWord(longest)
+    })
 
-    if(styledWidth > 277){
-      setTextBoxWidth(Math.min(50, Math.max(40, calculatedTextBoxWidth)));
+  }, [answer])
+
+  useEffect(() =>{
+    let styledWidth = width * 0.9
+    let calculatedTextBoxWidth = 40
+    
+    if(longestWord){
+      calculatedTextBoxWidth = styledWidth / longestWord
+    }
+
+    console.log(calculatedTextBoxWidth)
+
+    if(styledWidth > 330){
+      setTextBoxWidth(Math.min(40, Math.max(50, calculatedTextBoxWidth)));
       setTextBoxScale(1)
     } else {
-      let widthDiff = 277 - styledWidth
+      let widthDiff = 330 - styledWidth
       let calcWidthDiff = widthDiff * 0.01
-      console.log(1 - calcWidthDiff)
       setTextBoxScale(1 - calcWidthDiff)
     }
-    
+
   }, [longestWord, width])
     
   const [dev, setDev] = useState('')
@@ -303,7 +343,7 @@ useEffect(() => {
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="100%" justifyContent="center" alignItems={'center'}>
+    <Stack direction="column" width="90%" justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
@@ -328,7 +368,7 @@ useEffect(() => {
           margin={0.5}
           flexWrap="nowrap"
           sx={{ whiteSpace: 'nowrap' }} // prevent internal wrap
-        >
+        > 
           {word.split("").map((char, charIndex) => {
       const isAlphaNum = /[a-z0-9]/i.test(char);
 
@@ -362,7 +402,7 @@ useEffect(() => {
                 >
                   {char}
                 </Typography>
-              );
+              )
             }
           })}
         </Stack>
@@ -382,7 +422,8 @@ useEffect(() => {
         >
           Check Answer
         </Button>}
-        <Link onClick={() => handleClear()}>Clear</Link>
+        {!giveUp && <Link onClick={() => setIsWin(true)}>Skip</Link>}
+        {/* {!giveUp && <Link onClick={() => handleClear()}>Clear</Link>} */}
       </Stack>
       <Modal
         open={!!isWin}
@@ -401,7 +442,10 @@ useEffect(() => {
             <Typography color="green" fontSize={30}><i className="fi fi-rr-laugh-beam"></i></Typography>
             <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
             <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
-            <Button onClick={next} variant="contained">Continue</Button>
+            <Button onClick={() => {
+              next()
+              setLevelsPlayed(prev => prev +1)
+            }} variant="contained">Continue</Button>
             </MotionStack>
         </Stack>
       </Modal>

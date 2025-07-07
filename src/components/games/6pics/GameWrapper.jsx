@@ -36,6 +36,7 @@ const useScreenSize = () => {
 const GameWrapper = ({ pack, setPack }) => { 
   const [levels, setLevels] = useState([]);
   const [levelScore, setLevelScore] = useState([]);
+  const [levelsPlayed, setLevelsPlayed] = useState(0)
   const [wins, setWins] = useState(0);
   const [activeSlide, setActiveSlide] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
@@ -48,6 +49,7 @@ const GameWrapper = ({ pack, setPack }) => {
   const [forceRefresh, setForceRefresh] = useState(0)
 
   const inGame = useGlobalStore((state) => state.inGame)
+  const isDemo = useGlobalStore((state) => state.isDemo)
   const setInGame = useGlobalStore((state) => state.setInGame)
   const sliderRef = useRef();
 
@@ -95,7 +97,20 @@ const GameWrapper = ({ pack, setPack }) => {
   // Initialize level scores
   useEffect(() => {
     if (levels.length > 0 && levelScore.length === 0) {
-      const newScores = levels.map((_, i) => ({ level: i, score: 100 }));
+
+      const getHintAllowance = (ans) =>{
+        let hintLength = ans.replaceAll(" ",'').length / 2
+        
+        return Math.floor(hintLength)
+      }
+      
+      const newScores = levels.map((_, i) => (
+        { 
+          level: i, 
+          score: 100, 
+          hints: getHintAllowance(levels[i].answer), 
+          hintsUsed: 0
+        }));
       setLevelScore(newScores);
       setInGame(true)
     }
@@ -135,8 +150,10 @@ const GameWrapper = ({ pack, setPack }) => {
 
   // End game when last slide reached
   useEffect(() => {
-    if (activeSlide === levels.length - 1) {
-      setGameOver(true);
+    // console.log('activeSlide', activeSlide)
+    // console.log('levelsLength', levels.length)
+    if (levels.length > 0 && activeSlide >= levels.length -1) {
+      // setGameOver(true);
     }
   }, [activeSlide, levels.length]);
 
@@ -170,22 +187,37 @@ const GameWrapper = ({ pack, setPack }) => {
     setForceRefresh(prev => prev +1)
   };
 
+  useEffect(() =>{
+    if(levels?.length > 0 && levelsPlayed == levels?.length){
+      setGameOver(true)
+    }
+  }, [levelsPlayed])
+
   return (
     <Stack direction="column" sx={{ height: height, width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
       <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
-        <Box sx={{width: '33%'}}>
-          <Button onClick={() => {
-            navTo('/games/6pics')
-            setPack('')
-            }}>Start over</Button>
-        </Box>
-        <Box sx={{width: '33%'}}>
+        {!isDemo && 
+          <Box sx={{width: '33%'}}>
+            <Button onClick={() => {
+              navTo('/games/6pics')
+              setPack('')
+              }}>Start over</Button>
+          </Box>
+        }
+        <Stack key={refreshScore} sx={{width: '33%'}}>
           {!gameOver && levelScore[activeSlide] && (
-            <Typography key={refreshScore}>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
+            <>
+              <Typography>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
+              <Typography>{`Hints ${levelScore[activeSlide]?.hints}`}</Typography>
+            </>
           )}
-        </Box>
+        </Stack>
         <Box sx={{width: '33%'}}>
-          <Typography>{`Pic# ${activeSlide +1}`}</Typography>
+          {gameOver ? 
+            <Typography></Typography>
+          :
+            <Typography>{`Pic# ${activeSlide +1}`}</Typography>
+          }
         </Box>
       </Stack>
 
@@ -198,6 +230,7 @@ const GameWrapper = ({ pack, setPack }) => {
               {i === activeSlide && (
                 <Stack  justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
                   <SixPicsVideoPlayer
+                    isDemo={isDemo}
                     isWin={isWin}
                     setIsWin={setIsWin}
                     wins={wins}
@@ -215,8 +248,13 @@ const GameWrapper = ({ pack, setPack }) => {
                     giveUp={giveUp}
                     setGiveUp={setGiveUp}
                     forceRefresh={forceRefresh}
+                    setGameOver={setGameOver}
+                    setLevelsPlayed={setLevelsPlayed}
+                    levelsPlayed={levelsPlayed}
+                    levels={levels}
                   />
                   <TextBoxes
+                    isDemo={isDemo}
                     forceRefresh={forceRefresh}
                     isWin={isWin}
                     setIsWin={setIsWin}
@@ -233,6 +271,7 @@ const GameWrapper = ({ pack, setPack }) => {
                     height={height}
                     totalScore={totalScore}
                     giveUp={giveUp}
+                    setLevelsPlayed={setLevelsPlayed}
                   />
                 </Stack>
               )}
@@ -240,7 +279,7 @@ const GameWrapper = ({ pack, setPack }) => {
           )}
           )}
 
-        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={true} score={totalScore} gamePack={pack} width={width} height={height} />}
+        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={isDemo} score={totalScore} gamePack={pack} width={width} height={height} />}
       </Slider>
     </Stack>
   );

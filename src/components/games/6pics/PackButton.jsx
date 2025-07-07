@@ -22,7 +22,7 @@ const PackButton = ({pack, setGamePack, disable, playedDate}) => {
     };
 
     useEffect(() => {
-        console.log(formatDate(playedDate))
+        // console.log(formatDate(playedDate))
     }, [playedDate])
 
     const getFileType = (filename) => {

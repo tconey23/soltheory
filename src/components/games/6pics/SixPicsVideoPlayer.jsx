@@ -12,7 +12,13 @@ const SixPicsVideoPlayer = ({
   showGiveUp,
   setGiveUp,
   giveUp,
-  next
+  next,
+  setGameOver,
+  setLevelsPlayed,
+  setLevelScore,
+  levelScore,
+  levelsPlayed,
+  levels
 }) => {
   const videoRef = useRef(null);
   const screen = useGlobalStore((state) => state.screen);
@@ -22,6 +28,7 @@ const SixPicsVideoPlayer = ({
   const [enablePlay, setEnablePlay] = useState(false)
   const [playStage, setPlayStage] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
+  const [attempts, setAttempts] = useState(0)
 
   const [from, setFrom] = useState(0)
   const [to, setTo] = useState(0)
@@ -29,7 +36,54 @@ const SixPicsVideoPlayer = ({
   const [currentTime, setCurrentTime] = useState(0)
   const [endTime, setEndTime] = useState(0)
 
-  const [type, setType] = useState('clip')
+  const [type, setType] = useState('clip')  
+
+useEffect(() => {
+
+  console.log('attempts', attempts)
+  
+
+  if(giveUp){
+    setLevelScore(prev =>
+      prev.map((obj, idx) =>
+        idx === levelsPlayed
+          ? { ...obj, score: 0 }
+          : obj
+      )
+    );
+    return
+  }
+
+  if (attempts > 0 && levelScore?.length > 0 && levelsPlayed > -1) {
+    console.log('setting new score')
+    setLevelScore(prev =>
+      prev.map((obj, idx) =>
+        idx === levelsPlayed
+          ? { ...obj, score: 100 - attempts * 33 }
+          : obj
+      )
+    );
+  }
+
+  // Log just for dev
+  // console.log({
+  //   currentScores: levelScore,
+  //   currentLevel: levelsPlayed,
+  //   attempts,
+  //   updatedScore: 100 - attempts * 25
+  // });
+}, [attempts, giveUp]);
+
+useEffect(()=>{
+  console.log('levelsPlayed',levelsPlayed)
+  setAttempts(0)
+}, [levelsPlayed])
+
+useEffect(() => {
+  console.log(levelScore)
+}, [levelScore])
+
+  
 
   const stages = useMemo(() => {
     if (!level?.stops?.length || !level?.loops?.length) return [];
@@ -48,6 +102,10 @@ const SixPicsVideoPlayer = ({
     return stages;
   }, [level]);
 
+  useEffect(() => {
+    // console.log(level)
+  }, [level])
+
 useEffect(() => {
 
   let isLast = stage >= stages?.length -1
@@ -64,7 +122,6 @@ useEffect(() => {
     setEnablePlay(true)
 
     if(isLoop && isDegen){
-      // console.log('skipping degen loop')
       if(!isLast){
         setStage(prev => prev +1)
       }
@@ -78,7 +135,6 @@ useEffect(() => {
 
 useEffect(()=>{
   if(!isNaN(stage)){
-
     setTo(Math.floor(stages[stage]?.to))
     setFrom(Math.floor(stages[stage]?.from))
 
@@ -86,8 +142,7 @@ useEffect(()=>{
       setType('loop')
     } else {
       setType('clip')
-    }
-
+    }  
   }
 }, [stage])
 
@@ -137,7 +192,7 @@ useEffect(() => {
   }, [isLoaded])
 
   useEffect(() => {
-    console.log("SixPicsVideoPlayer mounted!");
+    // console.log("SixPicsVideoPlayer mounted!");
   }, []);
 
   const handleGiveUp = () => {
@@ -174,19 +229,30 @@ useEffect(() => {
           <Stack>
             {/* <Typography>{`${currentTime} ${to}`}</Typography> */}
 
-            {!showGiveUp && (
-              <Button disabled={!enablePlay} variant="contained" onClick={() => setPlayStage(true)}>
-                {
-                  isPlaying ? 
-                  <Box sx={{height: '36.5px', width: '64px'}}>
+            {isPlaying ? 
+
+              <Box sx={{height: '36.5px', width: '64px'}}>
                     <LoadingAnimation />
-                  </Box>
-                  : (
-                    <i className="fi fi-sr-play-pause"></i>
-                  )  
+              </Box>
+
+              :
+
+              <>
+              {!showGiveUp && (
+              <Button disabled={!enablePlay} variant="contained" onClick={() => {
+                setPlayStage(true)
+                if(stage > 0){
+                  console.log('stage', stage)
+                  setAttempts(prev => prev +1)
                 }
+
+                }}>
+                    <i className="fi fi-sr-play-pause"></i>
               </Button>
             )}
+              </>
+            
+            }
 
             {showGiveUp && !giveUp && (
               <Button variant="outlined" sx={{ backgroundColor: '#880202' }} onClick={() => setGiveUp(true)}>
@@ -200,6 +266,8 @@ useEffect(() => {
                 setGiveUp(false)
                 setShowGiveUp(false)
                 setEnablePlay(false)
+                setLevelsPlayed(prev => prev +1)
+                setAttempts(0)
               }}>
                 Next
               </Button>

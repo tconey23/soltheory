@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, List} from "@mui/material";
+import { Stack, Typography, TextField, Button, List, ListItem} from "@mui/material";
 import { addGameToUser, getGifs } from "../../../business/games_calls";
 import { useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";
@@ -10,16 +10,25 @@ import "slick-carousel/slick/slick-theme.css";
 import { supabase } from "../../../business/supabaseClient";
 import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
+import { render } from "@react-three/fiber";
+import { motion } from 'framer-motion'
 
 const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
+    const [renderScores, setRenderScores] = useState(false)
+    const MotionStack = motion(Stack)
   
     useEffect(() => {
       setShotCount(0)
-      console.log(levelScore)
+      // console.log(levelScore)
     }, [])
+
+    useEffect(() => {
+      // console.log('demo', demo)
+      // console.log(gamePack)
+    }, [demo, gamePack])
 
     const shootConfetti = (count) => {
      
@@ -68,7 +77,10 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
 
         return () =>{ 
           clearInterval(confettiInterval)
+          setRenderScores(false)
         }
+      } else {
+        setRenderScores(true)
       }
     }, [shotCount])
   
@@ -117,8 +129,15 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
               <Stack>
                 <List>
                   {
-                    gamePack?.map((p) => {
-                      
+                    gamePack?.videos?.map((p, i) => {
+                      if(renderScores){
+                        // console.log(p)
+                      }
+                      return (
+                        <ListItem>
+                          <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts`}</Typography>
+                        </ListItem>
+                      )
                     })
                   }
                 </List>
@@ -146,6 +165,28 @@ const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
               </Stack>
               <Typography fontSize={25}>Your Score</Typography>
               <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
+              <Stack>
+                <List>
+                  {
+                    gamePack?.videos?.map((p, i) => {
+                      if(renderScores){
+                        // console.log(p)
+                        return (
+                          <ListItem>
+                            <MotionStack
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ duration: 2, delay: 0 }}
+                            >
+                              <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hints`}</Typography>
+                            </MotionStack>
+                          </ListItem>
+                      )
+                    }
+                    })
+                  }
+                </List>
+              </Stack>
             </Stack>
           </>
         }

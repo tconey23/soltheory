@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Stack } from "@mui/material";
 
-const colors = ["#f4f6f8", "#fffb00", "#8be453", "#f4f6f8"];
+const colors = ['#dd95ff', "#fffb00", "#8be453", '#dd95ff'];
 const circleCount = colors.length;
 const baseY = 50;     // Middle y position
 const amplitude = 12; // How far up/down the bounce goes
@@ -9,6 +9,7 @@ const speed = 1;      // Animation speed
 
 const LoadingAnimation = () => {
   const [time, setTime] = useState(0);
+  const [radius, setRadius] = useState(15)
   const rafRef = useRef();
 
   useEffect(() => {
@@ -25,16 +26,16 @@ const LoadingAnimation = () => {
       <svg
         width={'100%'}
         height={'100%'}
-        viewBox="0 0 100 100"
-        style={{ shapeRendering: "auto", display: "block", background: "rgba(255, 255, 255, 0)" }}
+        viewBox={`${radius *2} 0 100 100`}
+        style={{ shapeRendering: "auto", display: "block", background: "rgba(255, 255, 255, 0)", overflow: 'visible'}}
       >
         {colors.map((color, i) => {
           // Animate each dot's y position with a phase delay
           const phase = (i / circleCount) * Math.PI * 2;
           const cy = baseY + Math.sin(time * speed + phase) * amplitude;
-          const cx = 36 + i * 9;
+          const cx = 36 + i * (radius*2);
           return (
-            <circle key={i} fill={color} r={4} cx={cx} cy={cy} />
+            <circle key={i} fill={color} r={radius} cx={cx} cy={cy} />
           );
         })}
       </svg>

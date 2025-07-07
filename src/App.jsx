@@ -226,7 +226,8 @@ useEffect(() => {
           <Route path="/games/6pics/:gameId" element={<Pic6 />} />
 
           <Route path="/avett/" element={<AvettDemo demo={true}/>} />
-          <Route path="/games/6pics/avett" element={<Pic6 demo={true}/>} />
+
+          <Route path="/games/6pics/avett" element={<Pic6 />} />
 
           <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
