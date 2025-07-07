@@ -44,7 +44,7 @@ const GameWrapper = ({ pack }) => {
   const [showGiveUp, setShowGiveUp] = useState(false);
   const [giveUp, setGiveUp] = useState(false)
   const [isWin, setIsWin] = useState(false)
-  const { width, height } = useScreenSize();
+  const { width, height } = useScreenSize()
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
@@ -149,7 +149,9 @@ const GameWrapper = ({ pack }) => {
 
       <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '100%'}}>
         {!gameOver &&
-          levels.map((level, i) => (
+          levels.map((level, i) => {
+            // console.log(i)
+            return (
             <Stack id='game_stage' key={i} height={'100%'}>
               {i === activeSlide && (
                 <Stack  justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
@@ -191,9 +193,10 @@ const GameWrapper = ({ pack }) => {
                 </Stack>
               )}
             </Stack>
-          ))}
+          )}
+          )}
 
-        {gameOver && <ResultsPage score={totalScore} gamePack={pack} width={width} height={height} />}
+        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={true} score={totalScore} gamePack={pack} width={width} height={height} />}
       </Slider>
     </Stack>
   );

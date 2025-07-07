@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button} from "@mui/material";
+import { Stack, Typography, TextField, Button, List} from "@mui/material";
 import { addGameToUser, getGifs } from "../../../business/games_calls";
 import { useNavigate } from "react-router-dom";
 import SixPicsPacks from "./SixPicsPacks";
@@ -11,13 +11,14 @@ import { supabase } from "../../../business/supabaseClient";
 import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
 
-const ResultsPage = ({score, gamePack, width, height}) => {
+const ResultsPage = ({score, gamePack, demo, levels, levelScore}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
   
     useEffect(() => {
       setShotCount(0)
+      console.log(levelScore)
     }, [])
 
     const shootConfetti = (count) => {
@@ -95,31 +96,59 @@ const ResultsPage = ({score, gamePack, width, height}) => {
   
     return (
       <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-        <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-          <Stack width={'50%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
-            <video
-              preload="metadata"
-              style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
-              muted
-              autoPlay = {false}
-              onLoadedMetadata={(e) => {
-                e.target.currentTime = e.target.duration
-              }}
-              onCanPlay={(e) => {
-
-                // console.log(e)
-
-              }}
-              >
-              <source src={gamePack?.graphic} type="video/mp4" />
-            </video>
-          </Stack>
-          <Typography fontSize={25}>Your Score</Typography>
-          <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
-        </Stack>
-        <Stack width={'10%'}>
-          <Button disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>
-        </Stack>
+      {!demo ?
+          <>
+            <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+              <Stack width={'30%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+                <video
+                  preload="metadata"
+                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
+                  muted
+                  autoPlay = {false}
+                  onLoadedMetadata={(e) => {
+                    e.target.currentTime = e.target.duration
+                  }}
+                  >
+                  <source src={gamePack?.graphic} type="video/mp4" />
+                </video>
+              </Stack>
+              <Typography fontSize={25}>Your Score</Typography>
+              <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
+              <Stack>
+                <List>
+                  {
+                    gamePack?.map((p) => {
+                      
+                    })
+                  }
+                </List>
+              </Stack>
+            </Stack>
+            <Stack width={'10%'}>
+              <Button disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>
+            </Stack>
+          </>
+          :
+          <>
+            <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+              <Stack width={'30%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+                <video
+                  preload="metadata"
+                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
+                  muted
+                  autoPlay = {false}
+                  onLoadedMetadata={(e) => {
+                    e.target.currentTime = e.target.duration
+                  }}
+                  >
+                  <source src={gamePack?.graphic} type="video/mp4" />
+                </video>
+              </Stack>
+              <Typography fontSize={25}>Your Score</Typography>
+              <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
+            </Stack>
+          </>
+        }
       </Stack>
     )
   }

@@ -23,6 +23,7 @@ import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
 import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
+import AvettDemo from './components/games/6pics/AvettDemo';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -223,6 +224,9 @@ useEffect(() => {
 
           <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
           <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+
+          <Route path="/avett/" element={<AvettDemo demo={true}/>} />
+          <Route path="/games/6pics/avett" element={<Pic6 demo={true}/>} />
 
           <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
