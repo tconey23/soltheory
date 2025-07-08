@@ -145,7 +145,7 @@ const Pic6 = ({demo}) => {
             />
           </Box>
         </Stack>
-        <Stack width={'80%'} justifyContent={'center'} alignItems={'center'}>
+        <Stack width={'80%'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
           <Typography fontFamily={'fredoka regular'} fontSize={30} >6 Pics</Typography>
         </Stack>
         <Stack title='rightspacer' width={'10%'} justifyContent={'center'} alignItems={'center'} ></Stack>
