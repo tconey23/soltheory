@@ -31,7 +31,7 @@ import { Helmet } from "react-helmet";
     }, [])
 
     useEffect(() => {
-      console.log('demo', isDemo)
+      // console.log('demo', isDemo)
       if(isDemo) {
         setShowMsg(true)
         handleSaveGame('487fd0c5-9493-4c18-9be0-9c5b77f6af5c')
@@ -75,7 +75,6 @@ import { Helmet } from "react-helmet";
       if(shotCount == 0){
         shootConfetti(100)
       }
-
 
       if(shotCount < (score / 100)){
         // console.log(score)
