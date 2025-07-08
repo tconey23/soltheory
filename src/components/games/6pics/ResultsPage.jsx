@@ -22,8 +22,8 @@ import { Helmet } from "react-helmet";
     const [showMsg, setShowMsg] = useState(true)
     const MotionStack = motion(Stack)
 
-    // const isDemo = useGlobalStore((state) => state.isDemo)
-    let isDemo = true
+    const isDemo = useGlobalStore((state) => state.isDemo)
+    // let isDemo = true
   
     useEffect(() => {
       setShotCount(0)
@@ -34,6 +34,7 @@ import { Helmet } from "react-helmet";
       console.log('demo', isDemo)
       if(isDemo) {
         setShowMsg(true)
+        handleSaveGame('487fd0c5-9493-4c18-9be0-9c5b77f6af5c')
       }
     }, [isDemo])
 
@@ -91,13 +92,16 @@ import { Helmet } from "react-helmet";
       }
     }, [shotCount])
   
-    const handleSaveGame = async () => {
+    const handleSaveGame = async (guest) => {
       const gameDataObject = {
-        user_id: user.id,
+        user_id: user ? user?.id : guest,
         pack_name: gamePack?.pack_name,
         score: score,
-        game_date: Date.now()
+        game_date: Date.now(),
+        promo: isDemo ? 'Avett25' : null
       };
+
+      // console.log(gameDataObject)
 
       const { data, error } = await supabase
       .from('six_pics_data')
@@ -109,19 +113,19 @@ import { Helmet } from "react-helmet";
         return; // Optional: stop navigation if there's an error
       }
 
-      console.log("Game saved:", data);
-      nav('/games');
+      // console.log("Game saved:", data);
+      // nav('/games');
     };
 
     const shareGame = async () => {
       await navigator.share({
+        title: 'I just played this fun new game',
         text: 'Think you can beat my scores?', 
-        title: 'I just played this fun new game', 
         url: `https://soltheory.com/avett`
       })
     }
 
-    console.log(gamePack)
+    // console.log(gamePack)
   
     return (
       <Stack width={'100%'} height={'80dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
@@ -159,7 +163,7 @@ import { Helmet } from "react-helmet";
                       }
                       return (
                         <ListItem>
-                          <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hint(s)`}</Typography>
+                          <Typography>{`${i+1}: ${p.answer} - ${levelScore[i]?.score} pts - ${levelScore[i]?.hintsUsed} hint(s)`}</Typography>
                         </ListItem>
                       )
                     })
@@ -167,7 +171,7 @@ import { Helmet } from "react-helmet";
                 </List>
               </Stack>
             </Stack>
-            <Stack width={'10%'}>
+            <Stack width={'50%'}>
               <Button disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>
             </Stack>
           </>
@@ -202,7 +206,7 @@ import { Helmet } from "react-helmet";
                               animate={{ opacity: 1 }}
                               transition={{ duration: 1, delay: 0 }}
                             >
-                              <Typography>{`${i+1}: ${p.answer} - ${levelScore[i].score} pts - ${levelScore[i].hintsUsed} hint(s)`}</Typography>
+                              <Typography>{`${i+1}: ${p.answer} - ${levelScore[i]?.score} pts - ${levelScore[i]?.hintsUsed} hint(s)`}</Typography>
                             </MotionStack>
                           </ListItem>
                       )
@@ -212,7 +216,6 @@ import { Helmet } from "react-helmet";
                 </List>
               </Stack>
             </Stack>
-            <Link onClick={() => shareGame()}>Share</Link>
           </>
         }
         {renderScores && showMsg && isDemo &&
@@ -246,12 +249,21 @@ import { Helmet } from "react-helmet";
               padding={2}
               zIndex={10000}
               >
-              <Typography textAlign={'center'} fontSize={30} fontFamily={'fredoka regular'}>Thank you for playing 6 Pics!</Typography>
-              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Dismiss this window, take a screenshot of your scores and send it to </Typography>
-              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>
-                <Link onClick={() => window.location.href = `sms:+18326910649?&body=I just played 6 Pics ${gamePack?.pack_name} by SOL Theory%0AMy score was ${score} / ${gamePack?.videos?.length *100}`}>720.588.2002</Link>
-              </Typography>
-              <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>to be entered to win a SOL Theory t-shirt</Typography>
+                <Typography textAlign={'center'} fontSize={30} fontFamily={'fredoka regular'}>Thank you for playing 6 Pics!</Typography>
+                <Box marginBottom={'10px'} bgcolor={'whitesmoke'}>
+                  <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Text your pack and scores to </Typography>
+                  <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>
+                    <Link onClick={() => window.location.href = `sms:+17205882002?&body=I just played 6 Pics - ${gamePack?.pack_name} by SOL Theory!%0AMy score was ${score} / ${gamePack?.videos?.length *100}`}>SOL Theory</Link>
+                  </Typography>
+                  <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>to be entered to win a SOL Theory t-shirt</Typography>
+                </Box>
+
+              <Box marginBottom={'10px'} bgcolor={'whitesmoke'}>
+                  <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>Send this game to a friend so they can join in on the fun!</Typography>
+                  <Typography textAlign={'center'} sx={{marginTop: '10px'}} fontFamily={'fredoka regular'}>
+                    <Link onClick={() => shareGame()}>Share</Link>
+                  </Typography>
+                </Box>
 
               <Box sx={{marginTop: 5}}>
                 <Button
