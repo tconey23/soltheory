@@ -21,6 +21,8 @@ const useGlobalStore = create((set) => ({
   toggleAffiliates: false, 
   shareGame: false,
   guestUser: {id: ''},
+  inGame: false,
+  isDemo: false,
 
 
   // ✅ Actions
@@ -38,6 +40,8 @@ const useGlobalStore = create((set) => ({
   setRedirectUrl: (val) => set({redirectUrl: val}),
   setToggleAffiliates: (val) => set({toggleAffiliates: val}),
   toggleShareGame: (val) => set({shareGame: val}),
-  setGuestUser: (val) => set({guestUser: val})
+  setGuestUser: (val) => set({guestUser: val}),
+  setInGame: (val) => set({inGame: val}),
+  setIsDemo: (val) => set({isDemo: val})
 }))
 export default useGlobalStore

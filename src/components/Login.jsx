@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
+import { Box, Button, FormControl, Input, InputLabel, Stack, Typography } from '@mui/material';
 import useGlobalStore from '../business/useGlobalStore';
 import { supabase } from '../business/supabaseClient';
 import { useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
+import { Link } from '@mui/material';
 
 const LoginForm = () => {
 
@@ -108,8 +109,8 @@ const handleLogin = async () => {
       </FormControl>
     </Stack>
 
-    <Stack direction={'column'} width={'100%'} justifyContent={'center'} alignItems={'center'} >
-        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+    <Stack direction={'column'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} >
+        <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
             <InputLabel sx={{color: 'white'}}>Password</InputLabel>
             <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
@@ -121,7 +122,6 @@ const handleLogin = async () => {
             <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
           }
         </Stack>
-
         {newUser && 
         <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
@@ -145,7 +145,6 @@ const handleLogin = async () => {
         <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
       </FormControl>
     </Stack>}
-
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
         {
@@ -195,6 +194,14 @@ const Login = () => {
       <Stack width={'90%'}> 
         <LoginForm />
       </Stack>
+        <Box>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>For more information about SOL Theory, reach out to 
+
+            <Typography sx={{fontSize: '21px'}}>
+              <Link href="mailto:steve@soltheory.com?subject=Info%20Request" target="_blank" rel="noopener noreferrer">steve@soltheory.com</Link>
+            </Typography>
+          </Typography>
+        </Box>
     </Stack>
   );
 };

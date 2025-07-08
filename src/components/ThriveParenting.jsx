@@ -1,32 +1,18 @@
 import { useEffect, useState } from 'react';
 import { Avatar, Button, Input, InputLabel, Menu, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
-import useGlobalStore from '../../business/useGlobalStore';
-import MotionStack from '../../ui_elements/MotionStack';
+import useGlobalStore from '../business/useGlobalStore';
+import MotionStack from '../ui_elements/MotionStack';
 import { useNavigate } from 'react-router-dom';
-import TwentyOneThingsData from './TwentyOneThingsData';
-import SixPicsData from './SixPicsData';
-import ThreeSongsData from './ThreeSongsData';
+import InProgress from '../ui_elements/InProgress';
 
-const GameData = () => {
+const ThriveParenting = () => {
     const MotionText = motion(Typography); 
     const MotionAvatar = motion(Avatar);
     const [hasMounted, setHasMounted] = useState(false);
-    const [renderObj, setRenderObj] = useState(<></>)
-    const [selection, setSelection] = useState('21 Things')
+    const [renderObj, setRenderObj] = useState(<InProgress />)
 
-    useEffect(() => {
-      switch(selection){
-        case '21 Things': setRenderObj(<TwentyOneThingsData />);
-        break;
-        case '6 Pics': setRenderObj(<SixPicsData />);
-        break;
-        case '3 Songs': setRenderObj(<ThreeSongsData />);
-        break;
-      }
-    }, [selection])
-
-  return (
+return (
     <Stack
         direction="column"
         width="90%"
@@ -46,14 +32,8 @@ const GameData = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 1 }}
         >
-          Game Data
+          Thrive Parenting
         </MotionText>
-
-      <Select value={selection} onChange={(e) => setSelection(e.target.value)}>
-        <MenuItem value={'21 Things'}>21 Things</MenuItem>
-        <MenuItem value={'6 Pics'}>6 Pics</MenuItem>
-        {/* <MenuItem value={'3 Songs'}>3 Songs</MenuItem> */}
-      </Select>
 
         <MotionStack
           key="account_select"
@@ -75,4 +55,4 @@ const GameData = () => {
   );
 };
 
-export default GameData;
+export default ThriveParenting;

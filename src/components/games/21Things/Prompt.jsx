@@ -24,7 +24,7 @@ const Prompt = ({prompt, color}) => {
                     backgroundColor: color, 
                     borderRadius: 2,
                     textAlign: 'center',
-                    boxShadow: '0px 2px 6px rgba(0,0,0,0.15)',
+                    boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.47)',
                     fontSize: '0.9rem',
                     lineHeight: 1,
                     overflow: 'hidden',
@@ -37,7 +37,7 @@ const Prompt = ({prompt, color}) => {
                 maxWidth={'100%'}
                 backgroundColor={color}
             >
-                <Typography fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis'}} textAlign={'center'} fontSize={'0.8rem'}>{prompt}</Typography>
+                <Typography noWrap={true} fontFamily={'Fredoka Regular'} sx={{textOverflow: 'ellipsis', whiteSpace: 'pre-line', overflowWrap: 'break-word'}} textAlign={'center'} fontSize={'0.8rem'}>{prompt}</Typography>
             </Stack>
     )
 }

@@ -8,6 +8,7 @@ import SolMates from '../components/solmates/SolMates';
 import Login from '../components/Login';
 import Affiliates from '../components/Affiliates';
 import GameData from '../components/game_data/GameData';
+import ThriveParenting from '../components/ThriveParenting';
 
 const MotionStack = motion(Stack);
 
@@ -19,7 +20,7 @@ const MenuGridItem = ({ delay = 0, content, index}) => {
       alignItems={'center'}
       overflow={'hidden'}
       width={'100%'}
-      height={'500px'}
+      height={'450px'}
       bgcolor={'#80808073'}
       borderRadius={5}
       initial={{ y: 50, opacity: 0 }}
@@ -41,6 +42,7 @@ const HomePageMenu = () => {
   const [columnCount, setColumnCount] = useState()
   const menuItems = [
     userMeta ? <Account/> : <Login />,
+    // <ThriveParenting />,
     <GamesWrapper />,
     <GameData />,
     <Affiliates />
@@ -51,17 +53,16 @@ const HomePageMenu = () => {
   }, [screen])
 
   return (
-    <Stack direction={'column'} width={'100%'} height={'89%'} alignItems={'center'} position={'absolute'} zIndex={2}>
+    <Stack direction={'column'} width={'100%'} height={'95%'} alignItems={'center'} position={'absolute'} zIndex={2} paddingBottom={'5px'}>
       <Stack
         sx={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 2,
+            gap: 1,
             width: '90%',
-            height: '100%',
+            height: '82%',
             overflow: 'auto',
             justifyItems:'center',
-            margin: 10
         }}
       >
         {menuItems?.map((m, i) => 

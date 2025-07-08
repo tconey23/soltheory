@@ -23,8 +23,8 @@ const AdSpace = () => {
     {
       name: isMobile ? 'personos_mobile' : 'personos_desktop',
       type: isMobile ? 'mobile' : 'desktop',
-      image: isMobile ? '/personos_ad_mobile.jpeg' : '/personos_ad_desktop.png',
-      url: 'https://www.personos.ai/',
+      image: isMobile ? '/personos_ad_mobile.png' : '/personos_ad_mobile.png',
+      url: 'https://www.personos.ai/', 
       dims: {
         width: isMobile ? '100%' : '728px', 
         height: isMobile ? '60px' : '169px'
@@ -33,7 +33,7 @@ const AdSpace = () => {
     {
       name: isMobile ? 'mom_mobile' : 'mom_desktop',
       type: isMobile ? 'mobile' : 'desktop',
-      image: isMobile ? '/mom_ad_mobile.jpeg' : '/mom_ad_desktop.png',
+      image: isMobile ? '/mom_ad_desktop.png' : '/mom_ad_desktop.png',
       url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
       dims: {
         width: isMobile ? '100%' : '728px', 
@@ -51,7 +51,14 @@ const AdSpace = () => {
   }, [adIndex]);
 
   return (
-    <Stack sx={{cursor: 'pointer', zIndex: 100}} height={'auto'} width={'100%'} overflow="hidden" justifyContent={'center'} alignItems={'center'}>
+    <Stack
+      sx={{ cursor: 'pointer', zIndex: 100 }}
+      height="100%"
+      width="100%"
+      overflow="hidden"
+      justifyContent="center"
+      alignItems="center"
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={mobileAds[adIndex].name + adIndex}
@@ -61,7 +68,7 @@ const AdSpace = () => {
           transition={{ duration: 0.5 }}
           style={{
             display: 'flex',
-            alignItem: 'center',
+            alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
             height: '100%',
@@ -71,7 +78,7 @@ const AdSpace = () => {
             <img
               src={mobileAds[adIndex].image}
               alt={mobileAds[adIndex].name}
-              style={{ width: mobileAds[adIndex]?.dims?.width, height: 'auto', objectFit: 'contain' }}
+              style={{ width: mobileAds[adIndex]?.dims?.width, height: '100%'}}
             />
           </Link>
         </motion.div>

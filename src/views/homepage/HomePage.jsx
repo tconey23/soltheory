@@ -156,30 +156,47 @@ const HomePage = ({showBot = true}) => {
     }, [groundReady, backdropReady, lettersReady, lightingReady, allAssetsReady])
 
     return (
-    <div style={{height: '90%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
+    <div style={{height: '100%', width: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', background: 'black'}}>
 
-        <Stack width={'99%'} position={'absolute'} zIndex={2} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+          <Stack
+            width="100%"
+            height="5%"
+            zIndex={200}
+            justifyContent="center"
+            alignItems="center"
+            sx={{ flex: '0 0 5%' }}
+            marginY={'3px'}
+          >
           <Button onClick={() => toggleMenuVisible(prev => !prev)}>Toggle Menu</Button>
         </Stack>
 
   
-        {menuVisible && <HomePageMenu />}
-        <Stack position={'fixed'} width={'100%'} height={'81%'} zIndex={1}>
-        <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '90%'}}>
+        {menuVisible && 
+          <Stack
+            height="95%"
+            width="100%"
+            sx={{ flex: 1 }}
+            marginTop={1}
+          >
+            <HomePageMenu />
+          </Stack>
+        }
+        <Stack position={'fixed'} width={'100%'} height={'100%'} zIndex={1}>
+          <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '80%'}}>
 
-          {/* <PerfHook /> */}
-        <AdaptiveEvents />
-        <PerfMonitor setDecline={setDecline} setIncline={setIncline} incline={incline} decline={decline} setDpr={setDpr} dpr={dpr}/>
+            {/* <PerfHook /> */}
+            <AdaptiveEvents />
+            <PerfMonitor setDecline={setDecline} setIncline={setIncline} incline={incline} decline={decline} setDpr={setDpr} dpr={dpr}/>
 
-          <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720} setBackdropReady={setBackdropReady}/>
-          <ThreeLetters setLettersReady={setLettersReady}/>
-          <GroundPlane setGroundReady={setGroundReady}/>
-  
-          <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
-          <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
-          {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
+            <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720} setBackdropReady={setBackdropReady}/>
+            <ThreeLetters setLettersReady={setLettersReady}/>
+            <GroundPlane setGroundReady={setGroundReady}/>
 
-      </Canvas>
+            <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
+            <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
+            {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
+
+          </Canvas>
         </Stack>
             
     </div>

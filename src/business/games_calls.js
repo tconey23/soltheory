@@ -4,6 +4,7 @@ import customParseFormat from 'dayjs/plugin/customParseFormat'
 dayjs.extend(customParseFormat)
 import useGlobalStore from "./useGlobalStore";
 
+const loc = window.location.origin
 
 export const listAllPacks = async () => {
   let { data: sixpicspacks, error } = await supabase
@@ -85,21 +86,22 @@ export const addNewPrompts = async (prompts) => {
       }
 };
 
-export const get21Things = async (index) =>{
+export const get21Things = async (index) =>{ 
         
+        const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
         const { data: reqEntry, error } = await supabase
             .from('21thingsprompts')
             .select('*')
-            .order('id', { ascending: false })
-            .range(index, index) // Offset by 1, return 1 record
+            .lte('date', today) // Only include dates less than or equal to today
+            .order('date', { ascending: false })
+            .range(index, index); // Offset by index, return 1 record
 
-            // console.log(index, reqEntry)
-        
-        if(reqEntry){
-            return reqEntry[0]
+        if (reqEntry) {
+            return reqEntry[0];
         }
 
-        return error 
+        return error;
 
     }
 
@@ -144,3 +146,35 @@ export const addGameToUser = async (user, newGameData) => {
           }
         }
       }
+
+       const formatSelectedSongs = (songs) =>
+      songs.map((s) => ({
+        id: s.id,
+        name: s.name,
+        artist: s.artists.map((a) => a.name).join(', '),
+        albumArt: s.album.images[1]?.url || null,
+        preview_url: s.preview_url,
+      }));
+
+export const saveThreeSongs = async (selectedSongs, userId) => {
+
+  console.log(selectedSongs, userId)
+
+const formattedSongs = formatSelectedSongs(selectedSongs);
+
+  const { data, error } = await supabase
+    .from('three_songs_data')
+    .insert([
+      {
+        user_id: userId,
+        song_list: formattedSongs, // This gets stored as JSONB
+      },
+    ]);
+
+  if (error) {
+    return('Error inserting songs:', error);
+  } else {
+    return 'success'
+  }
+  
+}

@@ -6,7 +6,7 @@ const Hexagon = ({dims}) => {
     const [size, setSize] = useState(200)
     const [strokeColor] = useState("#000")
     const [strokeSize] = useState(1)
-    const [purple] = useState('#c956ff')
+    const [purple] = useState('#dd95ff')
     const [yellow] = useState('#fff200')
     const [green] = useState('#45d500')
 

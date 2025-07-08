@@ -10,7 +10,8 @@ import SandboxButton from './SandboxButton'
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-dayjs.extend(customParseFormat) 
+import MyThreeSongsButton from './MyThreeSongsButton';
+dayjs.extend(customParseFormat)
 
 
 const HeaderImage = () => {
@@ -64,7 +65,8 @@ const GamesWrapper = () => {
     const menuStyle = {
       boxShadow : '1px 1px 5px 5px #66339933', 
       marginY : 5, 
-      borderRadius: 2
+      borderRadius: 2,
+      bgcolor: 'white'
     }
 
       useEffect(() => {
@@ -126,7 +128,7 @@ const GamesWrapper = () => {
       <Stack
         direction="column"
         width="90%"
-        height="95%"
+        height="100%"
         alignItems="center"
         justifyContent="flex-start"
         bgcolor={'#ffffffbd'}
@@ -159,15 +161,18 @@ const GamesWrapper = () => {
         <MotionStack
           key="account_select"
           width="85%"
-          sx={{ height: '100%' }} 
+          sx={{ height: '100%' }}
           alignItems="center"
           justifyContent="flex-start"
           direction="column"
           paddingY={2}
+          paddingX={2}
+          marginBottom={3}
           initial={hasMounted ? false : { opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 50 }}
           transition={{ duration: 0.5, delay: 1.5}}
+          overflow={'auto'}
         >
           <Stack
             sx={{
@@ -197,6 +202,9 @@ const GamesWrapper = () => {
               <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
                 <SandboxButton />
               </MenuItem>}
+              {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
+                <MyThreeSongsButton />
+              </MenuItem> */}
 
             </List>
           </Stack>
