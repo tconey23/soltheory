@@ -104,7 +104,7 @@ const handleLogin = async () => {
     <Stack paddingY={0} height={'75%'} width={'100%'}>
     <Stack paddingBottom={'1px'} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
       <FormControl>
-        <InputLabel sx={{color: 'white', textAlign: 'flex-start'}}>Email Address</InputLabel>
+        {!email && <InputLabel sx={{textAlign: 'flex-start'}}>Email Address</InputLabel>}
         <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
       </FormControl>
     </Stack>
@@ -112,39 +112,41 @@ const handleLogin = async () => {
     <Stack direction={'column'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} >
         <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
-            <InputLabel sx={{color: 'white'}}>Password</InputLabel>
+            {!password && <InputLabel>Password</InputLabel>}
             <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
           </FormControl>
           {
             toggleShowPassword ? 
-            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
+            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
             :
-            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
+            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
           }
         </Stack>
         {newUser && 
-        <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-          <FormControl>
-            <InputLabel sx={{color: 'white'}}>Confirm Password</InputLabel>
-            <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
-          </FormControl>
-          {
-            toggleShowPasswordConf ? 
-            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
-            :
-            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
-          }
-        </Stack>}
+        <>
+          <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+            <FormControl>
+              {!confPassword && <InputLabel>Confirm Password</InputLabel>}
+              <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
+            </FormControl>
+            {
+              toggleShowPasswordConf ? 
+              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
+              :
+              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
+            }
+          </Stack>
+          <Stack direction={'column'} width={'100%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
+            <FormControl>
+              <InputLabel>User name</InputLabel>
+              <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
+            </FormControl>
+          </Stack>
+        </>
+        }
 
     </Stack>
 
-    {newUser && 
-    <Stack paddingY={1} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-      <FormControl>
-        <InputLabel sx={{color: 'white'}}>User name</InputLabel>
-        <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
-      </FormControl>
-    </Stack>}
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
         {
@@ -187,11 +189,13 @@ const Login = () => {
   const screen = useGlobalStore((state) => state.screen)
   return (
     <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
-      <Stack paddingY={5} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
-        <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
-        <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
+      <Stack paddingY={3} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
+        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={20}>Welcome to SOLTheory</Typography>
+        <Box sx={{width: '90%'}}>
+          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>You can explore our site without creating an account, but signing up unlocks additional features such as saving your gameplay and following your bliss.</Typography>
+        </Box>
       </Stack>
-      <Stack width={'90%'}> 
+      <Stack width={'90%'}>
         <LoginForm />
       </Stack>
         <Box>
