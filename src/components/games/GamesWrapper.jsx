@@ -131,7 +131,6 @@ const GamesWrapper = () => {
         justifyContent="flex-start"
         bgcolor={'#ffffffbd'}
         borderRadius={5}
-        overflow={'auto'}
       >
         <MotionText
           paddingY={2}
@@ -145,7 +144,7 @@ const GamesWrapper = () => {
           SOL Games
         </MotionText>
   
-        <Stack marginBottom={7}>
+        <Stack marginBottom={0}>
           <MotionAvatar
             initial={hasMounted ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -160,9 +159,9 @@ const GamesWrapper = () => {
         <MotionStack
           key="account_select"
           width="85%"
-          sx={{ height: '10%' }}
+          sx={{ height: '100%' }}
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
           direction="column"
           paddingY={2}
           initial={hasMounted ? false : { opacity: 0, y: 50 }}
@@ -173,11 +172,16 @@ const GamesWrapper = () => {
           <Stack
             sx={{
               width: '100%',
-              marginTop: 20,
+              height: '75%',
+              marginBottom: 1,
+              paddingBottom: 1,
               borderRadius: 1,
+              overflow: 'auto',
+              justifyContent: 'flex-start'
             }}
           >
             <List
+              sx={{paddingLeft: '10px', paddingRight: '10px', height: '70%', paddingBottom: '20px', marginBottom: '10px'}}
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
@@ -189,9 +193,10 @@ const GamesWrapper = () => {
                 <SixPicsButton />
               </MenuItem>
 
+              {userMeta?.is_admin &&
               <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
                 <SandboxButton />
-              </MenuItem>
+              </MenuItem>}
 
             </List>
           </Stack>

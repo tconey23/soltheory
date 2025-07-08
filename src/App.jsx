@@ -201,13 +201,13 @@ useEffect(() => {
         />
 
     <Route 
-        path={"/solmates"}
-        element={
-          <PrivateRoute userData={userMeta}>
-            <SolMates />
-          </PrivateRoute>
-        } 
-        />
+      path={"/solmates"}
+      element={
+        <PrivateRoute userData={userMeta}>
+          <SolMates />
+        </PrivateRoute>
+      } 
+    />
 
     </Routes>
   </Stack>

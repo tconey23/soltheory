@@ -277,7 +277,7 @@ useEffect(() => {
 
   return (
     <Stack height={'80%'} width={'100%'}>
-      <Stack height={'30%'} bgcolor={'#ffffff00'}>
+      {/* <Stack height={'30%'} bgcolor={'#ffffff00'}>
       <Accordion sx={{height: '70%', overflow: 'auto', width: '40%', position: 'absolute', bgcolor: '#ffffff00'}}>
         <AccordionSummary sx={{color: 'white'}}><i class="fi fi-bs-menu-burger"></i></AccordionSummary>
         <AccordionDetails>
@@ -303,7 +303,7 @@ useEffect(() => {
           </Stack>
         </AccordionDetails>
       </Accordion>
-      </Stack>
+      </Stack> */}
       <canvas style={{position: 'absolute'}} width={'100%'} height={'100%'} ref={canvasRef} />
     </Stack>
   )

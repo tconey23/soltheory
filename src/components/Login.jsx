@@ -103,7 +103,7 @@ const handleLogin = async () => {
     <Stack paddingY={0} height={'75%'} width={'100%'}>
     <Stack paddingBottom={'1px'} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
       <FormControl>
-        <InputLabel sx={{textAlign: 'flex-start'}}>Email Address</InputLabel>
+        <InputLabel sx={{color: 'white', textAlign: 'flex-start'}}>Email Address</InputLabel>
         <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
       </FormControl>
     </Stack>
@@ -111,28 +111,28 @@ const handleLogin = async () => {
     <Stack direction={'column'} width={'100%'} justifyContent={'center'} alignItems={'center'} >
         <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
-            <InputLabel>Password</InputLabel>
+            <InputLabel sx={{color: 'white'}}>Password</InputLabel>
             <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
           </FormControl>
           {
             toggleShowPassword ? 
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
+            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
             :
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
+            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
           }
         </Stack>
 
         {newUser && 
         <Stack paddingY={2.5} direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
           <FormControl>
-            <InputLabel>Confirm Password</InputLabel>
+            <InputLabel sx={{color: 'white'}}>Confirm Password</InputLabel>
             <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
           </FormControl>
           {
             toggleShowPasswordConf ? 
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
+            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
             :
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
+            <i style={{color: 'white', cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
           }
         </Stack>}
 
@@ -141,7 +141,7 @@ const handleLogin = async () => {
     {newUser && 
     <Stack paddingY={1} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
       <FormControl>
-        <InputLabel>User name</InputLabel>
+        <InputLabel sx={{color: 'white'}}>User name</InputLabel>
         <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
       </FormControl>
     </Stack>}
@@ -189,8 +189,8 @@ const Login = () => {
   return (
     <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
       <Stack paddingY={5} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
-        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
-        <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
+        <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
+        <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
       </Stack>
       <Stack width={'90%'}>
         <LoginForm />
