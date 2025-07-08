@@ -32,7 +32,6 @@ const MenuGridItem = ({ delay = 0, content, index }) => {
     <div ref={ref} style={{ width: '100%', height: '450px' }}>
       
         <MotionStack
-          // sx={{opacity: itemOpac}}
           key={index}
           justifyContent={'center'}
           alignItems={'center'}

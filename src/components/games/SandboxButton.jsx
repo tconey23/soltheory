@@ -12,7 +12,7 @@ const SandboxButton = ({admin}) => {
         <Box sx={{padding: 2}}>
           {/* <SixPics dims={100}/> */}
         </Box>
-        <Typography fontSize={50} fontFamily={'Fredoka Regular'}>Sandbox</Typography>
+        <Typography fontSize={50} fontFamily={'Fredoka Regular'}>ORBstacles</Typography>
     </Stack>
   );
 };

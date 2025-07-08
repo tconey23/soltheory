@@ -32,8 +32,10 @@ const Sandbox = () => {
   const [orbColor2, setOrbColor2] = useState('#7a34eb')
   const [orbCollColor, setOrbCollColor] = useState('#ff008d')
   const [resetColor, setResetColor] = useState(10)
+  const [orbSize, setOrbSize] = useState(10)
   const orbColor1Ref = useRef(orbColor1);
   const orbCollColorRef = useRef(orbCollColor);
+  const orbSizeRef = useRef(orbSize)
 
   const hexToNumber = (hex) => Number(hex.replace(/^#/, '0x'))
 
@@ -44,6 +46,10 @@ const Sandbox = () => {
 useEffect(() => {
   orbCollColorRef.current = orbCollColor;
 }, [orbCollColor]);
+
+useEffect(() => {
+  orbSizeRef.current = orbSize;
+}, [orbSize]);
 
 useEffect(() => {
   const app = new PIXI.Application({
@@ -115,7 +121,7 @@ useEffect(() => {
   cueRef.current = cue;
 
   const cueGraphic = new PIXI.Graphics();
-  cueGraphic.beginFill(0xff4444);
+  cueGraphic.beginFill('#f59e42');
   cueGraphic.drawCircle(0, 0, 14);
   cueGraphic.endFill();
   app.stage.addChild(cueGraphic);
@@ -218,9 +224,9 @@ useEffect(() => {
       if (graphic.currentColor !== desiredColor) {
         graphic.clear();
         graphic.beginFill(hexToNumber(desiredColor));
-        graphic.drawCircle(0, 0, 10);
+        graphic.drawCircle(0, 0, Number(orbSizeRef.current)); // <-- FIXED!
         graphic.endFill();
-        graphic.currentColor = desiredColor; // cache for comparison
+        graphic.currentColor = desiredColor;
       }
     }
 
@@ -244,6 +250,7 @@ useEffect(() => {
   const world = worldRef.current;
   const app = appRef.current;
   const orbs = orbsRef.current;
+  const orbRadius = orbSize;
 
   if (!world || !app) return;
 
@@ -254,7 +261,7 @@ useEffect(() => {
     const toAdd = orbCount - currentCount;
     for (let i = 0; i < toAdd; i++) {
       const body = world.createDynamicBody();
-      body.createFixture(planck.Circle(toMeters(10)), {
+      body.createFixture(planck.Circle(toMeters(orbRadius)), {
         restitution: 0.9,
         density: 0.5,
         friction: 0,
@@ -267,7 +274,7 @@ useEffect(() => {
 
       const graphic = new PIXI.Graphics();
       graphic.beginFill(hexToNumber(orbColor1));
-      graphic.drawCircle(0, 0, 10);
+      graphic.drawCircle(0, 0, orbRadius);
       graphic.endFill();
       app.stage.addChild(graphic);
 
@@ -289,7 +296,40 @@ useEffect(() => {
       app.stage.removeChild(graphic);
     }
   }
-}, [orbCount]);
+}, [orbCount, orbSize]);
+
+
+useEffect(() => {
+  const orbs = orbsRef.current;
+  const app = appRef.current;
+  const world = worldRef.current;
+
+  if (!orbs || !app || !world) return;
+
+  orbs.forEach((orb) => {
+    // ---- Update Planck physics fixture ----
+
+    // Remove the old fixture (there's only one for each orb)
+    const oldFixture = orb.body.getFixtureList();
+    if (oldFixture) {
+      orb.body.destroyFixture(oldFixture);
+    }
+    // Add new fixture with the updated radius
+    orb.body.createFixture(planck.Circle(toMeters(orbSizeRef.current)), {
+      restitution: 0.9,
+      density: 0.5,
+      friction: 0,
+    });
+
+    // ---- Update PIXI graphics ----
+
+    orb.graphic.clear();
+    orb.graphic.beginFill(hexToNumber(orbColor1Ref.current));
+    orb.graphic.drawCircle(0, 0, orbSizeRef.current); // new size!
+    orb.graphic.endFill();
+    orb.graphic.currentColor = orbColor1Ref.current; // cache for comparison
+  });
+}, [orbSize]);
 
 
   return (  
@@ -300,7 +340,11 @@ useEffect(() => {
         <AccordionDetails>
           <Stack width={'98%'}>
             <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb Count ({orbCount})</Typography>
-            <Slider value={orbCount} max={500} step={10} onChange={(e) => setOrbCount(e.target.value)}/>
+            <Slider value={orbCount} max={500} step={10} onChange={(e) => setOrbCount(Number(e.target.value))}/>
+          </Stack>
+          <Stack width={'98%'}>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb Size</Typography>
+            <Slider value={orbSize} max={20} min={1} step={0.5} onChange={(e) => setOrbSize(Number(e.target.value))}/>
           </Stack>
           <Stack width={'98%'}>
             <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb color 1</Typography>
@@ -313,10 +357,6 @@ useEffect(() => {
           <Stack width={'98%'}>
             <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb collision color</Typography>
             <HexColorPicker color={orbCollColor} onChange={setOrbCollColor}/>
-          </Stack>
-          <Stack width={'98%'}>
-            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Collision color time</Typography>
-            <Slider value={resetColor} max={500} step={1} onChange={(e) => setResetColor(e.target.value)}/>
           </Stack>
         </AccordionDetails>
       </Accordion>
