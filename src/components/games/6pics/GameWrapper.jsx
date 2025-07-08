@@ -41,7 +41,7 @@ const GameWrapper = ({ pack, setPack }) => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [totalScore, setTotalScore] = useState(0);
   const [refreshScore, setRefreshScore] = useState(0);
-  const [gameOver, setGameOver] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
   const [showGiveUp, setShowGiveUp] = useState(false);
   const [giveUp, setGiveUp] = useState(false)
   const [isWin, setIsWin] = useState(false)
