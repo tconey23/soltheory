@@ -35,7 +35,7 @@ const TwentyOneThingsDisp = ({gameData}) => {
            setFavs(gameData?.map((g) => g?.stage3?.[0]?.prompt))
            const userFound =  gameData?.find((g) => g.user_id === userMeta?.primary_id)
            if(userFound){
-            // console.log(userFound?.stage3)
+
             setUserFav(userFound?.stage3?.[0]?.prompt)
            } else {
             setUserFav('')

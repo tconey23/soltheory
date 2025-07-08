@@ -21,9 +21,6 @@ const PackButton = ({pack, setGamePack, disable, playedDate}) => {
         setPlayed(date.toISOString().split('T')[0])
     };
 
-    useEffect(() => {
-        // console.log(formatDate(playedDate))
-    }, [playedDate])
 
     const getFileType = (filename) => {
         const ext = filename.split('.').pop().toLowerCase();
@@ -37,7 +34,7 @@ const PackButton = ({pack, setGamePack, disable, playedDate}) => {
         // disabled={disable}
         userdata='pack_button'
         onClick={(e) => {
-            // console.log(pack.id)
+
             if(played) return;
             
             setGamePack(pack)

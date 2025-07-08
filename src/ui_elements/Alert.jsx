@@ -35,7 +35,6 @@ const UserAlert = ({type}) => {
 
     useEffect(() => {
         if(alertContent?.text) toggleShow(true)
-            console.log(alertContent)
     }, [alertContent])
 
   return (

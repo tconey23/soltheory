@@ -10,7 +10,6 @@ const Username = () => {
 
         const handleUpdate = async () => {
         const res = await updateUserName(userMeta?.primary_id, newUserName)
-        console.log(res)
             if(res){
                 if(res?.user_name === newUserName){
                     setNewUserName('')

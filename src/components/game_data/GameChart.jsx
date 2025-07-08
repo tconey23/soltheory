@@ -16,8 +16,6 @@ const GameChart = ({ data, userFav }) => {
   const maxChartHeight = 700;
 
 
-  // console.log(data)
-
   useEffect(() => {
     if(isNaN(data?.[0]?.label)){
       setChartType('21things')

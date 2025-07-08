@@ -14,10 +14,8 @@ useEffect(() => {
   const stored = localStorage.getItem('spotify_token');
 
   if (code && !token) {
-    console.log('Auth code found:', code);
     getAccessToken(code)
       .then((accessToken) => {
-        console.log('Access Token Received:', accessToken);
         setToken(accessToken);
         localStorage.setItem('spotify_token', accessToken);
         window.history.replaceState({}, document.title, location.pathname);
@@ -28,7 +26,6 @@ useEffect(() => {
         localStorage.removeItem('verifier');
       });
   } else if (stored && !token) {
-    console.log('Using token from localStorage');
     setToken(stored);
   } else if (!stored && !code && !token) {
     // FORCE login if no token or code — run redirectToSpotifyLogin

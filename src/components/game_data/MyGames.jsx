@@ -15,15 +15,12 @@ const MyGames = ({displayGame}) => {
 
     const getGames = async (game) => {
 
-        console.log(game)
 
         let { data: game_data, error } = await supabase
         .from(game === 'twentyonethings' ? 'twentyone_things_data' : 'six_pics_data')
         .select('*')
         .eq('user_id', userMeta.primary_id)
         .order('game_date', { ascending: false });
-
-        // console.log(game_data, error)
         if(game_data){
             setGameArray(game_data)
         }
@@ -39,7 +36,6 @@ const MyGames = ({displayGame}) => {
     useEffect(() => {
         if(!selectedGame) return
         getGames(selectedGame)
-        console.log(selectedGame)
     }, [selectedGame])
 
     useEffect(() => {
@@ -75,7 +71,6 @@ const MyGames = ({displayGame}) => {
         <Stack direction={'column'} alignItems={'center'}>
             <List sx={{background: 'white', overflow: displayGame ? 'inherit' : 'auto', height: '50%'}}>
                 {gameArray?.map((g) => {
-                    // console.log(g)
                     return (
                         <ListItem onClick={() => handleClick(g?.user_id, g?.id)} sx={{border: '0px solid black', paddingY: 2, marginY: 0.25}}>
                             <Stack>
@@ -94,7 +89,6 @@ const MyGames = ({displayGame}) => {
         <Stack direction={'column'} alignItems={'center'}>
             <List sx={{background: 'white', overflow: displayGame ? 'inherit' : 'auto', height: '80%'}}>
                 {gameArray?.map((g) => {
-                    // console.log(g)
                     return (
                         <ListItem onClick={() => handleClick(g?.user_id, g?.id)} sx={{border: '0px solid black', paddingY: 2, marginY: 0.25}}>
                             <Stack padding={1} borderRadius={1} boxShadow={'0px 0px 10px 1px #7911bd75;'} width={'100%'}>

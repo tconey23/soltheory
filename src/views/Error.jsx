@@ -4,7 +4,6 @@ import { useLocation } from 'react-router-dom';
 
 const Error = () => {
     const loc = useLocation()
-    console.log(loc)
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'} sx={{bgcolor: '#f4f6f8',}}>
       <Typography sx={{bgcolor: '#f4f6f8',}}>ERROR</Typography>

@@ -16,7 +16,6 @@ const SongSelector = ({ token }) => {
   const height = useWindowHeight() 
 
   const handleSave = async (songs) => {
-    console.log(selected)
     let saveSongs = await saveThreeSongs(selected, userMeta?.primary_id)
 
     if(saveSongs === 'success'){
@@ -36,12 +35,7 @@ const SongSelector = ({ token }) => {
 
   }
 
-  useEffect(() => {
-    console.log(selected)
-  }, [selected])
-
 const searchSongs = async () => {
-  console.log("Spotify token:", token);
   if (!query || !token) return;
 
   const res = await fetch(

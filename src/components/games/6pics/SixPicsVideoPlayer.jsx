@@ -40,8 +40,6 @@ const SixPicsVideoPlayer = ({
   const [type, setType] = useState('clip')  
 
 useEffect(() => {
-
-  console.log('attempts', attempts)
   
 
   if(giveUp){
@@ -56,7 +54,6 @@ useEffect(() => {
   }
 
   if (attempts > 0 && levelScore?.length > 0 && levelsPlayed > -1) {
-    console.log('setting new score')
     setLevelScore(prev =>
       prev.map((obj, idx) =>
         idx === levelsPlayed
@@ -65,24 +62,12 @@ useEffect(() => {
       )
     );
   }
-
-  // Log just for dev
-  // console.log({
-  //   currentScores: levelScore,
-  //   currentLevel: levelsPlayed,
-  //   attempts,
-  //   updatedScore: 100 - attempts * 25
-  // });
 }, [attempts, giveUp]);
 
 useEffect(()=>{
-  console.log('levelsPlayed',levelsPlayed)
   setAttempts(0)
 }, [levelsPlayed])
 
-useEffect(() => {
-  console.log(levelScore)
-}, [levelScore])
 
   
 
@@ -103,20 +88,11 @@ useEffect(() => {
     return stages;
   }, [level]);
 
-  useEffect(() => {
-    // console.log(level)
-  }, [level])
-
 useEffect(() => {
 
   let isLast = stage >= stages?.length -1
   let isLoop = type === 'loop'
   let isDegen = stages[stage]?.from == stages[stage]?.to
-
-  // console.log('isDegen: ', isDegen)
-  // console.log('current stage: ', stage)
-  // console.log('stage detail: ', stages[stage])
-  // console.log('isLast', isLast)
 
   if(!isPlaying){
     
@@ -150,8 +126,6 @@ useEffect(()=>{
 useEffect(() => {
 
   const EPSILON = 0.05;
-
-  // console.log(currentTime, to, stages[stage]?.to)
 
   if (endTime > 0 && currentTime >= endTime - EPSILON) {
     setPlayStage(false);
@@ -191,10 +165,6 @@ useEffect(() => {
       setEnablePlay(true)
     }
   }, [isLoaded])
-
-  useEffect(() => {
-    // console.log("SixPicsVideoPlayer mounted!");
-  }, []);
 
   const handleGiveUp = () => {
     setShowGiveUp(true);
@@ -243,7 +213,6 @@ useEffect(() => {
               <Button disabled={!enablePlay} variant="contained" onClick={() => {
                 setPlayStage(true)
                 if(stage > 0){
-                  console.log('stage', stage)
                   setAttempts(prev => prev +1)
                 }
 

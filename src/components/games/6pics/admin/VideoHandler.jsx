@@ -94,7 +94,6 @@ const checkReady = async (v) => {
         .map(([key]) => key);
   
         const updateReady = async (key) => {
-            console.log(`Updating ${key}...`);
             const { data, error } = await supabase
               .from('sixpicksvideos')
               .update({ ready: true })
@@ -104,10 +103,7 @@ const checkReady = async (v) => {
             if (error) {
               console.error(`Failed to update ready for ${name}:`, error.message);
               return;
-            }
-          
-            console.log(`${name} updated successfully`, data);
-          
+            }          
             setIsReady((prev) => ({
               ...prev,
               [key]: true,
@@ -126,7 +122,6 @@ const checkReady = async (v) => {
   };
 
 const deleteFileByPublicUrl = async (publicUrl) => {
-    console.log(publicUrl)
     const match = publicUrl.match(/\/storage\/v1\/object\/public\/6picsvideos\/(.+)$/);
   
     if (!match || !match[1]) {
@@ -144,8 +139,6 @@ const deleteFileByPublicUrl = async (publicUrl) => {
       console.error('Error deleting file:', error);
       return false;
     }
-  
-    console.log(`Deleted "${filePath}" successfully`);
     getVids()
     return true;
   };
@@ -153,10 +146,6 @@ const deleteFileByPublicUrl = async (publicUrl) => {
     useEffect(() => {
         getVids()
     }, [refreshKey, refresh])
-
-    useEffect(() => {
-        console.log(isReady)
-    }, [isReady])
 
     useEffect(() => {
         setRefreshKey(prev => prev +1)

@@ -4,6 +4,7 @@ import { fetchPacks } from "./helpers/functions";
 import PackButton from "./PackButton";
 import GameWrapper from './GameWrapper';
 import useGlobalStore from "../../../business/useGlobalStore";
+import { useLocation } from "react-router-dom";
 
 const Pic6 = ({demo}) => {
   const [gamePack, setGamePack] = useState(null)
@@ -11,6 +12,9 @@ const Pic6 = ({demo}) => {
   const [playedGames, setPlayedGames] = useState([])
   const [loginSkipped, setLoginSkipped] = useState(false)
   const [displayModal, setDisplayModal] = useState(false)
+  const [displayPromo, setDisplayPromo] = useState(false)
+
+  const loc = useLocation()
 
   const userMeta = useGlobalStore((state) => state.userMeta) 
 
@@ -46,10 +50,6 @@ const Pic6 = ({demo}) => {
     })
 
   }, [packs])
-
-  useEffect(() => {
-    // console.log(playedGames) 
-  }, [playedGames])
 
   useEffect(() => {
     if (hasFetched.current) return; 
@@ -90,6 +90,14 @@ const Pic6 = ({demo}) => {
     // }
   }, [loginSkipped, userMeta])
 
+  useEffect(() => {
+    if(loc.pathname.includes('/promo/')){
+      setDisplayPromo(true)
+    } else {
+      setDisplayPromo(false)
+    }
+  }, [loc])
+
   return (
     <Stack
       direction={"column"}
@@ -118,9 +126,17 @@ const Pic6 = ({demo}) => {
                 played = findPlayedGame?.played
               }
 
-              return (
+              if(displayPromo && p.promo_name) {
+                return (
                   <PackButton key={i} pack={p} setGamePack={setGamePack} disable={disable} playedDate={played}/>
-              )})}
+                )
+              } else if (!displayPromo && !p.promo_name){
+                return (
+                  <PackButton key={i} pack={p} setGamePack={setGamePack} disable={disable} playedDate={played}/>
+                )
+              }
+                
+                })}
           </MenuList>
         </Stack>
       }

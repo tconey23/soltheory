@@ -11,9 +11,6 @@ const MotionStack = ({
   ...props
 }) => {
   const MotionWrapper = motion(Stack);
-
-  // console.log(children)
-
   return (
     <MotionWrapper
       initial={initial}

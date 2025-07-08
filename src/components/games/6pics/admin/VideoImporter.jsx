@@ -159,7 +159,6 @@ const VideoImporter = ({pack, getVids, type, getGraphic, setRefreshKey}) => {
     const [uploaded, setUploaded] = useState([])
 
     const handleUploadGraphic = async (URL) => {
-        console.log(URL)
         const { data, error } = await supabase
         .from('sixpicspacks')
         .update({ 'graphic': URL })
@@ -234,9 +233,6 @@ const VideoImporter = ({pack, getVids, type, getGraphic, setRefreshKey}) => {
                 text: null,
                 display: false
             }))
-        }
-        if(file){
-            console.log(file.target.files[0].name)
         }
       }, [alertProps, file])
 

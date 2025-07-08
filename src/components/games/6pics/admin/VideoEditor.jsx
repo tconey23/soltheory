@@ -41,7 +41,6 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
   const [answer, setAnswer] = useState('')
 
   useEffect(() => {
-    console.log(video)
     if(video){
       setStops(video.stops)
       setLoops(video.loops)
@@ -107,8 +106,6 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
       ready: true,
       answer: answer
     };
-
-    console.log(updatedFields)
   
     try {
 
@@ -117,8 +114,6 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
         .select('id, videos')
         .eq('pack_name', video.pack_name)
         .single();
-
-        console.log(packRows)
   
       if (selectError || !packRows) {
         throw selectError || new Error('Pack not found');
@@ -130,8 +125,6 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
           : vid
       );
 
-      console.log(updatedVideos)
-  
       const { error: updateError } = await supabase 
         .from('sixpicspacks')
         .update({ videos: updatedVideos })
@@ -210,10 +203,6 @@ const VideoEditor = ({setVideoToEdit, video, setSelection, setForceRefresh}) => 
   useEffect(() => {
     getMeta(video)
   }, [video])
-
-  useEffect(() => {
-    console.log(stops, loops)
-  }, [stops, loops])
 
   return (
         <Stack direction={'column'} sx={{ height: '100%', width: '100%' }} justifyContent={'center'} alignItems={'center'} backgroundColor={'#000000ab'}>

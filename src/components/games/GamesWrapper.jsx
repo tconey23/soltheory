@@ -64,7 +64,8 @@ const GamesWrapper = () => {
 
     const menuStyle = {
       boxShadow : '1px 1px 5px 5px #66339933', 
-      marginY : 5, 
+      marginY : 1, 
+      maxHeight: '100px',
       borderRadius: 2,
       bgcolor: 'white'
     }
@@ -100,8 +101,6 @@ const GamesWrapper = () => {
               console.error(guesterror)
               return
             } else {
-
-              console.log(guest?.[0])
               setGuestUser({id: userId})
             }
 
@@ -177,7 +176,7 @@ const GamesWrapper = () => {
           <Stack
             sx={{
               width: '100%',
-              height: '75%',
+              height: '100%',
               marginBottom: 1,
               paddingBottom: 1,
               borderRadius: 1,
@@ -199,9 +198,10 @@ const GamesWrapper = () => {
               </MenuItem>
 
               {userMeta?.is_admin &&
-              <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+              <MenuItem sx={menuStyle} marginBottom={10} value="sandbox"  onClick={() => startGame(`sandbox`)}>
                 <SandboxButton />
               </MenuItem>}
+
               {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
                 <MyThreeSongsButton />
               </MenuItem> */}

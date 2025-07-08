@@ -10,8 +10,6 @@ const SPAdminWrapper = ({setSelectedOption}) => {
 
     const {screen} = useGlobalStore()
 
-    console.log(screen)
-
   return (
     <Stack direction={'column'} sx={{ height: '98vh', width: '100%' }} fontFamily={'Fredoka Regular'}> 
         <Stack>

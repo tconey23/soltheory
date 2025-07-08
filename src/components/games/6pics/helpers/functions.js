@@ -19,7 +19,6 @@ export const getVideoDuration = (videoUrl) => {
 };
 
 export const fetchVideos = async (pack) => {
-  // console.log('pack id', pack)
   let { data: sixpicspacks, error } = await supabase
   .from('sixpicspacks')
   .select("*")

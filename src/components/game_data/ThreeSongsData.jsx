@@ -20,7 +20,6 @@ const SongListObject = ({list, date, toggleExpand}) => {
 
     useEffect(() =>{
         if(list){
-            // console.log(list)
             setSongs(
                 list?.map((s) => (
                     <ImageListItem>
@@ -183,7 +182,6 @@ const ThreeSongsData = () => {
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'} justifyContent={'flex-start'} alignItems={'center'}>
       {songLists?.map((l, i) => {
-        console.log(l)
         let expand = false
         if(opened === i){
             expand = true

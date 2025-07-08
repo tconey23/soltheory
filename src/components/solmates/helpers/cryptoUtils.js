@@ -61,10 +61,6 @@ export const generateCipherKey = async () => {
       let res = await encrypt(msgs[i].text, msgs[i].from)
       array.push(res)
     }
-
-    console.log(array)
-
-
       const { data, error } = await supabase
       .from('messaging')
       .insert([

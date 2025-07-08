@@ -10,7 +10,6 @@ const Affiliates = () => {
 
   
   useEffect(() =>{
-    console.log(screen)
     
     if(screen === 'xs'){
       setIsMobile(true)
@@ -37,6 +36,16 @@ const Affiliates = () => {
       url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
       dims: {
         width: isMobile ? '100%' : '100%', 
+        height: isMobile ? '60px' : '169px'
+      }
+    },
+    {
+      name: isMobile ? 'crochet_life_banner' : 'crochet_life_banner',
+      type: isMobile ? 'mobile' : 'desktop',
+      image: isMobile ? '/crochetlife_large.png' : '/crochetlife_large.png',
+      url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
+      dims: {
+        width: isMobile ? '100%' : '728px', 
         height: isMobile ? '60px' : '169px'
       }
     }

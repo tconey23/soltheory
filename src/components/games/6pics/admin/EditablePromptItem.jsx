@@ -13,14 +13,9 @@ const EditablePromptItem = ({
     const [editValue, setEditValue] = useState(value);
   
     const handleSave = () => {
-      console.log(index, editValue, type)
       onSave(index, editValue, type);
       setIsEditing(false);
     };
-
-    useEffect(() => {
-      console.log(editValue)
-    }, [editValue])
   
     return (
       <Stack

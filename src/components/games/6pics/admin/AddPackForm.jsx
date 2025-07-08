@@ -50,12 +50,7 @@ const AddPackForm = ({setExpandAddNewPack, resetData, setPacks}) => {
         resetForm()
       }, [resetData])
 
-      useEffect(() =>{
-        // console.log(uploadVideos, acceptVideos, videoObjects)
-      }, [uploadVideos, acceptVideos, videoObjects])
-
     const uploadFileAndGetUrl = async (file, pathPrefix) => {
-        console.log(file)
         const filePath = `${pathPrefix}/${file.name}`;
         
         const { data, error } = await supabase.storage
@@ -123,7 +118,7 @@ const AddPackForm = ({setExpandAddNewPack, resetData, setPacks}) => {
               },
             ]);
 
-            console.log(error)
+            console.error(error)
       
           if (error) throw error;
       
@@ -147,7 +142,6 @@ const AddPackForm = ({setExpandAddNewPack, resetData, setPacks}) => {
     useEffect(() => {
         const releaseInput = acceptVideos?.filter((c) => c.accepted === true)
         if(releaseInput?.length > 0 && releaseInput?.length == videoObjects?.length){
-            console.log(releaseInput)
             setUploadVideos(false)
         } else {
             setUploadVideos(true)
@@ -202,7 +196,6 @@ const AddPackForm = ({setExpandAddNewPack, resetData, setPacks}) => {
                             if(object){
                                 object.URL = URL.createObjectURL(object)
                             }
-                            console.log(object)
                             setGraphicObject(object)
                          }}/>
                             {errors.graphic && (

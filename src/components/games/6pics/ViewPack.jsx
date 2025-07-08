@@ -137,7 +137,6 @@ const ViewPack = ({setSelection, selection, setResetForm}) => {
             .from('sixpicspacks')
             .select("*")
             .eq('pack_name', newPackName)
-            console.log(sixpicspacks)
             data = sixpicspacks[0]
 
             data?.videos?.forEach((v) => {
@@ -196,7 +195,7 @@ const ViewPack = ({setSelection, selection, setResetForm}) => {
             }
 
         } catch (error) {
-            console.log(error); 
+            console.error(error); 
         }               
 
     }
@@ -226,7 +225,7 @@ const ViewPack = ({setSelection, selection, setResetForm}) => {
         .eq('id', packData?.id)
 
         if(error){
-            console.log(error)
+            console.error(error)
         } else {
             setAlertProps({
                 text: 'Successfully deleted pack',

@@ -57,12 +57,6 @@ useEffect(() => {
   }, [isWin]);
 
   useEffect(() => {
-    // console.log(
-    //   `
-    //   letterCount = ${letterCount}
-    //   letterTarget = ${letterTarget}
-    //   `
-    // )
     setToggleCheckAnswer(letterCount === letterTarget);
   }, [letterCount, letterTarget]);
 
@@ -78,8 +72,6 @@ useEffect(() => {
   } else {
     setToggleHint(false);
   }
-
-  console.log(levelScore)
 
 }, [hintIndex, letterTarget, isWin, giveUp, index, levelScore, answer]);
 
@@ -100,25 +92,14 @@ useEffect(()=>{
 const getHint = () => {
 
   let currentStep
-
-  console.clear()
-
-  // console.log('hint button clicked!')
-
   currentStep = 'getHint() function init'
-  // console.log('start getHint()')
 
   if (isWin || giveUp) return;
-
   currentStep = 'checking for isWin or giveUp'
-  // console.log('not isWin or giveUp')
-
   currentStep = 'checking inputLetters.length'
-  // console.log(`input letters length ${inputLetters?.length}`)
 
   for (let i = 0; i < inputLetters.length; i++) {
     currentStep = 'checking that index is valid'
-    // console.log(`index is ${i}`)
 
     if (!inputLetters[i]) {
       currentStep = 'getting the correctLetter'
@@ -126,14 +107,10 @@ const getHint = () => {
 
 
       currentStep = 'checking for valid cleaned letter at index'
-      // console.log(`Cleaned letter at ${i} is ${cleanedChars[i]}`)
 
       currentStep = 'checking for valid correctLetter'
-      // console.log(`Correct letter is ${correctLetter}`)
 
       if (!correctLetter) return;
-
-      // console.log('no valid correctLetter!')
 
       const updatedLetters = [...inputLetters];
       updatedLetters[i] = correctLetter;
@@ -148,22 +125,16 @@ const getHint = () => {
 
       setHintIndex(i + 1);
 
-      // Focus next empty input
       setTimeout(() => {
         const nextRef = inputRefs.current[i + 1];
         if (nextRef) nextRef.focus();
       }, 0);
-
-      // console.log('Setting hint at index', i, 'to', correctLetter);
 
       setHintsUsed(prev => prev +1)
 
       return;
     }
   }
-
-  // console.log(`Something went wrong and the function returned early while **${currentStep.toUpperCase()}**`)
-
   const allFilled = cleanedChars.every((_, i) => inputLetters[i]);
   if (allFilled) {
     setToggleHint(false);
@@ -300,9 +271,6 @@ useEffect(() => {
     if(longestWord){
       calculatedTextBoxWidth = styledWidth / longestWord
     }
-
-    console.log(calculatedTextBoxWidth)
-
     if(styledWidth > 330){
       setTextBoxWidth(Math.min(40, Math.max(50, calculatedTextBoxWidth)));
       setTextBoxScale(1)
@@ -360,8 +328,6 @@ useEffect(() => {
 }, [answer, index]);
 
   let cleanedIndex = 0;
-
-  // console.log(userMeta)
 
   return (
     <Stack direction="column" width="90%" justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
@@ -431,7 +397,7 @@ useEffect(() => {
 
     </Stack>
 
-      <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} marginTop={3} width={'75%'}>
+      <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} margin={'10px'} width={'75%'}>
         {<Link onClick={() => {
           if(levelScore[index]?.hints > 0){
             getHint()
