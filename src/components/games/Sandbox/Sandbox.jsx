@@ -52,7 +52,7 @@ useEffect(() => {
   const fixtureA = contact.getFixtureA();
   const fixtureB = contact.getFixtureB();
   const bodyA = fixtureA.getBody();
-  const bodyB = fixtureB.getBody();
+  const bodyB = fixtureB.getBody(); 
 
   const now = Date.now();
   const flashDuration = 200; // ms
@@ -75,11 +75,11 @@ useEffect(() => {
   world.on('end-contact', (contact) => {
   const bodyA = contact.getFixtureA().getBody();
   const bodyB = contact.getFixtureB().getBody();
-  console.log('Collision ended between:', bodyA.name, bodyB.name);
+  // console.log('Collision ended between:', bodyA.name, bodyB.name);
   });
 
   // Create walls
-  const createWall = (x, y, w, h) => {
+  const createWall = (x, y, w, h) => { 
     const body = world.createBody();
     body.createFixture(planck.Box(toMeters(w / 2), toMeters(h / 2)), { restitution: 1 });
     body.setPosition(planck.Vec2(toMeters(x), toMeters(y)));
@@ -118,11 +118,13 @@ useEffect(() => {
   let dragEnd = null;
 
   const getMouseWorld = (event) => {
-    const rect = app.view.getBoundingClientRect();
-    const x = toMeters(event.clientX - rect.left);
-    const y = toMeters(event.clientY - rect.top);
-    return planck.Vec2(x, y);
-  };
+  const rect = app.view.getBoundingClientRect();
+
+  const x = toMeters((event.clientX ?? event.touches?.[0]?.clientX) - rect.left);
+  const y = toMeters((event.clientY ?? event.touches?.[0]?.clientY) - rect.top);
+
+  return planck.Vec2(x, y);
+};
 
   const onPointerDown = (e) => {
     const worldPos = getMouseWorld(e);
