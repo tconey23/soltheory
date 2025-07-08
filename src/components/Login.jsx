@@ -192,7 +192,7 @@ const Login = () => {
         <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={20}>Welcome to SOLTheory</Typography>
         <Typography color={'whitesmoke'} textAlign={'center'} fontFamily={'Fredoka Regular'} fontSize={15}>Please log in to proceed</Typography>
       </Stack>
-      <Stack width={'90%'}>
+      <Stack width={'90%'}> 
         <LoginForm />
       </Stack>
     </Stack>

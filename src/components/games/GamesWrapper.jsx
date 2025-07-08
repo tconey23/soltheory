@@ -159,7 +159,7 @@ const GamesWrapper = () => {
         <MotionStack
           key="account_select"
           width="85%"
-          sx={{ height: '100%' }}
+          sx={{ height: '100%' }} 
           alignItems="center"
           justifyContent="flex-start"
           direction="column"
