@@ -4,7 +4,7 @@ const SecondaryOrbs = () => {
   return (
     <div>
       
-    </div>
+    </div> 
   )
 }
 

@@ -9,7 +9,7 @@ const cue = Matter.Bodies.circle(x - 500, y, 20, {
     });
     cue.label = "cue";
 
-  return (
+  return ( 
     <>
         {cue}
     </>

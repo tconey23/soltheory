@@ -10,7 +10,7 @@ import SandboxButton from './SandboxButton'
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
-dayjs.extend(customParseFormat)
+dayjs.extend(customParseFormat) 
 
 
 const HeaderImage = () => {
