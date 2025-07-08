@@ -47,7 +47,6 @@ export const getGames = async () => {
   };
   
   export const cleanAndFixPromptData = async () => {
-    console.log('ehere')
     const { data, error } = await supabase.from('21thingsprompts').select('*');
   
     if (error) return console.error('Fetch error:', error);
@@ -66,12 +65,12 @@ export const getGames = async () => {
     if (updateError) {
       console.error('Update error:', updateError);
     } else {
-      console.log('✅ Prompts normalized and reuploaded');
+
     }
   };
   
 export const addNewPrompts = async (prompts) => {
-  console.log(prompts)
+
   if(prompts) 
       {
         const { data, error } = await supabase
@@ -157,8 +156,6 @@ export const addGameToUser = async (user, newGameData) => {
       }));
 
 export const saveThreeSongs = async (selectedSongs, userId) => {
-
-  console.log(selectedSongs, userId)
 
 const formattedSongs = formatSelectedSongs(selectedSongs);
 

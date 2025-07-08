@@ -52,8 +52,6 @@ const SharedGame = () => {
                 if(game){
                     let gameData = game?.[0]
 
-                    console.log(gameData)
-
                     setDate(gameData?.game_date)
                     setNote(gameData?.note)
                     setStage1(gameData?.stage1)

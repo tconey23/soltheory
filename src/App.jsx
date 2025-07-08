@@ -97,7 +97,6 @@ function App() {
 
   useEffect(() => {
     const redir = sessionStorage.getItem('redirectAfterLogin')
-    // console.log(redir)
     if(redir){
       setRedirect(true)
       navTo(redir)
@@ -122,7 +121,6 @@ function App() {
 
   useEffect(() => { 
     if(userMeta?.user_name) {
-      // console.log(userMeta?.user_name)
       setAlertContent({
         text: `Welcome ${userMeta?.user_name}`,
         type: 'info'
@@ -136,10 +134,6 @@ const [dims, setDims] = useState(
     height: '80%'
   }
 )
-
-useEffect(() => {
-  // console.log(dims)
-}, [dims])
   
   useEffect(() => {
     switch(screen){
@@ -234,7 +228,7 @@ useEffect(() => {
 
           <Route path="/avett/" element={<AvettDemo demo={true}/>} />
 
-          <Route path="/games/6pics/avett" element={<Pic6 />} />
+          <Route path="/games/6pics/promo/avett" element={<Pic6 />} />
 
           <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 

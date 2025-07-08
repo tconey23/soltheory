@@ -29,7 +29,6 @@ const TwentyOneCalendar = ({setDayGame, dayGame}) => {
     }
 
   const getPromptDates = async (dt) => {
-    console.log(dt);
     let { data, error } = await supabase
         .from('twentyone_things_data')
         .select("*")

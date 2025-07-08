@@ -19,7 +19,6 @@ import { Button, Stack } from '@mui/material'
 
 const PerfHook = () => {
   const perf = usePerf()
-  console.log(perf.getReport())
   return <PerfHeadless />
 }
 
@@ -73,10 +72,6 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     const [lookAt, setLookAt] = useState([2, 2, 9])
 
     const screen = useGlobalStore((state) => state.screen)
-
-    useEffect(() => {
-      console.log(screen)
-    }, [screen])
    
     useEffect(() =>{
      
@@ -145,11 +140,6 @@ const HomePage = ({showBot = true}) => {
         setAnimate(true)
       }
     },[initialAnimation])
-
-    useEffect(() => {
-      // console.log(incline, decline)
-      // console.log(dpr)
-    }, [incline, decline, dpr])
 
 
     useEffect(() =>{

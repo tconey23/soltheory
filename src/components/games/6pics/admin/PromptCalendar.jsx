@@ -21,7 +21,6 @@ const PromptCalendar = ({setDate}) => {
     .select('date')
 
     if(prompts){
-      // console.log(prompts)
         prompts.forEach((p) => {
             let formDate = dayjs(p.date, "MM/DD/YYYY").format("YYYY-MM-DD")
             let finalDate
@@ -30,7 +29,6 @@ const PromptCalendar = ({setDate}) => {
             } else {
               finalDate = formDate
             }
-            console.log(finalDate)
             setDisabledDates(prev => ([
                 ...prev, 
                 finalDate

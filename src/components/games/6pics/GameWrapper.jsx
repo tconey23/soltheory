@@ -3,7 +3,7 @@ import { Box, Button, Stack, Typography } from '@mui/material';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { fetchVideos } from './helpers/functions';
 import SixPicsVideoPlayer from './SixPicsVideoPlayer';
 import TextBoxes from './TextBoxes';
@@ -11,6 +11,7 @@ import ResultsPage from './ResultsPage';
 import confetti from 'canvas-confetti';
 import useGlobalStore from '../../../business/useGlobalStore';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -49,9 +50,11 @@ const GameWrapper = ({ pack, setPack }) => {
   const [forceRefresh, setForceRefresh] = useState(0)
 
   const inGame = useGlobalStore((state) => state.inGame)
-  const isDemo = useGlobalStore((state) => state.isDemo)
   const setInGame = useGlobalStore((state) => state.setInGame)
   const userMeta = useGlobalStore((state) => state.userMeta)
+  
+  const loc = useLocation()
+  const isDemo = loc?.pathname?.includes('/promo/')
 
   const MotionStack = motion(Stack)
 
@@ -78,10 +81,6 @@ const GameWrapper = ({ pack, setPack }) => {
     afterChange: setActiveSlide,
   };
 
-  //Screensize
-  useEffect(() => {
-    // console.log('Current screen:', width, height);
-  }, [width, height]);
 
   // Fetch level data
   useEffect(() => {
@@ -90,7 +89,6 @@ const GameWrapper = ({ pack, setPack }) => {
         const res = await fetchVideos(pack?.id);
         if (res) {
           setLevels(res);
-          // console.log('Fetched levels:', res);
         }
       } catch (error) {
         console.error('Error fetching videos:', error);
@@ -155,15 +153,12 @@ const GameWrapper = ({ pack, setPack }) => {
 
   // End game when last slide reached
   useEffect(() => {
-    // console.log('activeSlide', activeSlide)
-    // console.log('levelsLength', levels.length)
     if (levels.length > 0 && activeSlide >= levels.length -1) {
       // setGameOver(true);
     }
   }, [activeSlide, levels.length]);
 
   useEffect(() => {
-    // console.log('isWin',isWin)
   }, [isWin])
 
   const startOver = () => {
@@ -201,14 +196,19 @@ const GameWrapper = ({ pack, setPack }) => {
   return (
     <Stack direction="column" sx={{ height: height, width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
       <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
-        {!isDemo && 
+        
           <Box sx={{width: '33%'}}>
             <Button onClick={() => {
-              navTo('/games/6pics')
+              if(isDemo){
+                navTo(loc?.pathname)
+              } else {
+                navTo('/games/6pics')
+              }
               setPack('')
+
               }}>Start over</Button>
           </Box>
-        }
+        
         <Stack key={refreshScore} sx={{width: '33%'}}>
           {!gameOver && levelScore[activeSlide] && (
             <>
@@ -226,10 +226,9 @@ const GameWrapper = ({ pack, setPack }) => {
         </Box>
       </Stack>
 
-      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '100%'}}>
+      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '77.5dvh'}}>
         {!gameOver &&
           levels.map((level, i) => {
-            // console.log(i)
             return (
             <Stack id='game_stage' key={i} height={'100%'}>
               {i === activeSlide && (
@@ -286,6 +285,23 @@ const GameWrapper = ({ pack, setPack }) => {
 
         {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={isDemo} score={totalScore} gamePack={pack} width={width} height={height} />}
       </Slider>
+        <Stack
+        width={'100%'}
+        height={'10dvh'}
+        justifyContent={'flex-start'}
+      >
+        {pack?.promo_name &&
+          <a href={pack?.promo_url} target="_blank" rel="noopener noreferrer">
+            <img
+              width="100%"
+              height="auto"
+              src={pack?.promo_image}
+              alt="Promo"
+              style={{ display: "block" }}
+            />
+          </a>
+        }
+      </Stack>
     </Stack>
   );
 };

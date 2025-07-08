@@ -75,15 +75,13 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       note:note,
       game_date: date || Date.now(),
     }
-
-    // console.log(gameData)
         
         const { data, error } = await supabase
       .from('twentyone_things_data')
       .upsert([gameData])  // replaces insert()
       .select();
 
-        console.log(data, error)
+        console.error(error)
         if(data){
           setAskToShare(true)
         }
@@ -171,7 +169,6 @@ const FinalStage = ({ prompts, setCurrentStage, date, setSelections }) => {
       <Stack direction="row" spacing={2} mt={2}>
         <Button 
           onClick={() => {
-            // console.log(showSubmit)
             if(showSubmit){
               setCurrentStage(3)
             } else {

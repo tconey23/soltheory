@@ -12,7 +12,6 @@ const Home = ({ onPlay, payload }) => {
     const [clicked, setClicked] = useState(1)
 
     const today = new Date().toISOString().split('T')[0];
-    console.log(today == payload.date)
 
     useEffect(() => {
         setTimeout(() => {

@@ -27,11 +27,9 @@ import { Helmet } from "react-helmet";
   
     useEffect(() => {
       setShotCount(0)
-      // console.log(levelScore)
     }, [])
 
     useEffect(() => {
-      // console.log('demo', isDemo)
       if(isDemo) {
         setShowMsg(true)
         handleSaveGame('487fd0c5-9493-4c18-9be0-9c5b77f6af5c')
@@ -67,7 +65,6 @@ import { Helmet } from "react-helmet";
 
 
       setShotCount(prev =>  prev +1)
-      // console.log(shotCount)
     }
 
     useEffect(() => {
@@ -77,7 +74,6 @@ import { Helmet } from "react-helmet";
       }
 
       if(shotCount < (score / 100)){
-        // console.log(score)
       const confettiInterval = setInterval(() => {
         shootConfetti(shotCount * 500)
       }, 400);
@@ -100,8 +96,6 @@ import { Helmet } from "react-helmet";
         promo: isDemo ? 'Avett25' : null
       };
 
-      // console.log(gameDataObject)
-
       const { data, error } = await supabase
       .from('six_pics_data')
       .upsert(gameDataObject)
@@ -111,9 +105,6 @@ import { Helmet } from "react-helmet";
         console.error("Failed to save game:", error);
         return; // Optional: stop navigation if there's an error
       }
-
-      // console.log("Game saved:", data);
-      // nav('/games');
     };
 
     const shareGame = async () => {
@@ -123,8 +114,6 @@ import { Helmet } from "react-helmet";
         url: `https://soltheory.com/avett`
       })
     }
-
-    // console.log(gamePack)
   
     return (
       <Stack width={'100%'} height={'80dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
@@ -158,7 +147,6 @@ import { Helmet } from "react-helmet";
                   {
                     gamePack?.videos?.map((p, i) => {
                       if(renderScores){
-                        // console.log(p)
                       }
                       return (
                         <ListItem>
@@ -197,7 +185,6 @@ import { Helmet } from "react-helmet";
                   {
                     gamePack?.videos?.map((p, i) => {
                       if(renderScores){
-                        // console.log(p)
                         return (
                           <ListItem>
                             <MotionStack

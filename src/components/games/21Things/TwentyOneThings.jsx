@@ -32,9 +32,6 @@ const green = '#45d500'
     const [payload, setPayload] = useState(null)
     const [savegameNote, setSavegameNote] = useState('')
     const [newGame, setNewGame] = useState(false)
-    // console.log('userId', userId, 'redirect', redirect, 'newgame', newGame)
-
-    
 
       const getGuestGame = async () => {
         let { data: guest_games, error } = await supabase
@@ -54,12 +51,10 @@ const green = '#45d500'
         .from('users')
         .select("*")
         .eq('primary_id', userId)
-        console.log(data)
 
         if(data){
           data.forEach((d) => {
             const foundGame = d?.game_data?.find((g) => g.id === gameId)
-            console.log(foundGame)
             if(foundGame){
                 setPrompts(foundGame?.stages)
                 setSavegameNote(foundGame?.note)
@@ -121,7 +116,6 @@ useEffect(() => {
   
   
     const renderStage = () => {
-      console.log(currentStage)
       switch (currentStage) {
         case 1:
           return <Stage height={'100%'} stageNum={1} prompts={prompts} setPrompts={setPrompts} selections={selections} setSelections={setSelections} setCurrentStage={setCurrentStage} nextStage={2} maxSelect={6} currentColor="#dd95ff" prevColor="white" />

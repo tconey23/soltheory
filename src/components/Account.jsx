@@ -27,7 +27,7 @@ const Account = () => {
   const [hasMounted, setHasMounted] = useState(false);
   const [backCol, setBackCol] = useState('#414770')
 
-//   console.log(userMeta)
+
 
     useEffect(() => {
         setTimeout(() => {

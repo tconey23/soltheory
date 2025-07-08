@@ -13,12 +13,12 @@ const AvettDemo = ({demo}) => {
 
    useEffect(() => {
     if(isDemo){
-        navTo('/games/6pics/avett')
+        navTo('/games/6pics/promo/avett')
     }
    }, [isDemo])
 
   return (
-    <Stack height={'100%'}>
+    <Stack height={'77dvh'}>
 
         <MotionStack
             initial={{ opacity: 0 }}
@@ -84,7 +84,7 @@ const AvettDemo = ({demo}) => {
                     In this game, you’ll see six images, each one slowly revealing an Avett-inspired image across three stages.
                 </Typography>
 
-                <Stack height={'90%'} width={'92%'} marginTop={'10px'} alignItems={'flex-start'} overflow={'auto'}>
+                <Stack height={'90%'} width={'92%'} marginTop={'10px'} alignItems={'flex-start'} overflow={'auto'} paddingLeft={'10px'} borderRadius={2} sx={{boxShadow: 'inset 0px -9px 11px 0px #00000042'}}>
                     <Typography marginTop={2} textAlign={'left'} fontFamily={'fredoka regular'} fontSize={15}>
                         •	Tap play to reveal the first part of each image.
                     </Typography>

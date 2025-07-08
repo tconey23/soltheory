@@ -22,7 +22,6 @@ const SixPicsDisp = ({gameData}) => {
             .eq('pack_name', pack)
 
             let dataArray
-            // console.log(pack_data)
             if(pack_data?.length > 0){
                 dataArray = pack_data.map((d, i) => { 
                     if(d.user_id === userMeta.primary_id){

@@ -6,9 +6,6 @@ import TwentyOneThingsDisp from './TwentyOneThingsDisp';
 const TwentyOneThingsData = () => {
 
     const [dayGame, setDayGame] = useState()
-    // useEffect(() => {
-    //     console.log(dayGame)
-    // }, [dayGame])
 
   return (
     <Stack direction={'column'} width={'100%'} height={'100%'} bgcolor={''}>

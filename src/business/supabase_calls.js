@@ -10,7 +10,7 @@ export const updatePassword = async (email, newPassword) => {
       })
 
       if(error){
-        console.log(error)
+        console.error(error)
         setAlertContent({text: 'An error has occured', type:'error'})
       }
 
@@ -65,7 +65,7 @@ export const login = async (email, password) => {
     return data
   } else if(error){
     setAlertContent({text: 'An error has occured', type:'error'})
-    console.log(error)
+    console.error(error)
   }
 }
 
@@ -104,7 +104,7 @@ export const logout = async () => {
       if(messaging){
         return messaging
       } else {
-        console.log(error)
+        console.error(error)
       }
     }
     
@@ -121,8 +121,6 @@ export const logout = async () => {
 
     export const deviceData = async (win_data, nav_data, user) => {
 
-      console.log(win_data, nav_data, user)
-
       const { data, error } = await supabase
       .from('device_details')
       .insert([
@@ -133,7 +131,7 @@ export const logout = async () => {
       ])
       .select() 
 
-      console.log(data, error)
+      console.error(error)
         
     }
 

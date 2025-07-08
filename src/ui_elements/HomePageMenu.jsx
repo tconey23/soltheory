@@ -48,10 +48,6 @@ const HomePageMenu = () => {
     <Affiliates />
   ]
 
-  useEffect(() => {
-    console.log(screen)
-  }, [screen])
-
   return (
     <Stack direction={'column'} width={'100%'} height={'95%'} alignItems={'center'} position={'absolute'} zIndex={2} paddingBottom={'5px'}>
       <Stack

@@ -39,7 +39,6 @@ const AddPrompts = () => {
       } else if(data?.length == 0 && prompts?.length == 0){
         setPromptCount(0)
       }
-      // console.log(data?.length, prompts?.length)
     }, [data, prompts, date, author]);
 
     useEffect(() => {
@@ -63,7 +62,6 @@ const AddPrompts = () => {
       };
   
       const res = await addNewPrompts(payload);
-      // console.log(res)
       if (res === 'success') {
         setDate('');
         setData([]);
@@ -115,7 +113,6 @@ const AddPrompts = () => {
     };
   
     const handleSaveEdit = (index, updatedText, type) => {
-      // console.log(updatedText)
       if (type === 'data') {
         setData(prev => prev.map((item, i) => i === index ? { ...item, prompt: updatedText } : item));
       } else if (type === 'prompts') {
@@ -130,7 +127,6 @@ const AddPrompts = () => {
           <Accordion
             onChange={() => {
               if(userMeta?.user_name){
-                console.log(userMeta?.user_name)
                 setAuthor(userMeta?.user_name)
               }
             }}

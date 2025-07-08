@@ -28,10 +28,6 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
     const [mobile, setMobile] = useState(false)
 
     const {screen} = useGlobalStore()
-
-    useEffect(() => {
-        console.log(mobile)
-    }, [mobile])
     
     useEffect(() => {
         switch(screen){

@@ -28,7 +28,7 @@ const Sandbox = () => {
   const [orbCount, setOrbCount] = useState(50)
   const [orbColor1, setOrbColor1] = useState('#34ebc0')
   const [orbColor2, setOrbColor2] = useState('#7a34eb')
-  const [orbCollColor, setOrbCollColor] = useState('#eb34d5')
+  const [orbCollColor, setOrbCollColor] = useState('#ff008d')
   const [resetColor, setResetColor] = useState(10)
 
 useEffect(() => {
@@ -75,7 +75,6 @@ useEffect(() => {
   world.on('end-contact', (contact) => {
   const bodyA = contact.getFixtureA().getBody();
   const bodyB = contact.getFixtureB().getBody();
-  // console.log('Collision ended between:', bodyA.name, bodyB.name);
   });
 
   // Create walls
@@ -181,7 +180,6 @@ useEffect(() => {
       }
 
       const pos = body.getPosition();
-      // console.log(toPixels(pos.x), toPixels(pos.y));
     }
     world.step(1 / 60);
 
@@ -279,33 +277,33 @@ useEffect(() => {
 
   return (  
     <Stack height={'80%'} width={'100%'}>
-      {/* <Stack height={'30%'} bgcolor={'#ffffff00'}>
-      <Accordion sx={{height: '70%', overflow: 'auto', width: '40%', position: 'absolute', bgcolor: '#ffffff00'}}>
+      <Stack height={'30%'} bgcolor={'#ffffff00'}>
+      <Accordion sx={{height: 'fit-content', overflow: 'auto', width: '40%', position: 'absolute', bgcolor: '#ffffff00', maxHeight: '50%'}}>
         <AccordionSummary sx={{color: 'white'}}><i class="fi fi-bs-menu-burger"></i></AccordionSummary>
         <AccordionDetails>
           <Stack width={'98%'}>
-            <Typography>Orb Count ({orbCount})</Typography>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb Count ({orbCount})</Typography>
             <Slider value={orbCount} max={500} step={10} onChange={(e) => setOrbCount(e.target.value)}/>
           </Stack>
           <Stack width={'98%'}>
-            <Typography>Orb color 1</Typography>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb color 1</Typography>
             <HexColorPicker color={orbColor1} onChange={setOrbColor1}/>
           </Stack>
           <Stack width={'98%'}>
-            <Typography>Orb color 2</Typography>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb color 2</Typography>
             <HexColorPicker color={orbColor2} onChange={setOrbColor2}/>
           </Stack>
           <Stack width={'98%'}>
-            <Typography>Orb collision color</Typography>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Orb collision color</Typography>
             <HexColorPicker color={orbCollColor} onChange={setOrbCollColor}/>
           </Stack>
           <Stack width={'98%'}>
-            <Typography>Collision color time</Typography>
+            <Typography fontFamily={'fredoka regular'} color={'whitesmoke'}>Collision color time</Typography>
             <Slider value={resetColor} max={500} step={1} onChange={(e) => setResetColor(e.target.value)}/>
           </Stack>
         </AccordionDetails>
       </Accordion>
-      </Stack> */}
+      </Stack>
       <canvas style={{position: 'absolute'}} width={'100%'} height={'100%'} ref={canvasRef} />
     </Stack>
   )

@@ -42,14 +42,11 @@ const LoginForm = () => {
 
   useEffect(() => {
     if(loc?.pathname){
-      console.log('setting loc', loc.pathname)
       setRedirectUrl(loc?.pathname)
     }
   }, [loc?.pathname])
 
 const handleLogin = async () => {
-  // console.log('email', email)
-  // console.log('password', password)
   let { data, error } = await supabase.auth.signInWithPassword({
     email: email.trim(),
     password: password.trim()
@@ -58,12 +55,10 @@ const handleLogin = async () => {
   if (error) {
     console.error('Supabase login error:', error.message);
   } else {
-    console.log(redirectUrl)
     sessionStorage.setItem('returnPath', redirectUrl)
   }
 
   if (data) {
-    // console.log(data);
     if(toggleLogin){
       setToggleLogin(false)
     }
@@ -202,7 +197,7 @@ const Login = () => {
           <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>For more information about SOL Theory, reach out to 
 
             <Typography sx={{fontSize: '21px'}}>
-              <Link href="mailto:steve@soltheory.com?subject=Info%20Request" target="_blank" rel="noopener noreferrer">steve@soltheory.com</Link>
+              <Link href="mailto:hello@soltheory.com?subject=Info%20Request" target="_blank" rel="noopener noreferrer">hello@soltheory.com</Link>
             </Typography>
           </Typography>
         </Box>

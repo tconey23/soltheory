@@ -31,7 +31,6 @@ const ChatBox = () => {
 
   useEffect(() => {
     fetchMessages();
-    console.log('chat mounted')
   }, []);
 
   return ( 
