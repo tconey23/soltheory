@@ -22,6 +22,7 @@ import AdSpace from './ui_elements/AdSpace';
 import FinalStage from './components/games/21Things/FinalStage';
 import { useParams } from 'react-router-dom';
 import SharedGame from './components/games/21Things/SharedGame';
+import Sandbox from './components/games/Sandbox/Sandbox';
 import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
 import AvettDemo from './components/games/6pics/AvettDemo';
 
@@ -177,7 +178,6 @@ useEffect(() => {
     <Stack flex="0 0 10%" width="100%">
       <AppHeader />
     </Stack>
-
     <Stack flex="1" width="100%" id="main">
         <Routes>
           <Route path='*' element={<Error/>} />
@@ -219,6 +219,13 @@ useEffect(() => {
             path={"/mythreesongs"}
             element={
               <MyThreeSongs />
+            } 
+          />
+              
+          <Route 
+            path={"/games/sandbox"}
+            element={
+              <Sandbox />
             } 
           />
 

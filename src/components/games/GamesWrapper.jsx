@@ -6,6 +6,7 @@ import MotionStack from '../../ui_elements/MotionStack';
 import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
 import SixPicsButton from './SixPicsButton';
+import SandboxButton from './SandboxButton'
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -75,6 +76,12 @@ const GamesWrapper = () => {
       }, []);
   
       const startGame = async (gameName, isLoggedIn) => { 
+       
+        if (gameName ===  'sandbox') {
+          navigate('/games/sandbox')
+          return
+        }
+       
         let gameId;
 
         if (userMeta) {
@@ -139,7 +146,7 @@ const GamesWrapper = () => {
           SOL Games
         </MotionText>
   
-        <Stack marginBottom={7}>
+        <Stack marginBottom={0}>
           <MotionAvatar
             initial={hasMounted ? false : { opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -156,7 +163,7 @@ const GamesWrapper = () => {
           width="85%"
           sx={{ height: '100%' }}
           alignItems="center"
-          justifyContent="center"
+          justifyContent="flex-start"
           direction="column"
           paddingY={2}
           paddingX={2}
@@ -170,11 +177,16 @@ const GamesWrapper = () => {
           <Stack
             sx={{
               width: '100%',
-              marginTop: 2,
+              height: '75%',
+              marginBottom: 1,
+              paddingBottom: 1,
               borderRadius: 1,
+              overflow: 'auto',
+              justifyContent: 'flex-start'
             }}
           >
             <List
+              sx={{paddingLeft: '10px', paddingRight: '10px', height: '70%', paddingBottom: '20px', marginBottom: '10px'}}
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
@@ -186,6 +198,10 @@ const GamesWrapper = () => {
                 <SixPicsButton />
               </MenuItem>
 
+              {userMeta?.is_admin &&
+              <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+                <SandboxButton />
+              </MenuItem>}
               {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
                 <MyThreeSongsButton />
               </MenuItem> */}
