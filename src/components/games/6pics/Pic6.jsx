@@ -81,16 +81,6 @@ const Pic6 = ({demo}) => {
   }, []);
 
   useEffect(() => {
-    // if(userMeta?.primary_id){
-    //   setDisplayModal(false)
-    // } else if(loginSkipped){
-    //   setDisplayModal(false)
-    // } else {
-    //   setDisplayModal(true)
-    // }
-  }, [loginSkipped, userMeta])
-
-  useEffect(() => {
     if(loc.pathname.includes('/promo/')){
       setDisplayPromo(true)
     } else {
@@ -105,7 +95,6 @@ const Pic6 = ({demo}) => {
       alignItems={"center"}
       justifyContent={"flex-start"}
     >
-
       {gamePack ? 
         <GameWrapper pack={gamePack} setPack={setGamePack}/>
       :
@@ -140,24 +129,6 @@ const Pic6 = ({demo}) => {
           </MenuList>
         </Stack>
       }
-      {/* <Modal
-        open={displayModal}
-      >
-        <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-          <Stack borderRadius={1} bgcolor={'#ffffff85'} width={'80%'} height={'25%'} justifyContent={'center'} alignItems={'center'}>
-            <Stack justifyContent={'center'} alignItems={'center'} padding={2} borderRadius={1} bgcolor={'#dd95ff'} width={'90%'} height={'80%'}>
-              <Typography sx={{marginBottom: '10px'}} fontFamily={'fredoka regular'} textAlign={'center'}>
-                You can play our game without logging in, but creating an account lets you save your game data—which is pretty cool. Totally up to you. Follow your bliss.
-              </Typography>
-              <Stack direction={'row'} sx={{justifyContent: 'space-evenly', width: '100%'}}>
-                <Button>Login</Button>
-                <Button>New user</Button>
-                <Button onClick={() => setLoginSkipped(true)}>Skip</Button>
-              </Stack>
-            </Stack>
-          </Stack>
-        </Stack>
-      </Modal> */}
     </Stack>
   );
 };

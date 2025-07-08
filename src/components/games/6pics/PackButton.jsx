@@ -5,37 +5,28 @@ import useGlobalStore from '../../../business/useGlobalStore';
 
 const PackButton = ({pack, setGamePack, disable, playedDate}) => {
     
-    const [font, setFont] = useState('Fredoka') 
     const videoRef = useRef()
-    const [played, setPlayed] = useState()
-    const [isHover, setIsHover] = useState(false)
-    const user = useGlobalStore((state) => state.user)
+    const buttonRef = useRef()
     const screen = useGlobalStore((state) => state.screen)
+    const setAlertContent = useGlobalStore((state) => state.setAlertContent)
+    const userMeta = useGlobalStore((state) => state.userMeta)
+    const [buttonWidth, setButtonWidth] = useState(208)
 
-    const formatDate = (unix) => {
-        if (!unix) return
-
-        const date = new Date(Number(unix)); // Ensure it's a number
-        if (isNaN(date.getTime())) return "Invalid date"; // handle bad value
-
-        setPlayed(date.toISOString().split('T')[0])
-    };
-
-
-    const getFileType = (filename) => {
-        const ext = filename.split('.').pop().toLowerCase();
-        if (ext === 'mp4') return 'video/mp4';
-        if (ext === 'svg') return 'image/svg+xml';
-        return 'unknown';
-      };
+    useEffect(() =>{
+        setButtonWidth(buttonRef?.current.offsetWidth)
+    }, [buttonRef])
 
     return (
         <MenuItem
-        // disabled={disable}
         userdata='pack_button'
         onClick={(e) => {
-
-            if(played) return;
+            if(disable && !userMeta.is_admin){
+                setAlertContent({
+                    text: `You have already played this pack`,
+                    type: 'warning'
+                })
+            return 
+            }
             
             setGamePack(pack)
         }}
@@ -61,12 +52,12 @@ const PackButton = ({pack, setGamePack, disable, playedDate}) => {
                 justifySelf: 'center',
             }}>
 
-                    <Stack width={'90%'} height={'100%'} alignItems={'center'}>
+                    <Stack ref={buttonRef} width={'90%'} height={'100%'} alignItems={'center'}>
                         <Stack width={screen === 'xs' ? '90%' : '60%'} height={screen === 'xs' ? '150px' : '155px'} justifyContent={'center'} alignItems={'flex-start'} direction={'row'}>
                             {disable && 
-                                <Box sx={{position: 'absolute', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#00000045'}}>
-                                    <Typography sx={{bgcolor:'#000000d4', padding: 1, color: 'white'}}>{`Played on: ${played}`}</Typography>
-                                </Box>
+                                <Stack sx={{top: '0px', position: 'absolute', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', bgcolor: '#00000045'}}>
+                                    <Typography fontSize={20} sx={{borderRadius: 1, padding: 1, color: 'green', position: 'absolute', top: '0px', left: `${buttonWidth - 30}px`}}><i className="fi fi-sr-check-circle"></i></Typography>
+                                </Stack>
                             }
                             <video 
                                 playsInline
@@ -85,26 +76,7 @@ const PackButton = ({pack, setGamePack, disable, playedDate}) => {
                                 }} muted autoPlay={false} loop={false}>
                                     <source src={pack?.graphic} type="video/mp4"/>
                             </video>
-                        </Stack>
-
-                        {/* <Stack width={'50%'} height={'35%'} justifyContent={'center'} alignItems={'center'}>
-                            <Typography sx={{padding: '10px'}} fontSize={'clamp(11px, 2vw, 20px)'} fontFamily={'Fredoka Regular'}>{pack?.pack_name.toUpperCase()}</Typography>
-                        </Stack> */}
-
-                        {/* <Stack width={'70%'} minHeight={'24px'} height={'30%'} alignItems={'flex-start'}>
-                            {played && 
-                                <Stack direction={'row'} alignItems={'center'} justifyContent={'center'}>
-                                    <Stack marginX={3} alignItems={'center'} justifyContent={'center'}>
-                                        <Typography lineHeight={0}><i onMouseOver={() => setIsHover(true)} onMouseOut={() => setIsHover(false)} style={{color: 'limegreen'}} className="fi fi-sr-checkbox"></i></Typography>
-                                    </Stack>
-
-                                    <Stack alignItems={'center'} justifyContent={'center'} >
-                                        <Typography sx={{transition: 'all 0.25s ease-in-out', opacity: isHover ? 1 : 0}} fontSize={10} fontFamily={'Fredoka Regular'} >You have played this pack</Typography>
-                                    </Stack>
-                                </Stack>  
-                            }
-                        </Stack> */}
-                    
+                        </Stack>                    
                     </Stack>
         </MenuItem>
         

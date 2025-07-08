@@ -213,7 +213,6 @@ const GameWrapper = ({ pack, setPack }) => {
           {!gameOver && levelScore[activeSlide] && (
             <>
               <Typography>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
-              {/* <Typography>{`Hints ${levelScore[activeSlide]?.hints}`}</Typography> */}
             </>
           )}
         </Stack>

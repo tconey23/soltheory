@@ -8,6 +8,7 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import { HexColorPicker } from "react-colorful";
+import { Button } from '@mui/material';
 
 const WIDTH = window.innerWidth;
 const HEIGHT = window.innerHeight * 0.80;
@@ -22,6 +23,7 @@ const Sandbox = () => {
   const appRef = useRef();
   const orbsRef = useRef([]);
   const cueRef = useRef();
+  const [resetRef, setResetRef] = useState(0)
 
   const DAMPING_FACTOR = 0.95;
 
@@ -30,6 +32,18 @@ const Sandbox = () => {
   const [orbColor2, setOrbColor2] = useState('#7a34eb')
   const [orbCollColor, setOrbCollColor] = useState('#ff008d')
   const [resetColor, setResetColor] = useState(10)
+  const orbColor1Ref = useRef(orbColor1);
+  const orbCollColorRef = useRef(orbCollColor);
+
+  const hexToNumber = (hex) => Number(hex.replace(/^#/, '0x'))
+
+  useEffect(() => {
+  orbColor1Ref.current = orbColor1;
+}, [orbColor1]);
+
+useEffect(() => {
+  orbCollColorRef.current = orbCollColor;
+}, [orbCollColor]);
 
 useEffect(() => {
   const app = new PIXI.Application({
@@ -197,14 +211,16 @@ useEffect(() => {
       graphic.y = toPixels(pos.y);
 
       const isFlashing = flashUntil && now < flashUntil;
-      const desiredColor = isFlashing ? orbColor2 : orbColor1;
+      const desiredColor = isFlashing
+        ? orbCollColorRef.current
+        : orbColor1Ref.current;
 
       if (graphic.currentColor !== desiredColor) {
         graphic.clear();
-        graphic.beginFill(desiredColor);
+        graphic.beginFill(hexToNumber(desiredColor));
         graphic.drawCircle(0, 0, 10);
         graphic.endFill();
-        graphic.currentColor = desiredColor; // cache it on the graphic object
+        graphic.currentColor = desiredColor; // cache for comparison
       }
     }
 
@@ -231,7 +247,7 @@ useEffect(() => {
 
   if (!world || !app) return;
 
-  const currentCount = orbs.length;
+  let currentCount = orbs.length;
 
   // Add orbs if needed
   if (orbCount > currentCount) {
@@ -250,7 +266,7 @@ useEffect(() => {
       ));
 
       const graphic = new PIXI.Graphics();
-      graphic.beginFill(orbColor1);
+      graphic.beginFill(hexToNumber(orbColor1));
       graphic.drawCircle(0, 0, 10);
       graphic.endFill();
       app.stage.addChild(graphic);
@@ -275,10 +291,11 @@ useEffect(() => {
   }
 }, [orbCount]);
 
+
   return (  
     <Stack height={'80%'} width={'100%'}>
       <Stack height={'30%'} bgcolor={'#ffffff00'}>
-      <Accordion sx={{height: 'fit-content', overflow: 'auto', width: '40%', position: 'absolute', bgcolor: '#ffffff00', maxHeight: '50%'}}>
+      <Accordion sx={{height: 'fit-content', overflow: 'auto', width: 'auto', position: 'absolute', bgcolor: '#ffffff00', maxHeight: '50%'}}>
         <AccordionSummary sx={{color: 'white'}}><i class="fi fi-bs-menu-burger"></i></AccordionSummary>
         <AccordionDetails>
           <Stack width={'98%'}>
