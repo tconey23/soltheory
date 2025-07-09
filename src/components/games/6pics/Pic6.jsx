@@ -111,7 +111,7 @@ const Pic6 = ({demo}) => {
       alignItems={"center"}
       justifyContent={"flex-start"}
     >
-      <Stack width={'100%'} height={'5%'}>
+      <Stack width={'100%'} height={'5%'} direction={'row'}>
         <Stack width={'10%'} justifyContent={'center'} alignItems={'center'} sx={{userSelect: 'none'}}>
           <Box
             onMouseOver={() => setInfoColor('white')}
