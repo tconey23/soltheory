@@ -172,7 +172,7 @@ const [dims, setDims] = useState(
     <Stack flex="0 0 10%" width="100%">
       <AppHeader />
     </Stack>
-    <Stack flex="1" width="100%" id="main">
+    <Stack flex="1" width="100%" id="main" height={'80svh'}>
         <Routes>
           <Route path='*' element={<Error/>} />
           <Route path={"/home"} element={<HomePage />}/>
