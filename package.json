@@ -1,7 +1,7 @@
 {
   "name": "soltheory",
   "private": true,
-  "version": "0.1.95",
+  "version": "0.1.96",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -16,6 +16,7 @@
     "@fontsource-variable/sofia-sans": "^5.2.6",
     "@mui/material": "^7.1.1",
     "@mui/x-date-pickers": "^8.5.0",
+    "@pixi/filter-glow": "^5.2.1",
     "@react-three/drei": "^9.94.1",
     "@react-three/fiber": "^8.15.10",
     "@react-three/postprocessing": "^2.19.1",
