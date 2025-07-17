@@ -194,6 +194,7 @@ useEffect(() => {
             onPause={() => setIsPlaying(false)}
             onCanPlay={() => handleLoaded(true)}
             start={from || 0}
+            playsInline={true}
           />
 
         <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'}>
