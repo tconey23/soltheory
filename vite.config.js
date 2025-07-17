@@ -10,7 +10,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
       workbox: {
-        cacheId: `soltheory-v${pkg.version}`, // ← Use version dynamically
+        cacheId: `soltheory-v${pkg.version}`,
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
         maximumFileSizeToCacheInBytes: 100 * 1024 * 1024,
         cleanupOutdatedCaches: true,
@@ -19,21 +19,22 @@ export default defineConfig({
             urlPattern: ({ request }) => request.destination === 'document',
             handler: 'NetworkFirst',
             options: {
-              cacheName: 'html-cache',
+              cacheName: `html-cache-v${pkg.version}`,
             },
           },
           {
-            urlPattern: ({ request }) => request.destination === 'script' || request.destination === 'style',
+            urlPattern: ({ request }) =>
+              request.destination === 'script' || request.destination === 'style',
             handler: 'StaleWhileRevalidate',
             options: {
-              cacheName: 'static-resources',
+              cacheName: `static-resources-v${pkg.version}`,
             },
           },
           {
             urlPattern: ({ request }) => request.destination === 'image',
             handler: 'CacheFirst',
             options: {
-              cacheName: 'image-cache',
+              cacheName: `image-cache-v${pkg.version}`,
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 7 * 24 * 60 * 60,

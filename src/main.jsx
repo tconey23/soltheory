@@ -22,3 +22,28 @@ createRoot(document.getElementById('root')).render(
         </ThemeProvider>
       </BrowserRouter>
 );
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.getRegistration().then(reg => {
+      if (reg?.waiting) {
+        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+        window.location.reload();
+      }
+
+      reg?.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW?.addEventListener('statechange', () => {
+          if (
+            newSW.state === 'installed' &&
+            navigator.serviceWorker.controller
+          ) {
+            // Optionally show a modal instead of auto reload:
+            newSW.postMessage({ type: 'SKIP_WAITING' });
+            window.location.reload();
+          }
+        });
+      });
+    });
+  });
+}
