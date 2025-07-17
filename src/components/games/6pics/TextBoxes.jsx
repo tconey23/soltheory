@@ -3,6 +3,7 @@ import { Stack, Typography, TextField, Button, Modal, Slider, Box } from "@mui/m
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
 import { Link } from "react-router-dom";
+import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
 
 const MotionStack = motion(Stack);
 
@@ -19,6 +20,8 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const [hintsUsed, setHintsUsed] = useState(0)
   const [moreHints, setMoreHints] = useState(false)
   const [reloadHints, setReloadHints] = useState(0)
+  const [keyboardInput, setKeyboardInput] = useState('')
+  const [focusedIndex, setFocusedIndex] = useState(0);
 
 
   const screen = useGlobalStore((state) => state.screen);
@@ -36,6 +39,27 @@ useEffect(() => {
   const cleaned = answer.replace(/[^\w]|_/g, ""); // remove punctuation and spaces
   setLetterTarget(cleaned.length);
 }, [answer]);
+
+useEffect(() =>{
+  // console.log(keyboardInput)
+  // console.log(letterCount)
+
+  if(keyboardInput){
+    if(keyboardInput === '{hint}'){
+      getHint()
+    } else if(keyboardInput === '{check}'){
+      checkAnswer()
+    } else if (keyboardInput === '{bksp}') {
+      const safeIndex = Math.max(0, Math.min(focusedIndex, inputLetters.length - 1));
+      handleCharBackspace(keyboardInput, safeIndex);
+    } else {
+      handleCharInput(keyboardInput, letterCount)
+    }
+    setKeyboardInput('')
+    
+  }
+  
+}, [keyboardInput])
 
   // Auto win logic
   useEffect(() => {
@@ -175,8 +199,8 @@ const checkAnswer = () => {
   check === ans ? handleRightAnswer() : handleWrongAnswer();
 };
 
-const handleCharInput = (e, index) => {
-  const val = e.target.value.toLowerCase().slice(0, 1);
+const handleCharInput = (char, index) => {
+  const val = char.toLowerCase().slice(0, 1);
   if (!val.match(/[a-z0-9]/i)) return;
 
   const newLetters = [...inputLetters];
@@ -212,28 +236,30 @@ const handleClear = () => {
 };
 
 
-const handleCharBackspace = (e, index) => {
-  if (e.key === "Backspace") {
-    // If current box has a letter, just clear it
-    if (inputLetters[index]) {
-      const newLetters = [...inputLetters];
+const handleCharBackspace = (key, index) => {
+  if (key === "{bksp}") {
+    const newLetters = [...inputLetters];
+
+    // Case 1: current box has a value, clear it
+    if (newLetters[index]) {
       newLetters[index] = "";
       setInputLetters(newLetters);
       setLetterCount(newLetters.filter(Boolean).length);
+      setFocusedIndex(index); // stay on same box
     }
-    // If current box is empty, move focus and clear previous box
-    else if (inputRefs.current[index]?.value === "") {
+    // Case 2: current box is empty, move back and clear
+    else if (index > 0) {
+      newLetters[index - 1] = "";
+      setInputLetters(newLetters);
+      setLetterCount(newLetters.filter(Boolean).length);
+
       const prev = inputRefs.current[index - 1];
       if (prev) prev.focus();
-      if (index > 0) {
-        const newLetters = [...inputLetters];
-        newLetters[index - 1] = "";
-        setInputLetters(newLetters);
-        setLetterCount(newLetters.filter(Boolean).length);
-      }
+      setFocusedIndex(index - 1);
     }
   }
 };
+
 
 
 useEffect(() => {
@@ -338,7 +364,7 @@ useEffect(() => {
       alignItems="center"
       padding={1}
       id="letter_wrapper"
-      height={height * 0.33}
+      height={height * 0.40}
       overflow="auto"
       sx={{
         gap: 1,
@@ -366,16 +392,15 @@ useEffect(() => {
               key={`char-${wordIndex}-${charIndex}`}
               value={inputLetters[currentIndex] || ""}
               inputRef={(el) => (inputRefs.current[currentIndex] = el)}
-              onChange={(e) => handleCharInput(e, currentIndex)}
-              onKeyDown={(e) => handleCharBackspace(e, currentIndex)}
+              onClick={() => setNextFocusIndex(currentIndex)} // for focus movement
+              onFocus={() => setFocusedIndex(currentIndex)}
               slotProps={{
                 input: {
-                  maxLength: 1,
+                  readOnly: true,
                   style: { textAlign: "center", fontSize: "1rem", width: textBoxWidth },
                 },
               }}
               sx={{ marginX: 0.25, transition: "all 0.3s" }}
-              autoComplete="off"
             />
               );
             } else {
@@ -395,9 +420,14 @@ useEffect(() => {
         </Stack>
       ))}
 
+        <Stack width={'100%'}>
+          <VirtualKeyboard setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+        </Stack>
+
     </Stack>
 
-      <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} margin={'10px'} width={'75%'}>
+      {/* <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} margin={'10px'} width={'75%'}>
+        
         {<Link onClick={() => {
           if(levelScore[index]?.hints > 0){
             getHint()
@@ -416,8 +446,8 @@ useEffect(() => {
           Check Answer
         </Button>}
         {!giveUp && userMeta?.is_admin && <Link onClick={() => setIsWin(true)}>Skip</Link>}
-        {/* {!giveUp && <Link onClick={() => handleClear()}>Clear</Link>} */}
-      </Stack>
+        {!giveUp && <Link onClick={() => handleClear()}>Clear</Link>}
+      </Stack> */}
       <Modal
         open={!!isWin}
         >

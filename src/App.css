@@ -22,6 +22,26 @@
   letter-spacing: 3px;
 }
 
+.simple-keyboard .hg-button {
+  flex: 1 0 auto !important; /* allow consistent width */
+  width: 30px;
+  min-width: 0 !important;
+  padding: 5px !important; /* consistent height and spacing */
+}
+
+.simple-keyboard .hg-row {
+  display: flex;
+  justify-content: center;
+}
+
+.simple-keyboard .hg-button[data-skbtn="{bksp}"],
+.simple-keyboard .hg-button[data-skbtn="{check}"],
+.simple-keyboard .hg-button[data-skbtn="{hint}"],
+.simple-keyboard .hg-button[data-skbtn="{gethint}"] {
+  flex: 1 0 auto !important;
+}
+
+
 
 
 @import url('https://fonts.googleapis.com/css2?family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap');
