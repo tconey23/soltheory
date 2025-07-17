@@ -3,7 +3,7 @@ import { Stack } from '@mui/material';
 import { motion } from 'framer-motion';
 
 const Hexagon = ({dims}) => {
-    const [size, setSize] = useState(200)
+    const [size, setSize] = useState(100)
     const [strokeColor] = useState("#000")
     const [strokeSize] = useState(1)
     const [purple] = useState('#dd95ff')

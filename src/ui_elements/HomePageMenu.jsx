@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Stack } from '@mui/material';
-import { motion } from 'framer-motion';
+import { useEffect, useState, Suspense } from 'react';
+import { Stack, Typography } from '@mui/material';
+import { AnimatePresence, motion } from 'framer-motion';
 import useGlobalStore from '../business/useGlobalStore';
 import Account from '../components/Account';
 import GamesWrapper from '../components/games/GamesWrapper';
@@ -10,6 +10,7 @@ import Affiliates from '../components/Affiliates';
 import GameData from '../components/game_data/GameData';
 import ThriveParenting from '../components/ThriveParenting';
 import { useInView } from 'react-intersection-observer';
+import FadeStack from './FadeStack';
 
 const MotionStack = motion(Stack);
 
@@ -31,6 +32,8 @@ const MenuGridItem = ({ delay = 0, content, index }) => {
   return (
     <div ref={ref} style={{ width: '100%', height: '450px' }}>
       
+      <AnimatePresence>
+
         <MotionStack
           key={index}
           justifyContent={'center'}
@@ -47,9 +50,11 @@ const MenuGridItem = ({ delay = 0, content, index }) => {
             ease: 'easeOut',
             delay: 0,
           }}
-        >
+          exit={{opacity: 0}}
+          >
           {inView && content}
         </MotionStack>
+        </AnimatePresence>
       
     </div>
   );
@@ -80,8 +85,17 @@ const HomePageMenu = () => {
             justifyItems:'center',
         }}
       >
+        
         {menuItems?.map((m, i) => 
+        <Suspense key={i} fallback={
+        <FadeStack transition={{duration: 5}}>
+          <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+            <Typography color={'white'}>Loading ...</Typography>
+          </Stack>
+        </FadeStack>
+      }>
         <MenuGridItem key={i} index={i} delay={i*0.5} content={m}/>
+      </Suspense>
     )}
       </Stack>
     </Stack>

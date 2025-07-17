@@ -1,17 +1,24 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, suspense, Suspense } from 'react';
 import { Avatar, Badge, Button, Input, InputLabel, List, Menu, MenuItem, Select, Stack, Typography } from '@mui/material';
 import { motion, AnimatePresence } from 'framer-motion';
 import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
-import TwentOneThingsButton from './TwentyOneThingsButton';
 import { useNavigate } from 'react-router-dom';
-import SixPicsButton from './SixPicsButton';
-import SandboxButton from './SandboxButton'
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import MyThreeSongsButton from './MyThreeSongsButton';
+import FadeStack from '../../ui_elements/FadeStack';
 dayjs.extend(customParseFormat)
+
+
+// import TwentOneThingsButton from './TwentyOneThingsButton';
+// import SixPicsButton from './SixPicsButton';
+// import SandboxButton from './SandboxButton'
+
+const TwentOneThingsButton = lazy(() => import('./TwentyOneThingsButton'))
+const SixPicsButton = lazy(() => import('./SixPicsButton'))
+const SandboxButton = lazy(() => import('./SandboxButton'))
 
 
 const HeaderImage = () => {
@@ -127,7 +134,7 @@ const GamesWrapper = () => {
       <Stack
         direction="column"
         width="90%"
-        height="100%"
+        height="90%"
         alignItems="center"
         justifyContent="flex-start"
         bgcolor={'#ffffffbd'}
@@ -189,23 +196,52 @@ const GamesWrapper = () => {
               value={selectedGame || ''}
               onChange={(e) => setSelectedGame(e.target.value)}
             >
-              <MenuItem sx={menuStyle} value="21things" onClick={() => startGame(`21things`)}>
-                <TwentOneThingsButton />
-              </MenuItem>
+              <Suspense
+                fallback={
+                  <FadeStack>
+                    <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+                      <Typography color={'white'}>Loading ...</Typography>
+                    </Stack>
+                  </FadeStack>
+                }
+              >
+                <MenuItem sx={menuStyle} value="21things" onClick={() => startGame(`21things`)}>
+                  <TwentOneThingsButton />
+                </MenuItem>
+              </Suspense>
 
+              <Suspense
+                fallback={
+                  <FadeStack>
+                    <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+                      <Typography color={'white'}>Loading ...</Typography>
+                    </Stack>
+                  </FadeStack>
+                }
+              >
               <MenuItem sx={menuStyle} value="6pics"  onClick={() => startGame(`6pics`)}>
                 <SixPicsButton />
               </MenuItem>
+              </Suspense>
 
-              {userMeta?.is_admin &&
-              <MenuItem sx={menuStyle} marginBottom={10} value="sandbox"  onClick={() => startGame(`sandbox`)}>
-                <SandboxButton />
-              </MenuItem>}
+              <Suspense
+                fallback={
+                  <FadeStack>
+                    <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+                      <Typography color={'white'}>Loading ...</Typography>
+                    </Stack>
+                  </FadeStack>
+                }
+              >
+                {userMeta?.is_admin &&
+                <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+                  <SandboxButton />
+                </MenuItem>}
+              </Suspense>
 
               {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>
                 <MyThreeSongsButton />
               </MenuItem> */}
-
             </List>
           </Stack>
         </MotionStack>

@@ -3,9 +3,6 @@ import * as PIXI from 'pixi.js';
 import planck, { Box } from 'planck-js';
 import Stack from '@mui/material/Stack';
 import Slider from '@mui/material/Slider';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
 import Typography from '@mui/material/Typography';
 import { HexColorPicker } from "react-colorful";
 import { Button, Checkbox, rgbToHex } from '@mui/material';
@@ -15,7 +12,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 
 const WIDTH = window.innerWidth;
-const HEIGHT = window.innerHeight * 0.80;
 const SCALE = 30;
 
 const toPixels = (v) => v * SCALE;
@@ -29,15 +25,20 @@ const Sandbox = () => {
   const appRef = useRef();
   const orbsRef = useRef([]);
   const cueRef = useRef();
+  const pendingResizesRef = useRef([]);
   const [resetRef, setResetRef] = useState(0)
   const [speedDestroy, setSpeedDestroy] = useState(false)
   const [speedResize, setSpeedResize] = useState(true)
+  const [height, setHeight] = useState(window.innerHeight * 0.76)
   const loc = useLocation()
 
   const speedDestroyRef = useRef(speedDestroy)
   const speedResizeRef = useRef(speedResize)
+  const canvasContRef = useRef()
 
   const DAMPING_FACTOR = 0.95;
+
+  const [screenSize, setScreenSize] = useState()
 
   const [orbCount, setOrbCount] = useState(50)
   const [orbColor1, setOrbColor1] = useState('#161c1b')
@@ -52,8 +53,26 @@ const Sandbox = () => {
   const [expAcc, setExpAcc] = useState(false)
   const [currOrbCount, setCurrOrbCount] = useState(0)
   const [popColor, setPopColor] = useState('#FFF59D')
+  const [toggleMoreOrbs, setToggleMoreOrbs] = useState(false)
 
   const hexToNumber = (hex) => Number(hex.replace(/^#/, '0x'))
+
+useEffect(() => {
+    const handleResize = () => {
+      setHeight(window.innerSize *0.76)
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+}, []);
+
+useEffect(() =>{
+  if(currOrbCount <= 1){
+    setToggleMoreOrbs(true)
+  } else {
+    setToggleMoreOrbs(false)
+  }
+}, [currOrbCount])
 
 useEffect(() => {
   orbColor1Ref.current = orbColor1;
@@ -81,60 +100,9 @@ useEffect(() => {
     speedResizeRef.current = speedResize;
 }, [speedResize]);
 
-function updateOrbSize(orb, world) {
-  let f = orb.body.getFixtureList();
-  while (f) {
-    let next = f.getNext();
-    orb.body.destroyFixture(f);
-    f = next;
-  }
-  orb.body.createFixture(planck.Circle(toMeters(orb.size)), {
-    restitution: 0.9,
-    density: 0.5,
-    friction: 0,
-  });
-
-  // Update PIXI graphics
-  if (orb.graphic && !orb.graphic.destroyed) {
-    orb.graphic.clear();
-    orb.graphic.beginFill(hexToNumber(orbColor1Ref.current));
-    orb.graphic.drawCircle(0, 0, orb.size);
-    orb.graphic.endFill();
-    orb.graphic.filters = [new GlowFilter({ color: orbColor2Ref.current, distance: 7, outerStrength: 4 })];
-    orb.graphic.currentColor = orbColor1Ref.current;
-  }
-}
-
-function popOrbEffect(graphic, app, { scaleTo = 2, duration = 300 } = {}) {
-  console.log(graphic)
-  const pop = new PIXI.Graphics();
-  pop.beginFill(graphic.currentColor ? hexToNumber(graphic.currentColor) : 0xffffff, 0.6);
-  pop.drawCircle(0, 0, graphic.width / 2)
-  pop.endFill();
-  pop.x = graphic.x;
-  pop.y = graphic.y;
-  pop.alpha = 1;
-  pop.scale.set(1);
-  app.stage.addChild(pop);
-
-  let elapsed = 0;
-  function animate(delta) {
-    elapsed += app.ticker.deltaMS;
-    const t = Math.min(elapsed / duration, 1);
-    pop.scale.set(1 + t * (scaleTo - 1));
-    pop.alpha = 1 - t;
-    if (t >= 1) {
-      app.ticker.remove(animate);
-      app.stage.removeChild(pop);
-      pop.destroy();
-    }
-  }
-  app.ticker.add(animate);
-}
-
 function popOrbBurstEffect({ x, y, color, radius }, app, options = {}) {
   const {
-    duration = 1000, // ms
+    duration = 300, // ms
     spikes = 20,
     maxScaleY = 2.0,
     minAlpha = 0.0,
@@ -153,7 +121,6 @@ function popOrbBurstEffect({ x, y, color, radius }, app, options = {}) {
     elapsed += app.ticker.deltaMS;
     const t = Math.min(elapsed / duration, 1);
 
-    // Clear previous drawing
     pop.clear();
 
     // 1. Ellipse "splat" (stretches then collapses)
@@ -173,6 +140,7 @@ function popOrbBurstEffect({ x, y, color, radius }, app, options = {}) {
     }
 
     // Fade out
+    // if (fadeOut) pop.alpha = 1 - t;
     if (fadeOut) pop.alpha = 1 - t;
 
     // Remove at end
@@ -185,12 +153,59 @@ function popOrbBurstEffect({ x, y, color, radius }, app, options = {}) {
   app.ticker.add(animate);
 }
 
-let maxRate = 0
+function updateOrbSize(orb, world) {
+  orb.graphic.width = orb.size * 2
+  orb.graphic.height = orb.size * 2
+  
+  if(orb.size >= 38){
+    orb.pendingDestroy = true
+    popOrbBurstEffect({
+          x: orb.graphic.x,
+          y: orb.graphic.y,
+          color: hexToNumber(orbColor2Ref.current),
+          radius: orb.size,
+        }, appRef.current);
+        return
+  } 
+  
+  if (orb.size < 5){
+    popOrbBurstEffect({
+          x: orb.graphic.x,
+          y: orb.graphic.y,
+          color: hexToNumber(orbColor2Ref.current),
+          radius: orb.size,
+        }, appRef.current);
+        return
+  }
+  
+  let f = orb.body.getFixtureList();
+  while (f) {
+    let next = f.getNext();
+    orb.body.destroyFixture(f);
+    setCurrOrbCount(world.m_bodyCount - 5)
+    f = next;
+  }
+  orb.body.createFixture(planck.Circle(toMeters(orb.size)), {
+    restitution: 0.9,
+    density: 0.5,
+    friction: 0,
+  });
+
+  // Update PIXI graphics
+  if (orb.graphic && !orb.graphic.destroyed) {
+    orb.graphic.clear();
+    orb.graphic.beginFill(hexToNumber(orbColor1Ref.current));
+    orb.graphic.drawCircle(0, 0, orb.size);
+    orb.graphic.endFill();
+    orb.graphic.filters = [new GlowFilter({ color: orbColor2Ref.current, distance: 7, outerStrength: 4 })];
+    orb.graphic.currentColor = orbColor1Ref.current;
+  }
+}
 
 useEffect(() => {
   const app = new PIXI.Application({
     width: WIDTH,
-    height: HEIGHT,
+    height: height,
     backgroundColor: 0x111111,
     antialias: true,
   });
@@ -211,17 +226,15 @@ useEffect(() => {
   const bodyA = fixtureA.getBody();
   const bodyB = fixtureB.getBody(); 
 
-  
+  setCurrOrbCount(world.m_bodyCount -5)
 
-  const now = Date.now();
-  const flashDuration = 10; // ms
 
   if (bodyA.name === 'orb' && bodyB.name === 'orb') {
     const orbA = orbsRef.current.find(o => o.body === bodyA);
     const orbB = orbsRef.current.find(o => o.body === bodyB);
 
     if (!orbA || !orbB) return; // Defensive!
-    setCurrOrbCount(world.m_bodyCount - 5)
+    // setCurrOrbCount(world.m_bodyCount - 5)
 
     const orbASpeed = orbA.body.getLinearVelocity().length();
     const orbBSpeed = orbB.body.getLinearVelocity().length();
@@ -234,72 +247,28 @@ useEffect(() => {
         bigger = orbB; smaller = orbA;
       }
 
-      
-      // Prevent resizing if either is on cooldown
       if (bigger && smaller && bigger.resizeCooldown === 0 && smaller.resizeCooldown === 0) {
-        // Resize logic as before...
-        let rate = 1+ bigger.body.getLinearVelocity().length() * 0.01
-        bigger.size = Math.min(bigger.size * rate, 30);
-        smaller.size = Math.max(smaller.size * rate, 2);
-        // console.log(1+ bigger.body.getLinearVelocity().length() * 0.01)
+        let calcVel = bigger.body.getLinearVelocity().length() * 0.08 + 1
+        const areaBigger = Math.PI * bigger.size ** 2;
+        const areaSmaller = Math.PI * smaller.size ** 2;
 
-        if(rate > maxRate){
-          maxRate = rate
-        }
-      
+        const transferRatio = 10; // 10% of smaller's area
+        const transferArea = Math.min(areaSmaller * transferRatio, 50); // optional clamp
 
-        // console.log(bigger.size)
+        const newAreaBigger = areaBigger * calcVel + transferArea;
+        const newAreaSmaller = Math.max(areaSmaller - transferArea, Math.PI * 5 ** 2); // clamp to radius ≥ 5
 
-        if(maxRate > 2){
-          console.log('velocity', maxRate)
-          popOrbBurstEffect({
-              x: bigger.graphic.x,
-              y: bigger.graphic.y,
-              color: hexToNumber(popColor),
-              radius: bigger.size || orbSizeRef.current,
-            }, appRef.current);
-            bigger.pendingDestroy = true;
-        } 
-        
-        if(bigger.size > 25) {
-          // popOrbEffect(bigger.graphic, appRef.current)
-            popOrbBurstEffect({
-              x: bigger.graphic.x,
-              y: bigger.graphic.y,
-              color: hexToNumber(popColor),
-              radius: bigger.size || orbSizeRef.current,
-            }, appRef.current);
-            bigger.pendingDestroy = true;
-        } else if(smaller.size > 25) {
-          // popOrbEffect(bigger.graphic, appRef.current)
-            popOrbBurstEffect({
-              x: smaller.graphic.x,
-              y: smaller.graphic.y,
-              color: hexToNumber(popColor),
-              radius: smaller.size || orbSizeRef.current,
-            }, appRef.current)
-            smaller.pendingDestroy = true
-        }
+        bigger.size = Math.min(Math.sqrt(newAreaBigger / Math.PI), 40); // clamp to max radius
+        smaller.size = Math.sqrt(newAreaSmaller / Math.PI);
 
-        // Destroy if too small
-        if (smaller.size <= 2) {
-          smaller.pendingDestroy = true;
-        }
+        // Queue resize
+        pendingResizesRef.current.push(bigger, smaller);
 
-        updateOrbSize(bigger, world);
-        updateOrbSize(smaller, world);
-
-        // Set cooldowns to prevent infinite resizing loop
         bigger.resizeCooldown = 10;
         smaller.resizeCooldown = 10;
-
-        return;
       }
     }
 
-
-    
-    
     if (speedDestroyRef.current) {
       let destroyTarget = null;
       if (orbASpeed > orbBSpeed) {
@@ -347,9 +316,9 @@ useEffect(() => {
   };
 
   createWall(WIDTH / 2, 0, WIDTH, 40);
-  createWall(WIDTH / 2, HEIGHT, WIDTH, 40);
-  createWall(0, HEIGHT / 2, 40, HEIGHT);
-  createWall(WIDTH, HEIGHT / 2, 40, HEIGHT);
+  createWall(WIDTH / 2, height, WIDTH, 40);
+  createWall(0, height / 2, 40, height);
+  createWall(WIDTH, height / 2, 40, height);
 
   // Cue ball
   const cue = world.createDynamicBody();
@@ -358,7 +327,7 @@ useEffect(() => {
     density: 10,
     friction: 0.05,
   });
-  cue.setPosition(planck.Vec2(toMeters(100), toMeters(HEIGHT / 2)));
+  cue.setPosition(planck.Vec2(toMeters(100), toMeters(height / 2)));
   cue.name = 'cue'
   cueRef.current = cue;
 
@@ -410,7 +379,7 @@ useEffect(() => {
   const onPointerUp = () => {
     if (!isDragging || !dragStart || !dragEnd) return;
     const impulse = dragStart.clone().sub(dragEnd);
-    cue.applyLinearImpulse(impulse.mul(50), cue.getWorldCenter(), true);
+    cue.applyLinearImpulse(impulse.mul(25), cue.getWorldCenter(), true);
     isDragging = false;
     aimLineRef.current.clear();
   };
@@ -444,6 +413,10 @@ useEffect(() => {
 
       const pos = body.getPosition();
     }
+    for (const orb of pendingResizesRef.current) {
+        updateOrbSize(orb, worldRef.current);
+      }
+      pendingResizesRef.current = []
     world.step(1 / 60);
 
     for (let i = orbsRef.current.length - 1; i >= 0; i--) {
@@ -559,7 +532,7 @@ while (orbs.length > 0) {
     body.name = 'orb'
     body.setPosition(planck.Vec2(
       toMeters(WIDTH / 2 + Math.random() * 100 - 50),
-      toMeters(HEIGHT / 2 + Math.random() * 100 - 50)
+      toMeters(height / 2 + Math.random() * 100 - 50)
     ));
 
     const graphic = new PIXI.Graphics();
@@ -577,8 +550,9 @@ while (orbs.length > 0) {
       size: orbSize,
       resizeCooldown: 0, // NEW!
     });
+    setCurrOrbCount(world.m_bodyCount - 5)
   }
-  setCurrOrbCount(world.m_bodyCount - 5)
+  // setCurrOrbCount(world.m_bodyCount - 5)
 }, [orbCount, orbSize, resetRef]);
 
 
@@ -712,9 +686,43 @@ useEffect(() =>{
 
       </Stack>
 
-      <Stack width={'100%'} height={'70%'} justifyContent={'flex-start'}>
+      <Stack width={'100%'} height={'70%'} justifyContent={'flex-start'} ref={canvasContRef}>
         <canvas style={{position: 'absolute'}} width={'100%'} height={'100%'} ref={canvasRef} key={canvKey}/>
       </Stack>
+
+        {toggleMoreOrbs &&
+          <AnimatePresence>
+            <MotionStack
+              initial={{
+                height: '0%',
+                opacity: 0
+              }}
+              animate={{
+                height: toggleMoreOrbs ? '75%' : '0%',
+                opacity: toggleMoreOrbs ? 0.8 : 0
+              }}
+              transition={{
+                duration: 1
+              }}
+              sx={{height:'0%', position: 'absolute', overflow: 'hidden', top: '17%', padding: '10px', bgcolor: 'black', width: '100%'}}
+              justifyContent={'center'}
+            >
+              <Stack sx={{overflow: 'scroll'}} alignItems={'center'} padding={2}>
+                <Typography color='white' fontSize={20} fontFamily={'fredoka regular'}>You popped all of the ORBstacles</Typography>
+                <Typography color='white' fontSize={20} fontFamily={'fredoka regular'}>Would you like to start over?</Typography>
+                <Stack direction={'row'}>
+                  <Button onClick={() => {
+                    setResetRef(prev => prev +1)
+                    setToggleMoreOrbs(false)
+                    }}>Yes</Button>
+                  <Button onClick={() => {
+                    setToggleMoreOrbs(false)
+                    }}>No</Button>
+                </Stack>
+              </Stack>
+            </MotionStack>
+          </AnimatePresence>
+        }
 
     </Stack>
   )

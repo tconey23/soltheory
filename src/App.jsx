@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import './App.css'
 import AppHeader from './components/AppHeader'
-import { Stack } from '@mui/material'
-import { Routes, Route, useLocation, useNavigate, redirect } from 'react-router-dom';
+import { Stack, Typography } from '@mui/material'
+import { Routes, Route, useNavigate} from 'react-router-dom';
 import HomePage from './views/homepage/HomePage';
 import PrivateRoute from './components/PrivateRoute';
 import Account from './components/Account';
@@ -10,21 +10,30 @@ import useGlobalStore from './business/useGlobalStore';
 import Modals from './views/modals/Modals';
 import { checkSession, getMeta } from './business/supabase_calls';
 import Error from './views/Error';
-import GamesWrapper from './components/games/GamesWrapper';
-import TwentyOneThings from './components/games/21Things/TwentyOneThings';
-import Pic6 from './components/games/6pics/Pic6';
 import AdminControls from './components/AdminControls';
 import useBreakpoints from './business/useBreakpoints';
 import SolMates from './components/solmates/SolMates';
 import UserAlert from './ui_elements/Alert';
-import { useWindowHeight } from './business/useWindowHeight';
-import AdSpace from './ui_elements/AdSpace';
-import FinalStage from './components/games/21Things/FinalStage';
-import { useParams } from 'react-router-dom';
-import SharedGame from './components/games/21Things/SharedGame';
-import Sandbox from './components/games/Sandbox/Sandbox';
-import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
-import AvettDemo from './components/games/6pics/AvettDemo';
+import FadeStack from './ui_elements/FadeStack';
+import LoadingAnimation from './ui_elements/LoadingAnimation';
+
+// import GamesWrapper from './components/games/GamesWrapper';
+// import TwentyOneThings from './components/games/21Things/TwentyOneThings';
+// import Pic6 from './components/games/6pics/Pic6';
+// import AdSpace from './ui_elements/AdSpace';
+// import SharedGame from './components/games/21Things/SharedGame';
+// import Sandbox from './components/games/Sandbox/Sandbox';
+// import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
+// import AvettDemo from './components/games/6pics/AvettDemo';
+
+const SixPics = lazy(() => import('./components/games/6pics/Pic6'))
+const TwentyOneThings = lazy (() => import('./components/games/21Things/TwentyOneThings'))
+const AdSpace = lazy (() => import('./ui_elements/AdSpace'))
+const GamesWrapper = lazy (() => import('./components/games/GamesWrapper'))
+const SharedGame = lazy (() => import('./components/games/21Things/SharedGame'))
+const Sandbox = lazy (() =>  import('./components/games/Sandbox/Sandbox'))
+const MyThreeSongs = lazy (() =>  import('./components/games/MyThreeSongs/MyThreeSongs'))
+const AvettDemo = lazy (() =>  import('./components/games/6pics/AvettDemo'))
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -173,6 +182,13 @@ const [dims, setDims] = useState(
       <AppHeader />
     </Stack>
     <Stack flex="1" width="100%" id="main" height={'80svh'}>
+      <Suspense fallback={
+        <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} exit={{opacity: 0}} transition={{duration: 1.5, delay: 1.5}}>
+          <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+            <Typography fontFamily={'fredoka regular'} fontSize={20} color={'white'}>Loading SOL Theory...</Typography>
+          </Stack>
+        </FadeStack>
+      }>
         <Routes>
           <Route path='*' element={<Error/>} />
           <Route path={"/home"} element={<HomePage />}/>
@@ -205,7 +221,7 @@ const [dims, setDims] = useState(
           <Route 
             path={"/games/6pics"}
             element={
-              <Pic6/>
+              <SixPics />
             } 
             />
 
@@ -214,21 +230,21 @@ const [dims, setDims] = useState(
             element={
               <MyThreeSongs />
             } 
-          />
+            />
               
           <Route 
             path={"/games/sandbox"}
             element={
               <Sandbox />
             } 
-          />
+            />
 
           <Route path="/games/21things/:gameId" element={<TwentyOneThings redirect={false} />} />
-          <Route path="/games/6pics/:gameId" element={<Pic6 />} />
+          <Route path="/games/6pics/:gameId" element={<SixPics />} />
 
           <Route path="/avett/" element={<AvettDemo demo={true}/>} />
 
-          <Route path="/games/6pics/promo/avett" element={<Pic6 />} />
+          <Route path="/games/6pics/promo/avett" element={<SixPics />} />
 
           <Route path="/games/21things/shared/:userId/:gameId" element={<SharedGame />} />
 
@@ -251,6 +267,7 @@ const [dims, setDims] = useState(
             />
 
         </Routes>
+        </Suspense>
       </Stack>
 
     

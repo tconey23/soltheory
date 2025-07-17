@@ -1,7 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { Box, Stack, Typography } from '@mui/material';
-import Hexagon from './Hexagon';
+// import Hexagon from './Hexagon';
 import { useNavigate } from 'react-router-dom';
+
+const Hexagon = lazy(() => import('./Hexagon'))
 
 const TwentOneThingsButton = ({admin, scl}) => {
     const nav = useNavigate()
@@ -12,7 +14,9 @@ const TwentOneThingsButton = ({admin, scl}) => {
         sx={{scale: scl || 0.5}}
     >  
     <Box sx={{paddingX: 2}}>
+      <Suspense>
         <Hexagon dims={100}/>
+      </Suspense>
     </Box>
         <Typography fontSize={50} fontFamily={'Fredoka Regular'}>21 Things</Typography>
     </Stack>

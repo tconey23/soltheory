@@ -1,7 +1,5 @@
 import { Canvas } from '@react-three/fiber'
 import { useState, useEffect, useRef} from 'react'
-import React from 'react'
-import Lighting from './Lighting'
 import Backdrop from './Backdrop'
 import ThreeLetters from './ThreeLetters'
 import GroundPlane from './GroundPlane'
@@ -15,7 +13,8 @@ import { AdaptiveEvents } from '@react-three/drei'
 import { usePerf } from 'r3f-perf'
 import { PerfHeadless } from 'r3f-perf'
 import HomePageMenu from '../../ui_elements/HomePageMenu'
-import { Button, Stack } from '@mui/material'
+import { Button, Modal, Stack } from '@mui/material'
+import FadeStack from '../../ui_elements/FadeStack'
 
 const PerfHook = () => {
   const perf = usePerf()
@@ -40,28 +39,31 @@ const PerfMonitor = ({setIncline, setDecline, incline, decline, setDpr, dpr}) =>
 
 }
 
-const FadeIn = ({canvasRef, assetsReady}) => {
+const FadeIn = ({ canvasRef, assetsReady }) => {
+  const [start, setStart] = useState(false)
 
-    const [start, setStart] = useState(false)
+  useEffect(() => {
+    if (assetsReady && canvasRef.current?.parentElement) {
+      setTimeout(() => {
+        setStart(true)
+      }, 500)
+    }
+  }, [assetsReady])
 
-    useEffect(() =>{
-      if(assetsReady){
-        setTimeout(() => {
-          setStart(true)
-        }, 500);
-      }      
-    }, [assetsReady])
+  useFrame(() => {
+    if (!canvasRef.current?.parentElement) return; // ✅ Bail out early
 
-    useFrame(() => {
-        if (start && canvasRef.current?.parentElement?.style) {
-          let currentOpacity = parseFloat(canvasRef.current.parentElement.style.opacity) || 0;
-          canvasRef.current.parentElement.style.opacity = Math.min(currentOpacity + 0.005, 1).toString();
-        } else {
-            canvasRef.current.parentElement.style.opacity = 0
-        }
-      });
+    const parent = canvasRef.current.parentElement;
 
-    return null
+    if (start && parent.style) {
+      const currentOpacity = parseFloat(parent.style.opacity) || 0
+      parent.style.opacity = Math.min(currentOpacity + 0.005, 1).toString()
+    } else {
+      parent.style.opacity = "0"
+    }
+  })
+
+  return null
 }
 
 const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, animate }) => { 
@@ -70,6 +72,7 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     const [startPosition, setStartPosition] = useState([0,3,50])
     const [targetPosition, setTargetPosition] = useState([-3, 7, -6])
     const [lookAt, setLookAt] = useState([2, 2, 9])
+    
 
     const screen = useGlobalStore((state) => state.screen)
    
@@ -91,6 +94,8 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
       }
      
    }, [screen])
+
+
 
     useEffect(() => {
       if(animate && start){
@@ -130,8 +135,14 @@ const HomePage = ({showBot = true}) => {
     const [incline, setIncline] = useState(false)
     const [decline, setDecline] = useState(false)
     const [menuVisible, toggleMenuVisible] = useState(true)
+    const [overlay, setOverlay] = useState(true)
     const allAssetsReady = groundReady && lettersReady
     
+       useEffect(() =>{
+    setTimeout(() => {
+      setOverlay(false)
+    }, 3000);
+   }, [overlay])
 
     useEffect(() =>{
       if(initialAnimation){
@@ -172,21 +183,21 @@ const HomePage = ({showBot = true}) => {
           </Stack>
         }
         <Stack position={'fixed'} width={'100%'} height={'100%'} zIndex={1}>
-          <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '80%'}}>
+          <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} transition={{duration: 1}}>
+              <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'relative'}></Stack>
+          </FadeStack>
+            <Canvas ref={canvasRef} className='canvas' gl={{ physicallyCorrectLights: true }} shadows dpr={dpr} sx={{position: 'fixed', zIndex: 100000, height: '80%'}}>
+              <AdaptiveEvents />
+              <PerfMonitor setDecline={setDecline} setIncline={setIncline} incline={incline} decline={decline} setDpr={setDpr} dpr={dpr}/>
 
-            {/* <PerfHook /> */}
-            <AdaptiveEvents />
-            <PerfMonitor setDecline={setDecline} setIncline={setIncline} incline={incline} decline={decline} setDpr={setDpr} dpr={dpr}/>
+              <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720} setBackdropReady={setBackdropReady}/>
+              <ThreeLetters setLettersReady={setLettersReady}/>
+              <GroundPlane setGroundReady={setGroundReady}/>
 
-            <Backdrop blur={0} int={0.06} backRot={[degrees(0), degrees(-250), degrees(0)]} envRot={[0, degrees(0), 0]} res={720} setBackdropReady={setBackdropReady}/>
-            <ThreeLetters setLettersReady={setLettersReady}/>
-            <GroundPlane setGroundReady={setGroundReady}/>
-
-            <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
-            <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
-            {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
-
-          </Canvas>
+              <FadeIn canvasRef={canvasRef} assetsReady={allAssetsReady}/>
+              <StaticCamera animate={animate} allAssetsReady={allAssetsReady} initialAnimation={initialAnimation} setInitialAnimation={setInitialAnimation}/>  
+              {showBot && <NPRobot pos={[1.5,0.5,5]} rot={[degrees(0), degrees(180), degrees(0)]}/>}
+            </Canvas>
         </Stack>
             
     </div>

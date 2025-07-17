@@ -54,6 +54,13 @@ const handleLogin = async () => {
 
   if (error) {
     console.error('Supabase login error:', error.message);
+
+    let errMsg = error.message === "Invalid login credentials" ? "Either your email address or password are incorrect. Please try again" : error.message
+
+    setAlertContent({
+        text: errMsg,
+        type: 'error'
+      })
   } else {
     sessionStorage.setItem('returnPath', redirectUrl)
   }
@@ -68,6 +75,12 @@ const handleLogin = async () => {
 }
 
   const handleSignUp = async () => {
+
+    if(!email || !passMatch || !password || !confPassword || !userName){
+      checkMissingData()
+      return
+    }
+
     let { data, error } = await supabase.auth.signUp({
       email: email,
       password: password
@@ -94,47 +107,113 @@ const handleLogin = async () => {
 
   }
 
+  const checkMissingData = () => {
+
+    if(!email){
+      setAlertContent({
+        text: `Please enter an email address`,
+        type: 'error'
+    })
+      return
+    }
+
+    if(!password){
+      setAlertContent({
+        text: `Please enter a password`,
+        type: 'error'
+    })
+      return
+    }
+
+    if(!confPassword){
+      setAlertContent({
+        text: `Please confirm your password`,
+        type: 'error'
+    })
+      return
+    }
+
+    if(!passMatch){
+      setAlertContent({
+        text: `Passwords do not match`,
+        type: 'error'
+    })
+      return
+    }
+
+    if(!userName){
+      setAlertContent({
+        text: `Please enter your user name`,
+        type: 'error'
+    })
+      return
+    }
+
+  }
+
+  const resetForm = () => {
+    setPassMatch(false)
+    setPassword('')
+    setConfPassword('')
+    setUserName('')
+    setEmail('')
+  }
+
 
   return (
-    <Stack paddingY={0} height={'75%'} width={'100%'}>
+    <Stack paddingY={1} height={'75%'} width={'100%'}>
     <Stack paddingBottom={'1px'} direction={'column'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-      <FormControl>
-        {!email && <InputLabel sx={{textAlign: 'flex-start'}}>Email Address</InputLabel>}
-        <Input value={email} onChange={(e) => setEmail(e.target.value)}/>
+      <FormControl variant="standard" fullWidth>
+        <InputLabel htmlFor="email">Email Address</InputLabel>
+        <Input id='email' value={email} onChange={(e) => setEmail(e.target.value)}/>
       </FormControl>
     </Stack>
 
+    {/* style={{
+                fontSize: 23,
+                display: 'block',
+                lineHeight: 1,
+                margin: 0,
+                padding: 0,
+                color: infoColor,
+                cursor: 'pointer',
+                userSelect: 'none'
+              }} */}
+
     <Stack direction={'column'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} >
-        <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-          <FormControl>
-            {!password && <InputLabel>Password</InputLabel>}
-            <Input type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
+        <Stack direction={'row'} width={'98%'} height={'auto'} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+          <FormControl variant="standard" fullWidth>
+            <InputLabel htmlFor="password">Password</InputLabel>
+            <Input id='password' type={toggleShowPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)}/>
           </FormControl>
-          {
-            toggleShowPassword ? 
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
-            :
-            <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
-          }
+          <Stack justifyContent={'center'} alignItems={'center'}>
+            {
+              toggleShowPassword ? 
+              <i style={{cursor: 'pointer', display: 'block', lineHeight: 1,margin: 0,paddingTop: '100%',userSelect: 'none'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPassword(false)}></i>
+              :
+              <i style={{cursor: 'pointer', display: 'block', lineHeight: 1,margin: 0,paddingTop: '100%',userSelect: 'none'}} className="fi fi-rr-eye" onClick={() => setToggleShowPassword(true)}></i>
+            }
+          </Stack>
         </Stack>
         {newUser && 
         <>
-          <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-            <FormControl>
-              {!confPassword && <InputLabel>Confirm Password</InputLabel>}
-              <Input type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
+          {password && 
+          <Stack direction={'row'} width={'98%'} height={'30%'} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel htmlFor="confPassword">Confirm Password</InputLabel>
+              <Input id="confPassword" type={toggleShowPasswordConf ? 'text' : 'password'} value={confPassword} onChange={(e) => setConfPassword(e.target.value)}/>
             </FormControl>
             {
               toggleShowPasswordConf ? 
-              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
+              <i style={{cursor: 'pointer', display: 'block', lineHeight: 1,margin: 0,userSelect: 'none'}} className="fi fi-rr-eye-crossed" onClick={() => setToggleShowPasswordConf(false)}></i>
               :
-              <i style={{cursor: 'pointer'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
+              <i style={{cursor: 'pointer', display: 'block', lineHeight: 1,margin: 0,userSelect: 'none'}} className="fi fi-rr-eye" onClick={() => setToggleShowPasswordConf(true)}></i>
             }
-          </Stack>
-          <Stack direction={'column'} width={'100%'} height={'30%'} justifyContent={'center'} alignItems={'center'}>
-            <FormControl>
-              <InputLabel>User name</InputLabel>
-              <Input value={userName} onChange={(e) => setUserName(e.target.value)}/>
+          </Stack>}
+          <Stack direction={'column'} width={'100%'} height={'30%'} justifyContent={'center'} alignItems={'center'} marginTop={1}>
+            <FormControl variant="standard" fullWidth>
+              <InputLabel htmlFor="userName">User name</InputLabel>
+              <Input id='userName' value={userName} onChange={(e) => setUserName(e.target.value)}/>
             </FormControl>
           </Stack>
         </>
@@ -144,33 +223,28 @@ const handleLogin = async () => {
 
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
-        {
-          newUser && passMatch && email && userName &&
           <Button onClick={() => {
             if(newUser){
               handleSignUp()
             } else {
               handleLogin()
             }
-          }}>Sign Up</Button>
-        }
-        {
-          !newUser && 
-          <Button onClick={() => {
-            if(newUser){
-              handleSignUp()
-            } else {
-              handleLogin()
-            }
-          }}>Login</Button>
-        }
+          }}>{newUser ? 'Sign up' : 'Login'}</Button>
 
       </Stack>
     </Stack>
 
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>
       <Stack>
-        <Button onClick={() => setNewUser(prev => !prev)} style={{bgcolor:'#372248'}}>{newUser ? 'Back to login' : 'New user'}</Button>
+        <Button 
+          onClick={() => {
+            setNewUser(prev => !prev)
+            resetForm()
+          }} 
+          style={{bgcolor:'#372248'}}
+        >
+            {newUser ? 'Back to login' : 'New user'}
+        </Button>
       </Stack>
     </Stack>
     </Stack>
@@ -183,7 +257,7 @@ const Login = () => {
   const setUser = useGlobalStore((state) => state.setUser)
   const screen = useGlobalStore((state) => state.screen)
   return (
-    <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'}>
+    <Stack direction={'column'} width={'90%'} height={'95%'} justifyContent={'flex-start'} alignItems={'center'} bgcolor={'#474973'} borderRadius={5} overflow={'auto'} padding={3}>
       <Stack paddingY={3} direction={'column'} width={'98%'} height={'fit-content'} justifyContent={'flex-start'} alignItems={'center'}>
         <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={20}>Welcome to SOLTheory</Typography>
         <Box sx={{width: '90%'}}>
@@ -194,11 +268,24 @@ const Login = () => {
         <LoginForm />
       </Stack>
         <Box>
-          <Typography textAlign={'center'} fontFamily={'Fredoka Regular'} color='white' fontSize={13}>For more information about SOL Theory, reach out to 
-
-            <Typography sx={{fontSize: '21px'}}>
-              <Link href="mailto:hello@soltheory.com?subject=Info%20Request" target="_blank" rel="noopener noreferrer">hello@soltheory.com</Link>
-            </Typography>
+          <Typography
+            variant="h6"
+            textAlign="center"
+            fontFamily="Fredoka Regular"
+            color="white"
+            fontSize={13}
+          >
+            For more information about SOL Theory, reach out to
+            <span style={{ display: 'block', fontSize: '21px', marginTop: '4px' }}>
+              <Link
+                href="mailto:hello@soltheory.com?subject=Info%20Request"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'inherit', textDecoration: 'underline' }}
+              >
+                hello@soltheory.com
+              </Link>
+            </span>
           </Typography>
         </Box>
     </Stack>
