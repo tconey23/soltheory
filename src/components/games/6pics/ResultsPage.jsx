@@ -1,16 +1,12 @@
 
-import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, List, ListItem, Box, Modal} from "@mui/material";
-import { addGameToUser, getGifs } from "../../../business/games_calls";
+import { useState, useEffect } from "react";
+import { Stack, Typography, Button, List, ListItem, Box, Modal} from "@mui/material";
 import { Link, useNavigate } from "react-router-dom";
-import SixPicsPacks from "./SixPicsPacks";
-import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import { supabase } from "../../../business/supabaseClient";
 import confetti from 'canvas-confetti';
 import useGlobalStore from "../../../business/useGlobalStore";
-import { render } from "@react-three/fiber";
 import { motion } from 'framer-motion'
 import { Helmet } from "react-helmet";
 
@@ -21,9 +17,10 @@ import { Helmet } from "react-helmet";
     const [renderScores, setRenderScores] = useState(false)
     const [showMsg, setShowMsg] = useState(true)
     const MotionStack = motion(Stack)
+    const [isSaved, setIsSaved] = useState(false)
 
     const isDemo = useGlobalStore((state) => state.isDemo)
-    // let isDemo = true
+    const setAlertContent = useGlobalStore((state) => state.setAlertContent)
   
     useEffect(() => {
       setShotCount(0)
@@ -102,8 +99,17 @@ import { Helmet } from "react-helmet";
       .select();
 
       if (error) {
-        console.error("Failed to save game:", error);
+        setAlertContent({
+          text: error,
+          type: 'error'
+        })
         return; // Optional: stop navigation if there's an error
+      } else {
+        setAlertContent({
+          text: 'Game saved succesfully',
+          type: 'success'
+        })
+        setIsSaved(true)
       }
     };
 
@@ -127,10 +133,10 @@ import { Helmet } from "react-helmet";
       {!demo ?
           <>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-              <Stack width={'30%'} height={'25%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+              <Stack width={'30%'} height={'25%'} justifyContent={'center'} alignItems={'center'} marginBottom={2} marginTop={2}>
                 <video
                   preload="metadata"
-                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
+                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '25%', height: 'auto'}}
                   muted
                   autoPlay = {false}
                   onLoadedMetadata={(e) => {
@@ -157,18 +163,22 @@ import { Helmet } from "react-helmet";
                   }
                 </List>
               </Stack>
-            </Stack>
-            <Stack width={'50%'}>
-              <Button disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>
+              <Stack width={'50%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
+                {
+                  isSaved ? 
+                  <Button onClick={() => nav('/games')}>Exit</Button>
+                  :
+                <Button sx={{height: '100%'}} disabled={!user} onClick={() => handleSaveGame()} variant="contained">{user ? 'Save' : 'Login to save'}</Button>}
+              </Stack>
             </Stack>
           </>
           :
           <>
             <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'}>
-              <Stack width={'30%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
+              <Stack width={'25%'} height={'100%'} justifyContent={'center'} alignItems={'center'} marginBottom={5}>
                 <video
                   preload="metadata"
-                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '30%', height: 'auto'}}
+                  style={{ boxShadow: '4px 2px 10px 1px #00000038', padding: 1, marginBlock: 10, width: '25%', height: 'auto'}}
                   muted
                   autoPlay = {false}
                   onLoadedMetadata={(e) => {
@@ -178,8 +188,8 @@ import { Helmet } from "react-helmet";
                   <source src={gamePack?.graphic} type="video/mp4" />
                 </video>
               </Stack>
-              <Typography fontSize={25}>Your Score</Typography>
-              <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
+              <Typography fontSize={20}>Your Score</Typography>
+              <Typography fontSize={25}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
               <Stack>
                 <List>
                   {

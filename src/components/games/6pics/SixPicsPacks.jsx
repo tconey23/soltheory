@@ -65,10 +65,10 @@ useEffect(() => {
 }, [])
 
   return (
-    <Stack direction={'column'} sx={{ height: '90%', width: '100%'}} justifyContent={'flex=start'} alignItems={'center'} >
+    <Stack userdata='game_parent' direction={'column'} sx={{ height: '90%', width: '100%'}} justifyContent={'center'} alignItems={'center'} >
         <Typography fontFamily={'Fredoka Regular'} fontSize={40}>Select Pack</Typography>
-        <Stack userdata='list_container' sx={{overflow: 'auto'}} height={'100%'} width={'100%'}>
-            <List userdata='pack_list' sx={{width: '100%'}}>
+        <Stack userdata='list_container' sx={{overflow: 'auto'}} height={'100%'} width={'100%'} justifyContent={'center'}>
+            <List userdata='pack_list' sx={{width: '100%', alignItems: 'center'}}>
                 {packs && packs.map((p, i) => {
                     let fileType = p.graphic
                     return (

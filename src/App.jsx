@@ -181,7 +181,7 @@ const [dims, setDims] = useState(
     <Stack flex="0 0 10%" width="100%">
       <AppHeader />
     </Stack>
-    <Stack flex="1" width="100%" id="main" height={'80svh'}>
+    <Stack flex="1" width="100%" id="main" height={'80svh'} justifyContent={'center'} alignItems={'center'}>
       <Suspense fallback={
         <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} exit={{opacity: 0}} transition={{duration: 1.5, delay: 1.5}}>
           <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
