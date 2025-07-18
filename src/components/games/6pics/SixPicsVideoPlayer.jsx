@@ -182,7 +182,7 @@ useEffect(() => {
     : { boxShadow: "4px 2px 10px 1px #00000038", padding: 1, marginBlock: 10, width: '80%', height: '70%' };
 
   return (
-    <Stack backgroundColor="white" justifyContent="center" alignItems="center" height={height * .33} width={screen === 'xs' ? width * 0.95 : '50%'}>
+    <Stack backgroundColor="white" justifyContent="center" alignItems="center" height={height * .25} width={screen === 'xs' ? width * 0.95 : '50%'}>
       <Stack width="100%" height="100%" justifyContent="center" alignItems="center" sx={{ opacity: isLoaded ? 1 : 1 }}>
           <ReactPlayer
             ref={videoRef}
@@ -197,7 +197,7 @@ useEffect(() => {
             playsInline={true}
           />
 
-        <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'}>
+        <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'} sx={{marginTop: '1px', marginBottom: '10px'}}>
           <Stack>
             {/* <Typography>{`${currentTime} ${to}`}</Typography> */}
 

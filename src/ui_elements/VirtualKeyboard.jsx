@@ -22,27 +22,27 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer }) => 
 
   const layouts = {
     withoutCheck: [
-      "q w e r t y u i o p {bksp}",
+      "q w e r t y u i o p",
       "a s d f g h j k l",
-      "z x c v b n m",
+      "z x c v b n m {bksp}",
       "{hint}"
     ],
     withHint: [
-      "q w e r t y u i o p {bksp}",
+      "q w e r t y u i o p",
       "a s d f g h j k l",
-      "z x c v b n m",
+      "z x c v b n m {bksp}",
       "{hint} {check}"
     ],
     withGetHint: [
-      "q w e r t y u i o p {bksp}",
+      "q w e r t y u i o p",
       "a s d f g h j k l",
-      "z x c v b n m",
+      "z x c v b n m {bksp}",
       "{gethint} {check}"
     ],
     minimal: [
-      "q w e r t y u i o p {bksp}",
+      "q w e r t y u i o p",
       "a s d f g h j k l",
-      "z x c v b n m",
+      "z x c v b n m {bksp}",
       "{gethint}"
     ]
   };

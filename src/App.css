@@ -22,10 +22,14 @@
   letter-spacing: 3px;
 }
 
+#main > div > div.MuiStack-root.css-1g0204k-MuiStack-root > div.slick-slider.slick-initialized > div > div > div.slick-slide.slick-active.slick-current > div {
+  height: 100%
+}
+
 .simple-keyboard .hg-button {
   flex: 1 0 auto !important; /* allow consistent width */
-  width: 30px;
-  min-width: 0 !important;
+  width: 50px;
+  min-width: 30px !important;
   padding: 5px !important; /* consistent height and spacing */
 }
 

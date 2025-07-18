@@ -116,7 +116,7 @@ import { Helmet } from "react-helmet";
     }
   
     return (
-      <Stack width={'100%'} height={'80dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
+      <Stack width={'100%'} height={'70dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
       <Helmet>
         <title>6 Pics – Avett Bros Demo</title>
         <link rel="icon" type="image/png" href="https://soltheory.com/AvettBros.png" />

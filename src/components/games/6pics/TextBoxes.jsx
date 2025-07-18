@@ -356,19 +356,19 @@ useEffect(() => {
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="90%" justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
+    <Stack direction="column" width="100%" height='100%' justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
       justifyContent="center"
       alignItems="center"
-      padding={1}
+      alignContent={'space-around'}
       id="letter_wrapper"
-      height={height * 0.40}
+      height={'100%'}
       overflow="auto"
       sx={{
         gap: 1,
-        rowGap: 1.5,
+        rowGap: '1px',
         wordBreak: "keep-all",  // optional
       }}
       >
