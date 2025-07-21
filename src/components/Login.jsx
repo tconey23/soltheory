@@ -26,6 +26,7 @@ const LoginForm = () => {
   const [toggleShowPassword, setToggleShowPassword] = useState(false)
   const [toggleShowPasswordConf, setToggleShowPasswordConf] = useState(false)
   const [passMatch, setPassMatch] = useState(false)
+  const [resetPass, setResetPass] = useState(false)
 
   const loc = useLocation()
   const navTo = useNavigate()
@@ -56,6 +57,10 @@ const handleLogin = async () => {
     console.error('Supabase login error:', error.message);
 
     let errMsg = error.message === "Invalid login credentials" ? "Either your email address or password are incorrect. Please try again" : error.message
+
+    if(error?.message === "Invalid login credentials"){
+      setResetPass(true)
+    }
 
     setAlertContent({
         text: errMsg,
@@ -159,6 +164,13 @@ const handleLogin = async () => {
     setEmail('')
   }
 
+  const handleResetPassword = async () => {
+    let { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://soltheory.com/resetpassword',
+    });
+    // console.log(data, error)
+  }
+
 
   return (
     <Stack paddingY={1} height={'75%'} width={'100%'}>
@@ -232,6 +244,15 @@ const handleLogin = async () => {
           }}>{newUser ? 'Sign up' : 'Login'}</Button>
 
       </Stack>
+
+      {resetPass && 
+        <Stack>
+            <Button onClick={() => {
+              handleResetPassword()
+            }}>Reset Password</Button>
+
+        </Stack>
+      }
     </Stack>
 
     <Stack paddingY={1} direction={'row'} justifyContent={'center'} alignItems={'center'}>

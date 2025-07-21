@@ -16,6 +16,7 @@ import SolMates from './components/solmates/SolMates';
 import UserAlert from './ui_elements/Alert';
 import FadeStack from './ui_elements/FadeStack';
 import LoadingAnimation from './ui_elements/LoadingAnimation';
+import Password from './components/Password';
 
 // import GamesWrapper from './components/games/GamesWrapper';
 // import TwentyOneThings from './components/games/21Things/TwentyOneThings';
@@ -236,6 +237,13 @@ const [dims, setDims] = useState(
             path={"/games/sandbox"}
             element={
               <Sandbox />
+            } 
+            />
+
+          <Route 
+            path={"/resetpassword"}
+            element={
+              <Password />
             } 
             />
 
