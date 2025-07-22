@@ -185,7 +185,7 @@ const [dims, setDims] = useState(
     <Stack flex="1" width="100%" id="main" height={'80svh'} justifyContent={'flex-start'} alignItems={'center'}>
       <Suspense fallback={
         <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} exit={{opacity: 0}} transition={{duration: 1.5, delay: 1.5}}>
-          <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'}>
+          <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'} sx={{top: 0, left: 0}}>
             <Typography fontFamily={'fredoka regular'} fontSize={20} color={'white'}>Loading SOL Theory...</Typography>
           </Stack>
         </FadeStack>

@@ -236,7 +236,12 @@ const GamesWrapper = () => {
                 {userMeta?.is_admin &&
                 <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
                   <SandboxButton />
-                </MenuItem>}
+                </MenuItem>
+                }
+
+                <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+                  <SandboxButton />
+                </MenuItem>
               </Suspense>
 
               {/* <MenuItem sx={menuStyle} value="6pics"  onClick={() => navigate(`/mythreesongs`)}>

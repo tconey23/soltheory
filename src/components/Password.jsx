@@ -14,14 +14,17 @@ const Password = () => {
   const [status, setStatus] = useState('');
   const [userEmail, setUserEmail] = useState('');
   const [resetPassword, setResetPassword] = useState(false)
+  const [disableInput, setDisableInput] = useState(false)
   const navTo = useNavigate()
 
   useEffect(() => {
     const initSession = async () => {
         const hash = window.location.hash;
+        console.log(hash)
 
         if (hash.includes('error_code=otp_expired')) {
             setErrorMsg('Your reset link has expired. Please request a new one.');
+            setDisableInput(true)
             return;
         }
 
@@ -82,6 +85,7 @@ const Password = () => {
                 <FormControl sx={{ paddingY: 2 }}>
                     <InputLabel htmlFor='password'>New password</InputLabel>
                     <Input
+                    disabled={disableInput}
                     id='password'
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
@@ -106,6 +110,7 @@ const Password = () => {
                 <FormControl sx={{ paddingY: 2 }}>
                     <InputLabel htmlFor='confpassword'>Confirm password</InputLabel>
                     <Input
+                    disabled={disableInput}
                     id='confpassword'
                     value={confPassword}
                     onChange={(e) => setConfPassword(e.target.value)}
