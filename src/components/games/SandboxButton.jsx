@@ -10,7 +10,7 @@ const SandboxButton = ({admin}) => {
         sx={{scale: 0.5}}
         > 
         <Box sx={{padding: 2}}>
-          {/* <SixPics dims={100}/> */}
+          <img width='100px' height='auto' src='/bubble.gif'/>
         </Box>
         <Typography fontSize={50} fontFamily={'Fredoka Regular'}>ORBstacles</Typography>
     </Stack>
