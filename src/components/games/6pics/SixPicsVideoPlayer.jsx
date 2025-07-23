@@ -111,6 +111,10 @@ useEffect(() => {
 }, [isPlaying]);
 
 useEffect(()=>{
+  if(stage == 0){
+    setPlayStage(true)
+  }
+
   if(!isNaN(stage)){
     setTo(Math.floor(stages[stage]?.to))
     setFrom(Math.floor(stages[stage]?.from))
@@ -195,6 +199,7 @@ useEffect(() => {
             onCanPlay={() => handleLoaded(true)}
             start={from || 0}
             playsInline={true}
+            autoplay={true}
           />
 
         <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'} sx={{marginTop: '1px', marginBottom: '10px'}}>
