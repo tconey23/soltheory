@@ -390,7 +390,7 @@ const crossfadeOscillator = async (channel, newWave) => {
         </AnimatePresence>
 
         <Stack alignItems={'center'}>
-            <Typography color="white" variant="h7">{`Binaural Wave Tuner`}</Typography>
+            <Typography color="white" fontFamily={'fredoka regular'} fontSize={30} variant="h7">SOL Vibes</Typography>
             <Button onClick={() => setToggleMenu(prev => !prev)}>Menu</Button>
             <Stack width="100%" height='50%' minHeight={'500px'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
                     {/* <WaveForm leftFreq={leftFreq} rightFreq={rightFreq} width={400} height={300} isPlaying={isPlaying}/> */}
