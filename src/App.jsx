@@ -19,15 +19,6 @@ import LoadingAnimation from './ui_elements/LoadingAnimation';
 import Password from './components/Password';
 import Wavetuner from './components/games/WaveTuner/Wavetuner';
 
-// import GamesWrapper from './components/games/GamesWrapper';
-// import TwentyOneThings from './components/games/21Things/TwentyOneThings';
-// import Pic6 from './components/games/6pics/Pic6';
-// import AdSpace from './ui_elements/AdSpace';
-// import SharedGame from './components/games/21Things/SharedGame';
-// import Sandbox from './components/games/Sandbox/Sandbox';
-// import MyThreeSongs from './components/games/MyThreeSongs/MyThreeSongs';
-// import AvettDemo from './components/games/6pics/AvettDemo';
-
 const SixPics = lazy(() => import('./components/games/6pics/Pic6'))
 const TwentyOneThings = lazy (() => import('./components/games/21Things/TwentyOneThings'))
 const AdSpace = lazy (() => import('./ui_elements/AdSpace'))
@@ -186,7 +177,7 @@ const [dims, setDims] = useState(
     <Stack flex="1" width="100%" id="main" height={'80svh'} justifyContent={'flex-start'} alignItems={'center'}>
       <Suspense fallback={
         <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} exit={{opacity: 0}} transition={{duration: 1.5, delay: 1.5}}>
-          <Stack width={'100%'} height={'80%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'} sx={{top: 0, left: 0}}>
+          <Stack width={'100%'} height={'100%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'} sx={{top: 0, left: 0}}>
             <Typography fontFamily={'fredoka regular'} fontSize={20} color={'white'}>Loading SOL Theory...</Typography>
           </Stack>
         </FadeStack>
@@ -226,8 +217,6 @@ const [dims, setDims] = useState(
               <SixPics />
             } 
             />
-
-            
 
           <Route 
             path={'/games/wavetuner'}

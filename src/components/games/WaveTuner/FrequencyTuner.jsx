@@ -40,11 +40,13 @@ const FrequencyTuner = ({
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
   return (
-    <Stack justifyContent={'flex-start'} alignItems={'center'} width={'50%'} height={'100%'} minHeight={'500px'} spacing={10}>
+    <Stack justifyContent={'center'} alignItems={'flex-start'} width={'100%'} height={'100%'}paddingTop={5}>
 
-    <Stack ref={tunerRef} justifyContent={'flex-start'} alignItems={'center'} width={'100%'}>
-        <Typography>Fine Tune Amt</Typography>
-        <Select value={fineTuneStep} onChange={(e) => {
+    <Stack ref={tunerRef} justifyContent={'flex-start'} alignItems={'center'} width={'100%'} height={'100%'} spacing={2} >
+        <Typography fontFamily={'fredoka regular'} color="white">{`${channel} Frequency`}</Typography>
+        <Typography fontFamily={'fredoka regular'} color="white">{freq} Hz</Typography>
+        <Typography fontFamily={'fredoka regular'} color="white">Fine Tune Amt</Typography>
+        <Select sx={{bgcolor: 'white'}} value={fineTuneStep} onChange={(e) => {
             setFinetuneStep(e.target.value)
             }}>
             <MenuItem value={0.01}>0.01</MenuItem>
@@ -52,28 +54,23 @@ const FrequencyTuner = ({
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={10}>10</MenuItem>
         </Select>
-    </Stack>
-
-    <Stack ref={tunerRef} justifyContent={'flex-start'} alignItems={'center'} width={'100%'} height={'50%'} minHeight={'250px'}>
-        <Typography>{`${channel} Frequency`}</Typography>
-        <Typography>{freq} Hz</Typography>
         <Slider
-                orientation="vertical"
-                min={-100}
-                max={100}
-                value={sliderVal}
-                onChange={(_, val) => {
+            orientation="vertical"
+            min={-100}
+            max={100}
+            value={sliderVal}
+            onChange={(_, val) => {
                 if(val >= 10){
-                    setSliderVal(val)
+                setSliderVal(val)
                 } else if(val <= -10){
-                    setSliderVal(val)
+                setSliderVal(val)
                 } else {
-                    setSliderVal(0)
+                setSliderVal(0)
                 }
             }}
-                onChangeCommitted={() => setSliderVal(0)}
-                step={1}
-                sx={{ height: "80%"}}
+            onChangeCommitted={() => setSliderVal(0)}
+            step={1}
+            sx={{ height: "100%"}}
         />
     </Stack>
     </Stack>

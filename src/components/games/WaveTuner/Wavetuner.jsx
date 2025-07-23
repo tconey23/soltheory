@@ -11,6 +11,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 import * as Tone from "tone"
+import Header from "./Header";
 
 const MIN_FREQ = 20;
 const MAX_FREQ = 200;
@@ -44,6 +45,8 @@ const Wavetuner = ({}) => {
     const [slides, setSlides] = useState(<></>)
     const [voiceType, setVoiceType] = useState("oscillator"); // or "tonejs"
     const [toneInstrument, setToneInstrument] = useState("Synth"); // or "AMSynth", "MonoSynth", etc.
+    const [selectedTab, setSelectedTab] = useState('presets')
+    const [binauralBeat, setBinauralBeat] = useState('')
 
     const sliderRef = useRef();
     const audioCtxRef = useRef(null);
@@ -71,6 +74,13 @@ const Wavetuner = ({}) => {
         swipe: false,
         afterChange: setActiveSlide,
     };
+
+    useEffect(() => {
+        if(rightFreq && rightFreq){
+            let binBeat = Math.abs(leftFreq - rightFreq).toFixed(2)
+            setBinauralBeat(binBeat)
+        }
+    }, [leftFreq, rightFreq])
 
     const setupAudioContext = () => {
         if (!audioCtxRef.current) {
@@ -184,13 +194,6 @@ const Wavetuner = ({}) => {
         }
     }, [rightWave, isPlaying])
 
-    const setValue = (key, val) => {
-        setCompVals(prev => ({ ...prev, [key]: val }));
-        // Also update the actual DynamicsCompressorNode if it exists:
-        if (audioCtxRef.current?.compressor) {
-        audioCtxRef.current.compressor[key].value = val;
-        }
-    };
 const crossfadeOscillator = async (channel, newWave) => {
     const ctx = audioCtxRef.current;
     if (!ctx) return;
@@ -287,7 +290,7 @@ const crossfadeOscillator = async (channel, newWave) => {
             showBars={true}
             showSine={true}
             width={280}
-            height={240}
+            height={sliderRef?.current?.offsetHeight}
         />,
         <SpectrumAnalyzer
             key="sine"
@@ -296,7 +299,7 @@ const crossfadeOscillator = async (channel, newWave) => {
             showBars={false}
             showSine={true}
             width={280}
-            height={240}
+            height={sliderRef?.current?.offsetHeight}
         />,
         <SpectrumAnalyzer
             key="bars"
@@ -305,7 +308,7 @@ const crossfadeOscillator = async (channel, newWave) => {
             showBars={true}
             showSine={false}
             width={280}
-            height={240}
+            height={sliderRef?.current?.offsetHeight}
         />,
         <WaveForm 
             leftFreq={leftFreq} 
@@ -316,83 +319,88 @@ const crossfadeOscillator = async (channel, newWave) => {
     )
   }, [leftAnalyserRef, rightAnalyserRef, isPlaying])
 
+
+    const updateCompValue = (key, val) => {
+    setCompVals(prev => {
+        // Update actual compressor node, too!
+        if (compressorRef.current && compressorRef.current[key]) {
+        compressorRef.current[key].value = val;
+        }
+        return { ...prev, [key]: val };
+    });
+    };
+
   return (
     <Stack spacing={0} alignItems="center" justifyContent={'flex-start'} sx={{ p: 4, maxWidth: 500, mx: "auto", height: '100%', width: '100%'}} bgcolor={'black'}>
-        <AnimatePresence>
-        <MotionStack
-            spacing={4}
-            width={'100%'}
-            position={'absolute'}
-            sx={{bgcolor: 'white', zIndex: 1, justifyContent: 'flex-start'}}
-            initial={{opacity: 1, height: '0px'}}
-            animate={
-                toggleMenu ? 
-                {
-                    height: '25%',
-                    opacity: 1,
-                    overflow: 'scroll'
-                }
-                :
-                {
-                    height: '0px',
-                    overflow: 'hidden'
-                }
-            }
-            transition={{duration: 1}}
-            exit={{opacity: 1, height: '0px'}}
-        >
-            <Stack justifyContent={'flex-start'} alignItems={'center'}  width={'100%'} sx={{zoom: 0.75}}>
-                <Typography>
-                    {`Binaural Wave: ${isPlaying ? `${Math.abs(rightFreq - leftFreq).toFixed(1)} hz` : ''}`}
-                </Typography>
-
-                <Stack width={'90%'}>
-                    <WaveType leftWave={leftWave} rightWave={rightWave} setLeftWave={setLeftWave} setRightWave={setRightWave}/>
-
-                    <BinauralPresets leftFreq={leftFreq} rightFreq={rightFreq} setLeftFreq={setLeftFreq} setRightFreq={setRightFreq}/>
-
-                    <Compressor values={compVals} setValue={setValue} />
-                </Stack>
-
-                <Stack direction={'row'} height={'100%'} width={'100%'}>
-                    <FrequencyTuner 
-                        tunerRef={ftlRef} 
-                        freq={leftFreq} 
-                        setFreq={setLeftFreq} 
-                        toggleFineTune={toggleFineTuneLeft} 
-                        setToggleFineTune={setToggleFineTuneLeft} 
-                        fineTuneStep={finetuneStepL}
-                        setFinetuneStep={setFinetuneStepL}
-                        MIN={MIN_FREQ}
-                        MAX={MAX_FREQ}
-                        isPlaying={isPlaying}
-                        channel={'Left'}
-                    />
-                    <FrequencyTuner 
-                        tunerRef={ftrRef} 
-                        freq={rightFreq} 
-                        setFreq={setRightFreq} 
-                        toggleFineTune={toggleFineTuneRight} 
-                        setToggleFineTune={setToggleFineTuneRight} 
-                        fineTuneStep={finetuneStepR}
-                        setFinetuneStep={setFinetuneStepR}
-                        MIN={MIN_FREQ}
-                        MAX={MAX_FREQ}
-                        isPlaying={isPlaying}
-                        channel={'Right'}
-                    />
-                </Stack>
-
-                <Button onClick={() => setToggleMenu(false)}>Close</Button>
-            </Stack>
-
-        </MotionStack>
-        </AnimatePresence>
 
         <Stack alignItems={'center'}>
-            <Typography color="white" fontFamily={'fredoka regular'} fontSize={30} variant="h7">SOL Vibes</Typography>
-            <Button onClick={() => setToggleMenu(prev => !prev)}>Menu</Button>
-            <Stack width="100%" height='50%' minHeight={'500px'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
+            <Typography color="white" fontFamily={'fredoka regular'} fontSize={20} variant="h7">SOL Vibes</Typography>
+            <Stack height='10%'>
+                {binauralBeat && 
+                    <Typography color='white' fontFamily={'fredoka regular'} fontSize={20}>{`Binaural beat: ${binauralBeat}hz`}</Typography>
+                }
+            </Stack>
+
+
+            <Stack height='auto' paddingBottom='5px'>
+                <Header tab={selectedTab} setTab={setSelectedTab}/>
+            </Stack>
+
+            <Stack height='25svh' width='100%' justifyContent={'flex-start'}>
+
+                <AnimatePresence>
+                    <MotionStack  sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'presets'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                        <BinauralPresets leftFreq={leftFreq} rightFreq={rightFreq} setLeftFreq={setLeftFreq} setRightFreq={setRightFreq}/>
+                    </MotionStack>
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    <MotionStack justifyContent={'flex-start'} paddingTop={1} alignItems={'center'} sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'wavetypes'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                        <WaveType leftWave={leftWave} rightWave={rightWave} setLeftWave={setLeftWave} setRightWave={setRightWave}/>
+                    </MotionStack>
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    <MotionStack sx={{overflow: 'hidden', width: '100%'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'tuner'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                        <Stack direction={'row'} alignItems={'center'} justifyContent={'center'} height={'100%'} width={'100%'} sx={{zoom: 0.55}} borderRadius={3}>
+                            <FrequencyTuner 
+                                tunerRef={ftlRef} 
+                                freq={leftFreq} 
+                                setFreq={setLeftFreq} 
+                                toggleFineTune={toggleFineTuneLeft} 
+                                setToggleFineTune={setToggleFineTuneLeft} 
+                                fineTuneStep={finetuneStepL}
+                                setFinetuneStep={setFinetuneStepL}
+                                MIN={MIN_FREQ}
+                                MAX={MAX_FREQ}
+                                isPlaying={isPlaying}
+                                channel={'Left'}
+                            />
+                            <FrequencyTuner 
+                                tunerRef={ftrRef} 
+                                freq={rightFreq} 
+                                setFreq={setRightFreq} 
+                                toggleFineTune={toggleFineTuneRight} 
+                                setToggleFineTune={setToggleFineTuneRight} 
+                                fineTuneStep={finetuneStepR}
+                                setFinetuneStep={setFinetuneStepR}
+                                MIN={MIN_FREQ}
+                                MAX={MAX_FREQ}
+                                isPlaying={isPlaying}
+                                channel={'Right'}
+                            />
+                        </Stack>
+                    </MotionStack>
+                </AnimatePresence>
+                
+                <AnimatePresence>
+                    <MotionStack sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'compressor'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                        <Compressor values={compVals} setValue={updateCompValue} />
+                    </MotionStack>
+                </AnimatePresence>
+            </Stack>
+
+            <Stack width="100%" height='33svh' justifyContent={'center'} alignItems={'center'} overflow='hidden'>
                     {/* <WaveForm leftFreq={leftFreq} rightFreq={rightFreq} width={400} height={300} isPlaying={isPlaying}/> */}
                     {leftAnalyserRef.current && rightAnalyserRef.current && (
                         <Slider ref={sliderRef} {...settings} style={{width:300, height: '50%'}}>

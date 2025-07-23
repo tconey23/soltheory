@@ -79,9 +79,6 @@ const GameWrapper = ({ pack, setPack }) => {
     afterChange: setActiveSlide,
   };
 
-  console.log(height, window.innerHeight)
-
-
   // Fetch level data
   useEffect(() => {
     (async () => {

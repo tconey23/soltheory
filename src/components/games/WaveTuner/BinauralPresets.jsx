@@ -57,31 +57,18 @@ const BinauralPresets = ({ setLeftFreq, setRightFreq }) => {
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
   return (
-    <Stack alignItems="center" width="100%" spacing={2} justifyContent={'center'}>
+    <Stack alignItems="center" width="100%" spacing={2} justifyContent={'center'} sx={{zoom: 0.9}}>
       <Stack direction="column" width="100%" alignItems={'center'}>
-        <Link onClick={() => setToggleMenu(prev => !prev)}>Presets</Link>
-        <AnimatePresence>
-            <MotionStack
-                sx={{overflow: 'hidden', width: '100%'}}
-                justifyContent={'center'}
-                initial={{height: 0, display: 'none'}}
-                animate={
-                    toggleMenu ? {height: '100%', display: 'block'} : {height: 0, display: 'none'}
-                }
-                exit={{height: 0, display: 'none'}}
-                transition={{duration: 1}}
-
-            >
-                <Select value={preset} onChange={e => setPreset(e.target.value)}>
-                {presets.map(p =>
-                    <MenuItem key={p.name} value={p.name}>
-                    {p.display} — {p.use}
-                    </MenuItem>
-                )}
+                <Select value={preset} onChange={e => setPreset(e.target.value)} sx={{bgcolor: 'white'}}>
+                    {presets.map(p =>
+                        <MenuItem key={p.name} value={p.name}>
+                        {p.display} — {p.use}
+                        </MenuItem>
+                    )}
                 </Select>
 
                 <Stack alignItems="center" width="100%">
-                    <Typography variant="body2">{`Base Tone ${baseTone}hz`}</Typography>
+                    <Typography color='white' variant="body2">{`Base Tone ${baseTone}hz`}</Typography>
                     <Slider
                         orientation="vertical"
                         min={-100}
@@ -93,8 +80,6 @@ const BinauralPresets = ({ setLeftFreq, setRightFreq }) => {
                         sx={{ height: 120 }}
                     />
                 </Stack>
-            </MotionStack>
-        </AnimatePresence>
       </Stack>
 
 
