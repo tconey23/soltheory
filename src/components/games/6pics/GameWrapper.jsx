@@ -56,8 +56,6 @@ const GameWrapper = ({ pack, setPack }) => {
   const loc = useLocation()
   const isDemo = loc?.pathname?.includes('/promo/')
 
-  const MotionStack = motion(Stack)
-
   const sliderRef = useRef();
 
   const navTo = useNavigate()

@@ -55,6 +55,7 @@
     "simple-keyboard": "^3.8.68",
     "slick-carousel": "^1.8.1",
     "three": "^0.175.0",
+    "tone": "^15.1.22",
     "uuid": "^11.1.0",
     "zustand": "^5.0.4"
   },
