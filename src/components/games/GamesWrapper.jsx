@@ -19,6 +19,7 @@ dayjs.extend(customParseFormat)
 const TwentOneThingsButton = lazy(() => import('./TwentyOneThingsButton'))
 const SixPicsButton = lazy(() => import('./SixPicsButton'))
 const SandboxButton = lazy(() => import('./SandboxButton'))
+const WavetunerButton = lazy(() => import('./WavetunerButton'))
 
 
 const HeaderImage = () => {
@@ -87,6 +88,11 @@ const GamesWrapper = () => {
        
         if (gameName ===  'sandbox') {
           navigate('/games/sandbox')
+          return
+        }
+
+        if (gameName ===  'wavetuner') {
+          navigate('/games/wavetuner')
           return
         }
        
@@ -234,12 +240,12 @@ const GamesWrapper = () => {
                 }
               >
                 {userMeta?.is_admin &&
-                <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
-                  <SandboxButton />
+                <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`wavetuner`)}>
+                  <WavetunerButton />
                 </MenuItem>
                 }
 
-                <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
+              <MenuItem sx={menuStyle} value="sandbox"  onClick={() => startGame(`sandbox`)}>
                   <SandboxButton />
                 </MenuItem>
               </Suspense>

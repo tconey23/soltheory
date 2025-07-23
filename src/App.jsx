@@ -17,6 +17,7 @@ import UserAlert from './ui_elements/Alert';
 import FadeStack from './ui_elements/FadeStack';
 import LoadingAnimation from './ui_elements/LoadingAnimation';
 import Password from './components/Password';
+import Wavetuner from './components/games/WaveTuner/Wavetuner';
 
 // import GamesWrapper from './components/games/GamesWrapper';
 // import TwentyOneThings from './components/games/21Things/TwentyOneThings';
@@ -223,6 +224,15 @@ const [dims, setDims] = useState(
             path={"/games/6pics"}
             element={
               <SixPics />
+            } 
+            />
+
+            
+
+          <Route 
+            path={'/games/wavetuner'}
+            element={
+              <Wavetuner />
             } 
             />
 
