@@ -6,7 +6,7 @@ const FrequencyTuner = ({
   tunerRef, freq, setFreq,
   toggleFineTune, setToggleFineTune,
   fineTuneStep, setFinetuneStep,
-  MIN, MAX, isPlaying, channel
+  MIN, MAX, isPlaying, channel 
 }) => {
   const [sliderVal, setSliderVal] = useState(0);
   const intervalRef = useRef(null);
@@ -40,12 +40,12 @@ const FrequencyTuner = ({
   useEffect(() => () => clearInterval(intervalRef.current), []);
 
   return (
-    <Stack justifyContent={'center'} alignItems={'flex-start'} width={'100%'} height={'100%'}paddingTop={5}>
+    <Stack justifyContent={'center'} alignItems={'flex-start'} width={'100%'} height={'100%'} paddingTop={3}>
 
-    <Stack ref={tunerRef} justifyContent={'flex-start'} alignItems={'center'} width={'100%'} height={'100%'} spacing={2} >
-        <Typography fontFamily={'fredoka regular'} color="white">{`${channel} Frequency`}</Typography>
+    <Stack ref={tunerRef} justifyContent={'flex-start'} alignItems={'center'} width={'100%'} height={'100%'} spacing={0} >
+        {/* <Typography fontFamily={'fredoka regular'} color="white">{`${channel} Frequency`}</Typography> */}
         <Typography fontFamily={'fredoka regular'} color="white">{freq} Hz</Typography>
-        <Typography fontFamily={'fredoka regular'} color="white">Fine Tune Amt</Typography>
+        {/* <Typography fontFamily={'fredoka regular'} color="white">Fine Tune Amt</Typography> */}
         <Select sx={{bgcolor: 'white'}} value={fineTuneStep} onChange={(e) => {
             setFinetuneStep(e.target.value)
             }}>

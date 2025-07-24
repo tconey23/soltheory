@@ -12,15 +12,46 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import * as Tone from "tone"
 import Header from "./Header";
+import MuiSlider from '@mui/material/Slider';
+
+function usePeakMeter(analyser, isActive) {
+  const [peak, setPeak] = useState(0);
+
+  useEffect(() => {
+    if (!analyser || !isActive) return;
+
+    let running = true;
+    const bufferLength = analyser.fftSize;
+    const data = new Uint8Array(bufferLength);
+
+    function checkPeak() {
+      if (!running) return;
+      analyser.getByteTimeDomainData(data);
+      let max = 0;
+      for (let i = 0; i < bufferLength; i++) {
+        const deviation = Math.abs(data[i] - 128);
+        if (deviation > max) max = deviation;
+      }
+      const percent = Math.round((max / 128) * 100)
+      setPeak(percent);
+      requestAnimationFrame(checkPeak);
+    }
+    checkPeak();
+
+    return () => { running = false; };
+  }, [analyser, isActive]);
+
+  return peak;
+}
 
 const MIN_FREQ = 20;
-const MAX_FREQ = 200;
+const MAX_FREQ = 1000;
 const DEFAULT_LEFT = 40;
 const DEFAULT_RIGHT = 41;
 
 const COMPRESSOR_DEFAULTS = {
-  threshold: -58,
-  knee: 40,
+  threshold: -25,
+  knee: 17,
   ratio: 14.5,
   attack: 0.024,
   release: 0.280,
@@ -36,17 +67,21 @@ const Wavetuner = ({}) => {
     const [finetuneStepR, setFinetuneStepR] = useState(0.1)
     const [toggleFineTuneLeft, setToggleFineTuneLeft] = useState(false)
     const [toggleFineTuneRight, setToggleFineTuneRight] = useState(false)
-    const [toggleWaveType, setToggleWaveType] = useState(false)
     const [leftWave, setLeftWave] = useState('sine');
     const [rightWave, setRightWave] = useState('sine')
-    const [toggleMenu, setToggleMenu] = useState(false)
     const [compVals, setCompVals] = useState(COMPRESSOR_DEFAULTS)
     const [activeSlide, setActiveSlide] = useState(1);
     const [slides, setSlides] = useState(<></>)
     const [voiceType, setVoiceType] = useState("oscillator"); // or "tonejs"
     const [toneInstrument, setToneInstrument] = useState("Synth"); // or "AMSynth", "MonoSynth", etc.
     const [selectedTab, setSelectedTab] = useState('presets')
-    const [binauralBeat, setBinauralBeat] = useState('')
+    const [binauralBeat, setBinauralBeat] = useState(null)
+    const [leftVolume, setLeftVolume] = useState(1);
+    const [rightVolume, setRightVolume] = useState(1);
+    const [analyserUpdate, setAnalyserUpdate] = useState(0);
+    const [lPeakMax, setLPeakMax] = useState(0)
+    const [rPeakMax, setRPeakMax] = useState(0)
+    const [vuRelease, setVuRelease] = useState(300)
 
     const sliderRef = useRef();
     const audioCtxRef = useRef(null);
@@ -64,7 +99,10 @@ const Wavetuner = ({}) => {
     const masterAnalyserRef = useRef(null);
     const toneSynthRef = useRef(null);
 
-      const settings = {
+    const leftPeak = usePeakMeter(leftAnalyserRef.current, isPlaying);
+    const rightPeak = usePeakMeter(rightAnalyserRef.current, isPlaying);
+
+    const settings = {
         dots: true,
         arrows: true,
         infinite: true,
@@ -74,6 +112,27 @@ const Wavetuner = ({}) => {
         swipe: false,
         afterChange: setActiveSlide,
     };
+
+    useEffect(() => {
+        if (leftPeak > lPeakMax) {
+            setLPeakMax(leftPeak);
+        }
+        if (rightPeak > rPeakMax) {
+            setRPeakMax(rightPeak);
+        }
+    }, [leftPeak, rightPeak, lPeakMax, rPeakMax]);
+
+    useEffect(() => {
+        if (lPeakMax === 0) return;
+        const timeout = setTimeout(() => setLPeakMax(0), vuRelease);
+        return () => clearTimeout(timeout);
+    }, [lPeakMax, vuRelease]);
+
+    useEffect(() => {
+        if (rPeakMax === 0) return;
+        const timeout = setTimeout(() => setRPeakMax(0), vuRelease);
+        return () => clearTimeout(timeout);
+    }, [rPeakMax, vuRelease]);
 
     useEffect(() => {
         if(rightFreq && rightFreq){
@@ -118,7 +177,8 @@ const Wavetuner = ({}) => {
         leftOscRef.current.type = leftWave;
         leftOscRef.current.frequency.value = leftFreq;
         const leftPan = ctx.createStereoPanner(); leftPan.pan.value = -1;
-        const leftGain = ctx.createGain(); leftGain.gain.value = 0.9;
+        const leftGain = ctx.createGain();
+        leftGain.gain.value = leftVolume;
         leftAnalyserRef.current = ctx.createAnalyser();
 
         leftOscRef.current
@@ -132,7 +192,8 @@ const Wavetuner = ({}) => {
         rightOscRef.current.type = rightWave;
         rightOscRef.current.frequency.value = rightFreq;
         const rightPan = ctx.createStereoPanner(); rightPan.pan.value = 1;
-        const rightGain = ctx.createGain(); rightGain.gain.value = 0.9;
+        const rightGain = ctx.createGain();
+        rightGain.gain.value = rightVolume;
         rightAnalyserRef.current = ctx.createAnalyser();
 
         rightOscRef.current
@@ -140,6 +201,9 @@ const Wavetuner = ({}) => {
             .connect(rightGain)
             .connect(rightAnalyserRef.current)
             .connect(compressor);
+
+        leftGainRef.current = leftGain;
+        rightGainRef.current = rightGain;
 
         if (ctx.state === "suspended") await ctx.resume();
         leftOscRef.current.start();
@@ -178,6 +242,19 @@ const Wavetuner = ({}) => {
         }
     };
 
+        useEffect(() => {
+            // console.log(leftVolume)
+        if (leftGainRef.current) {
+            leftGainRef.current.gain.setValueAtTime(leftVolume, audioCtxRef.current.currentTime);
+        }
+        }, [leftVolume]);
+
+        useEffect(() => {
+            // console.log(rightVolume)
+        if (rightGainRef.current) {
+            rightGainRef.current.gain.setValueAtTime(rightVolume, audioCtxRef.current.currentTime);
+        }
+        }, [rightVolume]);
 
 
   useEffect(() => {
@@ -195,62 +272,75 @@ const Wavetuner = ({}) => {
     }, [rightWave, isPlaying])
 
 const crossfadeOscillator = async (channel, newWave) => {
-    const ctx = audioCtxRef.current;
-    if (!ctx) return;
-    audioCtxRef.current.suspend()
-    const compressor = ctx.compressor;
+  const ctx = audioCtxRef.current;
+  if (!ctx) return;
+  audioCtxRef.current.suspend();
+  const compressor = compressorRef.current;
 
-    const freq = channel === "left" ? leftFreq : rightFreq;
-    const oldOscRef = channel === "left" ? leftOscRef : rightOscRef;
-    const oldGainRef = channel === "left" ? leftGainRef : rightGainRef;
-    const oldPanRef = channel === "left" ? leftPanRef : rightPanRef;
+  const freq = channel === "left" ? leftFreq : rightFreq;
+  const oldOscRef = channel === "left" ? leftOscRef : rightOscRef;
+  const oldGainRef = channel === "left" ? leftGainRef : rightGainRef;
+  const oldPanRef = channel === "left" ? leftPanRef : rightPanRef;
 
-    // 1. Fade out old gain quickly
-    const now = ctx.currentTime;
-    const FADE_OUT = 0.035; // 35ms
-    if (oldGainRef.current) {
-        oldGainRef.current.gain.cancelScheduledValues(now);
-        oldGainRef.current.gain.setValueAtTime(oldGainRef.current.gain.value, now);
-        oldGainRef.current.gain.linearRampToValueAtTime(0, now + FADE_OUT);
+  // Fade out
+  const now = ctx.currentTime;
+  const FADE_OUT = 0.035;
+  if (oldGainRef.current) {
+    oldGainRef.current.gain.cancelScheduledValues(now);
+    oldGainRef.current.gain.setValueAtTime(oldGainRef.current.gain.value, now);
+    oldGainRef.current.gain.linearRampToValueAtTime(0, now + FADE_OUT);
+  }
+
+  setTimeout(() => {
+    oldOscRef.current?.stop();
+    oldOscRef.current?.disconnect();
+    oldGainRef.current?.disconnect();
+    oldPanRef.current?.disconnect();
+
+    // ---- Here's the important bit: create new analyser for the correct channel
+    const newOsc = ctx.createOscillator();
+    newOsc.type = newWave;
+    newOsc.frequency.value = freq;
+
+    const newPan = ctx.createStereoPanner();
+    newPan.pan.value = channel === "left" ? -1 : 1;
+
+    const newGain = ctx.createGain();
+    const targetVol = channel === "left" ? leftVolume : rightVolume;
+    newGain.gain.value = 0;
+
+    const newAnalyser = ctx.createAnalyser();
+
+    // Connect: osc → pan → gain → analyser → compressor
+    newOsc.connect(newPan);
+    newPan.connect(newGain);
+    newGain.connect(compressor);
+    compressor.connect(newAnalyser); 
+    newOsc.start();
+
+    const startTime = ctx.currentTime;
+    const FADE_IN = 0.045;
+    newGain.gain.cancelScheduledValues(startTime);
+    newGain.gain.setValueAtTime(0, startTime);
+    newGain.gain.linearRampToValueAtTime(targetVol, startTime + FADE_IN);
+
+    // Re-assign refs correctly
+    if (channel === "left") {
+      leftOscRef.current = newOsc;
+      leftGainRef.current = newGain;
+      leftPanRef.current = newPan;
+      leftAnalyserRef.current = newAnalyser;
+    } else {
+      rightOscRef.current = newOsc;
+      rightGainRef.current = newGain;
+      rightPanRef.current = newPan;
+      rightAnalyserRef.current = newAnalyser;
     }
 
-    // 2. After fade out, stop/disconnect old osc, then start new one
-    setTimeout(() => {
-        oldOscRef.current?.stop();
-        oldOscRef.current?.disconnect();
-        oldGainRef.current?.disconnect();
-        oldPanRef.current?.disconnect();
+    audioCtxRef.current.resume();
 
-        // Create new osc
-        const newOsc = ctx.createOscillator();
-        newOsc.type = newWave;
-        newOsc.frequency.value = freq;
-        const newPan = ctx.createStereoPanner();
-        newPan.pan.value = channel === "left" ? -1 : 1;
-        const newGain = ctx.createGain();
-        newGain.gain.value = 0; // Start silent
-        newOsc.connect(newPan).connect(newGain).connect(compressor);
-        newOsc.start();
-
-        // Fade in
-        const startTime = ctx.currentTime;
-        const FADE_IN = 0.045;
-        newGain.gain.cancelScheduledValues(startTime);
-        newGain.gain.setValueAtTime(0, startTime);
-        newGain.gain.linearRampToValueAtTime(1, startTime + FADE_IN);
-
-        // Re-assign refs
-        if (channel === "left") {
-            leftOscRef.current = newOsc;
-            leftGainRef.current = newGain;
-            leftPanRef.current = newPan;
-        } else {
-            rightOscRef.current = newOsc;
-            rightGainRef.current = newGain;
-            rightPanRef.current = newPan;
-        }
-        audioCtxRef.current.resume()
-    }, FADE_OUT * 1000 + 10);
+    setAnalyserUpdate(prev => prev +1)
+  }, FADE_OUT * 1000 + 10);
 };
 
     const stopAudio = () => {
@@ -291,6 +381,8 @@ const crossfadeOscillator = async (channel, newWave) => {
             showSine={true}
             width={280}
             height={sliderRef?.current?.offsetHeight}
+            minFreq={MIN_FREQ}
+            maxFreq={MAX_FREQ}
         />,
         <SpectrumAnalyzer
             key="sine"
@@ -300,6 +392,8 @@ const crossfadeOscillator = async (channel, newWave) => {
             showSine={true}
             width={280}
             height={sliderRef?.current?.offsetHeight}
+            minFreq={MIN_FREQ}
+            maxFreq={MAX_FREQ}
         />,
         <SpectrumAnalyzer
             key="bars"
@@ -309,6 +403,8 @@ const crossfadeOscillator = async (channel, newWave) => {
             showSine={false}
             width={280}
             height={sliderRef?.current?.offsetHeight}
+            minFreq={MIN_FREQ}
+            maxFreq={MAX_FREQ}
         />,
         <WaveForm 
             leftFreq={leftFreq} 
@@ -317,8 +413,11 @@ const crossfadeOscillator = async (channel, newWave) => {
             isPlaying={isPlaying}
         />]
     )
-  }, [leftAnalyserRef, rightAnalyserRef, isPlaying])
+  }, [leftAnalyserRef, rightAnalyserRef, isPlaying, analyserUpdate])
 
+  useEffect(() => {
+        // console.log(leftAnalyserRef.current)
+  }, [leftGainRef, rightGainRef, leftVolume, rightVolume])
 
     const updateCompValue = (key, val) => {
     setCompVals(prev => {
@@ -331,7 +430,7 @@ const crossfadeOscillator = async (channel, newWave) => {
     };
 
   return (
-    <Stack spacing={0} alignItems="center" justifyContent={'flex-start'} sx={{ p: 4, maxWidth: 500, mx: "auto", height: '100%', width: '100%'}} bgcolor={'black'}>
+    <Stack spacing={0} alignItems="center" justifyContent={'center'} sx={{ p: 4, maxWidth: 500, mx: "auto", height: '100%', width: '100%'}} bgcolor={'black'}>
 
         <Stack alignItems={'center'}>
             <Typography color="white" fontFamily={'fredoka regular'} fontSize={20} variant="h7">SOL Vibes</Typography>
@@ -342,7 +441,7 @@ const crossfadeOscillator = async (channel, newWave) => {
             </Stack>
 
 
-            <Stack height='auto' paddingBottom='5px'>
+            <Stack justifyItems={'center'} alignItems={'center'} height='max-content' paddingBottom='5px' width={'90vw'}>
                 <Header tab={selectedTab} setTab={setSelectedTab}/>
             </Stack>
 
@@ -350,7 +449,14 @@ const crossfadeOscillator = async (channel, newWave) => {
 
                 <AnimatePresence>
                     <MotionStack  sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'presets'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
-                        <BinauralPresets leftFreq={leftFreq} rightFreq={rightFreq} setLeftFreq={setLeftFreq} setRightFreq={setRightFreq}/>
+                        <BinauralPresets 
+                            leftFreq={leftFreq} 
+                            rightFreq={rightFreq} 
+                            setLeftFreq={setLeftFreq} 
+                            setRightFreq={setRightFreq}
+                            minFreq={MIN_FREQ}
+                            maxFreq={MAX_FREQ}
+                        />
                     </MotionStack>
                 </AnimatePresence>
 
@@ -362,7 +468,7 @@ const crossfadeOscillator = async (channel, newWave) => {
 
                 <AnimatePresence>
                     <MotionStack sx={{overflow: 'hidden', width: '100%'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'tuner'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
-                        <Stack direction={'row'} alignItems={'center'} justifyContent={'center'} height={'100%'} width={'100%'} sx={{zoom: 0.55}} borderRadius={3}>
+                        <Stack direction={'row'} alignItems={'center'} justifyContent={'center'} height={'100%'} width={'100%'} sx={{zoom: 0.75}} borderRadius={3}>
                             <FrequencyTuner 
                                 tunerRef={ftlRef} 
                                 freq={leftFreq} 
@@ -396,6 +502,107 @@ const crossfadeOscillator = async (channel, newWave) => {
                 <AnimatePresence>
                     <MotionStack sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'compressor'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
                         <Compressor values={compVals} setValue={updateCompValue} />
+                    </MotionStack>
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    <MotionStack justifyContent={'center'} sx={{overflow: 'hidden', width: '100%'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'volume'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                       <Stack direction="row" spacing={2} height={'100%'} width={'100%'}>
+                        
+                        <Stack spacing={2} alignItems={'center'} width={'33%'}>
+                        <Typography color="white">Left Vol</Typography>
+                        <MuiSlider
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={leftVolume}
+                            onChange={(_, val) => setLeftVolume(val)}
+                            style={{ width: 50 }}
+                            orientation="vertical"
+                            />
+                        </Stack>
+                        <Stack spacing={2} alignItems={'center'} width={'33%'}>
+                        <Typography color="white">Main Vol</Typography>
+                        <MuiSlider
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={Math.min(rightVolume, leftVolume)}
+                            onChange={(_, val) => {
+                                setRightVolume(val)
+                                setLeftVolume(val)
+                            }}
+                            style={{ width: 50 }}
+                            orientation="vertical"
+                            />
+                        </Stack>
+                        <Stack spacing={2} alignItems={'center'} width={'33%'}>
+                        <Typography color="white">Right Vol</Typography>
+                        <MuiSlider
+                            min={0}
+                            max={1}
+                            step={0.01}
+                            value={rightVolume}
+                            onChange={(_, val) => setRightVolume(val)}
+                            style={{ width: 50 }}
+                            orientation="vertical"
+                            />
+                        </Stack>
+                        </Stack>
+                    </MotionStack>
+                </AnimatePresence>
+
+                <AnimatePresence>
+                    <MotionStack sx={{overflow: 'hidden'}} initial={{height: 0, opacity: 0, display: 'none'}} animate={selectedTab === 'vumeter'? {height: '100%', opacity: 1, display: 'flex'} : {height: 0, display: 'none'}} exit={{height: 0, opacity: 0, display: 'none'}} transition={{duration: 1}}>
+                        <Stack direction="row" spacing={2} height={'100%'} width={'100%'}>
+                            <Stack spacing={2} alignItems={'center'} width={'50%'}>
+                            <Typography color="white">{`L ${leftPeak}`}</Typography>
+                            <Typography color="white">{`${lPeakMax}`}</Typography>
+                            <MuiSlider
+                                min={0}
+                                max={100}
+                                step={0.01}
+                                value={leftPeak}
+                                style={{ width: 50 }}
+                                orientation="vertical"
+                                sx={{
+                                    '& .MuiSlider-thumb': { display: 'none' },
+                                    '& .MuiSlider-track': { bgcolor: lPeakMax == 100 ? 'red' : '#1976d2'}
+                                }}
+                                />
+                            </Stack>
+
+                            <Stack spacing={2} alignItems={'center'} width={'50%'}>
+                            <Typography color="white">Monitor Rls</Typography>
+                            <Typography color="white">{`${vuRelease / 1000}s`}</Typography>
+                            <MuiSlider
+                                min={0}
+                                max={3000}
+                                step={100}
+                                onChange={(_, val) => setVuRelease(val)}
+                                value={vuRelease}
+                                style={{ width: 50}}
+                                orientation="vertical"
+                                />
+                            </Stack>
+
+                            <Stack spacing={2} alignItems={'center'} width={'50%'}>
+                            <Typography color="white">{`R ${rightPeak}`}</Typography>
+                            <Typography color="white">{`${rPeakMax}`}</Typography>
+                            <MuiSlider
+                                min={0}
+                                max={100}
+                                step={0.01}
+                                value={rightPeak}
+                                style={{ width: 50 }}
+                                orientation="vertical"
+                                sx={{
+                                    '& .MuiSlider-thumb': { display: 'none' },
+                                    '& .MuiSlider-track': { bgcolor: rPeakMax == 100 ? 'red' : '#1976d2'}
+                                }}
+                                />
+                            </Stack>
+                        </Stack>
                     </MotionStack>
                 </AnimatePresence>
             </Stack>

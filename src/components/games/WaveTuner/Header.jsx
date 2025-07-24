@@ -19,15 +19,23 @@ const Header = ({tab, setTab}) => {
         {
             name: 'compressor',
             display: 'Compressor',
+        },
+        {
+            name: 'volume',
+            display: 'Volume',
+        },
+        {
+            name: 'vumeter',
+            display: 'Vu',
         }
     ]
 
 
   return (
-    <Stack direction={'row'} width={'100%'} height={'100%'} spacing={2}>
+    <Stack direction={'row'} width={'90%'} height={'100%'} spacing={1} justifyContent={'flex-start'} alignItems={'center'} sx={{overflowX: 'auto'}}>
         {menuTabs?.map((t, i) => {
             return  <Box key={i}>
-                        <Button variant={tab === t.name ? 'outlined' : 'contained'} sx={{bgcolor: tab === t.name ? '#937bdb' : '#372248', fontSize: 10}} onClick={() => setTab(t.name)}>{t.display}</Button>
+                        <Button variant={tab === t.name ? 'outlined' : 'contained'} sx={{bgcolor: tab === t.name ? '#937bdb' : '#372248', fontSize: 10, width: 'fit-content', maxWidth: '100px'}} onClick={() => setTab(t.name)}>{t.display}</Button>
                     </Box>
         })}
     </Stack>
