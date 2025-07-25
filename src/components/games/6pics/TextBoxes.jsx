@@ -390,17 +390,30 @@ useEffect(() => {
         return (
             <TextField
               key={`char-${wordIndex}-${charIndex}`}
-              value={inputLetters[currentIndex] || ""}
+              id='sixpicsinput'
+              value={inputLetters[currentIndex]?.toUpperCase() || ""}
               inputRef={(el) => (inputRefs.current[currentIndex] = el)}
               onClick={() => setNextFocusIndex(currentIndex)} // for focus movement
               onFocus={() => setFocusedIndex(currentIndex)}
               slotProps={{
                 input: {
                   readOnly: true,
-                  style: { textAlign: "center", fontSize: "1rem", width: textBoxWidth },
+                  style: { 
+                    textAlign: "center", 
+                    fontSize: "1rem", 
+                    width: textBoxWidth, 
+                    fontWeight: 'bolder', 
+                    height: '2.4375em',
+                  },
                 },
               }}
-              sx={{ marginX: 0.25, transition: "all 0.3s", textTransform: 'uppercase' }}
+              sx={{ 
+                textAlign: 'center', 
+                marginX: 0.25, 
+                transition: "all 0.3s", 
+                textTransform: 'uppercase',
+                display: 'flex'
+              }}
             />
               );
             } else {
