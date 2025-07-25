@@ -400,7 +400,7 @@ useEffect(() => {
                   style: { textAlign: "center", fontSize: "1rem", width: textBoxWidth },
                 },
               }}
-              sx={{ marginX: 0.25, transition: "all 0.3s" }}
+              sx={{ marginX: 0.25, transition: "all 0.3s", textTransform: 'uppercase' }}
             />
               );
             } else {
@@ -411,6 +411,7 @@ useEffect(() => {
                   component="span"
                   mx={0.5}
                   fontFamily="Fredoka"
+                  sx={{textTransform: 'uppercase' }}
                 >
                   {char}
                 </Typography>

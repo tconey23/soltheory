@@ -28,9 +28,12 @@
 
 .simple-keyboard .hg-button {
   flex: 1 0 auto !important; /* allow consistent width */
-  width: 50px;
-  min-width: 30px !important;
-  padding: 5px !important; /* consistent height and spacing */
+  width: 45px;
+  min-width: 36px !important;
+  padding: 5px !important; 
+  font-size: 25px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
 }
 
 .simple-keyboard .hg-row {
