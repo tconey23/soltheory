@@ -26,6 +26,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
     const [expandAddNewPack, setExpandAddNewPack] = useState(false)
     const [resetForm, setResetForm] = useState(0)
     const [mobile, setMobile] = useState(false)
+    const [packSorts, setPackSorts] = useState([])
 
     const {screen} = useGlobalStore()
     
@@ -108,10 +109,19 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                     </AccordionSummary>
                     <AccordionDetails>
                     
-                <List>
+                <List key={resetForm}>
                     {packs.length > 0 &&
                         packs.filter((pk) => !pk.marked_for_delete)
+                        .sort((a,b) => a.sort_order - b.sort_order)
                         .map((p, i) => {
+                            
+                            if(!packSorts.includes(p.sort_order)){
+                                setPackSorts(prev => ([
+                                    ...prev,
+                                    p.sort_order
+                                ]))
+                            }
+                            
                             let fields = Object.entries(p);
                             let count = fields.length;
                             const percentWidth = (1 / count) * 85;
@@ -132,7 +142,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                             });
                             
                             return (
-                                <ListItem key={i}>
+                                <ListItem key={i} sx={{width: '100%'}} >
                                     <Tooltip
                                         title={`Edit ${p['pack_name']}`}
                                         placement="top"
@@ -148,7 +158,6 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                                             boxShadow={isHover == i ? '5px 5px 16px 0px #00000045' : 'none'}
                                             borderRadius={10}
                                             padding={1}
-                                            onClick={() => setSelection(p['pack_name'])}
                                             onMouseOver={() => setisHover(i)} 
                                             onMouseOut={() => setisHover(null)}
                                             >
@@ -160,7 +169,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                                                     borderRadius: 10,
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    justifyContent: 'center',
+                                                    justifyContent: 'space-evenly',
                                                     overflow: 'hidden',
                                                     transition: 'all 1s ease-in-out'
                                                 }}
@@ -172,9 +181,12 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                                                 let formattedName = `${firstLetter}${nameEnding.join().replaceAll(',', '')}`
                                                 
                                                 return (
-                                                    <PackLIstItem key={f[0]} name={formattedName} value={f[1]} percentWidth={percentWidth}/>
+                                                    <PackLIstItem key={f[0]} setResetForm={setResetForm} packId={p.id} packSorts={packSorts} name={formattedName} value={f[1]} percentWidth={percentWidth} packCount={packs.length}/>
                                                 )
                                             })}
+                                            <Button onClick={() => setSelection(p['pack_name'])}>
+                                                <i class="fi fi-br-angle-right"></i>
+                                            </Button>
                                             </ButtonBase>
                                         </Stack>
                                     </Tooltip>
@@ -192,7 +204,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                         <Typography textAlign={'center'}>
                             <i style={{color: 'red', fontSize: '20px', margin: 20}} className="fi fi-sr-exclamation"></i>
                         </Typography>
-                        <Typography textAlign={'center'}>This option must be viewed on a desktop device</Typography>
+                        <Typography textAlign={'center'}>This module must be viewed on a desktop device</Typography>
                         <Button onClick={() => setSelectedOption(null)} >Back</Button>
                     </Stack>
                 </Stack>

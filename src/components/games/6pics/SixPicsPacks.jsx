@@ -69,7 +69,9 @@ useEffect(() => {
         <Typography fontFamily={'Fredoka Regular'} fontSize={40}>Select Pack</Typography>
         <Stack userdata='list_container' sx={{overflow: 'auto'}} height={'100%'} width={'100%'} justifyContent={'center'}>
             <List userdata='pack_list' sx={{width: '100%', alignItems: 'center'}}>
-                {packs && packs.map((p, i) => {
+                {packs && packs
+                .sort((a,b) => b.sort_order - a.sort_order)
+                .map((p, i) => {
                     let fileType = p.graphic
                     return (
                         <ListItem

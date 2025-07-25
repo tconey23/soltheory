@@ -83,7 +83,7 @@ const Pic6 = ({demo}) => {
               return !p.marked_for_delete
             } 
           })
-          let sortedPacks = filteredPacks.sort((a, b) => b.id - a.id);
+          let sortedPacks = filteredPacks.sort((a, b) => a.sort_order - b.sort_order);
           
           setPacks(sortedPacks)
         }
