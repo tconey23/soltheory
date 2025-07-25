@@ -107,9 +107,9 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                     <AccordionSummary>
                         Existing packs
                     </AccordionSummary>
-                    <AccordionDetails>
+                    <AccordionDetails key={resetForm}>
                     
-                <List key={resetForm}>
+                <List >
                     {packs.length > 0 &&
                         packs.filter((pk) => !pk.marked_for_delete)
                         .sort((a,b) => a.sort_order - b.sort_order)
@@ -181,7 +181,7 @@ const SPAdminPacks = ({setForceRefresh, forceRefresh, setSelectedOption}) => {
                                                 let formattedName = `${firstLetter}${nameEnding.join().replaceAll(',', '')}`
                                                 
                                                 return (
-                                                    <PackLIstItem key={f[0]} setResetForm={setResetForm} packId={p.id} packSorts={packSorts} name={formattedName} value={f[1]} percentWidth={percentWidth} packCount={packs.length}/>
+                                                    <PackLIstItem key={f[0]} getAllPacks={getAllPacks} setResetForm={setResetForm} packId={p.id} packSorts={packSorts} name={formattedName} value={f[1]} percentWidth={percentWidth} packCount={packs.length}/>
                                                 )
                                             })}
                                             <Button onClick={() => setSelection(p['pack_name'])}>

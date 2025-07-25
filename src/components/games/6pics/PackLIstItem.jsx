@@ -3,7 +3,7 @@ import { MenuItem, Select, Stack, Typography } from '@mui/material';
 import { supabase } from '../../../business/supabaseClient';
 import {ListItem} from '@mui/material';
 
-const PackLIstItem = ({name, value, packSorts, packId, setResetForm}) => {
+const PackLIstItem = ({name, value, packSorts, packId, setResetForm, getAllPacks}) => {
 
     const [sortNumber, setSortNumber] = useState()
 
@@ -45,11 +45,12 @@ const PackLIstItem = ({name, value, packSorts, packId, setResetForm}) => {
       // Optionally revert previous update if needed
       return;
     }
+    getAllPacks()
+    setResetForm(prev => prev + 1);
   }
 
   // 4. Update local state and trigger refresh
   setSortNumber(newSortNumber);
-  setResetForm(prev => prev + 1);
 };
 
     useEffect(() => {
