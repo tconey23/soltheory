@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
 import { Link } from "react-router-dom";
 import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
+import { Ellipse } from "pixi.js";
 
 const MotionStack = motion(Stack);
+const MotionText = motion(TextField)
 
 const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp, forceRefresh, setLevelsPlayed, isDemo}) => {
   const [inputLetters, setInputLetters] = useState([]);
@@ -27,6 +29,7 @@ const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wi
   const screen = useGlobalStore((state) => state.screen);
   const userMeta = useGlobalStore((state) => state.userMeta)
   const inputRefs = useRef([]);
+  const styleInputRef = useRef([])
 
   const parsedAnswer = answer.split("");
   const wordChunks = answer.match(/[\w']+|[^\w\s]/g);
@@ -353,10 +356,31 @@ useEffect(() => {
   inputRefs.current = [];
 }, [answer, index]);
 
+const elLoop = (parent, len) => {
+  let array = []
+  for(let i=0; i < parent.length +len; i++){
+    array.push(parent[i]) 
+  }
+
+  return array 
+} 
+
+
+useEffect(() => {
+
+  console.clear()
+
+  styleInputRef.current?.forEach((r) => {
+    r.children[0].firstChild.style.backgroundColor = ''
+    console.log(r.children[0].firstChild.style.backgroundColor)
+  })
+  
+}, [styleInputRef]) 
+
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="100%" height='100%' justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
+    <Stack direction="column" width="97%" height='100%' justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
@@ -374,7 +398,7 @@ useEffect(() => {
       >
       {wordChunks.map((word, wordIndex) => (
         <Stack
-          key={`word-${wordIndex}`}
+          key={`word-${wordIndex}`} 
           direction="row"
           justifyContent="center"
           alignItems="center"
@@ -388,8 +412,12 @@ useEffect(() => {
       if (isAlphaNum) {
         const currentIndex = cleanedIndex++;
         return (
-            <TextField
+            <MotionText
+              initial={{transform: 'rotate3d(0, 1, 0, 344deg)', boxShadow: '1px 0px 3px 0px #00000045'}}
+              animate={{transform: 'rotate3d(0, 1, 0, 0deg)', boxShadow: '1px 0px 3px 0px #0000000'}}
+              transition={{duration: 1, delay: currentIndex * 0.07 }}
               key={`char-${wordIndex}-${charIndex}`}
+              ref={el => styleInputRef.current[currentIndex] = el}
               id='sixpicsinput'
               value={inputLetters[currentIndex]?.toUpperCase() || ""}
               inputRef={(el) => (inputRefs.current[currentIndex] = el)}
@@ -400,10 +428,11 @@ useEffect(() => {
                   readOnly: true,
                   style: { 
                     textAlign: "center", 
-                    fontSize: "1rem", 
+                    fontSize: "1.5rem", 
                     width: textBoxWidth, 
                     fontWeight: 'bolder', 
-                    height: '2.4375em',
+                    height: '3rem',
+                    borderWidth: '0px'
                   },
                 },
               }}
@@ -412,7 +441,10 @@ useEffect(() => {
                 marginX: 0.25, 
                 transition: "all 0.3s", 
                 textTransform: 'uppercase',
-                display: 'flex'
+                display: 'flex',
+                fontSize: "1.5rem",
+                borderWidth: '0px',
+                
               }}
             />
               );
