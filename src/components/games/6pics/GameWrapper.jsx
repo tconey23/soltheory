@@ -12,6 +12,7 @@ import confetti from 'canvas-confetti';
 import useGlobalStore from '../../../business/useGlobalStore';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
+import ReactPlayer from 'react-player'
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -197,7 +198,7 @@ const GameWrapper = ({ pack, setPack }) => {
     <Stack direction="column" sx={{ height: height, width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
       <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
         
-          <Box sx={{width: '33%'}}>
+          <Box sx={{width: '33%', marginBottom: 2}}>
             <Button onClick={() => {
               if(isDemo){
                 navTo(loc?.pathname)
@@ -288,6 +289,7 @@ const GameWrapper = ({ pack, setPack }) => {
                     setAttempts={setAttempts}
                     playStage={playStage}
                     setPlayStage={setPlayStage}
+                    level={level}
                   />
                 </Stack>
               )}

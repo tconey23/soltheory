@@ -7,7 +7,45 @@ import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
 const MotionStack = motion(Stack);
 const MotionText = motion(TextField)
 
+function VideoLastFrame({ src, width = "100%", height = "auto" }) {
+  const videoRef = useRef();
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const showLastFrame = () => {
+      video.currentTime = video.duration || 0;
+      // Pause so it doesn't play the last moment
+      video.pause();
+    };
+
+    video.addEventListener("loadedmetadata", showLastFrame);
+
+    // In case metadata was loaded before this effect runs
+    if (video.readyState >= 1) showLastFrame();
+
+    return () => {
+      video.removeEventListener("loadedmetadata", showLastFrame);
+    };
+  }, [src]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      width={width}
+      height={height}
+      muted
+      preload="metadata"
+      style={{ objectFit: "contain", borderRadius: 8 }}
+      controls={false}
+    />
+  );
+}
+
 const TextBoxes = ({ 
+  level,
   setEnablePlay, 
   answer, 
   setWins, 
@@ -46,6 +84,8 @@ const TextBoxes = ({
   const [reloadHints, setReloadHints] = useState(0)
   const [keyboardInput, setKeyboardInput] = useState('')
   const [focusedIndex, setFocusedIndex] = useState(0);
+
+  const videoRef = useRef()
 
 
   const screen = useGlobalStore((state) => state.screen);
@@ -348,6 +388,7 @@ useEffect(() => {
     
   const [dev, setDev] = useState('')
   const [windowVPH, setWindowVPH] = useState(0)
+  const [windowVPW, setWindowVPW] = useState(0)
   const [initialVPH, setInitialVPH] = useState(0)
 
   useEffect(() => {
@@ -359,6 +400,7 @@ useEffect(() => {
     return () => {
       window.visualViewport?.removeEventListener('resize', onResize)
       setWindowVPH(document?.getElementById('game_stage')?.offsetHeight)
+      setWindowVPW(document?.getElementById('game_stage')?.offsetWidth)
     }
   }, []);
 
@@ -379,44 +421,37 @@ useEffect(() => {
   }, [windowVPH, dev])
 
   useEffect(() => {
-  const cleaned = answer.replace(/[^\w]|_/g, "");
-  setLetterTarget(cleaned.length);
-  setInputLetters(new Array(cleaned.length).fill(""));
-  setHintIndex(0);
-  setWrongAnswer(false);
-  setIsWin(false);
-  setToggleCheckAnswer(false);
-  setToggleHint(true);
-  setLetterCount(0);
-  inputRefs.current = [];
-}, [answer, index]);
-
-const elLoop = (parent, len) => {
-  let array = []
-  for(let i=0; i < parent.length +len; i++){
-    array.push(parent[i]) 
-  }
-
-  return array 
-} 
+    const cleaned = answer.replace(/[^\w]|_/g, "");
+    setLetterTarget(cleaned.length);
+    setInputLetters(new Array(cleaned.length).fill(""));
+    setHintIndex(0);
+    setWrongAnswer(false);
+    setIsWin(false);
+    setToggleCheckAnswer(false);
+    setToggleHint(true);
+    setLetterCount(0);
+    inputRefs.current = [];
+  }, [answer, index]);
 
 useEffect(() => {
-  console.log(keyboardInput)
+  // console.log(keyboardInput)
 }, [keyboardInput])
 
 
 useEffect(() => {
-
+  let inputWidth = styleInputRef?.current.offsetWidth
   styleInputRef.current?.forEach((r) => {
     r.children[0].firstChild.style.backgroundColor = ''
   })
+
+  setAutoAnswer(false)
   
-}, [styleInputRef]) 
+}, [styleInputRef, windowVPW]) 
 
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="97%" height='100%' justifyContent="center" alignItems={'center'} sx={{scale: 0.90}}>
+    <Stack direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
@@ -499,7 +534,7 @@ useEffect(() => {
               )
             }
           })}
-        </Stack>
+        </Stack> 
       ))}
 
         <Stack width={'100%'}>
@@ -507,50 +542,28 @@ useEffect(() => {
         </Stack>
 
     </Stack>
-
-      {/* <Stack alignItems={'center'} justifyContent={'flex-start'} height={'100%'} margin={'10px'} width={'75%'}>
-        
-        {<Link onClick={() => {
-          if(levelScore[index]?.hints > 0){
-            getHint()
-          } else {
-            setMoreHints(true)
-          }
-        }} disabled={hintIndex >= letterTarget}>{levelScore[index]?.hints > 0 ? `Hint (${levelScore[index]?.hints})` : 'Get more hints'}</Link>}
-
-        {!isWin && !giveUp &&
-        <Button
-          disabled={!toggleCheckAnswer}
-          sx={{ margin: 2 }}
-          onClick={checkAnswer}
-          variant="contained"
-        >
-          Check Answer
-        </Button>}
-        {!giveUp && userMeta?.is_admin && <Link onClick={() => setIsWin(true)}>Skip</Link>}
-        {!giveUp && <Link onClick={() => handleClear()}>Clear</Link>}
-      </Stack> */}
       <Modal
         open={!!isWin}
         >
         <Stack height={'100%'} bgcolor={'#00000063'} justifyContent={'center'}>
             <MotionStack
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2 }}
-            bgcolor="#ffffffe0"
-            width="100%"
-            height="25vh"
-            justifyContent="center"
-            alignItems="center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2 }}
+              bgcolor="#ffffffe0"
+              width="100%"
+              height="50vh"
+              justifyContent="center"
+              alignItems="center"
             >
-            <Typography color="green" fontSize={30}><i className="fi fi-rr-laugh-beam"></i></Typography>
-            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
-            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
-            <Button onClick={() => {
-              next()
-              setLevelsPlayed(prev => prev +1)
-            }} variant="contained">Continue</Button>
+              <Typography color="green" fontSize={30}><i className="fi fi-rr-laugh-beam"></i></Typography>
+              <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
+              <VideoLastFrame src={level?.public_url} width="100%" height={150} />
+              <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
+              <Button onClick={() => {
+                next()
+                setLevelsPlayed(prev => prev +1)
+              }} variant="contained">Continue</Button>
             </MotionStack>
         </Stack>
       </Modal>

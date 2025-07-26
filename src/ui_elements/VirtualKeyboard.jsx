@@ -10,8 +10,11 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
   useEffect(() => {
     // console.log(!toggleCheckAnswer && hintIndex <= 0)
 
-    if(showGiveUp && !giveUp) {
+    if(showGiveUp && !giveUp && !toggleCheckAnswer) {
       setLayoutName("giveup")
+      return
+    } else if(showGiveUp && !giveUp && toggleCheckAnswer) {
+      setLayoutName("giveuporcheck")
       return
     }
 
@@ -32,6 +35,14 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       setLayoutName("withGetHint");
     }
   }, [hintIndex, toggleCheckAnswer, showGiveUp, giveUp]);
+
+  const customKeys = {
+    hint : { "{hint}": `💡 Hint ${hintIndex}`},
+    gethints : {"{gethint}": "Add hints"},
+    check : {"{check}": `✅ Check`,},
+    bksp : {"{bksp}": "⌫"},
+    play : {"{play}": `<i class="fi fi-sr-play-pause"></i>`}
+  }
 
   const layouts = {
     withoutCheck: [
@@ -68,7 +79,13 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       "q w e r t y u i o p",
       "a s d f g h j k l",
       "z x c v b n m {bksp}",
-      "{giveup}"
+      "{hint} {giveup}"
+    ],
+    giveuporcheck: [
+      "q w e r t y u i o p",
+      "a s d f g h j k l",
+      "z x c v b n m {bksp}",
+      "{hint} {giveup} {check}"
     ]
   };
 
@@ -100,8 +117,15 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       "{next}": "Next Pic",
     },
     giveup: {
+      "{hint}": `💡 Hint ${hintIndex}`,
       "{bksp}": "⌫",
       "{giveup}": "Give Up",
+    },
+    giveuporcheck: {
+      "{hint}": `💡Hint ${hintIndex}`,
+      "{bksp}": "⌫",
+      "{giveup}": "Give Up",
+      "{check}": `✅Check`,
     }
   };
 
