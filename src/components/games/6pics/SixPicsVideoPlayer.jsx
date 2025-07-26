@@ -18,18 +18,21 @@ const SixPicsVideoPlayer = ({
   setLevelScore,
   levelScore,
   levelsPlayed,
-  levels
+  levels,
+  setEnablePlay,
+  enablePlay,
+  attempts, 
+  setAttempts,
+  playStage,
+  setPlayStage
 }) => {
   const videoRef = useRef(null);
   const screen = useGlobalStore((state) => state.screen);
   const userMeta = useGlobalStore((state) => state.userMeta)
-
   const [stage, setStage] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [enablePlay, setEnablePlay] = useState(false)
-  const [playStage, setPlayStage] = useState(false)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [attempts, setAttempts] = useState(0)
+  
 
   const [from, setFrom] = useState(0)
   const [to, setTo] = useState(0)
@@ -69,7 +72,13 @@ useEffect(()=>{
 }, [levelsPlayed])
 
 
-  
+useEffect(() => {
+
+  if(playStage && stage > 0){
+    setAttempts(prev => prev +1)
+  }
+
+}, [playStage])
 
   const stages = useMemo(() => {
     if (!level?.stops?.length || !level?.loops?.length) return [];
@@ -187,67 +196,35 @@ useEffect(() => {
 
   return (
     <Stack backgroundColor="white" justifyContent="center" alignItems="center" height={height * .25} width={screen === 'xs' ? width * 0.95 : '50%'}>
-      <Stack width="100%" height="100%" justifyContent="center" alignItems="center" sx={{ opacity: isLoaded ? 1 : 1 }}>
-          <ReactPlayer
-            ref={videoRef}
-            src={level?.public_url}
-            playing={playStage}
-            controls={false}
-            loop={false}
-            onPlay={() => setIsPlaying(true)}
-            onPause={() => setIsPlaying(false)}
-            onCanPlay={() => handleLoaded(true)}
-            start={from || 0}
-            playsInline={true}
-            autoplay={true}
-          />
+      <Stack width="100%" height="auto" justifyContent="center" alignItems="center" sx={{ opacity: isLoaded ? 1 : 1 }}>
+          <Stack justifyContent={'center'} alignItems={'center'} height={'100%'} width={'100%'} paddingY={2}>
+          <Typography>{level.pack_name}</Typography>
+            <ReactPlayer
+              ref={videoRef}
+              src={level?.public_url}
+              playing={playStage}
+              controls={false}
+              loop={false}
+              onPlay={() => setIsPlaying(true)}
+              onPause={() => setIsPlaying(false)}
+              onCanPlay={() => handleLoaded(true)}
+              start={from || 0}
+              playsInline={true}
+              autoplay={true}
+              style={{zoom: 0.8}}
+            />
+          </Stack>
 
         <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'} sx={{marginTop: '1px', marginBottom: '10px'}}>
           <Stack>
             {/* <Typography>{`${currentTime} ${to}`}</Typography> */}
 
-            {isPlaying ? 
+            {isPlaying &&
 
               <Box sx={{height: '36.5px', width: '64px'}}>
                     <LoadingAnimation />
               </Box>
-
-              :
-
-              <>
-              {!showGiveUp && (
-              <Button disabled={!enablePlay} variant="contained" onClick={() => {
-                setPlayStage(true)
-                if(stage > 0){
-                  setAttempts(prev => prev +1)
-                }
-
-                }}>
-                    <i className="fi fi-sr-play-pause"></i>
-              </Button>
-            )}
-              </>
-            
             }
-
-            {showGiveUp && !giveUp && (
-              <Button variant="outlined" sx={{ backgroundColor: '#880202' }} onClick={() => setGiveUp(true)}>
-                Give Up
-              </Button>
-            )}
-
-            {giveUp && (
-              <Button variant="outlined" sx={{ backgroundColor: '#880202' }} onClick={() => {
-                next()
-                setGiveUp(false)
-                setShowGiveUp(false)
-                setEnablePlay(false)
-                setLevelsPlayed(prev => prev +1)
-                setAttempts(0)
-              }}>
-                Next
-              </Button>
-            )}
           </Stack>
         </Stack>
       </Stack>

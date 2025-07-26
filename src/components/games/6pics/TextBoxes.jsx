@@ -2,14 +2,36 @@ import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button, Modal, Slider, Box } from "@mui/material";
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
-import { Link } from "react-router-dom";
 import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
-import { Ellipse } from "pixi.js";
 
 const MotionStack = motion(Stack);
 const MotionText = motion(TextField)
 
-const TextBoxes = ({ answer, setWins, next, levelScore, index, setShowGiveUp, wins, isWin, setIsWin, setLevelScore, width, height, totalScore, giveUp, forceRefresh, setLevelsPlayed, isDemo}) => {
+const TextBoxes = ({ 
+  setEnablePlay, 
+  answer, 
+  setWins, 
+  next, 
+  levelScore, 
+  index, 
+  setShowGiveUp, 
+  wins, 
+  isWin, 
+  setIsWin, 
+  setLevelScore,
+  width, 
+  height, 
+  totalScore, 
+  giveUp, 
+  forceRefresh, 
+  setLevelsPlayed, 
+  isDemo, 
+  showGiveUp, 
+  setGiveUp,
+  attempts, 
+  setAttempts,
+  setPlayStage
+}) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
@@ -50,11 +72,24 @@ useEffect(() =>{
   if(keyboardInput){
     if(keyboardInput === '{hint}'){
       getHint()
+    } else if(keyboardInput === '{gethint}'){
+      setMoreHints(true)
     } else if(keyboardInput === '{check}'){
       checkAnswer()
     } else if (keyboardInput === '{bksp}') {
       const safeIndex = Math.max(0, Math.min(focusedIndex, inputLetters.length - 1));
       handleCharBackspace(keyboardInput, safeIndex);
+    } else if(keyboardInput === '{giveup}'){
+      setGiveUp(true)
+    } else if(keyboardInput === '{next}'){
+      next()
+      setGiveUp(false)
+      setShowGiveUp(false)
+      setEnablePlay(false)
+      setLevelsPlayed(prev => prev +1)
+      setAttempts(0)
+    } else if(keyboardInput === '{play}'){
+      setPlayStage(true)
     } else {
       handleCharInput(keyboardInput, letterCount)
     }
@@ -365,14 +400,15 @@ const elLoop = (parent, len) => {
   return array 
 } 
 
+useEffect(() => {
+  console.log(keyboardInput)
+}, [keyboardInput])
+
 
 useEffect(() => {
 
-  console.clear()
-
   styleInputRef.current?.forEach((r) => {
     r.children[0].firstChild.style.backgroundColor = ''
-    console.log(r.children[0].firstChild.style.backgroundColor)
   })
   
 }, [styleInputRef]) 
@@ -467,7 +503,7 @@ useEffect(() => {
       ))}
 
         <Stack width={'100%'}>
-          <VirtualKeyboard setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+          <VirtualKeyboard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
         </Stack>
 
     </Stack>

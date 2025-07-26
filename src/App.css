@@ -61,6 +61,31 @@ fieldset{
   justify-content: center;
 }
 
+.highlight-hint {
+  background: #ffe066 !important;
+  color: #000 !important;
+}
+.highlight-check {
+  background: #7ae7c7 !important;
+  color: #000 !important;
+}
+.highlight-wrong {
+  background: #ff8686 !important;
+  color: #fff !important;
+}
+.highlight-next {
+  background: #a263f4 !important;
+  color: #fff !important;
+}
+.highlight-play {
+  background: #009528 !important;
+  color: #fff !important;
+}
+.highlight-bksp {
+  background: #ff8686 !important;
+  color: #fff !important;
+}
+
 .simple-keyboard .hg-button[data-skbtn="{bksp}"],
 .simple-keyboard .hg-button[data-skbtn="{check}"],
 .simple-keyboard .hg-button[data-skbtn="{hint}"],

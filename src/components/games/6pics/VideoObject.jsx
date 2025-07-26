@@ -10,7 +10,7 @@ const VideoObject = ({fileInfo, URL, videoRef, w, h, outerWidth, outerHeight}) =
     <Stack
      direction={'column'} 
      sx={{ height: outerHeight ? outerHeight : '100%', width: outerWidth ? outerWidth : '50%' }} 
-     padding={1}
+     paddingY={1}
      justifyContent={'center'}
      alignItems={'center'}
      > 

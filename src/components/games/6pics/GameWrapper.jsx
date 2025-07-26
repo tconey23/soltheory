@@ -46,8 +46,11 @@ const GameWrapper = ({ pack, setPack }) => {
   const [showGiveUp, setShowGiveUp] = useState(false);
   const [giveUp, setGiveUp] = useState(false)
   const [isWin, setIsWin] = useState(false)
-  const { width, height } = useScreenSize();
+  const {width, height } = useScreenSize();
   const [forceRefresh, setForceRefresh] = useState(0)
+  const [enablePlay, setEnablePlay] = useState()
+  const [attempts, setAttempts] = useState(0)
+  const [playStage, setPlayStage] = useState(false)
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
@@ -252,6 +255,12 @@ const GameWrapper = ({ pack, setPack }) => {
                     setLevelsPlayed={setLevelsPlayed}
                     levelsPlayed={levelsPlayed}
                     levels={levels}
+                    setEnablePlay={setEnablePlay}
+                    enablePlay={enablePlay}
+                    attempts={attempts}
+                    setAttempts={setAttempts}
+                    playStage={playStage}
+                    setPlayStage={setPlayStage}
                   />
                   <TextBoxes
                     isDemo={isDemo}
@@ -267,11 +276,18 @@ const GameWrapper = ({ pack, setPack }) => {
                     setLevelScore={setLevelScore}
                     index={i}
                     setShowGiveUp={setShowGiveUp}
+                    showGiveUp={showGiveUp}
                     width={width}
                     height={height}
                     totalScore={totalScore}
                     giveUp={giveUp}
                     setLevelsPlayed={setLevelsPlayed}
+                    setGiveUp={setGiveUp}
+                    setEnablePlay={setEnablePlay}
+                    attempts={attempts}
+                    setAttempts={setAttempts}
+                    playStage={playStage}
+                    setPlayStage={setPlayStage}
                   />
                 </Stack>
               )}
