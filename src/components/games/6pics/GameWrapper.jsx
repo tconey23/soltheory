@@ -52,6 +52,7 @@ const GameWrapper = ({ pack, setPack }) => {
   const [enablePlay, setEnablePlay] = useState()
   const [attempts, setAttempts] = useState(0)
   const [playStage, setPlayStage] = useState(false)
+  const [stage, setStage] = useState(0)
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
@@ -146,7 +147,7 @@ const GameWrapper = ({ pack, setPack }) => {
       confetti({ ...confettiSettings, angle: 135, origin: { y: 0.8, x: 1 } });
     }
     if(gameOver){
-      setInGame(false)
+      setInGame(false) 
     }
   }, [wins, gameOver]);
 
@@ -262,6 +263,8 @@ const GameWrapper = ({ pack, setPack }) => {
                     setAttempts={setAttempts}
                     playStage={playStage}
                     setPlayStage={setPlayStage}
+                    stage={stage}
+                    setStage={setStage}
                   />
                   <TextBoxes
                     isDemo={isDemo}
@@ -290,6 +293,8 @@ const GameWrapper = ({ pack, setPack }) => {
                     playStage={playStage}
                     setPlayStage={setPlayStage}
                     level={level}
+                    stage={stage}
+                    setStage={setStage}
                   />
                 </Stack>
               )}

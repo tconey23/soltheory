@@ -2,18 +2,18 @@ import React, { useEffect, useState } from "react";
 import Keyboard from "react-simple-keyboard";
 import "react-simple-keyboard/build/css/index.css";
 
-const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp, showGiveUp}) => {
+const VirtualKeyboard = ({stage, setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp, showGiveUp}) => {
   const [layoutName, setLayoutName] = useState("minimal");
 
   const playIcon = <i className="fi fi-sr-play-pause"></i>
 
   useEffect(() => {
-    // console.log(!toggleCheckAnswer && hintIndex <= 0)
+    console.log(!toggleCheckAnswer && hintIndex <= 0)
 
-    if(showGiveUp && !giveUp && !toggleCheckAnswer) {
+    if(showGiveUp && !giveUp && !toggleCheckAnswer && hintIndex > 0) {
       setLayoutName("giveup")
       return
-    } else if(showGiveUp && !giveUp && toggleCheckAnswer) {
+    } else if(showGiveUp && !giveUp && toggleCheckAnswer && hintIndex > 0) {
       setLayoutName("giveuporcheck")
       return
     }
@@ -24,14 +24,26 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
     }
 
     if (!toggleCheckAnswer && hintIndex > 0) {
+      console.log(1)
       setLayoutName("withoutCheck");
     } else if (!toggleCheckAnswer && hintIndex <= 0) {
+      console.log(1)
       setLayoutName("minimal");
     } else if (toggleCheckAnswer && hintIndex > 0) {
+      console.log(1)
       setLayoutName("withHint");
-    } else if (toggleCheckAnswer && hintIndex <= 0) {
+    } else if (toggleCheckAnswer && hintIndex <= 0 && stage < 5) {
+      console.log(1)
       setLayoutName("withGetHint");
-    } else if (!toggleCheckAnswer && hintIndex <= 0) {
+    } else if (toggleCheckAnswer && hintIndex <= 0 && stage >= 5) {
+      console.log(1)
+      setLayoutName("finalcheckmorehints");
+    } else if (toggleCheckAnswer && hintIndex > 0 && stage >= 5) {
+      console.log(1)
+      setLayoutName("finalcheck");
+    }
+    else if (!toggleCheckAnswer && hintIndex <= 0) {
+      console.log(1)
       setLayoutName("withGetHint");
     }
   }, [hintIndex, toggleCheckAnswer, showGiveUp, giveUp]);
@@ -49,7 +61,7 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       "q w e r t y u i o p",
       "a s d f g h j k l",
       "{play} z x c v b n m {bksp}",
-      "{hint}"
+      `{hint}`
     ],
     withHint: [
       "q w e r t y u i o p",
@@ -66,13 +78,13 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
     minimal: [
       "q w e r t y u i o p",
       "a s d f g h j k l",
-      "{play} z x c v b n m {bksp}",
-      "{gethint}"
+      "{dumb} z x c v b n m {bksp}",
+      "{gethint} {giveup}"
     ],
     nextonly: [
       "q w e r t y u i o p",
       "a s d f g h j k l",
-      "z x c v b n m {bksp}",
+      "z x c v b n m {dumb}",
       "{next}"
     ],
     giveup: [
@@ -86,6 +98,18 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       "a s d f g h j k l",
       "z x c v b n m {bksp}",
       "{hint} {giveup} {check}"
+    ],
+    finalcheck: [
+      "q w e r t y u i o p",
+      "a s d f g h j k l",
+      "z x c v b n m {bksp}",
+      "{hint} {check}"
+    ],
+    finalcheckmorehints: [
+      "q w e r t y u i o p",
+      "a s d f g h j k l",
+      "z x c v b n m {bksp}",
+      "{gethint} {check}"
     ]
   };
 
@@ -110,10 +134,11 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
     minimal: {
       "{bksp}": "⌫",
       "{gethint}": "Add hints",
-      "{play}": `<i class="fi fi-sr-play-pause"></i>`
+      "{dumb}": `<i class="fi fi-sr-play-pause"></i>`,
+      "{giveup}": "Give Up",
     },
     nextonly: {
-      "{bksp}": "⌫",
+      "{dumb}": "_",
       "{next}": "Next Pic",
     },
     giveup: {
@@ -125,6 +150,19 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
       "{hint}": `💡Hint ${hintIndex}`,
       "{bksp}": "⌫",
       "{giveup}": "Give Up",
+      "{check}": `✅Check`,
+    },
+    finalcheck: {
+      "{hint}": `💡Hint ${hintIndex}`,
+      "{dumb}": "_",
+      "{giveup}": "Give Up",
+      "{check}": `✅Check`,
+    },
+    finalcheckmorehints: {
+      "{hint}": `💡Hint ${hintIndex}`,
+      "{dumb}": "_",
+      "{giveup}": "Give Up",
+      "{gethint}": "Add hints",
       "{check}": `✅Check`,
     }
   };
@@ -159,6 +197,10 @@ const VirtualKeyboard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveU
           {
             class: "highlight-bksp",
             buttons: "{bksp}"
+          },
+          {
+            class: "highlight-dumb",
+            buttons: "{dumb}"
           }
         ]}
       />

@@ -85,6 +85,10 @@ fieldset{
   background: #ff8686 !important;
   color: #fff !important;
 }
+.highlight-dumb {
+  background: #bbbaba !important;
+  color: #8d8d8d !important;
+}
 
 .simple-keyboard .hg-button[data-skbtn="{bksp}"],
 .simple-keyboard .hg-button[data-skbtn="{check}"],

@@ -9,6 +9,7 @@ import { Button, Checkbox, rgbToHex } from '@mui/material';
 import { useLocation } from 'react-router-dom';
 import { GlowFilter } from '@pixi/filter-glow';
 import { motion, AnimatePresence } from 'framer-motion';
+import * as Tone from "tone"
 
 
 const WIDTH = window.innerWidth;
@@ -54,17 +55,106 @@ const Sandbox = () => {
   const [currOrbCount, setCurrOrbCount] = useState(0)
   const [popColor, setPopColor] = useState('#FFF59D')
   const [toggleMoreOrbs, setToggleMoreOrbs] = useState(false)
+  const [playAudio, setPlayAudio] = useState(false)
+  const [synthCount, setSynthCount] = useState(0)
+  
+
+  const percRef = useRef()
+  const synthRef = useRef();
+  const panVolRef = useRef();
+
+  useEffect(() => {
+
+    if(!panVolRef.current || !synthRef.current || !percRef.current) return
+
+    const pan = Math.random() * 2 - 1;
+    panVolRef.current.pan.value = pan;
+    const limiter = new Tone.Limiter(-10).toDestination();
+
+    synthRef.current = new Tone.PolySynth(Tone.Synth, { maxPolyphony: 10 }).toDestination();
+    percRef.current = new Tone.PolySynth(Tone.MembraneSynth).toDestination();
+    const synth = synthRef.current
+    const perc = percRef.current
+
+    synth.connect(limiter)
+    perc.connect(limiter)
+    limiter.connect(pan)
+
+    // synthRef.current = new Tone.FMSynth().toDestination();
+    return () => synthRef.current?.dispose();
+  }, [synthRef, percRef, panVolRef]);
+
+useEffect(() => {
+  // console.log(playAudio)
+  if(!playAudio) {
+    setPlayAudio(true)
+  }
+}, [playAudio])
+
+useEffect(() => {
+  // console.log(synthCount)
+  if(synthCount > 5){
+    
+  }
+}, [synthCount])
+
+    const playTone = (note) => {
+      const polyCount = synthRef.current?._activeVoices?.length || 0
+      const percCount = percRef.current?._activeVoices?.length || 0
+      setSynthCount(polyCount+percCount)
+      if (Tone.context.state === "running" && synthCount <= 5) {
+        synthRef.current?.triggerAttackRelease(note, "32n", Tone.now());
+      }
+    }
+
+    
+
+    const playPerc = (note) => {
+      
+      if (Tone.context.state === "running" && synthCount < 5) { 
+        percRef.current?.triggerAttackRelease(note, "32n", Tone.now());
+      }
+    }
+
+useEffect(() => {
+  panVolRef.current = new Tone.PanVol(0, 0).toDestination();
+  synthRef.current = new Tone.PolySynth(Tone.Synth).connect(panVolRef.current);
+  return () => {
+    synthRef.current?.dispose();
+    panVolRef.current?.dispose();
+  };
+}, []);
+
+  useEffect(() => {
+
+    const unlockAudio = async () => {
+      console.log(Tone.context.state)
+      if (Tone.context.state !== "running") {
+        await Tone.start();
+      } else {}
+    };
+
+
+    document.addEventListener('load', unlockAudio, { once: false });
+    window.addEventListener('pointerdown', unlockAudio, { once: false });
+    window.addEventListener('touchstart', unlockAudio, { once: false });
+    return () => {
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      document.removeEventListener('load', unlockAudio);
+    };
+  }, []);
 
   const hexToNumber = (hex) => Number(hex.replace(/^#/, '0x'))
 
-useEffect(() => {
-    const handleResize = () => {
-      setHeight(window.innerSize *0.76)
-    };
+  useEffect(() => {
+      const handleResize = () => {
+        setHeight(window.innerSize *0.76)
+      };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-}, []);
+      window.addEventListener('resize', handleResize);
+      return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
 useEffect(() =>{
   if(currOrbCount <= 1){
@@ -109,6 +199,8 @@ function popOrbBurstEffect({ x, y, color, radius }, app, options = {}) {
     spikeLength = 30,
     fadeOut = true
   } = options;
+
+  playPerc('E0')
 
   const pop = new PIXI.Graphics();
   pop.x = x;
@@ -227,14 +319,30 @@ useEffect(() => {
   const bodyB = fixtureB.getBody(); 
 
   setCurrOrbCount(world.m_bodyCount -5)
+ 
+  if(bodyA.name === 'wall' || bodyB.name === 'wall') {
+    playTone(bodyA.note)
+  }
 
+  if(playAudio){
+    if(bodyA.name === 'cue' || bodyB.name === 'cue') {
+      const pan = Math.random() * 2 - 1; // -1 (left) to 1 (right)
+      const panVol = new Tone.PanVol(pan, 0).toDestination(); // PanVol handles panning + volume
+      const notes = ["C4", "E4", "G4", "B4", "A4", "F4"];
+      const note = notes[Math.floor(Math.random() * notes.length)];
+      // console.log('ORB COLLISION - playing note:', note);
+      let nextAudioTime = Tone.now();
+      function playNote(note) {
+        synthRef.current?.triggerAttackRelease("C4", "32n", Tone.now());
+        nextAudioTime += 0.001; // 1ms spacing
+      }
+    }
+  }
 
   if (bodyA.name === 'orb' && bodyB.name === 'orb') {
-    const orbA = orbsRef.current.find(o => o.body === bodyA);
-    const orbB = orbsRef.current.find(o => o.body === bodyB);
-
-    if (!orbA || !orbB) return; // Defensive!
-    // setCurrOrbCount(world.m_bodyCount - 5)
+      const orbA = orbsRef.current.find(o => o.body === bodyA);
+      const orbB = orbsRef.current.find(o => o.body === bodyB);
+    if (!orbA || !orbB) return;
 
     const orbASpeed = orbA.body.getLinearVelocity().length();
     const orbBSpeed = orbB.body.getLinearVelocity().length();
@@ -313,6 +421,8 @@ useEffect(() => {
     const body = world.createBody();
     body.createFixture(planck.Box(toMeters(w / 2), toMeters(h / 2)), { restitution: 1 });
     body.setPosition(planck.Vec2(toMeters(x), toMeters(y)));
+    body.name = 'wall'
+    body.note = 'C3'
   };
 
   createWall(WIDTH / 2, 0, WIDTH, 40);
@@ -394,6 +504,10 @@ useEffect(() => {
     for (let body = world.getBodyList(); body; body = body.getNext()) {
       if (body.isDynamic()) {
 
+        let octave = Math.floor(Math.random() * 4) + 2;
+        const notes = [`C${octave}`, `E${octave}`, `G${octave}`, `B${octave}`, `A${octave}`, `F${octave}`];
+        const note = notes[Math.floor(Math.random() * notes.length)];
+
         if(body.name === 'cue'){
           const velocity = body.getLinearVelocity();
           const mass = body.getMass();
@@ -407,6 +521,7 @@ useEffect(() => {
           const mass = body.getMass() * 1;
           const damp = Math.pow(DAMPING_FACTOR, 1 / Math.max(20, mass));
           velocity.mul(damp);
+          body.note = note
           body.setLinearVelocity(velocity);
         }
       }

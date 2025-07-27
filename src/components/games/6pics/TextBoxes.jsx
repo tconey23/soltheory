@@ -3,13 +3,14 @@ import { Stack, Typography, TextField, Button, Modal, Slider, Box } from "@mui/m
 import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
 import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
+import CustomKeyBoard from "./CustomKeyBoard";
 
 const MotionStack = motion(Stack);
 const MotionText = motion(TextField)
 
 function VideoLastFrame({ src, width = "100%", height = "auto" }) {
   const videoRef = useRef();
-
+ 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -68,7 +69,9 @@ const TextBoxes = ({
   setGiveUp,
   attempts, 
   setAttempts,
-  setPlayStage
+  setPlayStage,
+  stage,
+  setStage
 }) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
@@ -128,7 +131,7 @@ useEffect(() =>{
       setEnablePlay(false)
       setLevelsPlayed(prev => prev +1)
       setAttempts(0)
-    } else if(keyboardInput === '{play}'){
+    } else if(keyboardInput === '{play}' && stage < 5){
       setPlayStage(true)
     } else {
       handleCharInput(keyboardInput, letterCount)
@@ -537,8 +540,9 @@ useEffect(() => {
         </Stack> 
       ))}
 
-        <Stack width={'100%'}>
-          <VirtualKeyboard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+        <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
+          <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+          {/* <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
         </Stack>
 
     </Stack>

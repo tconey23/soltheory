@@ -10,7 +10,7 @@ import SpectrumAnalyzer from "./SpectrumAnalyzer";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-import * as Tone from "tone"
+import * as Tone from "tone" 
 import Header from "./Header";
 import MuiSlider from '@mui/material/Slider';
 
