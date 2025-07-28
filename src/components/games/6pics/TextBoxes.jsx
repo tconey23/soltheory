@@ -1,49 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { Stack, Typography, TextField, Button, Modal, Slider, Box } from "@mui/material";
-import { motion } from "framer-motion";
 import useGlobalStore from "../../../business/useGlobalStore";
-import VirtualKeyboard from "../../../ui_elements/VirtualKeyboard";
-import CustomKeyBoard from "./CustomKeyBoard";
+import WrongAnswer from "./WrongAnswer";
 
+import { motion } from "framer-motion";
+import RightAnswer from "./RightAnswer";
+import MoreHints from "./MoreHints";
 const MotionStack = motion(Stack);
 const MotionText = motion(TextField)
-
-function VideoLastFrame({ src, width = "100%", height = "auto" }) {
-  const videoRef = useRef();
- 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const showLastFrame = () => {
-      video.currentTime = video.duration || 0;
-      // Pause so it doesn't play the last moment
-      video.pause();
-    };
-
-    video.addEventListener("loadedmetadata", showLastFrame);
-
-    // In case metadata was loaded before this effect runs
-    if (video.readyState >= 1) showLastFrame();
-
-    return () => {
-      video.removeEventListener("loadedmetadata", showLastFrame);
-    };
-  }, [src]);
-
-  return (
-    <video
-      ref={videoRef}
-      src={src}
-      width={width}
-      height={height}
-      muted
-      preload="metadata"
-      style={{ objectFit: "contain", borderRadius: 8 }}
-      controls={false}
-    />
-  );
-}
 
 const TextBoxes = ({ 
   level,
@@ -53,39 +17,36 @@ const TextBoxes = ({
   next, 
   levelScore, 
   index, 
-  setShowGiveUp, 
-  wins, 
+  setShowGiveUp,  
   isWin, 
   setIsWin, 
   setLevelScore,
   width, 
-  height, 
-  totalScore, 
   giveUp, 
-  forceRefresh, 
   setLevelsPlayed, 
   isDemo, 
-  showGiveUp, 
   setGiveUp,
-  attempts, 
   setAttempts,
   setPlayStage,
   stage,
-  setStage
+  setVph,
+  keyboardInput,
+  setKeyboardInput,
+  hintIndex,
+  setHintIndex,
+  toggleCheckAnswer,
+  setToggleCheckAnswer
 }) => {
   const [inputLetters, setInputLetters] = useState([]);
   const [letterCount, setLetterCount] = useState(0);
   const [letterTarget, setLetterTarget] = useState(0);
   const [autoAnswer, setAutoAnswer] = useState(false);
-  const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
-  const [hintIndex, setHintIndex] = useState(0);
   const [toggleHint, setToggleHint] = useState(true)
   const [wrongAnswer, setWrongAnswer] = useState(false)
   const [nextFocusIndex, setNextFocusIndex] = useState(null);
   const [hintsUsed, setHintsUsed] = useState(0)
   const [moreHints, setMoreHints] = useState(false)
   const [reloadHints, setReloadHints] = useState(0)
-  const [keyboardInput, setKeyboardInput] = useState('')
   const [focusedIndex, setFocusedIndex] = useState(0);
 
   const videoRef = useRef()
@@ -109,8 +70,6 @@ useEffect(() => {
 }, [answer]);
 
 useEffect(() =>{
-  // console.log(keyboardInput)
-  // console.log(letterCount)
 
   if(keyboardInput){
     if(keyboardInput === '{hint}'){
@@ -124,6 +83,13 @@ useEffect(() =>{
       handleCharBackspace(keyboardInput, safeIndex);
     } else if(keyboardInput === '{giveup}'){
       setGiveUp(true)
+      setLevelScore(prev =>
+          prev.map((obj, idx) =>
+              idx === index
+            ? { ...obj, score: 0 }
+            : obj
+        )
+      );
     } else if(keyboardInput === '{next}'){
       next()
       setGiveUp(false)
@@ -133,6 +99,16 @@ useEffect(() =>{
       setAttempts(0)
     } else if(keyboardInput === '{play}' && stage < 5){
       
+      if(stage > 0){
+        let score = levelScore[index].score
+        setLevelScore(prev =>
+          prev.map((obj, idx) =>
+              idx === index
+            ? { ...obj, score: score-10 }
+            : obj
+        )
+      );
+      }
       setPlayStage(true)
     } else {
       handleCharInput(keyboardInput, letterCount)
@@ -143,7 +119,6 @@ useEffect(() =>{
   
 }, [keyboardInput])
 
-  // Auto win logic
   useEffect(() => {
     if (autoAnswer){
       setIsWin(true)
@@ -452,180 +427,106 @@ useEffect(() => {
   
 }, [styleInputRef, windowVPW]) 
 
+useEffect(() => {
+  setVph(initialVPH)
+}, [initialVPH])
+
   let cleanedIndex = 0;
 
   return (
-    <Stack userdata='textbox' direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
-    <Stack 
-      direction="row"
-      flexWrap="wrap"
-      justifyContent="center"
-      alignItems="center"
-      alignContent={'space-around'}
-      id="letter_wrapper"
-      height={'100%'}
-      overflow="auto"
-      sx={{
-        gap: 1,
-        rowGap: '1px',
-        wordBreak: "keep-all",  // optional
-      }}
-      >
-      {wordChunks.map((word, wordIndex) => (
-        <Stack
-          key={`word-${wordIndex}`} 
-          direction="row"
-          justifyContent="center"
-          alignItems="center"
-          margin={0.5}
-          flexWrap="nowrap"
-          sx={{ whiteSpace: 'nowrap' }} // prevent internal wrap
-        > 
-          {word.split("").map((char, charIndex) => {
-      const isAlphaNum = /[a-z0-9]/i.test(char);
+    <Stack userdata='textbox' direction="column" width="95%" height={'100%'} justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
+      <Stack 
+        direction="row"
+        flexWrap="wrap"
+        justifyContent="center"
+        alignItems="center"
+        alignContent={'flex-start'}
+        id="letter_wrapper"
+        height={'100%'}
+        overflow="auto"
+        sx={{
+          gap: 1,
+          rowGap: '1px',
+          wordBreak: "keep-all",  // optional
+        }}
+        >
+        {wordChunks.map((word, wordIndex) => (
+          <Stack
+            key={`word-${wordIndex}`} 
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            margin={0.5}
+            flexWrap="nowrap"
+            sx={{ whiteSpace: 'nowrap' }}
+            spacing={0.2}
+          > 
+            {word.split("").map((char, charIndex) => {
+        const isAlphaNum = /[a-z0-9]/i.test(char);
 
-      if (isAlphaNum) {
-        const currentIndex = cleanedIndex++;
-        return (
-            <MotionText
-              initial={{transform: 'rotate3d(0, 1, 0, 344deg)', boxShadow: '1px 0px 3px 0px #00000045'}}
-              animate={{transform: 'rotate3d(0, 1, 0, 0deg)', boxShadow: '1px 0px 3px 0px #0000000'}}
-              transition={{duration: 1, delay: currentIndex * 0.07 }}
-              key={`char-${wordIndex}-${charIndex}`}
-              ref={el => styleInputRef.current[currentIndex] = el}
-              id='sixpicsinput'
-              value={inputLetters[currentIndex]?.toUpperCase() || ""}
-              inputRef={(el) => (inputRefs.current[currentIndex] = el)}
-              onClick={() => setNextFocusIndex(currentIndex)} // for focus movement
-              onFocus={() => setFocusedIndex(currentIndex)}
-              slotProps={{
-                input: {
-                  readOnly: true,
-                  style: { 
-                    textAlign: "center", 
-                    fontSize: "1.5rem", 
-                    width: textBoxWidth, 
-                    fontWeight: 'bolder', 
-                    height: '3rem',
-                    borderWidth: '0px'
+        if (isAlphaNum) {
+          const currentIndex = cleanedIndex++;
+          return (
+              <MotionText
+                initial={{transform: 'rotate3d(0, 1, 0, 344deg)', boxShadow: '1px 0px 3px 0px #00000045'}}
+                animate={{transform: 'rotate3d(0, 1, 0, 0deg)', boxShadow: '1px 0px 3px 0px #0000000'}}
+                transition={{duration: 1, delay: currentIndex * 0.07 }}
+                key={`char-${wordIndex}-${charIndex}`}
+                ref={el => styleInputRef.current[currentIndex] = el}
+                id='sixpicsinput'
+                value={inputLetters[currentIndex]?.toUpperCase() || ""}
+                inputRef={(el) => (inputRefs.current[currentIndex] = el)}
+                onClick={() => setNextFocusIndex(currentIndex)} // for focus movement
+                onFocus={() => setFocusedIndex(currentIndex)}
+                slotProps={{
+                  input: {
+                    readOnly: true,
+                    style: { 
+                      textAlign: "center", 
+                      fontSize: "1.5rem", 
+                      width: textBoxWidth, 
+                      fontWeight: 'bolder', 
+                      height: '3rem',
+                      borderWidth: '0px'
+                    },
                   },
-                },
-              }}
-              sx={{ 
-                textAlign: 'center', 
-                marginX: 0.25, 
-                transition: "all 0.3s", 
-                textTransform: 'uppercase',
-                display: 'flex',
-                fontSize: "1.5rem",
-                borderWidth: '0px',
-                
-              }}
-            />
-              );
-            } else {
-              return (
-                <Typography
-                  key={`punct-${wordIndex}-${charIndex}`}
-                  variant="h5"
-                  component="span"
-                  mx={0.5}
-                  fontFamily="Fredoka"
-                  sx={{textTransform: 'uppercase' }}
-                >
-                  {char}
-                </Typography>
-              )
-            }
-          })}
-        </Stack> 
-      ))}
+                }}
+                sx={{ 
+                  textAlign: 'center', 
+                  marginX: 0.25, 
+                  transition: "all 0.3s", 
+                  textTransform: 'uppercase',
+                  display: 'flex',
+                  fontSize: "1.5rem",
+                  borderWidth: '0px',
+                  
+                }}
+              />
+                );
+              } else {
+                return (
+                  <Typography
+                    key={`punct-${wordIndex}-${charIndex}`}
+                    variant="h5"
+                    component="span"
+                    mx={0.5}
+                    fontFamily="Fredoka"
+                    sx={{textTransform: 'uppercase' }}
+                  >
+                    {char}
+                  </Typography>
+                )
+              }
+            })}
+          </Stack> 
+        ))}
 
-        <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
-          {/* <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
-          <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
-        </Stack>
+      </Stack>
 
-    </Stack>
-      <Modal
-        open={!!isWin}
-        >
-        <Stack height={'100%'} bgcolor={'#00000063'} justifyContent={'center'}>
-            <MotionStack
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-              bgcolor="#ffffffe0"
-              width="100%"
-              height="50vh"
-              justifyContent="center"
-              alignItems="center"
-            >
-              <Typography color="green" fontSize={30}><i className="fi fi-rr-laugh-beam"></i></Typography>
-              <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Answer: ${answer}`}</Typography>
-              <VideoLastFrame src={level?.public_url} width="100%" height={150} />
-              <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">CORRECT!</Typography>
-              <Button onClick={() => {
-                next()
-                setLevelsPlayed(prev => prev +1)
-              }} variant="contained">Continue</Button>
-            </MotionStack>
-        </Stack>
-      </Modal>
-      <Modal
-        open={!!wrongAnswer}
-        >
-        <Stack height={'100%'} bgcolor={'#00000063'} justifyContent={'center'}>
-            <MotionStack
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1.2 }}
-              bgcolor="#ffffffe0"
-              width="100%"
-              height="33vh"
-              justifyContent="center"
-              alignItems="center"
-            >
-            <Typography color="blue" fontSize={30}><i className="fi fi-rs-face-sad-sweat"></i></Typography>
-            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">{`Sorry! Your answer:`}</Typography>
-            {inputLetters?.length > 0 && (
-              <Typography>
-                {`"${inputLetters.join('').toLowerCase()}"`}
-              </Typography>
-            )}
-            <Typography color="black" fontSize={25} fontFamily="Fredoka Regular">Is incorrect!</Typography>
-            <Button onClick={() => setWrongAnswer(false)} variant="contained">Try again</Button>
-            </MotionStack>
-        </Stack>
-      </Modal>
-      <Modal 
-        open={!!moreHints}
-      >
-        <Stack height={'100%'} width={'100%'} justifyContent={'center'} alignItems={'center'}>
-          <Stack height={'30%'} width={'75%'} bgcolor={'white'} justifyContent={'center'} alignItems={'center'} borderRadius={2}>
-            {levelScore[index]?.score > longestWord && !levelScore[index]?.reloadedHints &&
-              <>              
-                <Typography textAlign={'center'} fontFamily={'fredoka regular'} fontSize={18}>{levelScore[index]?.score > longestWord ? `You can reload a maximum of ${Math.floor(longestWord /2)} hints.`: 'You cannot afford to reload points for this level'}</Typography>
-                <Typography textAlign={'center'} fontFamily={'fredoka regular'} fontSize={15}>{`Additional hints will count against your total score`}</Typography>
-                <Typography marginTop={'10px'} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={15}>{`Are you sure you want to get ${reloadHints} more hints?`}</Typography>
-                <Box sx={{width: '75%', display: 'flex', flexDirection: 'column'}}>
-                  <Slider min={1} max={Math.floor(longestWord /2)} step={1} valueLabelDisplay={true} value={reloadHints} onChange={(e) => setReloadHints(e.target.value)}/>
-                  <Button disabled={reloadHints == 0} onClick={() => getMoreHints(reloadHints)}>Reload!</Button>
-                </Box>
-              </>
-            }
-
-            {levelScore[index]?.reloadedHints &&
-            <>
-              <Typography marginX={2} marginY={'10px'} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={18}>{`You can only reload hints once per level`}</Typography>
-              <Box sx={{width: '75%', display: 'flex', flexDirection: 'column'}}>
-                <Button onClick={() => setMoreHints(false)}>Ok</Button>
-              </Box>
-            </>
-            }
-          </Stack>
-        </Stack>
-      </Modal>
+      <Modal open={!!isWin} next={next} setLevelsPlayed={setLevelScore} answer={answer}><RightAnswer next={next} answer={answer} setLevelsPlayed={setLevelsPlayed} level={level}/></Modal>
+      <Modal open={!!wrongAnswer}><WrongAnswer letterCount={letterCount} setWrongAnswer={setWrongAnswer} /></Modal>
+      <Modal open={!!moreHints}><MoreHints levelScore={levelScore} index={index} longestWord={longestWord} reloadHints={reloadHints} setReloadHints={setReloadHints} getMoreHints={getMoreHints} setMoreHints={setMoreHints}/></Modal>
+    
     </Stack>
   );
 };

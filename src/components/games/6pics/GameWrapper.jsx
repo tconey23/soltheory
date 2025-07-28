@@ -13,6 +13,7 @@ import useGlobalStore from '../../../business/useGlobalStore';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import ReactPlayer from 'react-player'
+import CustomKeyBoard from './CustomKeyBoard';
 
 const useScreenSize = () => {
   const [screenSize, setScreenSize] = useState({
@@ -53,6 +54,12 @@ const GameWrapper = ({ pack, setPack }) => {
   const [attempts, setAttempts] = useState(0)
   const [playStage, setPlayStage] = useState(false)
   const [stage, setStage] = useState(0)
+  const [vph, setVph] = useState(0)
+  const [keyboardInput, setKeyboardInput] = useState('')
+  const [hintIndex, setHintIndex] = useState(0);
+  const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [maxScore, setMaxScore] = useState(30)
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
@@ -122,7 +129,7 @@ const GameWrapper = ({ pack, setPack }) => {
       const newScores = levels.map((_, i) => (
         { 
           level: i, 
-          score: 100, 
+          score: maxScore, 
           hints: getHintAllowance(levels[i].answer), 
           hintsUsed: 0,
           reloadedHints: false
@@ -207,10 +214,11 @@ const GameWrapper = ({ pack, setPack }) => {
   }, [levelsPlayed])
 
   return (
-    <Stack direction="column" sx={{ height: '100%', width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
-      <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
+    <Stack userdata='gamewrapper' direction="column" sx={{ height: '90%', width: '100%' }} justifyContent="flex-start" alignItems="center">
+
+      <Stack userdata='gameheader' key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} my={1}>
         
-          <Box sx={{width: '33%', marginBottom: 2}}>
+          <Stack sx={{width: '33%', height: '100%'}}>
             <Button onClick={() => {
               if(isDemo){
                 navTo(loc?.pathname)
@@ -220,12 +228,12 @@ const GameWrapper = ({ pack, setPack }) => {
               setPack('')
 
               }}>Start over</Button>
-          </Box>
+          </Stack>
         
         <Stack key={refreshScore} sx={{width: '33%'}}>
           {!gameOver && levelScore[activeSlide] && (
             <>
-              <Typography>{`Points ${levelScore[activeSlide]?.score}/100`}</Typography>
+              <Typography>{`Points ${levelScore[activeSlide]?.score}/${maxScore}`}</Typography>
             </>
           )}
         </Stack>
@@ -238,75 +246,98 @@ const GameWrapper = ({ pack, setPack }) => {
         </Box>
       </Stack>
 
-      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '77.5dvh'}}>
+      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '70dvh'}}>
         {!gameOver &&
           levels.map((level, i) => {
             return (
-            <Stack id='game_stage' key={i} height={'100%'}>
+            <Stack id='game_stage' key={i} height={'100%'} width={'100%'}>
               {i === activeSlide && (
-                <Stack  justifyContent="center" alignItems="center" direction="column" sx={{ height: '98%', width: '100%' }}>
-                  <SixPicsVideoPlayer
-                    isDemo={isDemo}
-                    isWin={isWin}
-                    setIsWin={setIsWin}
-                    wins={wins}
-                    level={level}
-                    setWins={setWins}
-                    next={next}
-                    setLevelScore={setLevelScore}
-                    levelScore={levelScore}
-                    setRefreshScore={setRefreshScore}
-                    index={i}
-                    setShowGiveUp={setShowGiveUp}
-                    showGiveUp={showGiveUp}
-                    width={width}
-                    height={height}
-                    giveUp={giveUp}
-                    setGiveUp={setGiveUp}
-                    forceRefresh={forceRefresh}
-                    setGameOver={setGameOver}
-                    setLevelsPlayed={setLevelsPlayed}
-                    levelsPlayed={levelsPlayed}
-                    levels={levels}
-                    setEnablePlay={setEnablePlay}
-                    enablePlay={enablePlay}
-                    attempts={attempts}
-                    setAttempts={setAttempts}
-                    playStage={playStage}
-                    setPlayStage={setPlayStage}
-                    stage={stage}
-                    setStage={setStage}
-                  />
-                  <TextBoxes
-                    isDemo={isDemo}
-                    forceRefresh={forceRefresh}
-                    isWin={isWin}
-                    setIsWin={setIsWin}
-                    answer={level.answer}
-                    setWins={setWins}
-                    wins={wins}
-                    next={next}
-                    prev={prev}
-                    levelScore={levelScore}
-                    setLevelScore={setLevelScore}
-                    index={i}
-                    setShowGiveUp={setShowGiveUp}
-                    showGiveUp={showGiveUp}
-                    width={width}
-                    height={height}
-                    totalScore={totalScore}
-                    giveUp={giveUp}
-                    setLevelsPlayed={setLevelsPlayed}
-                    setGiveUp={setGiveUp}
-                    setEnablePlay={setEnablePlay}
-                    attempts={attempts}
-                    setAttempts={setAttempts}
-                    playStage={playStage}
-                    setPlayStage={setPlayStage}
-                    level={level}
-                    stage={stage}
-                    setStage={setStage}
-                  />
+                <Stack  justifyContent="flex-start" alignItems="center" direction="column" sx={{ height: '100%', width: '100%'}}>
+
+                  <Stack justifyContent="center" alignItems="center" sx={{ height: '33%', width: '100%'}}>
+                    <SixPicsVideoPlayer
+                      setIsPlaying={setIsPlaying}
+                      isPlaying={isPlaying}
+                      isDemo={isDemo}
+                      isWin={isWin}
+                      setIsWin={setIsWin}
+                      wins={wins}
+                      level={level}
+                      setWins={setWins}
+                      next={next}
+                      setLevelScore={setLevelScore}
+                      levelScore={levelScore}
+                      setRefreshScore={setRefreshScore}
+                      index={i}
+                      setShowGiveUp={setShowGiveUp}
+                      showGiveUp={showGiveUp}
+                      width={width}
+                      height={height}
+                      giveUp={giveUp}
+                      setGiveUp={setGiveUp}
+                      forceRefresh={forceRefresh}
+                      setGameOver={setGameOver}
+                      setLevelsPlayed={setLevelsPlayed}
+                      levelsPlayed={levelsPlayed}
+                      levels={levels}
+                      setEnablePlay={setEnablePlay}
+                      enablePlay={enablePlay}
+                      attempts={attempts}
+                      setAttempts={setAttempts}
+                      playStage={playStage}
+                      setPlayStage={setPlayStage}
+                      stage={stage}
+                      setStage={setStage}
+                      setVph={setVph}
+                      vph={vph}
+                    />
+                  </Stack>
+
+                  <Stack justifyContent="center" alignItems="center" sx={{ height: '30%', width: '100%'}}>
+                    <TextBoxes
+                      isDemo={isDemo}
+                      forceRefresh={forceRefresh}
+                      isWin={isWin}
+                      setIsWin={setIsWin}
+                      answer={level.answer}
+                      setWins={setWins}
+                      wins={wins}
+                      next={next}
+                      prev={prev}
+                      levelScore={levelScore}
+                      setLevelScore={setLevelScore}
+                      index={i}
+                      setShowGiveUp={setShowGiveUp}
+                      showGiveUp={showGiveUp}
+                      width={width}
+                      height={height}
+                      totalScore={totalScore}
+                      giveUp={giveUp}
+                      setLevelsPlayed={setLevelsPlayed}
+                      setGiveUp={setGiveUp}
+                      setEnablePlay={setEnablePlay}
+                      attempts={attempts}
+                      setAttempts={setAttempts}
+                      playStage={playStage}
+                      setPlayStage={setPlayStage}
+                      level={level}
+                      stage={stage}
+                      setStage={setStage}
+                      setVph={setVph}
+                      vph={vph}
+                      setKeyboardInput={setKeyboardInput}
+                      keyboardInput={keyboardInput}
+                      setHintIndex={setHintIndex}
+                      hintIndex={hintIndex}
+                      toggleCheckAnswer={toggleCheckAnswer}
+                      setToggleCheckAnswer={setToggleCheckAnswer}
+                    />
+                  </Stack>
+
+                  <Stack justifyContent="center" alignItems="center" sx={{ height: '33%', width: '100%', zoom: 0.8}}>
+                    <CustomKeyBoard maxScore={maxScore} levelId={i} levelScore={levelScore} isPlaying={isPlaying} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[i]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+                  </Stack>
+
                 </Stack>
               )}
             </Stack>
