@@ -17,12 +17,14 @@ const SixPicsVideoPlayer = ({
   playStage,
   setPlayStage,
   stage,
-  setStage
+  setStage,
+  isPlaying, 
+  setIsPlaying
 }) => {
   const videoRef = useRef(null);
   const screen = useGlobalStore((state) => state.screen);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  
   const [from, setFrom] = useState(0);
   const [to, setTo] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
@@ -139,9 +141,9 @@ const SixPicsVideoPlayer = ({
     : { boxShadow: "4px 2px 10px 1px #00000038", padding: 1, marginBlock: 10, width: '80%', height: '70%' };
 
   return (
-    <Stack backgroundColor="white" justifyContent="center" alignItems="center" height={height * .25} width={screen === 'xs' ? width * 0.95 : '50%'}>
-      <Stack width="100%" height="auto" justifyContent="center" alignItems="center" sx={{ opacity: isLoaded ? 1 : 1 }}>
-        <Stack justifyContent={'center'} alignItems={'center'} height={'100%'} width={'100%'} paddingY={2}>
+    <Stack userdata='videowrap1' backgroundColor="white" justifyContent="center" alignItems="center" height={'100%'} width={'45%'}>
+      <Stack userdata='videowrap2' width="100%" height="100%" justifyContent="center" alignItems="center" sx={{ opacity: isLoaded ? 1 : 1 }}>
+        <Stack userdata='videowrap3' justifyContent={'center'} alignItems={'center'} height={'100%'} width={'100%'} paddingY={0}>
           <Typography fontFamily={'fredoka regular'}>{level.pack_name}</Typography>
           <ReactPlayer
             ref={videoRef}
@@ -155,24 +157,25 @@ const SixPicsVideoPlayer = ({
             start={from || 0}
             playsInline={true}
             autoplay={true}
-            style={{zoom: 0.8}}
+            style={{width: '100%', height: 'auto'}}
           />
         </Stack>
-        <Stack width="100%" minHeight="37px" justifyContent="center" alignItems="center" direction={'row'} sx={{marginTop: '1px', marginBottom: '10px'}}>
+      </Stack>
+
+        {/* <Stack width="100%" height='10%' justifyContent="center" alignItems="center" direction={'row'}>
           <Stack>
             {isPlaying && (
-              <Box sx={{height: '36.5px', width: '64px'}}>
+              <Box sx={{height: '100%', width: '64px'}}>
                 <LoadingAnimation />
               </Box>
             )}
           </Stack>
-        </Stack>
-      </Stack>
-      {!isLoaded && (
+        </Stack> */}
+      {/* {!isLoaded && (
         <Stack width="100%" height="100%" justifyContent="center" alignItems="center" position="absolute">
           <CircularProgress size={24} />
         </Stack>
-      )}
+      )} */}
     </Stack>
   );
 };
