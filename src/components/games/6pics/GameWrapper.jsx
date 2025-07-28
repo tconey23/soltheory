@@ -57,6 +57,8 @@ const GameWrapper = ({ pack, setPack }) => {
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
   const userMeta = useGlobalStore((state) => state.userMeta)
+
+
   
   const loc = useLocation()
   const isDemo = loc?.pathname?.includes('/promo/')
@@ -67,11 +69,12 @@ const GameWrapper = ({ pack, setPack }) => {
 
   const next = () => {
   setIsWin(false); 
-  setStage(0)
+  setShowGiveUp(false)
   setPlayStage(false)                
+  setStage(0)
   setTimeout(() => {
     sliderRef.current?.slickNext();
-  }, 50);                         // slight delay gives React time to re-render with isWin === false
+  }, 50);
 };
   const prev = () => sliderRef.current?.slickPrev();
 
@@ -85,6 +88,12 @@ const GameWrapper = ({ pack, setPack }) => {
     swipe: false,
     afterChange: setActiveSlide,
   };
+
+  useEffect(() => {
+    if(inGame){
+      setInGame(false)
+    }
+  }, [inGame])
 
   // Fetch level data
   useEffect(() => {
@@ -198,7 +207,7 @@ const GameWrapper = ({ pack, setPack }) => {
   }, [levelsPlayed])
 
   return (
-    <Stack direction="column" sx={{ height: height, width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
+    <Stack direction="column" sx={{ height: '100%', width: '100%' }} justifyContent="flex-start" alignItems="center" marginTop={2}>
       <Stack key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'}>
         
           <Box sx={{width: '33%', marginBottom: 2}}>

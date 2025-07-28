@@ -455,7 +455,7 @@ useEffect(() => {
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
+    <Stack userdata='textbox' direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
