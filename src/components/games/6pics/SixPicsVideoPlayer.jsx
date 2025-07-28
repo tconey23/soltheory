@@ -123,6 +123,9 @@ useEffect(() => {
 useEffect(()=>{
   if(stage == 0){
     setPlayStage(true)
+    console.log('here')
+  } else {
+    setPlayStage(false)
   }
 
   if(!isNaN(stage)){
@@ -147,6 +150,11 @@ useEffect(() => {
   }
 
   if (to && currentTime >= to - EPSILON) {
+
+    console.log(to)
+    console.log(currentTime)
+    console.log(currentTime >= to - EPSILON)
+    
     setPlayStage(false);
     setStage(prev => prev + 1);
   }

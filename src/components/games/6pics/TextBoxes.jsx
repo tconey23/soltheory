@@ -132,6 +132,7 @@ useEffect(() =>{
       setLevelsPlayed(prev => prev +1)
       setAttempts(0)
     } else if(keyboardInput === '{play}' && stage < 5){
+      
       setPlayStage(true)
     } else {
       handleCharInput(keyboardInput, letterCount)

@@ -66,10 +66,12 @@ const GameWrapper = ({ pack, setPack }) => {
   const navTo = useNavigate()
 
   const next = () => {
-  setIsWin(false);                 // reset win state BEFORE slide changes
+  setIsWin(false); 
+  setStage(0)
+  setPlayStage(false)                
   setTimeout(() => {
     sliderRef.current?.slickNext();
-  }, 100);                         // slight delay gives React time to re-render with isWin === false
+  }, 50);                         // slight delay gives React time to re-render with isWin === false
 };
   const prev = () => sliderRef.current?.slickPrev();
 
