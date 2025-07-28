@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Stack, Typography, TextField, Button, MenuList, MenuItem, Modal, Box} from "@mui/material";
+import { Stack, Typography, TextField, Button, MenuList, MenuItem, Modal, Box, Checkbox, InputLabel, Select, Menu} from "@mui/material";
 import { fetchPacks } from "./helpers/functions";
 import PackButton from "./PackButton";
 import GameWrapper from './GameWrapper';
@@ -17,6 +17,8 @@ const Pic6 = ({demo}) => {
   const [displayPromo, setDisplayPromo] = useState(false)
   const [infoColor, setInfoColor] = useState('black')
   const [showInfo, setShowInfo] = useState(false)
+  const [dontShowInfo, setDontShowInfo] = useState(false)
+  const [packType, setPackType] = useState('standard')
 
   const loc = useLocation()
   const MotionStack = motion(Stack);
@@ -56,6 +58,15 @@ const Pic6 = ({demo}) => {
 
   }, [packs])
 
+  useEffect(() => {
+    const stored = localStorage.getItem('sixpics_dontShowInfo');
+    if (stored !== null) setDontShowInfo(JSON.parse(stored));
+  }, []);
+
+  useEffect(() => {
+    setShowInfo(!dontShowInfo);
+  }, [dontShowInfo]);
+
   const handleInfoClick = () => {
     setInfoColor('blue')
 
@@ -94,15 +105,31 @@ const Pic6 = ({demo}) => {
     };
   
     getPacks();
-  }, []);
+  }, [displayPromo]);
 
   useEffect(() => {
-    if(loc.pathname.includes('/promo/')){
+    if(loc.pathname.includes('/promo')){
+      setPackType('promo')
+    } else {
+      setPackType('standard')
+    }
+  }, [loc])
+
+    useEffect(() => {
+    if(packType === 'promo'){
       setDisplayPromo(true)
     } else {
       setDisplayPromo(false)
     }
-  }, [loc])
+  }, [packType])
+
+  const shareGame = async () => {
+      await navigator.share({
+        title: 'I just played this fun new game',
+        text: 'Think you can beat my scores?', 
+        url: loc.pathname
+      })
+    }
 
   return (
     <Stack
@@ -111,8 +138,8 @@ const Pic6 = ({demo}) => {
       alignItems={"center"}
       justifyContent={"flex-start"}
     >
-      <Stack width={'100%'} height={'5%'} direction={'row'}>
-        <Stack width={'10%'} justifyContent={'center'} alignItems={'center'} sx={{userSelect: 'none'}}>
+      <Stack width={'100%'} height={'8%'} direction={'row'}>
+        <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} sx={{userSelect: 'none'}} direction='row'>
           <Box
             onMouseOver={() => setInfoColor('white')}
             onMouseOut={() => setInfoColor('black')}
@@ -144,11 +171,49 @@ const Pic6 = ({demo}) => {
               className="fi fi-sr-info" 
             />
           </Box>
+          <Box
+            onMouseOver={() => setInfoColor('white')}
+            onMouseOut={() => setInfoColor('black')}
+            onClick={() => shareGame()}
+            sx={{
+              width: 'fit-content',
+              height: 'auto',
+              display: 'flex',
+              padding: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent', 
+              '&:focus': { outline: 'none' },
+            }}
+          >
+            <i
+              style={{
+                fontSize: 23,
+                display: 'block',
+                lineHeight: 1,
+                margin: 0,
+                padding: 0,
+                color: infoColor,
+                cursor: 'pointer',
+                userSelect: 'none'
+              }}
+              className="fi fi-rr-share" 
+            />
+          </Box>
         </Stack>
-        <Stack width={'80%'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
+        <Stack width={'65%'} justifyContent={'center'} alignItems={'center'} direction={'row'}>
           <Typography fontFamily={'fredoka regular'} fontSize={30} >6 Pics</Typography>
         </Stack>
-        <Stack title='rightspacer' width={'10%'} justifyContent={'center'} alignItems={'center'} ></Stack>
+        <Stack title='rightspacer' width={'2%'} justifyContent={'center'} alignItems={'center'} >
+          <Select sx={{zoom: 0.7}} value={packType} onChange={(e) => {
+            setPackType(e.target.value)
+            }}>
+            <MenuItem value={'standard'}>Standard Packs</MenuItem>
+            <MenuItem value={'promo'}>Promo Packs</MenuItem>
+          </Select>
+        </Stack>
       </Stack>
 
           <DropStack showInfo={showInfo}>
@@ -169,7 +234,7 @@ const Pic6 = ({demo}) => {
                         A SOL Theory game
                     </Typography>
                     <motion.img
-                        width='30%'
+                        width='45%'
                         height='auto'
                         src='/6pics_logo.png'
                     />
@@ -195,7 +260,7 @@ const Pic6 = ({demo}) => {
                         transition={{ duration: 2, delay: 1.1 }}
                     >
                         <Typography fontFamily={'fredoka regular'} fontSize={16}>
-                            In this game, you’ll see six images, each one slowly revealing an image across three stages.
+                            In this game, you’ll see 6 Pics, each one slowly revealing an image across three stages.
                         </Typography>
 
                         <Stack height={'100%'} width={'92%'} marginTop={'10px'} alignItems={'flex-start'} overflow={'auto'} paddingLeft={'10px'} borderRadius={2} sx={{boxShadow: 'inset 0px -9px 11px 0px #00000042'}}>
@@ -208,14 +273,25 @@ const Pic6 = ({demo}) => {
                             </Typography>
 
                             <Typography marginTop={2} textAlign={'left'} fontFamily={'fredoka regular'} fontSize={15}>
-                                •	But beware: every extra stage costs you 33 points, and hints cost 1 point.
+                                •	But beware: every extra stage costs you 10 points and hints cost 1 point.
                             </Typography>
 
                             <Typography marginTop={2} textAlign={'center'} fontFamily={'fredoka regular'} fontSize={17}>
-                                Can you guess each song title before the final frame?
+                                Can you guess the answer before the final frame?
                             </Typography>
                         </Stack>
                       </MotionStack>
+                  <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
+                    <InputLabel>Don't show this again</InputLabel>
+                    <Checkbox 
+                    onChange={() => setDontShowInfo(prev => {
+                      const updated = !prev;
+                      localStorage.setItem('sixpics_dontShowInfo', JSON.stringify(updated));
+                      return updated;
+                    })} 
+                    checked={dontShowInfo}
+                  />
+                  </Stack>
                   </MotionStack>
               </Stack>
           </DropStack>

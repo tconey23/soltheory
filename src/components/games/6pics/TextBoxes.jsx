@@ -132,6 +132,7 @@ useEffect(() =>{
       setLevelsPlayed(prev => prev +1)
       setAttempts(0)
     } else if(keyboardInput === '{play}' && stage < 5){
+      
       setPlayStage(true)
     } else {
       handleCharInput(keyboardInput, letterCount)
@@ -454,7 +455,7 @@ useEffect(() => {
   let cleanedIndex = 0;
 
   return (
-    <Stack direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
+    <Stack userdata='textbox' direction="column" width="95%" height='100%' justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
     <Stack 
       direction="row"
       flexWrap="wrap"
@@ -541,8 +542,8 @@ useEffect(() => {
       ))}
 
         <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
-          <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
-          {/* <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
+          {/* <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
+          <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
         </Stack>
 
     </Stack>
