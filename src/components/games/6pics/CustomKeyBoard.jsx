@@ -140,8 +140,8 @@ const CustomKeyBoard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp
 
 
   return (
-    <Stack userdata="customkey" width={'98%'} height={'auto'} alignItems={'center'} justifyContent={'center'}>
-      <Stack alignItems="center" justifyContent="space-between" direction="column" width="100%">
+    <Stack userdata="customkey" width={'98%'} height={'100%'} alignItems={'center'} justifyContent={'center'}>
+      <Stack alignItems="center" justifyContent="flex-end" direction="column" width="100%" height={'80%'}>
         
         <Stack direction={'row'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
           <Key d='q' v='q' w={width} setKeyboardInput={setKeyboardInput} color='white' disabled={disableLetters} setKeyCount={setKeyCount} keyCount={1}/>
