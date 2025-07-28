@@ -541,8 +541,8 @@ useEffect(() => {
       ))}
 
         <Stack width={'100%'} alignItems={'center'} justifyContent={'center'}>
-          <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
-          {/* <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
+          {/* <VirtualKeyboard stage={stage} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/> */}
+          <CustomKeyBoard showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[index]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
         </Stack>
 
     </Stack>
