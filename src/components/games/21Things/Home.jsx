@@ -3,13 +3,22 @@ import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography,
 import useGlobalStore from '../../../business/useGlobalStore';
 import Hexagon from '../Hexagon';
 import MyGames from '../../game_data/MyGames';
+import DropStack from '../../../ui_elements/DropStack';
+import { motion } from 'framer-motion';
+import { useLocation } from "react-router-dom";
+import Info from './Info';
 
+const MotionStack = motion(Stack)
 
 const Home = ({ onPlay, payload }) => {
     const screen = useGlobalStore((state) => state.screen)
     const gameIndex = useGlobalStore((state) => state.gameIndex)
 
     const [clicked, setClicked] = useState(1)
+    const [showInfo, setShowInfo] = useState(false)
+    const [infoColor, setInfoColor] = useState()
+
+    const loc = useLocation()
 
     const today = new Date().toISOString().split('T')[0];
 
@@ -18,9 +27,85 @@ const Home = ({ onPlay, payload }) => {
             setClicked(0)
         }, 100);
     }, [clicked])
+
+    const shareGame = async () => {
+      await navigator.share({
+        title: 'I just played this fun new game',
+        text: 'Think you can beat my scores?', 
+        url: loc.pathname
+      })
+    }
   
     return (
-      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 1 : 1 }} marginTop={5}>
+      <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 1 : 1 }}>
+        <Stack height={'5%'} width={'100%'} direction={'row'}>
+          <Box
+            onMouseOver={() => setInfoColor('white')}
+            onMouseOut={() => setInfoColor('black')}
+            onClick={() => {
+              setShowInfo(true)
+              console.log(showInfo)
+            }}
+            sx={{
+              width: 'fit-content',
+              height: 'auto',
+              display: 'flex',
+              padding: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent', 
+              '&:focus': { outline: 'none' },
+            }}
+          >
+            <i
+              style={{
+                fontSize: 23,
+                display: 'block',
+                lineHeight: 1,
+                margin: 0,
+                padding: 0,
+                color: 'black',
+                cursor: 'pointer',
+                userSelect: 'none'
+              }}
+              className="fi fi-sr-info" 
+            />
+          </Box>
+          <Box
+            onMouseOver={() => setInfoColor('white')}
+            onMouseOut={() => setInfoColor('black')}
+            onClick={() => shareGame()}
+            sx={{
+              width: 'fit-content',
+              height: 'auto',
+              display: 'flex',
+              padding: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent', 
+              '&:focus': { outline: 'none' },
+            }}
+          >
+            <i
+              style={{
+                fontSize: 23,
+                display: 'block',
+                lineHeight: 1,
+                margin: 0,
+                padding: 0,
+                color: infoColor,
+                cursor: 'pointer',
+                userSelect: 'none'
+              }}
+              className="fi fi-rr-share" 
+            />
+          </Box>
+        </Stack>
+        
         <Stack>
           <Hexagon dims={100}/>
         </Stack>
@@ -66,6 +151,21 @@ const Home = ({ onPlay, payload }) => {
           <Typography fontSize={20} fontWeight={'bold'} fontFamily={'Fredoka Regular'}>Your games</Typography>
           <MyGames displayGame={'twentyonethings'}/>
         </Stack>
+
+        <DropStack showInfo={showInfo} setShowInfo={setShowInfo}>
+                <Stack bgcolor={'white'} width={'95%'} height={'90%'}>
+                  <MotionStack 
+                    marginTop={2}
+                    alignItems={'center'}
+                    height={'30%'}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 2, delay: 0.5 }}
+                  > 
+                    <Info />
+                  </MotionStack>
+                </Stack>
+        </DropStack>
       </Stack>
     )
   }

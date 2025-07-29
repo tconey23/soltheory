@@ -137,7 +137,7 @@ const Pic6 = ({demo}) => {
       sx={{ height: "100%", width: "100%" }}
       alignItems={"center"}
       justifyContent={"flex-start"}
-    >
+    > 
       <Stack width={'100%'} height={'8%'} direction={'row'}>
         <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} sx={{userSelect: 'none'}} direction='row'>
           <Box
@@ -216,7 +216,7 @@ const Pic6 = ({demo}) => {
         </Stack>
       </Stack>
 
-          <DropStack showInfo={showInfo}>
+          <DropStack showInfo={showInfo} setShowInfo={setShowInfo}>
               <Stack bgcolor={'white'} width={'95%'} height={'100%'}>
                 <MotionStack 
                     marginTop={2}

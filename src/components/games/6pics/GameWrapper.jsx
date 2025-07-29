@@ -219,7 +219,7 @@ const GameWrapper = ({ pack, setPack }) => {
       <Stack userdata='gameheader' key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} my={1}>
         
           <Stack sx={{width: '33%', height: '100%'}}>
-            <Button onClick={() => {
+            <Button sx={{width: '70%'}} onClick={() => {
               if(isDemo){
                 navTo(loc?.pathname)
               } else {
