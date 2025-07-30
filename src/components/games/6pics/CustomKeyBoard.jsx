@@ -1,5 +1,5 @@
 import { Box, Button, Stack } from '@mui/material'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import IDontKnowSvg from './IDontKnowSvg'
 import { motion, AnimatePresence } from 'framer-motion'
 
@@ -50,7 +50,7 @@ const Key = ({d, v, w, children, setKeyboardInput, color, disabled, keyCount}) =
 
 }
 
-const CustomKeyBoard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp, showGiveUp, isPlaying, levelScore, maxScore, levelId}) => {
+const CustomKeyBoard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp, showGiveUp, isPlaying, levelScore, maxScore, levelId, setKeyboard}) => {
   const [topRow, setTopRow] = useState([]);
   const [midRow, setMidRow] = useState([]);
   const [botRow, setBotRow] = useState([]);
@@ -58,6 +58,14 @@ const CustomKeyBoard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp
   const [disablePlay, setDisablePlay] = useState(true)
   const [disableHint, setDisableHint] = useState(true)
   const [disableLetters, setDisableLetters] = useState(true)
+
+  const keyboardRef = useRef()
+
+  useEffect(() => {
+    if(keyboardRef?.current){
+      setKeyboard(keyboardRef)
+    }
+  }, [keyboardRef])
 
   useEffect(() =>{
 
@@ -140,7 +148,7 @@ const CustomKeyBoard = ({ setKeyboardInput, hintIndex, toggleCheckAnswer, giveUp
 
 
   return (
-    <Stack userdata="customkey" width={'98%'} height={'100%'} alignItems={'center'} justifyContent={'center'}>
+    <Stack ref={keyboardRef} userdata="customkey" width={'98%'} height={'100%'} alignItems={'center'} justifyContent={'center'}>
       <Stack alignItems="center" justifyContent="flex-end" direction="column" width="100%" height={'80%'}>
         
         <Stack direction={'row'} width={'100%'} alignItems={'center'} justifyContent={'center'}>

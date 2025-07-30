@@ -60,6 +60,8 @@ const GameWrapper = ({ pack, setPack }) => {
   const [toggleCheckAnswer, setToggleCheckAnswer] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [maxScore, setMaxScore] = useState(30)
+  const [keyBoard, setKeyboard] = useState()
+  const [keyZoom, setKeyZoom] = useState(0.75)
 
   const inGame = useGlobalStore((state) => state.inGame)
   const setInGame = useGlobalStore((state) => state.setInGame)
@@ -213,10 +215,25 @@ const GameWrapper = ({ pack, setPack }) => {
     }
   }, [levelsPlayed])
 
-  return (
-    <Stack userdata='gamewrapper' direction="column" sx={{ height: '90%', width: '100%' }} justifyContent="flex-start" alignItems="center">
 
-      <Stack userdata='gameheader' key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} my={1}>
+  useEffect(() => {
+
+    let keyWidth = keyBoard?.current?.offsetParent.offsetWidth
+    let keyHeight  = keyBoard?.current?.offsetParent.offsetHeight
+
+    if(keyWidth > width){
+      let perc = width / keyWidth * 0.9
+      setKeyZoom(perc * 0.70)
+    } else {
+      setKeyZoom(0.70)
+    }
+
+  }, [width, height, keyBoard])
+
+  return (
+    <Stack userdata='gamewrapper' direction="column" sx={{ height: '92%', width: '100svw'}} justifyContent="flex-start" alignItems="center">
+
+      <Stack userdata='gameheader' key={forceRefresh} direction={'row'} width={'100%'} justifyContent={'space-evenly'} alignItems={'center'} my={1} height={'10%'}>
         
           <Stack sx={{width: '33%', height: '100%'}}>
             <Button sx={{width: '70%'}} onClick={() => {
@@ -246,7 +263,7 @@ const GameWrapper = ({ pack, setPack }) => {
         </Box>
       </Stack>
 
-      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '70dvh'}}>
+      <Slider ref={sliderRef} {...settings} style={{width:'100%', height: '70%'}}>
         {!gameOver &&
           levels.map((level, i) => {
             return (
@@ -334,8 +351,8 @@ const GameWrapper = ({ pack, setPack }) => {
                     />
                   </Stack>
 
-                  <Stack justifyContent="center" alignItems="center" sx={{ height: '33%', width: '100%', zoom: 0.8}}>
-                    <CustomKeyBoard maxScore={maxScore} levelId={i} levelScore={levelScore} isPlaying={isPlaying} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[i]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
+                  <Stack justifyContent="center" alignItems="center" sx={{ height: '33%', width: '100%', zoom: keyZoom}}>
+                    <CustomKeyBoard setKeyboard={setKeyboard} maxScore={maxScore} levelId={i} levelScore={levelScore} isPlaying={isPlaying} showGiveUp={showGiveUp} giveUp={giveUp} setKeyboardInput={setKeyboardInput} hintIndex={levelScore[i]?.hints} toggleCheckAnswer={toggleCheckAnswer}/>
                   </Stack>
 
                 </Stack>
@@ -344,7 +361,7 @@ const GameWrapper = ({ pack, setPack }) => {
           )}
           )}
 
-        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={isDemo} score={totalScore} gamePack={pack} width={width} height={height} />}
+        {gameOver && <ResultsPage levels={levels} levelScore={levelScore} demo={isDemo} score={totalScore} gamePack={pack} width={width} height={height} maxScore={maxScore} />}
       </Slider>
         <Stack
         width={'100%'}

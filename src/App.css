@@ -27,11 +27,18 @@
 }
 
 .slick-slider .slick-track, .slick-slider .slick-list{
-  height: 70dvh !important
+  height: 70dvh !important;
 }
 
 #main > div > div.MuiStack-root.css-880y8c-MuiStack-root > div.slick-slider.slick-initialized > div > div > div.slick-slide.slick-active.slick-current > div{
   height: 70dvh !important
+}
+
+.slick-slide{
+  height: 95% !important;
+  display: flex !important ;
+  align-items: stretch !important;
+  justify-content: center !important;
 }
 
 fieldset{

@@ -12,8 +12,6 @@ const Pic6 = ({demo}) => {
   const [gamePack, setGamePack] = useState(null)
   const [packs, setPacks] = useState([])
   const [playedGames, setPlayedGames] = useState([])
-  const [loginSkipped, setLoginSkipped] = useState(false)
-  const [displayModal, setDisplayModal] = useState(false)
   const [displayPromo, setDisplayPromo] = useState(false)
   const [infoColor, setInfoColor] = useState('black')
   const [showInfo, setShowInfo] = useState(false)
@@ -26,6 +24,7 @@ const Pic6 = ({demo}) => {
   const userMeta = useGlobalStore((state) => state.userMeta) 
 
   const hasFetched = useRef(false);
+  const infoRef = useRef()
 
   const checkIfPlayed = async (pack) => {
     let { data: pack_data, error } = await supabase
@@ -57,15 +56,6 @@ const Pic6 = ({demo}) => {
     })
 
   }, [packs])
-
-  useEffect(() => {
-    const stored = localStorage.getItem('sixpics_dontShowInfo');
-    if (stored !== null) setDontShowInfo(JSON.parse(stored));
-  }, []);
-
-  useEffect(() => {
-    setShowInfo(!dontShowInfo);
-  }, [dontShowInfo]);
 
   const handleInfoClick = () => {
     setInfoColor('blue')
@@ -141,6 +131,7 @@ const Pic6 = ({demo}) => {
       <Stack width={'100%'} height={'8%'} direction={'row'}>
         <Stack width={'20%'} justifyContent={'center'} alignItems={'center'} sx={{userSelect: 'none'}} direction='row'>
           <Box
+            ref={infoRef}
             onMouseOver={() => setInfoColor('white')}
             onMouseOut={() => setInfoColor('black')}
             onClick={() => handleInfoClick()}
@@ -207,16 +198,16 @@ const Pic6 = ({demo}) => {
           <Typography fontFamily={'fredoka regular'} fontSize={30} >6 Pics</Typography>
         </Stack>
         <Stack title='rightspacer' width={'2%'} justifyContent={'center'} alignItems={'center'} >
-          <Select sx={{zoom: 0.7}} value={packType} onChange={(e) => {
+          {!gamePack && <Select sx={{zoom: 0.7}} value={packType} onChange={(e) => {
             setPackType(e.target.value)
             }}>
             <MenuItem value={'standard'}>Standard Packs</MenuItem>
             <MenuItem value={'promo'}>Promo Packs</MenuItem>
-          </Select>
+          </Select>}
         </Stack>
       </Stack>
 
-          <DropStack showInfo={showInfo} setShowInfo={setShowInfo}>
+          <DropStack showInfo={showInfo} setShowInfo={setShowInfo} top={infoRef?.current?.offsetTop + infoRef?.current?.offsetHeight} storageKey={'sixpics_dontShowInfo'}>
               <Stack bgcolor={'white'} width={'95%'} height={'100%'}>
                 <MotionStack 
                     marginTop={2}
@@ -281,17 +272,6 @@ const Pic6 = ({demo}) => {
                             </Typography>
                         </Stack>
                       </MotionStack>
-                  <Stack direction={'row'} justifyContent={'center'} alignItems={'center'}>
-                    <InputLabel>Don't show this again</InputLabel>
-                    <Checkbox 
-                    onChange={() => setDontShowInfo(prev => {
-                      const updated = !prev;
-                      localStorage.setItem('sixpics_dontShowInfo', JSON.stringify(updated));
-                      return updated;
-                    })} 
-                    checked={dontShowInfo}
-                  />
-                  </Stack>
                   </MotionStack>
               </Stack>
           </DropStack>

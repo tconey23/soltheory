@@ -121,6 +121,8 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
     return null
   }
 
+  let mountCount = 0;
+
 const HomePage = ({showBot = true}) => {
     const degrees = useGlobalStore((state) => state.degrees)
     const canvasRef = useRef()
@@ -137,6 +139,7 @@ const HomePage = ({showBot = true}) => {
     const [menuVisible, toggleMenuVisible] = useState(true)
     const [overlay, setOverlay] = useState(true)
     const allAssetsReady = groundReady && lettersReady
+
     
        useEffect(() =>{
     setTimeout(() => {

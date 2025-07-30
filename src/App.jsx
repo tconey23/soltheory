@@ -49,6 +49,8 @@ const useScreenSize = () => {
   return screenSize;
 };
 
+let mountCount = 0;
+
 function App() {
   const navTo = useNavigate()
   const setScreen = useGlobalStore((state) => state.setScreen)
@@ -171,7 +173,7 @@ const [dims, setDims] = useState(
   return (
    <Stack direction={'column'} height={'100svh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
 
-    <Stack flex="0 0 10%" width="100%">
+    <Stack flex="0 0 10svh" width="100%">
       <AppHeader />
     </Stack>
     <Stack flex="1" width="100%" id="main" height={'80svh'} justifyContent={'flex-start'} alignItems={'center'}>
@@ -279,7 +281,7 @@ const [dims, setDims] = useState(
 
     
       {!inGame && 
-      <Stack flex="0 0 7%" width="100%">
+      <Stack flex="0 0 10svh" width="100%">
         <AdSpace />
       </Stack> }
 

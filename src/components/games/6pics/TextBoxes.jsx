@@ -120,18 +120,20 @@ useEffect(() =>{
 }, [keyboardInput])
 
   useEffect(() => {
+    // console.log(autoAnswer)
     if (autoAnswer){
       setIsWin(true)
     };
   }, [autoAnswer, answer, inputLetters]);
 
   useEffect(() =>{
-    if(isDemo){
-      setAutoAnswer(false)
-    }
+    // if(isDemo){
+    //   setAutoAnswer(false)
+    // }
   }, [isDemo])
 
   useEffect(() => {
+    // console.log(isWin)
     if (isWin) {
       setWins(prev => prev + 1);
     }
@@ -442,7 +444,7 @@ useEffect(() => {
         alignItems="center"
         alignContent={'flex-start'}
         id="letter_wrapper"
-        height={'100%'}
+        height={'auto'}
         overflow="auto"
         sx={{
           gap: 1,

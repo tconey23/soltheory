@@ -10,7 +10,7 @@ import useGlobalStore from "../../../business/useGlobalStore";
 import { motion } from 'framer-motion'
 import { Helmet } from "react-helmet";
 
-  const ResultsPage = ({score, gamePack, demo=true, levels, levelScore}) => {
+  const ResultsPage = ({score, gamePack, demo=true, levels, levelScore, maxScore}) => {
     const [shotCount, setShotCount] = useState(0)
     const nav = useNavigate()
     const user = useGlobalStore((state) => state.user)
@@ -24,6 +24,7 @@ import { Helmet } from "react-helmet";
   
     useEffect(() => {
       setShotCount(0)
+      console.log(levels)
     }, [])
 
     useEffect(() => {
@@ -120,9 +121,11 @@ import { Helmet } from "react-helmet";
         url: `https://soltheory.com/avett`
       })
     }
+
+    
   
     return (
-      <Stack width={'100%'} height={'70dvh'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
+      <Stack width={'100%'} height={'100%'} justifyContent={'center'} alignItems={'center'} overflow={'auto'}>
       <Helmet>
         <title>6 Pics – Avett Bros Demo</title>
         <link rel="icon" type="image/png" href="https://soltheory.com/AvettBros.png" />
@@ -147,7 +150,7 @@ import { Helmet } from "react-helmet";
                 </video>
               </Stack>
               <Typography fontSize={25}>Your Score</Typography>
-              <Typography fontSize={35}>{`${score} / ${gamePack?.videos?.length *100}`}</Typography>
+              <Typography fontSize={35}>{`${score} / ${levels?.length * maxScore}`}</Typography>
               <Stack>
                 <List>
                   {

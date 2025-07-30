@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, Button, Input, InputLabel, MenuItem, Select, Stack, Typography, Box } from '@mui/material';
 import useGlobalStore from '../../../business/useGlobalStore';
 import Hexagon from '../Hexagon';
@@ -17,6 +17,8 @@ const Home = ({ onPlay, payload }) => {
     const [clicked, setClicked] = useState(1)
     const [showInfo, setShowInfo] = useState(false)
     const [infoColor, setInfoColor] = useState()
+
+    const infoRef = useRef(null)
 
     const loc = useLocation()
 
@@ -40,6 +42,7 @@ const Home = ({ onPlay, payload }) => {
       <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 1 : 1 }}>
         <Stack height={'5%'} width={'100%'} direction={'row'}>
           <Box
+            ref={infoRef}
             onMouseOver={() => setInfoColor('white')}
             onMouseOut={() => setInfoColor('black')}
             onClick={() => {
@@ -152,12 +155,11 @@ const Home = ({ onPlay, payload }) => {
           <MyGames displayGame={'twentyonethings'}/>
         </Stack>
 
-        <DropStack showInfo={showInfo} setShowInfo={setShowInfo}>
+        <DropStack showInfo={showInfo} setShowInfo={setShowInfo} storageKey={'21things_dontShowInfo'} top={infoRef?.current?.offsetTop + infoRef?.current?.offsetHeight}>
                 <Stack bgcolor={'white'} width={'95%'} height={'90%'}>
                   <MotionStack 
                     marginTop={2}
                     alignItems={'center'}
-                    height={'30%'}
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 2, delay: 0.5 }}

@@ -6,6 +6,7 @@ const Info = () => {
   return (
     <Stack height={'90%'} width={'100%'} alignItems={'center'} justifyContent={'flex-start'}>
         
+        <Stack alignItems={'center'}>
         <Typography fontFamily={'fredoka regular'} fontSize={25}>
             Welcome to 21 Things!
         </Typography>
@@ -14,11 +15,10 @@ const Info = () => {
             A SOL Theory game
         </Typography>
 
-        <Stack>
           <Hexagon dims={100}/>
         </Stack>
 
-        <Stack width={'90%'} height={'100%'} minHeight={'54dvh'} overflow={'auto'}>
+        <Stack width={'90%'} height={'76%'} overflow={'auto'}>
             <Stack my={2} height={'20%'}>
                 <Typography fontFamily={'fredoka regular'} fontSize={18}>
                     21 Things Is A Daily Game of Discovery, Joy, and Reflection
