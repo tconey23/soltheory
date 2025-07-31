@@ -133,7 +133,6 @@ useEffect(() =>{
   }, [isDemo])
 
   useEffect(() => {
-    // console.log(isWin)
     if (isWin) {
       setWins(prev => prev + 1);
     }
@@ -436,7 +435,7 @@ useEffect(() => {
   let cleanedIndex = 0;
 
   return (
-    <Stack userdata='textbox' direction="column" width="95%" height={'100%'} justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}}>
+    <Stack userdata='textbox' direction="column" width="95%" height={'100%'} justifyContent="center" alignItems={'center'} sx={{zoom: 0.85}} marginBottom={4}>
       <Stack 
         direction="row"
         flexWrap="wrap"

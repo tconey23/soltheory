@@ -106,17 +106,16 @@ const StaticCamera = ({ initialAnimation, setInitialAnimation, allAssetsReady, a
       }
     }, [startPosition, camera, animate])
   
-    // Animate camera toward target each frame
-    useFrame(() => {
-      if(allAssetsReady && !start){setStart(true)}
-      if(targetPosition){
-        camera.position.lerp(new THREE.Vector3(...targetPosition), 0.009)
-        camera.lookAt(new THREE.Vector3(...lookAt))
-      }
-      if(camera.position.x < -2.98 && !initialAnimation){
-        setInitialAnimation(true)
-      }
-    }, [targetPosition, screen])
+    // useFrame(() => {
+    //   if(allAssetsReady && !start){setStart(true)}
+    //   if(targetPosition){
+    //     camera.position.lerp(new THREE.Vector3(...targetPosition), 0.009)
+    //     camera.lookAt(new THREE.Vector3(...lookAt))
+    //   }
+    //   if(camera.position.x < -2.98 && !initialAnimation){
+    //     setInitialAnimation(true)
+    //   }
+    // }, [targetPosition, screen])
   
     return null
   }
@@ -151,7 +150,7 @@ const HomePage = ({showBot = true}) => {
       if(initialAnimation){
         setAnimate(false)
       } else {
-        setAnimate(true)
+        setAnimate(false)
       }
     },[initialAnimation])
 
