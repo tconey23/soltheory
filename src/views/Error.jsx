@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react';
-import { Stack, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const MotionStack = motion(Stack)
 
 const Error = () => {
     const loc = useLocation()
+    const navTo = useNavigate()
+
   return (
-    <Stack direction={'column'} width={'100%'} height={'100%'} sx={{bgcolor: '#f4f6f8',}}>
+    <Stack direction={'column'} width={'100%'} height={'100%'} sx={{bgcolor: '#f4f6f8',}} justifyContent={'center'}>
       <Typography fontFamily={'fredoka regular'} sx={{bgcolor: '#f4f6f8',}}>Whoops!</Typography>
       <Typography fontFamily={'fredoka regular'} sx={{bgcolor: '#f4f6f8',}}>This page doesn't exist</Typography>
       
@@ -21,6 +24,9 @@ const Error = () => {
         src='/soltheorygrayscale.png'
         />
       <Typography fontFamily={'fredoka regular'} fontSize={20} sx={{bgcolor: '#f4f6f8',}}>Don't worry, this happens sometimes.</Typography>
+      <Stack>
+        <Button onClick={() => navTo('/home')}>Home</Button>
+      </Stack>
       </MotionStack>
     </Stack>
   );

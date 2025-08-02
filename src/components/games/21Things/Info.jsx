@@ -18,7 +18,7 @@ const Info = () => {
           <Hexagon dims={100}/>
         </Stack>
 
-        <Stack width={'90%'} height={'76%'} overflow={'auto'}>
+        <Stack width={'90%'} height={'54%'} overflow={'auto'}>
             <Stack my={2} height={'20%'}>
                 <Typography fontFamily={'fredoka regular'} fontSize={18}>
                     21 Things Is A Daily Game of Discovery, Joy, and Reflection

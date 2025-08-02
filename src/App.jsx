@@ -18,6 +18,7 @@ import FadeStack from './ui_elements/FadeStack';
 import LoadingAnimation from './ui_elements/LoadingAnimation';
 import Password from './components/Password';
 import Wavetuner from './components/games/WaveTuner/Wavetuner';
+import AddPrompts from './components/games/6pics/admin/AddPrompts';
 
 const SixPics = lazy(() => import('./components/games/6pics/Pic6'))
 const TwentyOneThings = lazy (() => import('./components/games/21Things/TwentyOneThings'))
@@ -273,7 +274,16 @@ const [dims, setDims] = useState(
                 <SolMates />
               </PrivateRoute>
             } 
-            />
+          />
+
+          <Route 
+            path={"/21things/addprompts"}
+            element={
+              <PrivateRoute userData={userMeta}>
+                <AddPrompts />
+              </PrivateRoute>
+            } 
+          />
 
         </Routes>
         </Suspense>

@@ -31,7 +31,7 @@ const AdminControls = () => {
 
     useEffect(() => {
           switch(selectedOption){
-              case '21things_prompts': setAccountObj(<AddPrompts />);
+              case '21things_prompts': navTo('/21things/addprompts');
               break;
               case '6pics_packs': setAccountObj(<SPAdminPacks setSelectedOption={setSelectedOption}/>);
               break;
