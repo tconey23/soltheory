@@ -121,65 +121,66 @@ const AddPrompts = () => {
     };
   
     return (
-      <Stack alignItems='center' height={'70svh'} width={'98%'} style={{zoom: 0.75}}>
-        <Typography variant='h6' color='white'>Add Prompts</Typography>
-            <Stack width={'98%'} height={'100%'} marginY={3} >
+      <Stack userdata='addprompts' justifyContent={'flex-start'} alignItems='center' height={'70svh'} width={'98%'} style={{zoom: 0.75}} overflowY={'hidden'}>
+            
+            <Stack width={'98%'} height={'100%'} marginY={2} paddingY={2} alignItems={'center'} justifyContent={'flex-start'}>
+              <Typography variant='h6' color='black'>Add Prompts</Typography>
+              
               <Stack height={'50%'} marginY={1} bgcolor={'white'} width={'98%'} padding={2} alignItems={'center'} borderRadius={2}>
-              <PromptCalendar setDate={setDate}/>
-        
-              <TextField
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                label="Author"
-                sx={{ marginTop: 1, width: '50%'}}
+                <PromptCalendar setDate={setDate}/>
+
+                <TextField
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                  label="Author"
+                  sx={{ marginTop: 1, width: '50%'}}
                 />
+              </Stack>
+
+              <Stack bgcolor={'white'} width={'98%'} height={'50%'} padding={2} alignItems={'center'} borderRadius={2}>
+                  <Typography fontWeight={'bolder'}>{!toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Typography>
+                  <Switch checked={!toggleMulti} onChange={() => setToggleMulti(prev => !prev)}/>              
+                  <Typography marginTop={2} marginBottom={-4}>{`Prompt count ${promptCount}`}</Typography>
+
+                  {toggleMulti ? (
+                    <Stack marginY={1}>
+                      <input type="file" accept=".csv" onChange={handleFileUpload} />
+                    </Stack>
+                  ) : (
+                    <Stack direction={'row'} justifyContent={'center'} marginTop={2}>
+                      <TextField
+                        value={newPrompt}
+                        onChange={(e) => setNewPrompt(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e.key)}
+                        label="New Prompt"
+                        sx={{ marginTop: 2, marginLeft: 3}}
+                        />
+                      <Button sx={{marginX: 3, marginY: 3, color: 'white'}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
+                    </Stack>
+                  )}
+              </Stack>
+
+              <Stack height={'85%'} width='100%' overflowY={'scroll'}>
+                <List sx={{ width: screen === 'xs' ? '98%' : '75%', overflowY: 'auto', justifySelf: 'center', boxShadow: 'inset 0px 0px 13px 1px #00000021'}}>
+                  {(toggleMulti ? data : prompts).map((item, i) => (
+                    <EditablePromptItem
+                    key={i}
+                    index={i}
+                    value={item}
+                    type={toggleMulti ? 'data' : 'prompts'}
+                    onDelete={handleDelete}
+                    onSave={handleSaveEdit}
+                    isMobile={!!screen === 'xs'}
+                    />
+                  ))}
+                </List>
+              <Stack direction={'row'} height={'10%'} width={'100%'} alignItems={'center'} justifyContent={'center'}>
+                <Button onClick={() => handleClear()}>Clear</Button>
+                <Button onClick={() => nav('/account')}>Back</Button>
+                {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
+              </Stack>
+              </Stack> 
             </Stack>
-                <Stack bgcolor={'white'} width={'98%'} height={'100%'} padding={2} alignItems={'center'} borderRadius={2}>
-
-                <Typography fontWeight={'bolder'}>{!toggleMulti ? 'Single Prompt' : 'Upload CSV'}</Typography>
-                <Switch checked={!toggleMulti} onChange={() => setToggleMulti(prev => !prev)}/>              
-                <Typography marginTop={2} marginBottom={-4}>{`Prompt count ${promptCount}`}</Typography>
-
-                {toggleMulti ? (
-                  <Stack marginY={1}>
-                    <input type="file" accept=".csv" onChange={handleFileUpload} />
-                  </Stack>
-                ) : (
-                  <Stack direction={'row'} justifyContent={'center'} marginTop={2}>
-                    <TextField
-                      value={newPrompt}
-                      onChange={(e) => setNewPrompt(e.target.value)}
-                      onKeyDown={(e) => handleKeyDown(e.key)}
-                      label="New Prompt"
-                      sx={{ marginTop: 2, marginLeft: 3}}
-                      />
-                    <Button sx={{marginX: 3, marginY: 3, color: 'white'}} onClick={handleAddPrompt} disabled={!newPrompt}>Add</Button>
-                  </Stack>
-                )}
-                </Stack>
-
-          <Stack height={'1000px'} width='100%' overflowY={'scroll'}>
-            <List sx={{ width: screen === 'xs' ? '98%' : '75%', overflowY: 'auto', justifySelf: 'center', boxShadow: 'inset 0px 0px 13px 1px #00000021'}}>
-              {(toggleMulti ? data : prompts).map((item, i) => (
-                <EditablePromptItem
-                key={i}
-                index={i}
-                value={item}
-                type={toggleMulti ? 'data' : 'prompts'}
-                onDelete={handleDelete}
-                onSave={handleSaveEdit}
-                isMobile={!!screen === 'xs'}
-                />
-              ))}
-            </List>
-          </Stack> 
-          <Stack direction={'row'} width={'25%'} justifyContent={'space-evenly'}>
-            <Button onClick={() => handleClear()}>Clear</Button>
-            <Button onClick={() => nav('/account')}>Back</Button>
-            {readyToSubmit && <Button onClick={handlePost}>Upload</Button>}
-          </Stack>
-        </Stack>
-
       </Stack>
     );
   };

@@ -17,6 +17,42 @@ const Home = ({ onPlay, payload }) => {
     const [clicked, setClicked] = useState(1)
     const [showInfo, setShowInfo] = useState(false)
     const [infoColor, setInfoColor] = useState()
+    const [selectedPPT, setSelectedPPT] = useState(null)
+    const [select2, setSelect2] = useState([])
+    const [person, setPerson] = useState(null)
+    const [place, setPlace] = useState(null)
+    const [thing, setThing] = useState(null)
+
+    const people = [
+      {name: 'Steve Huff', val: 'stevehuff'},
+      {name: 'Gerard Jardin', val: 'gerardjardin'},
+      {name: 'Tom Coney', val: 'tomconey'}
+    ]
+
+    const places = [
+      {name: 'Denver', val: 'denver'},
+      {name: 'Chicago', val: 'chicago'},
+      {name: 'Coney Island', val: 'coneyisland'}
+    ]
+
+    const things = [
+      {name: 'Apple pie', val: 'applepie'},
+      {name: 'Black Metal', val: 'blackmetal'},
+      {name: 'One million Dollars', val: 'onemilliondollars'},
+    ]
+
+    useEffect(() => {
+
+      if(selectedPPT === 'people'){
+        setSelect2(people)
+      } else if(selectedPPT === 'places'){
+        setSelect2(places)
+      } else if (selectedPPT === 'things'){
+        setSelect2(things)
+      } else {
+        setSelect2([])
+      }
+    }, [selectedPPT])
 
     const infoRef = useRef(null)
 
@@ -40,7 +76,7 @@ const Home = ({ onPlay, payload }) => {
   
     return (
       <Stack alignItems="center" height="100%" width="100%" sx={{ scale: screen ? 1 : 1 }}>
-        <Stack height={'5%'} width={'100%'} direction={'row'}>
+        <Stack height={'10%'} width={'100%'} direction={'row'} justifyContent={'space-evenly'} alignItems={'center'}>
           <Box
             ref={infoRef}
             onMouseOver={() => setInfoColor('white')}
@@ -106,6 +142,46 @@ const Home = ({ onPlay, payload }) => {
               }}
               className="fi fi-rr-share" 
             />
+          </Box>
+          <Box
+          sx={{
+              width: 'fit-content',
+              height: 'auto',
+              display: 'flex',
+              padding: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent', 
+              '&:focus': { outline: 'none' },
+            }}>
+            <Select value={selectedPPT} onChange={(e) => setSelectedPPT(e.target.value)}>
+              <MenuItem value={null}>Select option</MenuItem>
+              <MenuItem value={'people'}>People</MenuItem>
+              <MenuItem value={'places'}>Places</MenuItem>
+              <MenuItem value={'things'}>Things</MenuItem>
+            </Select>
+          </Box>
+          <Box
+          sx={{
+              width: 'fit-content',
+              height: 'auto',
+              display: 'flex',
+              padding: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+              outline: 'none',
+              WebkitTapHighlightColor: 'transparent', 
+              '&:focus': { outline: 'none' },
+            }}
+          >
+            <Select >
+              {select2.map((s) => {
+                return (<MenuItem value={s.val}>{s.name}</MenuItem>)
+              })}
+            </Select>
           </Box>
         </Stack>
         
