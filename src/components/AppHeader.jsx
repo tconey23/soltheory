@@ -22,7 +22,7 @@ const AppHeader = () => {
   }, [userMeta])
 
   return (
-    <Stack direction={'row'} width={'100%'} height={'100%'} bgcolor={'#372248'} alignItems={'center'} paddingY={1}>
+    <div className='header'>
       <Stack paddingX={2}>
         <Button onClick={() => setToggleMenu(true)}>
           <i className="fi fi-br-menu-dots-vertical"></i>
@@ -37,7 +37,7 @@ const AppHeader = () => {
         <Avatar src={avatar}/>  
       }
       </Stack>
-    </Stack>
+    </div>
   );
 };
 

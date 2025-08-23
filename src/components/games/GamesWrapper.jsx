@@ -3,7 +3,7 @@ import { Avatar, Badge, Button, Input, InputLabel, List, Menu, MenuItem, Select,
 import { motion, AnimatePresence } from 'framer-motion';
 import useGlobalStore from '../../business/useGlobalStore';
 import MotionStack from '../../ui_elements/MotionStack';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
 import dayjs from "dayjs"
 import customParseFormat from 'dayjs/plugin/customParseFormat'
@@ -69,6 +69,7 @@ const GamesWrapper = () => {
     const [selectedGame, setSelectedGame] = useState(null)
     const [gameObj, setGameObj] = useState()
     const [hasMounted, setHasMounted] = useState(false);
+    const loc = useLocation()
 
     const menuStyle = {
       boxShadow : '1px 1px 5px 5px #66339933', 
@@ -137,14 +138,9 @@ const GamesWrapper = () => {
 
   
     return (
-      <Stack
-        direction="column"
-        width="90%"
-        height="90%"
-        alignItems="center"
-        justifyContent="flex-start"
-        bgcolor={'#ffffffbd'}
-        borderRadius={5}
+      <div
+        className='gamesWrapper'
+        style={{height: loc.pathname === '/home' ? '90%' : '100%'}}
       >
         <MotionText
           paddingY={2}
@@ -256,7 +252,7 @@ const GamesWrapper = () => {
             </List>
           </Stack>
         </MotionStack>
-      </Stack>
+      </div>
     );
 };
 

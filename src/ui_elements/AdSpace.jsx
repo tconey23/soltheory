@@ -19,7 +19,7 @@ const AdSpace = () => {
   }, [screen])
 
 
-  const mobileAds = [
+  const adImgs = [
     {
       name: isMobile ? 'personos_mobile' : 'personos_desktop',
       type: isMobile ? 'mobile' : 'desktop',
@@ -46,7 +46,7 @@ const AdSpace = () => {
       image: isMobile ? '/crochetlife_banner.png' : '/crochetlife_banner.png',
       url: 'https://www.andreasnlp.com/trainings/metaphors-of-movement/l1/',
       dims: {
-        width: isMobile ? '100%' : '728px', 
+        width: isMobile ? '100%' : '100%', 
         height: isMobile ? '60px' : '169px'
       }
     }
@@ -54,46 +54,34 @@ const AdSpace = () => {
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setAdIndex((prev) => (prev + 1) % mobileAds.length); 
+      setAdIndex((prev) => (prev + 1) % adImgs.length); 
     }, 8000);
 
     return () => clearTimeout(timeout);
   }, [adIndex]);
 
   return (
-    <Stack
-      sx={{ cursor: 'pointer', zIndex: 100 }}
-      height="100%"
-      width="100%"
-      overflow="hidden"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <AnimatePresence mode="wait">
+    <div className='adSpace'>
+      <AnimatePresence >
         <motion.div
-          key={mobileAds[adIndex].name + adIndex}
+          key={adImgs[adIndex].name + adIndex}
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 50, opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 1 }}
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             width: '100%',
             height: '100%',
+            position: 'absolute'
           }}
         >
-          <Link to={mobileAds[adIndex].url} target="_blank" rel="noopener noreferrer" style={{maxHeight: '100%', display:'flex', alignItems: 'flex-start'}}>
-            <img
-              src={mobileAds[adIndex].image}
-              alt={mobileAds[adIndex].name}
-              style={{ width: mobileAds[adIndex]?.dims?.width, height: '100%'}}
-            />
-          </Link>
+          <img src={adImgs[adIndex].image} width='100%' height='auto'/>
         </motion.div>
       </AnimatePresence>
-    </Stack>
+    </div>
   );
 };
 

@@ -22,6 +22,65 @@
   letter-spacing: 3px;
 }
 
+footer{
+  height: 10%;
+  width: 100%;
+  background-color: white;
+  display: flex;
+}
+
+.adSpace {
+    height: 100%;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    z-index: 10000;
+    position: relative;
+  }
+
+header{
+  background-color: #372248;
+  height: 10%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  && .header{
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 5px
+  }
+}
+
+.appContainer{
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  width: 100svw;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.gamesWrapper{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 90%;
+  background-color: white;
+  border-radius: 30px;
+}
+
+.appContent{
+  display: flex;
+  height: 80%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+}
+
 #main > div > div.MuiStack-root.css-1g0204k-MuiStack-root > div.slick-slider.slick-initialized > div > div > div.slick-slide.slick-active.slick-current > div {
   height: 100%
 }

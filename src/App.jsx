@@ -69,6 +69,7 @@ function App() {
   const {screenSize} = useBreakpoints()
   const [appReady, setAppReady] = useState(false)
   const [redirect, setRedirect] = useState(false)
+  const [displayAds, setDisplayAds] = useState(false)
 
   // const height = useWindowHeight() 
 
@@ -172,12 +173,12 @@ const [dims, setDims] = useState(
   
 
   return (
-   <Stack direction={'column'} height={'100svh'} width={'100dvw'} justifyContent={'flex-start'} alignItems={'center'}>
-
-    <Stack flex="0 0 10svh" width="100%">
+   <div className='appContainer'>
+    <header>
       <AppHeader />
-    </Stack>
-    <Stack flex="1" width="100%" id="main" height={'80svh'} justifyContent={'flex-start'} alignItems={'center'}>
+    </header>
+
+    <section className='appContent'>
       <Suspense fallback={
         <FadeStack initial={{opacity: 1}} animate={{opacity: 0}} exit={{opacity: 0}} transition={{duration: 1.5, delay: 1.5}}>
           <Stack width={'100%'} height={'100%'} bgcolor={'black'} position={'absolute'} justifyContent={'center'} sx={{top: 0, left: 0}}>
@@ -287,19 +288,16 @@ const [dims, setDims] = useState(
 
         </Routes>
         </Suspense>
-      </Stack>
+      </section>
 
     
-      {!inGame && 
-      <Stack flex="0 0 10svh" width="100%">
+      <footer>
         <AdSpace />
-      </Stack> }
+      </footer>
 
     <UserAlert />
     {appReady && <Modals needsLogin={false}/>}
-
-
-   </Stack>
+   </div>
   )
 }
 

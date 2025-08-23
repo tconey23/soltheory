@@ -281,7 +281,7 @@ const Pic6 = ({demo}) => {
       :
         <Stack width={'75%'} height={'100%'} alignItems={'center'} sx={{overflowY: 'auto', zoom: 0.9}}> 
           <Typography fontFamily={'Fredoka regular'} fontSize={20}>Select Game Pack</Typography>
-          <MenuList sx={{width: '100%', height: '100%'}}>
+          <MenuList sx={{width: '100%', height: '100%', marginBottom: 10}}>
             {packs?.filter((p) => !p.marked_for_delete)
 
             .map((p, i) => { 

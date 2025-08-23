@@ -68,7 +68,8 @@ const Account = () => {
         overflow={'auto'}
     >
       <Stack width={'90%'} height={'80%'} overflow={'auto'} marginTop={5} alignItems="center"
-      justifyContent="flex-start">
+      justifyContent="flex-start"
+      >
 
       <MotionText
         paddingY={2}
